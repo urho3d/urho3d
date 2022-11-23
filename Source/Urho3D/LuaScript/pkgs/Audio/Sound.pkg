@@ -5,7 +5,7 @@ class Sound : public ResourceWithMetadata
 {
     Sound();
     ~Sound();
-    
+
     bool LoadRaw(Deserializer& source);
     bool LoadWav(Deserializer& source);
     bool LoadOggVorbis(Deserializer& source);

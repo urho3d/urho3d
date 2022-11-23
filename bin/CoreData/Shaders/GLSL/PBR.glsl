@@ -10,9 +10,9 @@
 
     vec3 SphereLight(vec3 worldPos, vec3 lightVec, vec3 normal, vec3 toCamera, float roughness, vec3 specColor, vec3 diffColor, out float ndl)
     {
-        float specEnergy = 1.0f;
+        float specEnergy = 1.0;
 
-        float radius = cLightRad / 100;
+        float radius = cLightRad / 100.0;
         float rough2 = max(roughness, 0.08);
         rough2 *= rough2;
 
@@ -27,15 +27,15 @@
         if(ndl < sinAlpha)
         {
             ndl = max(ndl, -sinAlpha);
-            ndl = ((sinAlpha + ndl) * (sinAlpha + ndl)) / (4 * sinAlpha);
+            ndl = ((sinAlpha + ndl) * (sinAlpha + ndl)) / (4.0 * sinAlpha);
         }
 
         float sphereAngle = clamp(radius * invDistToLight, 0.0, 1.0);
-                            
-        specEnergy = rough2 / (rough2 + 0.5f * sphereAngle);
-        specEnergy *= specEnergy;                           
 
-        vec3 R = 2 * dot(toCamera, normal) * normal - toCamera;
+        specEnergy = rough2 / (rough2 + 0.5f * sphereAngle);
+        specEnergy *= specEnergy;
+
+        vec3 R = 2.0 * dot(toCamera, normal) * normal - toCamera;
         R = GetSpecularDominantDir(normal, R, roughness);
 
         // Find closest point on sphere to ray
@@ -63,11 +63,11 @@
 
     vec3 TubeLight(vec3 worldPos, vec3 lightVec, vec3 normal, vec3 toCamera, float roughness, vec3 specColor, vec3 diffColor, out float ndl)
     {
-        float radius      = cLightRad / 100;
-        float len         = cLightLength / 10; 
+        float radius      = cLightRad / 100.0;
+        float len         = cLightLength / 10.0;
         vec3 pos         = (cLightPosPS.xyz - worldPos);
         vec3 reflectVec  = reflect(-toCamera, normal);
-        
+
         vec3 L01 = cLightDirPS * len;
         vec3 L0 = pos - 0.5 * L01;
         vec3 L1 = pos + 0.5 * L01;
@@ -78,13 +78,13 @@
 
         float NoL0      = dot( L0, normal ) / ( 2.0 * distL0 );
         float NoL1      = dot( L1, normal ) / ( 2.0 * distL1 );
-        ndl             = ( 2.0 * clamp( NoL0 + NoL1, 0.0, 1.0 ) ) 
+        ndl             = ( 2.0 * clamp( NoL0 + NoL1, 0.0, 1.0 ) )
                         / ( distL0 * distL1 + dot( L0, L1 ) + 2.0 );
-    
+
         float a = len * len;
         float b = dot( reflectVec, L01 );
         float t = clamp( dot( L0, b * reflectVec - L01 ) / (a - b*b), 0.0, 1.0 );
-        
+
         vec3 closestPoint   = L0 + ld * clamp(t, 0.0, 1.0);
         vec3 centreToRay    = dot( closestPoint, reflectVec ) * reflectVec - closestPoint;
         closestPoint          = closestPoint + centreToRay * clamp(radius / length(centreToRay), 0.0, 1.0);

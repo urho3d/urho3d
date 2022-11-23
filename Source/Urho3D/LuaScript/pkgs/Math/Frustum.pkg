@@ -27,14 +27,14 @@ class Frustum
     void DefineSplit(const Matrix4& projection, float near, float far);
     void Transform(const Matrix3& transform);
     void Transform(const Matrix3x4& transform);
-    
+
     Intersection IsInside(const Vector3& point) const;
     Intersection IsInside(const Sphere& sphere) const;
     Intersection IsInsideFast(const Sphere& sphere) const;
     Intersection IsInside(const BoundingBox& box) const;
     Intersection IsInsideFast(const BoundingBox& box) const;
     float Distance(const Vector3& point) const;
-    
+
     Frustum Transformed(const Matrix3& transform) const;
     Frustum Transformed(const Matrix3x4& transform) const;
     Rect Projected(const Matrix4& transform) const;

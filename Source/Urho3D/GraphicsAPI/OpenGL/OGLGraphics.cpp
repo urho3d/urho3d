@@ -386,6 +386,7 @@ bool Graphics::SetScreenMode_OGL(int width, int height, const ScreenModeParams& 
 #endif
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 #endif
+
         SDL_Rect display_rect;
         SDL_GetDisplayBounds(newParams.monitor_, &display_rect);
         reposition = newParams.fullscreen_ || (newParams.borderless_ && width >= display_rect.w && height >= display_rect.h);

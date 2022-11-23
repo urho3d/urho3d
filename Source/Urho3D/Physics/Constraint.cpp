@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -37,6 +18,8 @@
 #include <Bullet/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h>
 #include <Bullet/BulletDynamics/ConstraintSolver/btSliderConstraint.h>
 #include <Bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
+
+using namespace std;
 
 namespace Urho3D
 {
@@ -129,7 +112,7 @@ void Constraint::OnSetEnabled()
         constraint_->setEnabled(IsEnabledEffective());
 }
 
-void Constraint::GetDependencyNodes(PODVector<Node*>& dest)
+void Constraint::GetDependencyNodes(Vector<Node*>& dest)
 {
     if (otherBody_ && otherBody_->GetNode())
         dest.Push(otherBody_->GetNode());
@@ -141,7 +124,7 @@ void Constraint::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     {
         physicsWorld_->SetDebugRenderer(debug);
         physicsWorld_->SetDebugDepthTest(depthTest);
-        physicsWorld_->GetWorld()->debugDrawConstraint(constraint_.Get());
+        physicsWorld_->GetWorld()->debugDrawConstraint(constraint_.get());
         physicsWorld_->SetDebugRenderer(nullptr);
     }
 }
@@ -354,9 +337,9 @@ void Constraint::ReleaseConstraint()
             otherBody_->RemoveConstraint(this);
 
         if (physicsWorld_)
-            physicsWorld_->GetWorld()->removeConstraint(constraint_.Get());
+            physicsWorld_->GetWorld()->removeConstraint(constraint_.get());
 
-        constraint_.Reset();
+        constraint_.reset();
     }
 }
 
@@ -375,7 +358,7 @@ void Constraint::ApplyFrames()
     {
     case POINT2POINT_CONSTRAINT_TYPE:
         {
-            auto* pointConstraint = static_cast<btPoint2PointConstraint*>(constraint_.Get());
+            auto* pointConstraint = static_cast<btPoint2PointConstraint*>(constraint_.get());
             pointConstraint->setPivotA(ToBtVector3(ownBodyScaledPosition));
             pointConstraint->setPivotB(ToBtVector3(otherBodyScaledPosition));
         }
@@ -383,7 +366,7 @@ void Constraint::ApplyFrames()
 
     case HINGE_CONSTRAINT_TYPE:
         {
-            auto* hingeConstraint = static_cast<btHingeConstraint*>(constraint_.Get());
+            auto* hingeConstraint = static_cast<btHingeConstraint*>(constraint_.get());
             btTransform ownFrame(ToBtQuaternion(rotation_), ToBtVector3(ownBodyScaledPosition));
             btTransform otherFrame(ToBtQuaternion(otherRotation_), ToBtVector3(otherBodyScaledPosition));
             hingeConstraint->setFrames(ownFrame, otherFrame);
@@ -392,7 +375,7 @@ void Constraint::ApplyFrames()
 
     case SLIDER_CONSTRAINT_TYPE:
         {
-            auto* sliderConstraint = static_cast<btSliderConstraint*>(constraint_.Get());
+            auto* sliderConstraint = static_cast<btSliderConstraint*>(constraint_.get());
             btTransform ownFrame(ToBtQuaternion(rotation_), ToBtVector3(ownBodyScaledPosition));
             btTransform otherFrame(ToBtQuaternion(otherRotation_), ToBtVector3(otherBodyScaledPosition));
             sliderConstraint->setFrames(ownFrame, otherFrame);
@@ -401,7 +384,7 @@ void Constraint::ApplyFrames()
 
     case CONETWIST_CONSTRAINT_TYPE:
         {
-            auto* coneTwistConstraint = static_cast<btConeTwistConstraint*>(constraint_.Get());
+            auto* coneTwistConstraint = static_cast<btConeTwistConstraint*>(constraint_.get());
             btTransform ownFrame(ToBtQuaternion(rotation_), ToBtVector3(ownBodyScaledPosition));
             btTransform otherFrame(ToBtQuaternion(otherRotation_), ToBtVector3(otherBodyScaledPosition));
             coneTwistConstraint->setFrames(ownFrame, otherFrame);
@@ -485,7 +468,7 @@ void Constraint::CreateConstraint()
     {
     case CONSTRAINT_POINT:
         {
-            constraint_ = new btPoint2PointConstraint(*ownBody, *otherBody, ToBtVector3(ownBodyScaledPosition),
+            constraint_ = make_unique<btPoint2PointConstraint>(*ownBody, *otherBody, ToBtVector3(ownBodyScaledPosition),
                 ToBtVector3(otherBodyScaledPosition));
         }
         break;
@@ -494,7 +477,7 @@ void Constraint::CreateConstraint()
         {
             btTransform ownFrame(ToBtQuaternion(rotation_), ToBtVector3(ownBodyScaledPosition));
             btTransform otherFrame(ToBtQuaternion(otherRotation_), ToBtVector3(otherBodyScaledPosition));
-            constraint_ = new btHingeConstraint(*ownBody, *otherBody, ownFrame, otherFrame);
+            constraint_ = make_unique<btHingeConstraint>(*ownBody, *otherBody, ownFrame, otherFrame);
         }
         break;
 
@@ -502,7 +485,7 @@ void Constraint::CreateConstraint()
         {
             btTransform ownFrame(ToBtQuaternion(rotation_), ToBtVector3(ownBodyScaledPosition));
             btTransform otherFrame(ToBtQuaternion(otherRotation_), ToBtVector3(otherBodyScaledPosition));
-            constraint_ = new btSliderConstraint(*ownBody, *otherBody, ownFrame, otherFrame, false);
+            constraint_ = make_unique<btSliderConstraint>(*ownBody, *otherBody, ownFrame, otherFrame, false);
         }
         break;
 
@@ -510,7 +493,7 @@ void Constraint::CreateConstraint()
         {
             btTransform ownFrame(ToBtQuaternion(rotation_), ToBtVector3(ownBodyScaledPosition));
             btTransform otherFrame(ToBtQuaternion(otherRotation_), ToBtVector3(otherBodyScaledPosition));
-            constraint_ = new btConeTwistConstraint(*ownBody, *otherBody, ownFrame, otherFrame);
+            constraint_ = make_unique<btConeTwistConstraint>(*ownBody, *otherBody, ownFrame, otherFrame);
         }
         break;
 
@@ -528,7 +511,7 @@ void Constraint::CreateConstraint()
 
         ApplyLimits();
 
-        physicsWorld_->GetWorld()->addConstraint(constraint_.Get(), disableCollision_);
+        physicsWorld_->GetWorld()->addConstraint(constraint_.get(), disableCollision_);
     }
 
     recreateConstraint_ = false;
@@ -545,14 +528,14 @@ void Constraint::ApplyLimits()
     {
     case HINGE_CONSTRAINT_TYPE:
         {
-            auto* hingeConstraint = static_cast<btHingeConstraint*>(constraint_.Get());
+            auto* hingeConstraint = static_cast<btHingeConstraint*>(constraint_.get());
             hingeConstraint->setLimit(lowLimit_.x_ * M_DEGTORAD, highLimit_.x_ * M_DEGTORAD);
         }
         break;
 
     case SLIDER_CONSTRAINT_TYPE:
         {
-            auto* sliderConstraint = static_cast<btSliderConstraint*>(constraint_.Get());
+            auto* sliderConstraint = static_cast<btSliderConstraint*>(constraint_.get());
             sliderConstraint->setUpperLinLimit(highLimit_.x_);
             sliderConstraint->setUpperAngLimit(highLimit_.y_ * M_DEGTORAD);
             sliderConstraint->setLowerLinLimit(lowLimit_.x_);
@@ -562,7 +545,7 @@ void Constraint::ApplyLimits()
 
     case CONETWIST_CONSTRAINT_TYPE:
         {
-            auto* coneTwistConstraint = static_cast<btConeTwistConstraint*>(constraint_.Get());
+            auto* coneTwistConstraint = static_cast<btConeTwistConstraint*>(constraint_.get());
             coneTwistConstraint->setLimit(highLimit_.y_ * M_DEGTORAD, highLimit_.y_ * M_DEGTORAD, highLimit_.x_ * M_DEGTORAD);
         }
         break;

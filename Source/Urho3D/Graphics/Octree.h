@@ -1,28 +1,8 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
-#include "../Container/List.h"
 #include "../Core/Mutex.h"
 #include "../Graphics/Drawable.h"
 #include "../Graphics/OctreeQuery.h"
@@ -33,21 +13,22 @@ namespace Urho3D
 class Octree;
 
 static const int NUM_OCTANTS = 8;
-static const unsigned ROOT_INDEX = M_MAX_UNSIGNED;
+static const i32 ROOT_INDEX = NINDEX;
 
-/// %Octree octant
+/// %Octree octant.
+/// @nobind
 class URHO3D_API Octant
 {
 public:
     /// Construct.
-    Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* root, unsigned index = ROOT_INDEX);
+    Octant(const BoundingBox& box, i32 level, Octant* parent, Octree* root, i32 index = ROOT_INDEX);
     /// Destruct. Move drawables to root if available (detach if not) and free child octants.
     virtual ~Octant();
 
     /// Return or create a child octant.
-    Octant* GetOrCreateChild(unsigned index);
+    Octant* GetOrCreateChild(i32 index);
     /// Delete child octant.
-    void DeleteChild(unsigned index);
+    void DeleteChild(i32 index);
     /// Insert a drawable object by checking for fit recursively.
     void InsertDrawable(Drawable* drawable);
     /// Check if a drawable object fits.
@@ -73,13 +54,14 @@ public:
     }
 
     /// Return world-space bounding box.
+    /// @property
     const BoundingBox& GetWorldBoundingBox() const { return worldBoundingBox_; }
 
     /// Return bounding box used for fitting drawable objects.
     const BoundingBox& GetCullingBox() const { return cullingBox_; }
 
     /// Return subdivision level.
-    unsigned GetLevel() const { return level_; }
+    i32 GetLevel() const { return level_; }
 
     /// Return parent octant.
     Octant* GetParent() const { return parent_; }
@@ -88,7 +70,7 @@ public:
     Octree* GetRoot() const { return root_; }
 
     /// Return number of drawables.
-    unsigned GetNumDrawables() const { return numDrawables_; }
+    i32 GetNumDrawables() const { return numDrawables_; }
 
     /// Return true if there are no drawable objects in this octant and child octants.
     bool IsEmpty() { return numDrawables_ == 0; }
@@ -96,6 +78,7 @@ public:
     /// Reset root pointer recursively. Called when the whole octree is being destroyed.
     void ResetRoot();
     /// Draw bounds to the debug graphics recursively.
+    /// @nobind
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
 protected:
@@ -106,7 +89,7 @@ protected:
     /// Return drawable objects by a ray query, called internally.
     void GetDrawablesInternal(RayOctreeQuery& query) const;
     /// Return drawable objects only for a threaded ray query, called internally.
-    void GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*>& drawables) const;
+    void GetDrawablesOnlyInternal(RayOctreeQuery& query, Vector<Drawable*>& drawables) const;
 
     /// Increase drawable object count recursively.
     void IncDrawableCount()
@@ -137,7 +120,7 @@ protected:
     /// Bounding box used for drawable object fitting.
     BoundingBox cullingBox_;
     /// Drawable objects.
-    PODVector<Drawable*> drawables_;
+    Vector<Drawable*> drawables_;
     /// Child octants.
     Octant* children_[NUM_OCTANTS]{};
     /// World bounding box center.
@@ -145,18 +128,18 @@ protected:
     /// World bounding box half size.
     Vector3 halfSize_;
     /// Subdivision level.
-    unsigned level_;
+    i32 level_;
     /// Number of drawable objects in this octant and child octants.
-    unsigned numDrawables_{};
+    i32 numDrawables_{};
     /// Parent octant.
     Octant* parent_;
     /// Octree root.
     Octree* root_;
-    /// Octant index relative to its siblings or ROOT_INDEX for root octant
-    unsigned index_;
+    /// Octant index relative to its siblings or ROOT_INDEX for root octant.
+    i32 index_;
 };
 
-/// %Octree component. Should be added only to the root scene node
+/// %Octree component. Should be added only to the root scene node.
 class URHO3D_API Octree : public Component, public Octant
 {
     URHO3D_OBJECT(Octree, Component);
@@ -167,13 +150,14 @@ public:
     /// Destruct.
     ~Octree() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Visualize the component as debug geometry.
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set size and maximum subdivision levels. If octree is not empty, drawable objects will be temporarily moved to the root.
-    void SetSize(const BoundingBox& box, unsigned numLevels);
+    void SetSize(const BoundingBox& box, i32 numLevels);
     /// Update and reinsert drawable objects.
     void Update(const FrameInfo& frame);
     /// Add a drawable manually.
@@ -182,6 +166,7 @@ public:
     void RemoveManualDrawable(Drawable* drawable);
 
     /// Return drawable objects by a query.
+    /// @nobind
     void GetDrawables(OctreeQuery& query) const;
     /// Return drawable objects by a ray query.
     void Raycast(RayOctreeQuery& query) const;
@@ -189,7 +174,8 @@ public:
     void RaycastSingle(RayOctreeQuery& query) const;
 
     /// Return subdivision levels.
-    unsigned GetNumLevels() const { return numLevels_; }
+    /// @property
+    i32 GetNumLevels() const { return numLevels_; }
 
     /// Mark drawable object as requiring an update and a reinsertion.
     void QueueUpdate(Drawable* drawable);
@@ -205,15 +191,15 @@ private:
     void UpdateOctreeSize() { SetSize(worldBoundingBox_, numLevels_); }
 
     /// Drawable objects that require update.
-    PODVector<Drawable*> drawableUpdates_;
+    Vector<Drawable*> drawableUpdates_;
     /// Drawable objects that were inserted during threaded update phase.
-    PODVector<Drawable*> threadedDrawableUpdates_;
+    Vector<Drawable*> threadedDrawableUpdates_;
     /// Mutex for octree reinsertions.
     Mutex octreeMutex_;
     /// Ray query temporary list of drawables.
-    mutable PODVector<Drawable*> rayQueryDrawables_;
+    mutable Vector<Drawable*> rayQueryDrawables_;
     /// Subdivision level.
-    unsigned numLevels_;
+    i32 numLevels_;
 };
 
 }

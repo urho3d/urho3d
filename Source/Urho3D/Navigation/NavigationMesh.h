@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 /// \file
 
@@ -29,6 +10,8 @@
 #include "../Math/BoundingBox.h"
 #include "../Math/Matrix3x4.h"
 #include "../Scene/Component.h"
+
+#include <memory>
 
 #ifdef DT_POLYREF64
 using dtPolyRef = uint64_t;
@@ -61,7 +44,7 @@ struct NavigationGeometryInfo
     /// Component.
     Component* component_;
     /// Geometry LOD level if applicable.
-    unsigned lodLevel_;
+    i32 lodLevel_;
     /// Transform relative to the navigation mesh root node.
     Matrix3x4 transform_;
     /// Bounding box relative to the navigation mesh root node.
@@ -101,38 +84,53 @@ public:
     /// Destruct.
     ~NavigationMesh() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Visualize the component as debug geometry.
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set tile size.
+    /// @property
     void SetTileSize(int size);
     /// Set cell size.
+    /// @property
     void SetCellSize(float size);
     /// Set cell height.
+    /// @property
     void SetCellHeight(float height);
     /// Set navigation agent height.
+    /// @property
     void SetAgentHeight(float height);
     /// Set navigation agent radius.
+    /// @property
     void SetAgentRadius(float radius);
     /// Set navigation agent max vertical climb.
+    /// @property
     void SetAgentMaxClimb(float maxClimb);
     /// Set navigation agent max slope.
+    /// @property
     void SetAgentMaxSlope(float maxSlope);
     /// Set region minimum size.
+    /// @property
     void SetRegionMinSize(float size);
     /// Set region merge size.
+    /// @property
     void SetRegionMergeSize(float size);
     /// Set edge max length.
+    /// @property
     void SetEdgeMaxLength(float length);
     /// Set edge max error.
+    /// @property
     void SetEdgeMaxError(float error);
     /// Set detail sampling distance.
+    /// @property
     void SetDetailSampleDistance(float distance);
     /// Set detail sampling maximum error.
+    /// @property
     void SetDetailSampleMaxError(float error);
     /// Set padding of the navigation mesh bounding box. Having enough padding allows to add geometry on the extremities of the navigation mesh when doing partial rebuilds.
+    /// @property
     void SetPadding(const Vector3& padding);
     /// Set the cost of an area.
     void SetAreaCost(unsigned areaID, float cost);
@@ -145,9 +143,9 @@ public:
     /// Rebuild part of the navigation mesh in the rectangular area. Return true if successful.
     virtual bool Build(const IntVector2& from, const IntVector2& to);
     /// Return tile data.
-    virtual PODVector<unsigned char> GetTileData(const IntVector2& tile) const;
+    virtual Vector<unsigned char> GetTileData(const IntVector2& tile) const;
     /// Add tile to navigation mesh.
-    virtual bool AddTile(const PODVector<unsigned char>& tileData);
+    virtual bool AddTile(const Vector<unsigned char>& tileData);
     /// Remove tile from navigation mesh.
     virtual void RemoveTile(const IntVector2& tile);
     /// Remove all tiles from navigation mesh.
@@ -165,11 +163,11 @@ public:
     Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, int maxVisited = 3,
         const dtQueryFilter* filter = nullptr);
     /// Find a path between world space points. Return non-empty list of points if successful. Extents specifies how far off the navigation mesh the points can be.
-    void FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE,
+    void FindPath(Vector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE,
         const dtQueryFilter* filter = nullptr);
     /// Find a path between world space points. Return non-empty list of navigation path points if successful. Extents specifies how far off the navigation mesh the points can be.
     void FindPath
-        (PODVector<NavigationPathPoint>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE,
+        (Vector<NavigationPathPoint>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE,
             const dtQueryFilter* filter = nullptr);
     /// Return a random point on the navigation mesh.
     Vector3 GetRandomPoint(const dtQueryFilter* filter = nullptr, dtPolyRef* randomRef = nullptr);
@@ -195,83 +193,107 @@ public:
     void SetMeshName(const String& newName);
 
     /// Return tile size.
+    /// @property
     int GetTileSize() const { return tileSize_; }
 
     /// Return cell size.
+    /// @property
     float GetCellSize() const { return cellSize_; }
 
     /// Return cell height.
+    /// @property
     float GetCellHeight() const { return cellHeight_; }
 
     /// Return navigation agent height.
+    /// @property
     float GetAgentHeight() const { return agentHeight_; }
 
     /// Return navigation agent radius.
+    /// @property
     float GetAgentRadius() const { return agentRadius_; }
 
     /// Return navigation agent max vertical climb.
+    /// @property
     float GetAgentMaxClimb() const { return agentMaxClimb_; }
 
     /// Return navigation agent max slope.
+    /// @property
     float GetAgentMaxSlope() const { return agentMaxSlope_; }
 
     /// Return region minimum size.
+    /// @property
     float GetRegionMinSize() const { return regionMinSize_; }
 
     /// Return region merge size.
+    /// @property
     float GetRegionMergeSize() const { return regionMergeSize_; }
 
     /// Return edge max length.
+    /// @property
     float GetEdgeMaxLength() const { return edgeMaxLength_; }
 
     /// Return edge max error.
+    /// @property
     float GetEdgeMaxError() const { return edgeMaxError_; }
 
     /// Return detail sampling distance.
+    /// @property
     float GetDetailSampleDistance() const { return detailSampleDistance_; }
 
     /// Return detail sampling maximum error.
+    /// @property
     float GetDetailSampleMaxError() const { return detailSampleMaxError_; }
 
     /// Return navigation mesh bounding box padding.
+    /// @property
     const Vector3& GetPadding() const { return padding_; }
 
-    /// Get the current cost of an area
+    /// Get the current cost of an area.
     float GetAreaCost(unsigned areaID) const;
 
     /// Return whether has been initialized with valid navigation data.
+    /// @property
     bool IsInitialized() const { return navMesh_ != nullptr; }
 
     /// Return local space bounding box of the navigation mesh.
+    /// @property
     const BoundingBox& GetBoundingBox() const { return boundingBox_; }
 
     /// Return world space bounding box of the navigation mesh.
+    /// @property
     BoundingBox GetWorldBoundingBox() const;
 
     /// Return number of tiles.
+    /// @property
     IntVector2 GetNumTiles() const { return IntVector2(numTilesX_, numTilesZ_); }
 
     /// Set the partition type used for polygon generation.
+    /// @property
     void SetPartitionType(NavmeshPartitionType partitionType);
 
     /// Return Partition Type.
+    /// @property
     NavmeshPartitionType GetPartitionType() const { return partitionType_; }
 
     /// Set navigation data attribute.
-    virtual void SetNavigationDataAttr(const PODVector<unsigned char>& value);
+    virtual void SetNavigationDataAttr(const Vector<unsigned char>& value);
     /// Return navigation data attribute.
-    virtual PODVector<unsigned char> GetNavigationDataAttr() const;
+    virtual Vector<unsigned char> GetNavigationDataAttr() const;
 
     /// Draw debug geometry for OffMeshConnection components.
+    /// @property
     void SetDrawOffMeshConnections(bool enable) { drawOffMeshConnections_ = enable; }
 
     /// Return whether to draw OffMeshConnection components.
+    /// @property
     bool GetDrawOffMeshConnections() const { return drawOffMeshConnections_; }
 
     /// Draw debug geometry for NavArea components.
+    /// @property
     void SetDrawNavAreas(bool enable) { drawNavAreas_ = enable; }
 
     /// Return whether to draw NavArea components.
+    /// @property
     bool GetDrawNavAreas() const { return drawNavAreas_; }
 
 private:
@@ -300,14 +322,19 @@ protected:
 
     /// Identifying name for this navigation mesh.
     String meshName_;
+
     /// Detour navigation mesh.
     dtNavMesh* navMesh_;
+
     /// Detour navigation mesh query.
     dtNavMeshQuery* navMeshQuery_;
+
     /// Detour navigation mesh query filter.
-    UniquePtr<dtQueryFilter> queryFilter_;
+    std::unique_ptr<dtQueryFilter> queryFilter_;
+
     /// Temporary data for finding a path.
-    UniquePtr<FindPathData> pathData_;
+    std::unique_ptr<FindPathData> pathData_;
+
     /// Tile size.
     int tileSize_;
     /// Cell size.
@@ -350,11 +377,12 @@ protected:
     bool drawOffMeshConnections_;
     /// Debug draw NavArea components.
     bool drawNavAreas_;
-    /// NavAreas for this NavMesh
-    Vector<WeakPtr<NavArea> > areas_;
+    /// NavAreas for this NavMesh.
+    Vector<WeakPtr<NavArea>> areas_;
 };
 
 /// Register Navigation library objects.
+/// @nobind
 void URHO3D_API RegisterNavigationLibrary(Context* context);
 
 }

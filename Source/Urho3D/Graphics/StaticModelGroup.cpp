@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -30,7 +11,7 @@
 #include "../Graphics/OcclusionBuffer.h"
 #include "../Graphics/OctreeQuery.h"
 #include "../Graphics/StaticModelGroup.h"
-#include "../Graphics/VertexBuffer.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #include "../Scene/Scene.h"
 
 #include "../DebugNew.h"
@@ -103,7 +84,7 @@ void StaticModelGroup::ApplyAttributes()
     OnMarkedDirty(GetNode());
 }
 
-void StaticModelGroup::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
+void StaticModelGroup::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results)
 {
     // If no bones or no bone-level testing, use the Drawable test
     RayQueryLevel level = query.level_;
@@ -118,7 +99,7 @@ void StaticModelGroup::ProcessRayQuery(const RayOctreeQuery& query, PODVector<Ra
     if (query.ray_.HitDistance(GetWorldBoundingBox()) >= query.maxDistance_)
         return;
 
-    for (unsigned i = 0; i < numWorldTransforms_; ++i)
+    for (i32 i = 0; i < numWorldTransforms_; ++i)
     {
         // Initial test using AABB
         float distance = query.ray_.HitDistance(boundingBox_.Transformed(worldTransforms_[i]));
@@ -251,7 +232,7 @@ bool StaticModelGroup::DrawOcclusion(OcclusionBuffer* buffer)
             unsigned vertexSize;
             const unsigned char* indexData;
             unsigned indexSize;
-            const PODVector<VertexElement>* elements;
+            const Vector<VertexElement>* elements;
 
             geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
             // Check for valid geometry data
@@ -291,7 +272,7 @@ void StaticModelGroup::RemoveInstanceNode(Node* node)
         return;
 
     WeakPtr<Node> instanceWeak(node);
-    Vector<WeakPtr<Node> >::Iterator i = instanceNodes_.Find(instanceWeak);
+    Vector<WeakPtr<Node>>::Iterator i = instanceNodes_.Find(instanceWeak);
     if (i == instanceNodes_.End())
         return;
 

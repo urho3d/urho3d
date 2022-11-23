@@ -1,29 +1,10 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
-#include "../Graphics/Texture2D.h"
+#include "../GraphicsAPI/Texture2D.h"
 #include "../Resource/ResourceCache.h"
 #include "../UI/Sprite.h"
 
@@ -107,7 +88,7 @@ IntVector2 Sprite::ElementToScreen(const IntVector2& position)
     return IntVector2((int)transformedPos.x_, (int)transformedPos.y_);
 }
 
-void Sprite::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
+void Sprite::GetBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, const IntRect& currentScissor)
 {
     bool allOpaque = true;
     if (GetDerivedOpacity() < 1.0f || colors_[C_TOPLEFT].a_ < 1.0f || colors_[C_TOPRIGHT].a_ < 1.0f ||
@@ -247,6 +228,9 @@ const Matrix3x4& Sprite::GetTransform() const
             case HA_RIGHT:
                 pos.x_ += (float)parent_->GetSize().x_;
                 break;
+
+            case HA_CUSTOM:
+                break;
             }
             switch (GetVerticalAlignment())
             {
@@ -259,6 +243,9 @@ const Matrix3x4& Sprite::GetTransform() const
 
             case VA_BOTTOM:
                 pos.y_ += (float)(parent_->GetSize().y_);
+                break;
+
+            case VA_CUSTOM:
                 break;
             }
         }

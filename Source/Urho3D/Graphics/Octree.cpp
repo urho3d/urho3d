@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -48,7 +29,7 @@ static const int DEFAULT_OCTREE_LEVELS = 8;
 
 extern const char* SUBSYSTEM_CATEGORY;
 
-void UpdateDrawablesWork(const WorkItem* item, unsigned threadIndex)
+void UpdateDrawablesWork(const WorkItem* item, i32 threadIndex)
 {
     const FrameInfo& frame = *(reinterpret_cast<FrameInfo*>(item->aux_));
     auto** start = reinterpret_cast<Drawable**>(item->start_);
@@ -68,12 +49,14 @@ inline bool CompareRayQueryResults(const RayQueryResult& lhs, const RayQueryResu
     return lhs.distance_ < rhs.distance_;
 }
 
-Octant::Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* root, unsigned index) :
+Octant::Octant(const BoundingBox& box, i32 level, Octant* parent, Octree* root, i32 index/* = ROOT_INDEX*/) :
     level_(level),
     parent_(parent),
     root_(root),
     index_(index)
 {
+    assert(index >= 0 || index == ROOT_INDEX);
+    assert(level >= 0);
     Initialize(box);
 }
 
@@ -82,7 +65,7 @@ Octant::~Octant()
     if (root_)
     {
         // Remove the drawables (if any) from this octant to the root octant
-        for (PODVector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
+        for (Vector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
         {
             (*i)->SetOctant(root_);
             root_->drawables_.Push(*i);
@@ -92,12 +75,14 @@ Octant::~Octant()
         numDrawables_ = 0;
     }
 
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+    for (i32 i = 0; i < NUM_OCTANTS; ++i)
         DeleteChild(i);
 }
 
-Octant* Octant::GetOrCreateChild(unsigned index)
+Octant* Octant::GetOrCreateChild(i32 index)
 {
+    assert(index >= 0);
+
     if (children_[index])
         return children_[index];
 
@@ -124,9 +109,9 @@ Octant* Octant::GetOrCreateChild(unsigned index)
     return children_[index];
 }
 
-void Octant::DeleteChild(unsigned index)
+void Octant::DeleteChild(i32 index)
 {
-    assert(index < NUM_OCTANTS);
+    assert(index >= 0 && index < NUM_OCTANTS);
     delete children_[index];
     children_[index] = nullptr;
 }
@@ -157,9 +142,9 @@ void Octant::InsertDrawable(Drawable* drawable)
     else
     {
         Vector3 boxCenter = box.Center();
-        unsigned x = boxCenter.x_ < center_.x_ ? 0 : 1;
-        unsigned y = boxCenter.y_ < center_.y_ ? 0 : 2;
-        unsigned z = boxCenter.z_ < center_.z_ ? 0 : 4;
+        i32 x = boxCenter.x_ < center_.x_ ? 0 : 1;
+        i32 y = boxCenter.y_ < center_.y_ ? 0 : 2;
+        i32 z = boxCenter.z_ < center_.z_ ? 0 : 4;
 
         GetOrCreateChild(x + y + z)->InsertDrawable(drawable);
     }
@@ -194,7 +179,7 @@ void Octant::ResetRoot()
     root_ = nullptr;
 
     // The whole octree is being destroyed, just detach the drawables
-    for (PODVector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
+    for (Vector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
         (*i)->SetOctant(nullptr);
 
     for (auto& child : children_)
@@ -281,7 +266,7 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
     }
 }
 
-void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*>& drawables) const
+void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, Vector<Drawable*>& drawables) const
 {
     float octantDist = query.ray_.HitDistance(cullingBox_);
     if (octantDist >= query.maxDistance_)
@@ -348,17 +333,19 @@ void Octree::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     }
 }
 
-void Octree::SetSize(const BoundingBox& box, unsigned numLevels)
+void Octree::SetSize(const BoundingBox& box, i32 numLevels)
 {
+    assert(numLevels >= 0);
+
     URHO3D_PROFILE(ResizeOctree);
 
     // If drawables exist, they are temporarily moved to the root
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+    for (i32 i = 0; i < NUM_OCTANTS; ++i)
         DeleteChild(i);
 
     Initialize(box);
     numDrawables_ = drawables_.Size();
-    numLevels_ = Max(numLevels, 1U);
+    numLevels_ = Max(numLevels, 1);
 }
 
 void Octree::Update(const FrameInfo& frame)
@@ -383,16 +370,16 @@ void Octree::Update(const FrameInfo& frame)
         int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
         int drawablesPerItem = Max((int)(drawableUpdates_.Size() / numWorkItems), 1);
 
-        PODVector<Drawable*>::Iterator start = drawableUpdates_.Begin();
+        Vector<Drawable*>::Iterator start = drawableUpdates_.Begin();
         // Create a work item for each thread
         for (int i = 0; i < numWorkItems; ++i)
         {
             SharedPtr<WorkItem> item = queue->GetFreeItem();
-            item->priority_ = M_MAX_UNSIGNED;
+            item->priority_ = WI_MAX_PRIORITY;
             item->workFunction_ = UpdateDrawablesWork;
             item->aux_ = const_cast<FrameInfo*>(&frame);
 
-            PODVector<Drawable*>::Iterator end = drawableUpdates_.End();
+            Vector<Drawable*>::Iterator end = drawableUpdates_.End();
             if (i < numWorkItems - 1 && end - start > drawablesPerItem)
                 end = start + drawablesPerItem;
 
@@ -403,7 +390,7 @@ void Octree::Update(const FrameInfo& frame)
             start = end;
         }
 
-        queue->Complete(M_MAX_UNSIGNED);
+        queue->Complete(WI_MAX_PRIORITY);
         scene->EndThreadedUpdate();
     }
 
@@ -412,7 +399,7 @@ void Octree::Update(const FrameInfo& frame)
     {
         URHO3D_PROFILE(UpdateDrawablesQueuedDuringUpdate);
 
-        for (PODVector<Drawable*>::ConstIterator i = threadedDrawableUpdates_.Begin(); i != threadedDrawableUpdates_.End(); ++i)
+        for (Vector<Drawable*>::ConstIterator i = threadedDrawableUpdates_.Begin(); i != threadedDrawableUpdates_.End(); ++i)
         {
             Drawable* drawable = *i;
             if (drawable)
@@ -443,7 +430,7 @@ void Octree::Update(const FrameInfo& frame)
     {
         URHO3D_PROFILE(ReinsertToOctree);
 
-        for (PODVector<Drawable*>::Iterator i = drawableUpdates_.Begin(); i != drawableUpdates_.End(); ++i)
+        for (Vector<Drawable*>::Iterator i = drawableUpdates_.Begin(); i != drawableUpdates_.End(); ++i)
         {
             Drawable* drawable = *i;
             drawable->updateQueued_ = false;
@@ -516,7 +503,7 @@ void Octree::RaycastSingle(RayOctreeQuery& query) const
     GetDrawablesOnlyInternal(query, rayQueryDrawables_);
 
     // Sort by increasing hit distance to AABB
-    for (PODVector<Drawable*>::Iterator i = rayQueryDrawables_.Begin(); i != rayQueryDrawables_.End(); ++i)
+    for (Vector<Drawable*>::Iterator i = rayQueryDrawables_.Begin(); i != rayQueryDrawables_.End(); ++i)
     {
         Drawable* drawable = *i;
         drawable->SetSortValue(query.ray_.HitDistance(drawable->GetWorldBoundingBox()));
@@ -526,12 +513,12 @@ void Octree::RaycastSingle(RayOctreeQuery& query) const
 
     // Then do the actual test according to the query, and early-out as possible
     float closestHit = M_INFINITY;
-    for (PODVector<Drawable*>::Iterator i = rayQueryDrawables_.Begin(); i != rayQueryDrawables_.End(); ++i)
+    for (Vector<Drawable*>::Iterator i = rayQueryDrawables_.Begin(); i != rayQueryDrawables_.End(); ++i)
     {
         Drawable* drawable = *i;
         if (drawable->GetSortValue() < Min(closestHit, query.maxDistance_))
         {
-            unsigned oldSize = query.result_.Size();
+            i32 oldSize = query.result_.Size();
             drawable->ProcessRayQuery(query, query.result_);
             if (query.result_.Size() > oldSize)
                 closestHit = Min(closestHit, query.result_.Back().distance_);

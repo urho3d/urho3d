@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 /// \file
 
@@ -26,6 +7,8 @@
 
 #include "../Math/Vector3.h"
 #include "../Scene/Component.h"
+
+#include <memory>
 
 class btTypedConstraint;
 
@@ -57,6 +40,7 @@ public:
     /// Destruct.
     ~Constraint() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
@@ -64,82 +48,109 @@ public:
     /// Handle enabled/disabled state change.
     void OnSetEnabled() override;
     /// Return the depended on nodes to order network updates.
-    void GetDependencyNodes(PODVector<Node*>& dest) override;
+    void GetDependencyNodes(Vector<Node*>& dest) override;
     /// Visualize the component as debug geometry.
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set constraint type and recreate the constraint.
+    /// @property
     void SetConstraintType(ConstraintType type);
     /// Set other body to connect to. Set to null to connect to the static world.
+    /// @property
     void SetOtherBody(RigidBody* body);
     /// Set constraint position relative to own body.
+    /// @property
     void SetPosition(const Vector3& position);
     /// Set constraint rotation relative to own body.
+    /// @property
     void SetRotation(const Quaternion& rotation);
     /// Set constraint rotation relative to own body by specifying the axis.
+    /// @property
     void SetAxis(const Vector3& axis);
     /// Set constraint position relative to the other body. If connected to the static world, is a world space position.
+    /// @property
     void SetOtherPosition(const Vector3& position);
     /// Set constraint rotation relative to the other body. If connected to the static world, is a world space rotation.
+    /// @property
     void SetOtherRotation(const Quaternion& rotation);
     /// Set constraint rotation relative to the other body by specifying the axis.
+    /// @property
     void SetOtherAxis(const Vector3& axis);
     /// Set constraint world space position. Resets both own and other body relative position, ie. zeroes the constraint error.
+    /// @property
     void SetWorldPosition(const Vector3& position);
     /// Set high limit. Interpretation is constraint type specific.
+    /// @property
     void SetHighLimit(const Vector2& limit);
     /// Set low limit. Interpretation is constraint type specific.
+    /// @property
     void SetLowLimit(const Vector2& limit);
     /// Set constraint error reduction parameter. Zero = leave to default.
+    /// @property{set_erp}
     void SetERP(float erp);
     /// Set constraint force mixing parameter. Zero = leave to default.
+    /// @property{set_cfm}
     void SetCFM(float cfm);
     /// Set whether to disable collisions between connected bodies.
+    /// @property
     void SetDisableCollision(bool disable);
 
     /// Return physics world.
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
 
     /// Return Bullet constraint.
-    btTypedConstraint* GetConstraint() const { return constraint_.Get(); }
+    btTypedConstraint* GetConstraint() const { return constraint_.get(); }
 
     /// Return constraint type.
+    /// @property
     ConstraintType GetConstraintType() const { return constraintType_; }
 
     /// Return rigid body in own scene node.
+    /// @property
     RigidBody* GetOwnBody() const { return ownBody_; }
 
     /// Return the other rigid body. May be null if connected to the static world.
+    /// @property
     RigidBody* GetOtherBody() const { return otherBody_; }
 
     /// Return constraint position relative to own body.
+    /// @property
     const Vector3& GetPosition() const { return position_; }
 
     /// Return constraint rotation relative to own body.
+    /// @property
     const Quaternion& GetRotation() const { return rotation_; }
 
     /// Return constraint position relative to other body.
+    /// @property
     const Vector3& GetOtherPosition() const { return otherPosition_; }
 
     /// Return constraint rotation relative to other body.
+    /// @property
     const Quaternion& GetOtherRotation() const { return otherRotation_; }
 
     /// Return constraint world position, calculated from own body.
+    /// @property
     Vector3 GetWorldPosition() const;
 
     /// Return high limit.
+    /// @property
     const Vector2& GetHighLimit() const { return highLimit_; }
 
     /// Return low limit.
+    /// @property
     const Vector2& GetLowLimit() const { return lowLimit_; }
 
     /// Return constraint error reduction parameter.
+    /// @property{get_erp}
     float GetERP() const { return erp_; }
 
     /// Return constraint force mixing parameter.
+    /// @property{get_cfm}
     float GetCFM() const { return cfm_; }
 
     /// Return whether collisions between connected bodies are disabled.
+    /// @property
     bool GetDisableCollision() const { return disableCollision_; }
 
     /// Release the constraint.
@@ -173,8 +184,10 @@ private:
     WeakPtr<RigidBody> ownBody_;
     /// Other rigid body.
     WeakPtr<RigidBody> otherBody_;
+
     /// Bullet constraint.
-    UniquePtr<btTypedConstraint> constraint_;
+    std::unique_ptr<btTypedConstraint> constraint_;
+
     /// Constraint type.
     ConstraintType constraintType_;
     /// Constraint position.

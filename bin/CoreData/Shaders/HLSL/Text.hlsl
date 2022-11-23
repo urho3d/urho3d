@@ -93,7 +93,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
                        + GetAlpha(distance3, width)
                        + GetAlpha(distance4, width)
                        + GetAlpha(distance5, width);
-            
+
                 // For calculating of average correct would be dividing by 5.
                 // But when text is blurred, its brightness is lost. Therefore divide by 4.
                 alpha = alpha * 0.25;

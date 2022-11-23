@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -50,73 +31,58 @@ public:
     using ConstIterator = RandomAccessConstIterator<char>;
 
     /// Construct empty.
-    String() noexcept :
-        length_(0),
-        capacity_(0),
-        buffer_(&endZero)
+    String() noexcept
     {
+        SetShortStringLength(0);
+        data_.shortString_.buffer_[0] = '\0';
     }
 
     /// Construct from another string.
-    String(const String& str) :
-        length_(0),
-        capacity_(0),
-        buffer_(&endZero)
+    String(const String& str)
+        : String()
     {
         *this = str;
     }
 
     /// Move-construct from another string.
-    String(String && str) noexcept :
-        length_(0),
-        capacity_(0),
-        buffer_(&endZero)
+    String(String&& str) noexcept
+        : String()
     {
         Swap(str);
     }
 
     /// Construct from a C string.
-    String(const char* str) :   // NOLINT(google-explicit-constructor)
-        length_(0),
-        capacity_(0),
-        buffer_(&endZero)
+    String(const char* str)   // NOLINT(google-explicit-constructor)
+        : String()
     {
         *this = str;
     }
 
     /// Construct from a C string.
-    String(char* str) :         // NOLINT(google-explicit-constructor)
-        length_(0),
-        capacity_(0),
-        buffer_(&endZero)
+    String(char* str)         // NOLINT(google-explicit-constructor)
+        : String()
     {
         *this = (const char*)str;
     }
 
     /// Construct from a char array and length.
-    String(const char* str, unsigned length) :
-        length_(0),
-        capacity_(0),
-        buffer_(&endZero)
+    String(const char* str, i32 length)
+        : String()
     {
         Resize(length);
-        CopyChars(buffer_, str, length);
+        CopyChars(GetBuffer(), str, length);
     }
 
     /// Construct from a null-terminated wide character array.
-    explicit String(const wchar_t* str) :
-        length_(0),
-        capacity_(0),
-        buffer_(&endZero)
+    explicit String(const wchar_t* str)
+        : String()
     {
         SetUTF8FromWChar(str);
     }
 
     /// Construct from a null-terminated wide character array.
-    explicit String(wchar_t* str) :
-        length_(0),
-        capacity_(0),
-        buffer_(&endZero)
+    explicit String(wchar_t* str)
+        : String()
     {
         SetUTF8FromWChar(str);
     }
@@ -129,6 +95,7 @@ public:
     /// Construct from a short integer.
     explicit String(short value);
     /// Construct from a long integer.
+    /// @nobind
     explicit String(long value);
     /// Construct from a long long integer.
     explicit String(long long value);
@@ -137,6 +104,7 @@ public:
     /// Construct from an unsigned short integer.
     explicit String(unsigned short value);
     /// Construct from an unsigned long integer.
+    /// @nobind
     explicit String(unsigned long value);
     /// Construct from an unsigned long long integer.
     explicit String(unsigned long long value);
@@ -149,13 +117,11 @@ public:
     /// Construct from a character.
     explicit String(char value);
     /// Construct from a character and fill length.
-    explicit String(char value, unsigned length);
+    explicit String(char value, i32 length);
 
     /// Construct from a convertible value.
-    template <class T> explicit String(const T& value) :
-        length_(0),
-        capacity_(0),
-        buffer_(&endZero)
+    template <class T> explicit String(const T& value)
+        : String()
     {
         *this = value.ToString();
     }
@@ -163,8 +129,8 @@ public:
     /// Destruct.
     ~String()
     {
-        if (capacity_)
-            delete[] buffer_;
+        if (!IsShort())
+            delete[] data_.longString_.buffer_;
     }
 
     /// Assign a string.
@@ -172,17 +138,16 @@ public:
     {
         if (&rhs != this)
         {
-            Resize(rhs.length_);
-            CopyChars(buffer_, rhs.buffer_, rhs.length_);
+            Resize(rhs.Length());
+            CopyChars(GetBuffer(), rhs.GetBuffer(), rhs.Length());
         }
 
         return *this;
     }
 
     /// Move-assign a string.
-    String& operator =(String && rhs) noexcept
+    String& operator =(String&& rhs) noexcept
     {
-        assert(&rhs != this);
         Swap(rhs);
         return *this;
     }
@@ -190,9 +155,9 @@ public:
     /// Assign a C string.
     String& operator =(const char* rhs)
     {
-        unsigned rhsLength = CStringLength(rhs);
+        i32 rhsLength = CStringLength(rhs);
         Resize(rhsLength);
-        CopyChars(buffer_, rhs, rhsLength);
+        CopyChars(GetBuffer(), rhs, rhsLength);
 
         return *this;
     }
@@ -200,9 +165,10 @@ public:
     /// Add-assign a string.
     String& operator +=(const String& rhs)
     {
-        unsigned oldLength = length_;
-        Resize(length_ + rhs.length_);
-        CopyChars(buffer_ + oldLength, rhs.buffer_, rhs.length_);
+        i32 oldLength = Length();
+        i32 rhsLength = rhs.Length();
+        Resize(oldLength + rhsLength);
+        CopyChars(GetBuffer() + oldLength, rhs.GetBuffer(), rhsLength);
 
         return *this;
     }
@@ -210,10 +176,10 @@ public:
     /// Add-assign a C string.
     String& operator +=(const char* rhs)
     {
-        unsigned rhsLength = CStringLength(rhs);
-        unsigned oldLength = length_;
-        Resize(length_ + rhsLength);
-        CopyChars(buffer_ + oldLength, rhs, rhsLength);
+        i32 rhsLength = CStringLength(rhs);
+        i32 oldLength = Length();
+        Resize(oldLength + rhsLength);
+        CopyChars(GetBuffer() + oldLength, rhs, rhsLength);
 
         return *this;
     }
@@ -221,9 +187,9 @@ public:
     /// Add-assign a character.
     String& operator +=(char rhs)
     {
-        unsigned oldLength = length_;
-        Resize(length_ + 1);
-        buffer_[oldLength] = rhs;
+        i32 oldLength = Length();
+        Resize(oldLength + 1);
+        GetBuffer()[oldLength] = rhs;
 
         return *this;
     }
@@ -233,6 +199,7 @@ public:
     /// Add-assign (concatenate as string) a short integer.
     String& operator +=(short rhs);
     /// Add-assign (concatenate as string) a long integer.
+    /// @nobind
     String& operator +=(long rhs);
     /// Add-assign (concatenate as string) a long long integer.
     String& operator +=(long long rhs);
@@ -241,6 +208,7 @@ public:
     /// Add-assign (concatenate as string) a short unsigned integer.
     String& operator +=(unsigned short rhs);
     /// Add-assign (concatenate as string) a long unsigned integer.
+    /// @nobind
     String& operator +=(unsigned long rhs);
     /// Add-assign (concatenate as string) a long long unsigned integer.
     String& operator +=(unsigned long long rhs);
@@ -256,9 +224,12 @@ public:
     String operator +(const String& rhs) const
     {
         String ret;
-        ret.Resize(length_ + rhs.length_);
-        CopyChars(ret.buffer_, buffer_, length_);
-        CopyChars(ret.buffer_ + length_, rhs.buffer_, rhs.length_);
+        i32 length = Length();
+        i32 rhsLength = rhs.Length();
+        ret.Resize(length + rhsLength);
+        char* retBuffer = ret.GetBuffer();
+        CopyChars(retBuffer, GetBuffer(), length);
+        CopyChars(retBuffer + length, rhs.GetBuffer(), rhsLength);
 
         return ret;
     }
@@ -266,11 +237,13 @@ public:
     /// Add a C string.
     String operator +(const char* rhs) const
     {
-        unsigned rhsLength = CStringLength(rhs);
+        i32 length = Length();
+        i32 rhsLength = CStringLength(rhs);
         String ret;
-        ret.Resize(length_ + rhsLength);
-        CopyChars(ret.buffer_, buffer_, length_);
-        CopyChars(ret.buffer_ + length_, rhs, rhsLength);
+        ret.Resize(length + rhsLength);
+        char* retBuffer = ret.GetBuffer();
+        CopyChars(retBuffer, GetBuffer(), length);
+        CopyChars(retBuffer + length, rhs, rhsLength);
 
         return ret;
     }
@@ -300,31 +273,31 @@ public:
     bool operator >(const char* rhs) const { return strcmp(CString(), rhs) > 0; }
 
     /// Return char at index.
-    char& operator [](unsigned index)
+    char& operator [](i32 index)
     {
-        assert(index < length_);
-        return buffer_[index];
+        assert(index >= 0 && index < Length());
+        return GetBuffer()[index];
     }
 
     /// Return const char at index.
-    const char& operator [](unsigned index) const
+    const char& operator [](i32 index) const
     {
-        assert(index < length_);
-        return buffer_[index];
+        assert(index >= 0 && index < Length());
+        return GetBuffer()[index];
     }
 
     /// Return char at index.
-    char& At(unsigned index)
+    char& At(i32 index)
     {
-        assert(index < length_);
-        return buffer_[index];
+        assert(index >= 0 && index < Length());
+        return GetBuffer()[index];
     }
 
     /// Return const char at index.
-    const char& At(unsigned index) const
+    const char& At(i32 index) const
     {
-        assert(index < length_);
-        return buffer_[index];
+        assert(index >= 0 && index < Length());
+        return GetBuffer()[index];
     }
 
     /// Replace all occurrences of a character.
@@ -332,9 +305,9 @@ public:
     /// Replace all occurrences of a string.
     void Replace(const String& replaceThis, const String& replaceWith, bool caseSensitive = true);
     /// Replace a substring.
-    void Replace(unsigned pos, unsigned length, const String& replaceWith);
+    void Replace(i32 pos, i32 length, const String& replaceWith);
     /// Replace a substring with a C string.
-    void Replace(unsigned pos, unsigned length, const char* replaceWith);
+    void Replace(i32 pos, i32 length, const char* replaceWith);
     /// Replace a substring by iterators.
     Iterator Replace(const Iterator& start, const Iterator& end, const String& replaceWith);
     /// Return a string with all occurrences of a character replaced.
@@ -348,11 +321,11 @@ public:
     /// Append a character.
     String& Append(char c);
     /// Append characters.
-    String& Append(const char* str, unsigned length);
+    String& Append(const char* str, i32 length);
     /// Insert a string.
-    void Insert(unsigned pos, const String& str);
+    void Insert(i32 pos, const String& str);
     /// Insert a character.
-    void Insert(unsigned pos, char c);
+    void Insert(i32 pos, char c);
     /// Insert a string by iterator.
     Iterator Insert(const Iterator& dest, const String& str);
     /// Insert a string partially by iterators.
@@ -360,15 +333,18 @@ public:
     /// Insert a character by iterator.
     Iterator Insert(const Iterator& dest, char c);
     /// Erase a substring.
-    void Erase(unsigned pos, unsigned length = 1);
+    void Erase(i32 pos, i32 length = 1);
     /// Erase a character by iterator.
     Iterator Erase(const Iterator& it);
     /// Erase a substring by iterators.
     Iterator Erase(const Iterator& start, const Iterator& end);
-    /// Resize the string.
-    void Resize(unsigned newLength);
-    /// Set new capacity.
-    void Reserve(unsigned newCapacity);
+
+    /// Resize the string. Can increase capacity, but never decrease.
+    void Resize(i32 newLength);
+
+    /// Set new capacity. New capacity may differ from requested.
+    void Reserve(i32 newCapacity);
+
     /// Reallocate so that no extra memory is used.
     void Compact();
     /// Clear the string.
@@ -377,27 +353,31 @@ public:
     void Swap(String& str);
 
     /// Return iterator to the beginning.
-    Iterator Begin() { return Iterator(buffer_); }
+    Iterator Begin() { return Iterator(GetBuffer()); }
 
     /// Return const iterator to the beginning.
-    ConstIterator Begin() const { return ConstIterator(buffer_); }
+    ConstIterator Begin() const { return ConstIterator(GetBuffer()); }
 
     /// Return iterator to the end.
-    Iterator End() { return Iterator(buffer_ + length_); }
+    Iterator End() { return Iterator(GetBuffer() + Length()); }
 
     /// Return const iterator to the end.
-    ConstIterator End() const { return ConstIterator(buffer_ + length_); }
+    ConstIterator End() const { return ConstIterator(GetBuffer() + Length()); }
 
     /// Return first char, or 0 if empty.
-    char Front() const { return buffer_[0]; }
+    char Front() const { return GetBuffer()[0]; }
 
     /// Return last char, or 0 if empty.
-    char Back() const { return length_ ? buffer_[length_ - 1] : buffer_[0]; }
+    char Back() const
+    {
+        i32 length = Length();
+        return length ? GetBuffer()[length - 1] : GetBuffer()[0];
+    }
 
     /// Return a substring from position to end.
-    String Substring(unsigned pos) const;
+    String Substring(i32 pos) const;
     /// Return a substring with length from position.
-    String Substring(unsigned pos, unsigned length) const;
+    String Substring(i32 pos, i32 length) const;
     /// Return string with whitespace trimmed from the beginning and the end.
     String Trimmed() const;
     /// Return string in uppercase.
@@ -409,29 +389,37 @@ public:
     /// Join substrings with a 'glue' string.
     void Join(const Vector<String>& subStrings, const String& glue);
     /// Return index to the first occurrence of a string, or NPOS if not found.
-    unsigned Find(const String& str, unsigned startPos = 0, bool caseSensitive = true) const;
+    i32 Find(const String& str, i32 startPos = 0, bool caseSensitive = true) const;
     /// Return index to the first occurrence of a character, or NPOS if not found.
-    unsigned Find(char c, unsigned startPos = 0, bool caseSensitive = true) const;
+    i32 Find(char c, i32 startPos = 0, bool caseSensitive = true) const;
     /// Return index to the last occurrence of a string, or NPOS if not found.
-    unsigned FindLast(const String& str, unsigned startPos = NPOS, bool caseSensitive = true) const;
+    i32 FindLast(const String& str, i32 startPos = NPOS, bool caseSensitive = true) const;
     /// Return index to the last occurrence of a character, or NPOS if not found.
-    unsigned FindLast(char c, unsigned startPos = NPOS, bool caseSensitive = true) const;
+    i32 FindLast(char c, i32 startPos = NPOS, bool caseSensitive = true) const;
     /// Return whether starts with a string.
     bool StartsWith(const String& str, bool caseSensitive = true) const;
     /// Return whether ends with a string.
     bool EndsWith(const String& str, bool caseSensitive = true) const;
 
+    /// Return pointer to buffer.
+    char* GetBuffer() { return IsShort() ? data_.shortString_.buffer_ : data_.longString_.buffer_; }
+
+    /// Return pointer to buffer.
+    const char* GetBuffer() const { return IsShort() ? data_.shortString_.buffer_ : data_.longString_.buffer_; }
+
     /// Return the C string.
-    const char* CString() const { return buffer_; }
+    const char* CString() const { return GetBuffer(); }
 
     /// Return length.
-    unsigned Length() const { return length_; }
+    /// @property
+    i32 Length() const { return IsShort() ? GetShortStringLength() : data_.longString_.length_; }
 
     /// Return buffer capacity.
-    unsigned Capacity() const { return capacity_; }
+    i32 Capacity() const { return IsShort() ? SHORT_STRING_CAPACITY : data_.longString_.capacity_; }
 
     /// Return whether the string is empty.
-    bool Empty() const { return length_ == 0; }
+    /// @property
+    bool Empty() const { return Length() == 0; }
 
     /// Return comparison result with a string.
     int Compare(const String& str, bool caseSensitive = true) const;
@@ -449,27 +437,28 @@ public:
     /// Construct UTF8 content from wide characters.
     void SetUTF8FromWChar(const wchar_t* str);
     /// Calculate number of characters in UTF8 content.
-    unsigned LengthUTF8() const;
+    /// @property{get_utf8Length}
+    i32 LengthUTF8() const;
     /// Return byte offset to char in UTF8 content.
-    unsigned ByteOffsetUTF8(unsigned index) const;
+    i32 ByteOffsetUTF8(i32 index) const;
     /// Return next Unicode character from UTF8 content and increase byte offset.
-    unsigned NextUTF8Char(unsigned& byteOffset) const;
+    c32 NextUTF8Char(i32& byteOffset) const;
     /// Return Unicode character at index from UTF8 content.
-    unsigned AtUTF8(unsigned index) const;
+    c32 AtUTF8(i32 index) const;
     /// Replace Unicode character at index from UTF8 content.
-    void ReplaceUTF8(unsigned index, unsigned unicodeChar);
+    void ReplaceUTF8(i32 index, c32 unicodeChar);
     /// Append Unicode character at the end as UTF8.
-    String& AppendUTF8(unsigned unicodeChar);
+    String& AppendUTF8(c32 unicodeChar);
     /// Return a UTF8 substring from position to end.
-    String SubstringUTF8(unsigned pos) const;
+    String SubstringUTF8(i32 pos) const;
     /// Return a UTF8 substring with length from position.
-    String SubstringUTF8(unsigned pos, unsigned length) const;
+    String SubstringUTF8(i32 pos, i32 length) const;
 
     /// Return hash value for HashSet & HashMap.
     unsigned ToHash() const
     {
         unsigned hash = 0;
-        const char* ptr = buffer_;
+        const char* ptr = GetBuffer();
         while (*ptr)
         {
             hash = *ptr + (hash << 6u) + (hash << 16u) - hash;
@@ -482,20 +471,21 @@ public:
     /// Return substrings split by a separator char. By default don't return empty strings.
     static Vector<String> Split(const char* str, char separator, bool keepEmptyStrings = false);
     /// Return a string by joining substrings with a 'glue' string.
+    /// @manualbind
     static String Joined(const Vector<String>& subStrings, const String& glue);
     /// Encode Unicode character to UTF8. Pointer will be incremented.
-    static void EncodeUTF8(char*& dest, unsigned unicodeChar);
+    static void EncodeUTF8(char*& dest, c32 unicodeChar);
     /// Decode Unicode character from UTF8. Pointer will be incremented.
-    static unsigned DecodeUTF8(const char*& src);
+    static c32 DecodeUTF8(const char*& src);
 #ifdef _WIN32
     /// Encode Unicode character to UTF16. Pointer will be incremented.
-    static void EncodeUTF16(wchar_t*& dest, unsigned unicodeChar);
+    static void EncodeUTF16(wchar_t*& dest, c32 unicodeChar);
     /// Decode Unicode character from UTF16. Pointer will be incremented.
-    static unsigned DecodeUTF16(const wchar_t*& src);
+    static c32 DecodeUTF16(const wchar_t*& src);
 #endif
 
     /// Return length of a C string.
-    static unsigned CStringLength(const char* str) { return str ? (unsigned)strlen(str) : 0; }
+    static i32 CStringLength(const char* str) { return str ? (i32)strlen(str) : 0; }
 
     /// Append to string using formatting.
     String& AppendWithFormat(const char* formatString, ...);
@@ -505,23 +495,83 @@ public:
     /// Compare two C strings.
     static int Compare(const char* lhs, const char* rhs, bool caseSensitive);
 
-    /// Position for "not found."
-    static const unsigned NPOS = 0xffffffff;
-    /// Initial dynamic allocation size.
-    static const unsigned MIN_CAPACITY = 8;
+    /// Position for "not found".
+    static inline constexpr i32 NPOS = -1;
+
     /// Empty string.
     static const String EMPTY;
 
+    /// Is the string stored on the stack?
+    bool IsShort() const
+    {
+        u8 lastByte = data_.shortString_.length_;
+        return !!(lastByte & SSO_MASK);
+    }
+
 private:
+    struct LongString
+    {
+        /// Data.
+        char* buffer_;
+
+        /// Number of bytes without null terminator.
+        i32 length_;
+
+        /// Size of buffer_.
+        i32 capacity_;
+    };
+
+    /// 11 bytes on 32-bit platform, 15 bytes on 64-bit platform
+    inline static constexpr i32 SHORT_STRING_CAPACITY = sizeof(LongString) - 1;
+
+    struct ShortString
+    {
+        /// Data.
+        char buffer_[SHORT_STRING_CAPACITY];
+
+        /// Number of bytes without null terminator.
+        u8 length_;
+    };
+
+    static_assert(sizeof(LongString) == sizeof(ShortString));
+
+    // https://github.com/doxygen/doxygen/issues/7623
+    union
+    {
+        /// @nobind
+        LongString longString_;
+
+        /// @nobind
+        ShortString shortString_;
+    } data_;
+
+    /// MSB of the last byte is used as a flag.
+    inline static constexpr u8 SSO_MASK = 0b10000000u;
+
+    inline static constexpr u8 INVERTED_SSO_MASK = static_cast<u8>(~SSO_MASK);
+
+    i32 GetShortStringLength() const
+    {
+        return data_.shortString_.length_ & INVERTED_SSO_MASK;
+    }
+
+    void SetShortStringLength(u8 value)
+    {
+        data_.shortString_.length_ = value | SSO_MASK;
+    }
+
     /// Move a range of characters within the string.
-    void MoveRange(unsigned dest, unsigned src, unsigned count)
+    void MoveRange(i32 dest, i32 src, i32 count)
     {
         if (count)
-            memmove(buffer_ + dest, buffer_ + src, count);
+        {
+            char* buffer = GetBuffer();
+            memmove(buffer + dest, buffer + src, count);
+        }
     }
 
     /// Copy chars from one buffer to another.
-    static void CopyChars(char* dest, const char* src, unsigned count)
+    static void CopyChars(char* dest, const char* src, i32 count)
     {
 #ifdef _MSC_VER
         if (count)
@@ -538,17 +588,7 @@ private:
     }
 
     /// Replace a substring with another substring.
-    void Replace(unsigned pos, unsigned length, const char* srcStart, unsigned srcLength);
-
-    /// String length.
-    unsigned length_;
-    /// Capacity, zero if buffer not allocated.
-    unsigned capacity_;
-    /// String buffer, point to &endZero if buffer is not allocated.
-    char* buffer_;
-
-    /// End zero for empty strings.
-    static char endZero;
+    void Replace(i32 pos, i32 length, const char* srcStart, i32 srcLength);
 };
 
 /// Add a string to a C string.
@@ -568,6 +608,7 @@ inline String operator +(const wchar_t* lhs, const String& rhs)
 }
 
 /// Wide character string. Only meant for converting from String and passing to the operating system where necessary.
+/// @nobind
 class URHO3D_API WString
 {
 public:
@@ -579,48 +620,48 @@ public:
     ~WString();
 
     /// Return char at index.
-    wchar_t& operator [](unsigned index)
+    wchar_t& operator [](i32 index)
     {
-        assert(index < length_);
+        assert(index >= 0 && index < length_);
         return buffer_[index];
     }
 
     /// Return const char at index.
-    const wchar_t& operator [](unsigned index) const
+    const wchar_t& operator [](i32 index) const
     {
-        assert(index < length_);
+        assert(index >= 0 && index < length_);
         return buffer_[index];
     }
 
     /// Return char at index.
-    wchar_t& At(unsigned index)
+    wchar_t& At(i32 index)
     {
-        assert(index < length_);
+        assert(index >= 0 && index < length_);
         return buffer_[index];
     }
 
     /// Return const char at index.
-    const wchar_t& At(unsigned index) const
+    const wchar_t& At(i32 index) const
     {
-        assert(index < length_);
+        assert(index >= 0 && index < length_);
         return buffer_[index];
     }
 
     /// Resize the string.
-    void Resize(unsigned newLength);
+    void Resize(i32 newLength);
 
     /// Return whether the string is empty.
     bool Empty() const { return length_ == 0; }
 
     /// Return length.
-    unsigned Length() const { return length_; }
+    i32 Length() const { return length_; }
 
     /// Return character data.
     const wchar_t* CString() const { return buffer_; }
 
 private:
     /// String length.
-    unsigned length_;
+    i32 length_;
     /// String buffer, null if not allocated.
     wchar_t* buffer_;
 };

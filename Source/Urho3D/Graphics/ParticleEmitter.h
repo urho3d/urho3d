@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -45,9 +26,9 @@ struct Particle
     /// Rotation speed.
     float rotationSpeed_;
     /// Current color animation index.
-    unsigned colorIndex_;
+    i32 colorIndex_;
     /// Current texture animation index.
-    unsigned texIndex_;
+    i32 texIndex_;
 };
 
 /// %Particle emitter component.
@@ -61,6 +42,7 @@ public:
     /// Destruct.
     ~ParticleEmitter() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Handle enabled/disabled state change.
@@ -69,14 +51,19 @@ public:
     void Update(const FrameInfo& frame) override;
 
     /// Set particle effect.
+    /// @property
     void SetEffect(ParticleEffect* effect);
     /// Set maximum number of particles.
-    void SetNumParticles(unsigned num);
+    /// @property
+    void SetNumParticles(i32 num);
     /// Set whether should be emitting. If the state was changed, also resets the emission period timer.
+    /// @property
     void SetEmitting(bool enable);
     /// Set whether particles should be serialized. Default true, set false to reduce scene file size.
+    /// @property
     void SetSerializeParticles(bool enable);
-    //// Set to remove either the emitter component or its owner node from the scene automatically on particle effect completion. Disabled by default.
+    /// Set to remove either the emitter component or its owner node from the scene automatically on particle effect completion. Disabled by default.
+    /// @property
     void SetAutoRemoveMode(AutoRemoveMode mode);
     /// Reset the emission period timer.
     void ResetEmissionTimer();
@@ -88,18 +75,23 @@ public:
     void ApplyEffect();
 
     /// Return particle effect.
+    /// @property
     ParticleEffect* GetEffect() const;
 
     /// Return maximum number of particles.
-    unsigned GetNumParticles() const { return particles_.Size(); }
+    /// @property
+    i32 GetNumParticles() const { return particles_.Size(); }
 
     /// Return whether is currently emitting.
+    /// @property
     bool IsEmitting() const { return emitting_; }
 
     /// Return whether particles are to be serialized.
+    /// @property
     bool GetSerializeParticles() const { return serializeParticles_; }
 
     /// Return automatic removal mode on particle effect completion.
+    /// @property
     AutoRemoveMode GetAutoRemoveMode() const { return autoRemove_; }
 
     /// Set particles effect attribute.
@@ -120,7 +112,7 @@ protected:
     /// Create a new particle. Return true if there was room.
     bool EmitNewParticle();
     /// Return a free particle index.
-    unsigned GetFreeParticle() const;
+    i32 GetFreeParticle() const;
     /// Return whether has active particles.
     bool CheckActiveParticles() const;
 
@@ -133,7 +125,7 @@ private:
     /// Particle effect.
     SharedPtr<ParticleEffect> effect_;
     /// Particles.
-    PODVector<Particle> particles_;
+    Vector<Particle> particles_;
     /// Active/inactive period timer.
     float periodTimer_;
     /// New particle emission timer.
@@ -141,7 +133,7 @@ private:
     /// Last scene timestep.
     float lastTimeStep_;
     /// Rendering framenumber on which was last updated.
-    unsigned lastUpdateFrameNumber_;
+    i32 lastUpdateFrameNumber_;
     /// Currently emitting flag.
     bool emitting_;
     /// Need update flag.

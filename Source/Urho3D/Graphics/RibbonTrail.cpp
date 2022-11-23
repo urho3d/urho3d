@@ -1,39 +1,20 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
-#include "../Graphics/RibbonTrail.h"
-#include "../Graphics/VertexBuffer.h"
-#include "../Graphics/IndexBuffer.h"
 #include "../Graphics/Camera.h"
+#include "../Graphics/Geometry.h"
 #include "../Graphics/Material.h"
 #include "../Graphics/OctreeQuery.h"
-#include "../Graphics/Geometry.h"
+#include "../Graphics/RibbonTrail.h"
+#include "../GraphicsAPI/IndexBuffer.h"
+#include "../GraphicsAPI/VertexBuffer.h"
+#include "../IO/Log.h"
+#include "../Resource/ResourceCache.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
-#include "../Resource/ResourceCache.h"
-#include "../IO/Log.h"
 
 namespace Urho3D
 {
@@ -79,7 +60,7 @@ RibbonTrail::RibbonTrail(Context* context) :
     lastTimeStep_(0.0f),
     endColor_(Color(1.0f, 1.0f, 1.0f, 0.0f)),
     startColor_(Color(1.0f, 1.0f, 1.0f, 1.0f)),
-    lastUpdateFrameNumber_(M_MAX_UNSIGNED),
+    lastUpdateFrameNumber_(NINDEX),
     needUpdate_(false),
     sorted_(false),
     previousOffset_(Vector3::ZERO),
@@ -125,7 +106,7 @@ void RibbonTrail::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Sort By Distance", IsSorted, SetSorted, bool, false, AM_DEFAULT);
 }
 
-void RibbonTrail::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
+void RibbonTrail::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results)
 {
     // If no trail-level testing, use the Drawable test
     if (query.level_ < RAY_TRIANGLE)
@@ -139,7 +120,7 @@ void RibbonTrail::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
         return;
 
     // Approximate the tails as spheres for raycasting
-    for (unsigned i = 0; i < points_.Size() - 1; ++i)
+    for (i32 i = 0; i < points_.Size() - 1; ++i)
     {
         Vector3 center = (points_[i].position_ + points_[i+1].position_) * 0.5f;
         Vector3 scale = width_ * Vector3::ONE;
@@ -186,7 +167,7 @@ void RibbonTrail::HandleScenePostUpdate(StringHash eventType, VariantMap& eventD
     if (updateInvisible_ || viewFrameNumber_ != lastUpdateFrameNumber_)
     {
         // Reset if ribbon trail is too small and too much difference in frame
-        if (points_.Size() < 3 && viewFrameNumber_ - lastUpdateFrameNumber_ > 1)
+        if (points_.Size() < 3 && (viewFrameNumber_ - lastUpdateFrameNumber_) > 1)
         {
             previousPosition_ = node_->GetWorldPosition();
             points_.Erase(0, points_.Size());
@@ -228,7 +209,7 @@ void RibbonTrail::UpdateTail(float timeStep)
     if (points_.Size() > 0)
     {
         // No need to update last point
-        for (unsigned i = 0; i < points_.Size() - 1; ++i)
+        for (i32 i = 0; i < points_.Size() - 1; ++i)
         {
             points_[i].lifetime_ += lastTimeStep_;
 
@@ -241,7 +222,7 @@ void RibbonTrail::UpdateTail(float timeStep)
     // Delete expired points
     if (expiredIndex != -1)
     {
-        points_.Erase(0, (unsigned)(expiredIndex + 1));
+        points_.Erase(0, expiredIndex + 1);
 
         // Update endTail pointer
         if (points_.Size() > 1)
@@ -431,7 +412,7 @@ void RibbonTrail::OnWorldBoundingBoxUpdate()
 {
     BoundingBox worldBox;
 
-    for (unsigned i = 0; i < points_.Size(); ++i)
+    for (i32 i = 0; i < points_.Size(); ++i)
     {
         Vector3 &p = points_[i].position_;
         Vector3 scale = width_ * Vector3::ONE;

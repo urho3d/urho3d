@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -26,6 +7,8 @@
 #include "../Core/Variant.h"
 #include "../Math/BoundingBox.h"
 #include "../Math/Rect.h"
+
+#include <memory>
 
 namespace pugi
 {
@@ -99,6 +82,7 @@ public:
     XPathResultSet SelectPrepared(const XPathQuery& query) const;
 
     /// Set the value for an inner node in the following format <node>value</node>.
+    /// @property
     bool SetValue(const String& value);
     /// Set the value for an inner node in the following format <node>value</node>. Must be used on the <node> element.
     bool SetValue(const char* value);
@@ -117,7 +101,7 @@ public:
     /// Set a buffer attribute.
     bool SetBuffer(const String& name, const void* data, unsigned size);
     /// Set a buffer attribute.
-    bool SetBuffer(const String& name, const PODVector<unsigned char>& value);
+    bool SetBuffer(const String& name, const Vector<unsigned char>& value);
     /// Set a color attribute.
     bool SetColor(const String& name, const Color& value);
     /// Set a float attribute.
@@ -174,12 +158,15 @@ public:
     bool SetMatrix4(const String& name, const Matrix4& value);
 
     /// Return whether does not refer to an element or an XPath node.
+    /// @property{get_isNull}
     bool IsNull() const;
     /// Return whether refers to an element or an XPath node.
+    /// @property
     bool NotNull() const;
     /// Return true if refers to an element or an XPath node.
     explicit operator bool() const;
     /// Return element name (or attribute name if it is an attribute only XPath query result).
+    /// @property
     String GetName() const;
     /// Return whether has a child element.
     bool HasChild(const String& name) const;
@@ -194,14 +181,17 @@ public:
     /// Return next sibling element.
     XMLElement GetNext(const char* name) const;
     /// Return parent element.
+    /// @property
     XMLElement GetParent() const;
     /// Return number of attributes.
+    /// @property
     unsigned GetNumAttributes() const;
     /// Return whether has an attribute.
     bool HasAttribute(const String& name) const;
     /// Return whether has an attribute.
     bool HasAttribute(const char* name) const;
-    /// Return inner value, or empty if missing for nodes like <node>value</node>
+    /// Return inner value, or empty if missing for nodes like <node>value</node>.
+    /// @property
     String GetValue() const;
     /// Return attribute, or empty if missing.
     String GetAttribute(const String& name = String::EMPTY) const;
@@ -222,7 +212,7 @@ public:
     /// Return bool attribute, or false if missing.
     bool GetBool(const String& name) const;
     /// Return buffer attribute, or empty if missing.
-    PODVector<unsigned char> GetBuffer(const String& name) const;
+    Vector<unsigned char> GetBuffer(const String& name) const;
     /// Copy buffer attribute into a supplied buffer. Return true if buffer was large enough.
     bool GetBuffer(const String& name, void* dest, unsigned size) const;
     /// Return bounding box attribute, or empty if missing.
@@ -282,6 +272,7 @@ public:
     /// Return a Matrix4 attribute, or zero matrix if missing.
     Matrix4 GetMatrix4(const String& name) const;
     /// Return XML file.
+    /// @property
     XMLFile* GetFile() const;
 
     /// Return pugixml xml_node_struct.
@@ -297,6 +288,7 @@ public:
     unsigned GetXPathResultIndex() const { return xpathResultIndex_; }
 
     /// Return next XPath query result. Only valid when this instance of XMLElement is itself one of the query result in the result set.
+    /// @property
     XMLElement NextResult() const;
 
     /// Empty XMLElement.
@@ -334,10 +326,13 @@ public:
     XMLElement operator [](unsigned index) const;
     /// Return the first result in the set. Call XMLElement::GetNextResult() to get the subsequent result in the set.
     /// Note: The XPathResultSet return value must be stored in a lhs variable to ensure the underlying xpath_node_set* is still valid while performing XPathResultSet::FirstResult(), XPathResultSet::operator [], and XMLElement::NextResult().
+    /// @property
     XMLElement FirstResult();
     /// Return size of result set.
+    /// @property
     unsigned Size() const;
     /// Return whether result set is empty.
+    /// @property
     bool Empty() const;
 
     /// Return pugixml xpath_node_set.
@@ -387,21 +382,24 @@ public:
     XPathResultSet Evaluate(const XMLElement& element) const;
 
     /// Return query string.
+    /// @property
     String GetQuery() const { return queryString_; }
 
     /// Return pugixml xpath_query.
-    pugi::xpath_query* GetXPathQuery() const { return query_.Get(); }
+    pugi::xpath_query* GetXPathQuery() const { return query_.get(); }
 
     /// Return pugixml xpath_variable_set.
-    pugi::xpath_variable_set* GetXPathVariableSet() const { return variables_.Get(); }
+    pugi::xpath_variable_set* GetXPathVariableSet() const { return variables_.get(); }
 
 private:
     /// XPath query string.
     String queryString_;
+
     /// Pugixml xpath_query.
-    UniquePtr<pugi::xpath_query> query_;
+    std::unique_ptr<pugi::xpath_query> query_;
+
     /// Pugixml xpath_variable_set.
-    UniquePtr<pugi::xpath_variable_set> variables_;
+    std::unique_ptr<pugi::xpath_variable_set> variables_;
 };
 
 }

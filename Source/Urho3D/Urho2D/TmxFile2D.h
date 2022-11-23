@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -100,7 +81,7 @@ public:
 
 protected:
     /// Tiles.
-    Vector<SharedPtr<Tile2D> > tiles_;
+    Vector<SharedPtr<Tile2D>> tiles_;
 };
 
 /// Tmx objects layer.
@@ -123,7 +104,7 @@ public:
 
 private:
     /// Objects.
-    Vector<SharedPtr<TileMapObject2D> > objects_;
+    Vector<SharedPtr<TileMapObject2D>> objects_;
 };
 
 /// Tmx image layer.
@@ -164,6 +145,7 @@ public:
     /// Destruct.
     ~TmxFile2D() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
@@ -187,7 +169,7 @@ public:
     Sprite2D* GetTileSprite(unsigned gid) const;
 
     /// Return tile collision shapes for a given gid.
-    Vector<SharedPtr<TileMapObject2D> > GetTileCollisionShapes(unsigned gid) const;
+    Vector<SharedPtr<TileMapObject2D>> GetTileCollisionShapes(unsigned gid) const;
 
     /// Return tile property set by gid, if not exist return 0.
     PropertySet2D* GetTilePropertySet(unsigned gid) const;
@@ -199,9 +181,11 @@ public:
     const TmxLayer2D* GetLayer(unsigned index) const;
 
     /// Set texture edge offset for all sprites, in pixels.
+    /// @property{set_edgeOffset}
     void SetSpriteTextureEdgeOffset(float offset);
 
     /// Return texture edge offset, in pixels.
+    /// @property{get_edgeOffset}
     float GetSpriteTextureEdgeOffset() const { return edgeOffset_; }
 
 private:
@@ -213,15 +197,15 @@ private:
     /// XML file used during loading.
     SharedPtr<XMLFile> loadXMLFile_;
     /// TSX name to XML file mapping.
-    HashMap<String, SharedPtr<XMLFile> > tsxXMLFiles_;
+    HashMap<String, SharedPtr<XMLFile>> tsxXMLFiles_;
     /// Tile map information.
     TileMapInfo2D info_{};
     /// Gid to tile sprite mapping.
-    HashMap<unsigned, SharedPtr<Sprite2D> > gidToSpriteMapping_;
+    HashMap<unsigned, SharedPtr<Sprite2D>> gidToSpriteMapping_;
     /// Gid to tile property set mapping.
-    HashMap<unsigned, SharedPtr<PropertySet2D> > gidToPropertySetMapping_;
+    HashMap<unsigned, SharedPtr<PropertySet2D>> gidToPropertySetMapping_;
     /// Gid to tile collision shape mapping.
-    HashMap<unsigned, Vector<SharedPtr<TileMapObject2D> > > gidToCollisionShapeMapping_;
+    HashMap<unsigned, Vector<SharedPtr<TileMapObject2D>>> gidToCollisionShapeMapping_;
     /// Layers.
     Vector<TmxLayer2D*> layers_;
     /// Texture edge offset.

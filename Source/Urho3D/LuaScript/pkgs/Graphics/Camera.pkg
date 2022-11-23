@@ -2,10 +2,13 @@ $#include "Graphics/Camera.h"
 
 enum FillMode {};
 
-static const unsigned VO_NONE;
-static const unsigned VO_LOW_MATERIAL_QUALITY;
-static const unsigned VO_DISABLE_SHADOWS;
-static const unsigned VO_DISABLE_OCCLUSION;
+enum ViewOverride
+{
+    VO_NONE,
+    VO_LOW_MATERIAL_QUALITY,
+    VO_DISABLE_SHADOWS,
+    VO_DISABLE_OCCLUSION,
+};
 
 class Camera : public Component
 {
@@ -64,7 +67,7 @@ class Camera : public Component
     float GetLodDistance(float distance, float scale, float bias) const;
     bool IsProjectionValid() const;
     Matrix3x4 GetEffectiveWorldTransform() const;
-    
+
     tolua_property__get_set float farClip;
     tolua_property__get_set float nearClip;
     tolua_property__get_set float fov;

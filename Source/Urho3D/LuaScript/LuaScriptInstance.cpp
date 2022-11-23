@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -32,7 +13,7 @@
 #include "../LuaScript/LuaScript.h"
 #include "../LuaScript/LuaScriptEventInvoker.h"
 #include "../LuaScript/LuaScriptInstance.h"
-#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_PHYSICS2D)
 #include "../Physics/PhysicsEvents.h"
 #endif
 #include "../Resource/ResourceCache.h"
@@ -86,9 +67,9 @@ void LuaScriptInstance::RegisterObject(Context* context)
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef,
         ResourceRef(LuaFile::GetTypeStatic()), AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Script Object Type", GetScriptObjectType, SetScriptObjectType, String, String::EMPTY, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, Variant::emptyBuffer,
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script Data", GetScriptDataAttr, SetScriptDataAttr, Vector<unsigned char>, Variant::emptyBuffer,
         AM_FILE | AM_NOEDIT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, PODVector<unsigned char>,
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, Vector<unsigned char>,
         Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
 
@@ -360,7 +341,7 @@ void LuaScriptInstance::RemoveAllEventHandlers()
 
 void LuaScriptInstance::RemoveEventHandlersExcept(const Vector<String>& exceptionNames)
 {
-    PODVector<StringHash> exceptionTypes(exceptionNames.Size());
+    Vector<StringHash> exceptionTypes(exceptionNames.Size());
     for (unsigned i = 0; i < exceptionTypes.Size(); ++i)
         exceptionTypes[i] = StringHash(exceptionNames[i]);
 
@@ -431,7 +412,7 @@ void LuaScriptInstance::SetScriptObjectType(const String& scriptObjectType)
     FindScriptObjectMethodRefs();
 }
 
-void LuaScriptInstance::SetScriptDataAttr(const PODVector<unsigned char>& data)
+void LuaScriptInstance::SetScriptDataAttr(const Vector<unsigned char>& data)
 {
     if (scriptObjectRef_ == LUA_REFNIL)
         return;
@@ -445,7 +426,7 @@ void LuaScriptInstance::SetScriptDataAttr(const PODVector<unsigned char>& data)
     }
 }
 
-void LuaScriptInstance::SetScriptNetworkDataAttr(const PODVector<unsigned char>& data)
+void LuaScriptInstance::SetScriptNetworkDataAttr(const Vector<unsigned char>& data)
 {
     if (scriptObjectRef_ == LUA_REFNIL)
         return;
@@ -464,10 +445,10 @@ LuaFile* LuaScriptInstance::GetScriptFile() const
     return scriptFile_;
 }
 
-PODVector<unsigned char> LuaScriptInstance::GetScriptDataAttr() const
+Vector<unsigned char> LuaScriptInstance::GetScriptDataAttr() const
 {
     if (scriptObjectRef_ == LUA_REFNIL)
-        return PODVector<unsigned char>();
+        return Vector<unsigned char>();
 
     VectorBuffer buf;
 
@@ -481,10 +462,10 @@ PODVector<unsigned char> LuaScriptInstance::GetScriptDataAttr() const
     return buf.GetBuffer();
 }
 
-PODVector<unsigned char> LuaScriptInstance::GetScriptNetworkDataAttr() const
+Vector<unsigned char> LuaScriptInstance::GetScriptNetworkDataAttr() const
 {
     if (scriptObjectRef_ == LUA_REFNIL)
-        return PODVector<unsigned char>();
+        return Vector<unsigned char>();
 
     VectorBuffer buf;
 
@@ -625,7 +606,7 @@ void LuaScriptInstance::SubscribeToScriptMethodEvents()
     if (scene && scriptObjectMethods_[LSOM_POSTUPDATE])
         SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(LuaScriptInstance, HandlePostUpdate));
 
-#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_PHYSICS2D)
     Component* world = GetFixedUpdateSource();
 
     if (world && scriptObjectMethods_[LSOM_FIXEDUPDATE])
@@ -644,7 +625,7 @@ void LuaScriptInstance::UnsubscribeFromScriptMethodEvents()
     UnsubscribeFromEvent(E_SCENEUPDATE);
     UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
 
-#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_PHYSICS2D)
     UnsubscribeFromEvent(E_PHYSICSPRESTEP);
     UnsubscribeFromEvent(E_PHYSICSPOSTSTEP);
 #endif
@@ -687,7 +668,7 @@ void LuaScriptInstance::HandlePostUpdate(StringHash eventType, VariantMap& event
     }
 }
 
-#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_PHYSICS2D)
 
 void LuaScriptInstance::HandleFixedUpdate(StringHash eventType, VariantMap& eventData)
 {

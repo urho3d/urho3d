@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -26,12 +7,12 @@
 #include "../Core/Profiler.h"
 #include "../Graphics/DrawableEvents.h"
 #include "../Graphics/Geometry.h"
-#include "../Graphics/IndexBuffer.h"
 #include "../Graphics/Material.h"
 #include "../Graphics/Octree.h"
 #include "../Graphics/Terrain.h"
 #include "../Graphics/TerrainPatch.h"
-#include "../Graphics/VertexBuffer.h"
+#include "../GraphicsAPI/IndexBuffer.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #include "../IO/Log.h"
 #include "../Resource/Image.h"
 #include "../Resource/ResourceCache.h"
@@ -173,10 +154,10 @@ void Terrain::OnSetEnabled()
 {
     bool enabled = IsEnabledEffective();
 
-    for (unsigned i = 0; i < patches_.Size(); ++i)
+    for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
-        if (patches_[i])
-            patches_[i]->SetEnabled(enabled);
+        if (patch)
+            patch->SetEnabled(enabled);
     }
 }
 
@@ -252,10 +233,11 @@ bool Terrain::SetHeightMap(Image* image)
 void Terrain::SetMaterial(Material* material)
 {
     material_ = material;
-    for (unsigned i = 0; i < patches_.Size(); ++i)
+
+    for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
-        if (patches_[i])
-            patches_[i]->SetMaterial(material);
+        if (patch)
+            patch->SetMaterial(material);
     }
 
     MarkNetworkUpdate();
@@ -380,10 +362,11 @@ void Terrain::SetNeighbors(Terrain* north, Terrain* south, Terrain* west, Terrai
 void Terrain::SetDrawDistance(float distance)
 {
     drawDistance_ = distance;
-    for (unsigned i = 0; i < patches_.Size(); ++i)
+
+    for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
-        if (patches_[i])
-            patches_[i]->SetDrawDistance(distance);
+        if (patch)
+            patch->SetDrawDistance(distance);
     }
 
     MarkNetworkUpdate();
@@ -392,10 +375,11 @@ void Terrain::SetDrawDistance(float distance)
 void Terrain::SetShadowDistance(float distance)
 {
     shadowDistance_ = distance;
-    for (unsigned i = 0; i < patches_.Size(); ++i)
+
+    for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
-        if (patches_[i])
-            patches_[i]->SetShadowDistance(distance);
+        if (patch)
+            patch->SetShadowDistance(distance);
     }
 
     MarkNetworkUpdate();
@@ -404,10 +388,11 @@ void Terrain::SetShadowDistance(float distance)
 void Terrain::SetLodBias(float bias)
 {
     lodBias_ = bias;
-    for (unsigned i = 0; i < patches_.Size(); ++i)
+
+    for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
-        if (patches_[i])
-            patches_[i]->SetLodBias(bias);
+        if (patch)
+            patch->SetLodBias(bias);
     }
 
     MarkNetworkUpdate();
@@ -416,10 +401,11 @@ void Terrain::SetLodBias(float bias)
 void Terrain::SetViewMask(unsigned mask)
 {
     viewMask_ = mask;
-    for (unsigned i = 0; i < patches_.Size(); ++i)
+
+    for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
-        if (patches_[i])
-            patches_[i]->SetViewMask(mask);
+        if (patch)
+            patch->SetViewMask(mask);
     }
 
     MarkNetworkUpdate();
@@ -428,10 +414,11 @@ void Terrain::SetViewMask(unsigned mask)
 void Terrain::SetLightMask(unsigned mask)
 {
     lightMask_ = mask;
-    for (unsigned i = 0; i < patches_.Size(); ++i)
+
+    for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
-        if (patches_[i])
-            patches_[i]->SetLightMask(mask);
+        if (patch)
+            patch->SetLightMask(mask);
     }
 
     MarkNetworkUpdate();
@@ -440,10 +427,11 @@ void Terrain::SetLightMask(unsigned mask)
 void Terrain::SetShadowMask(unsigned mask)
 {
     shadowMask_ = mask;
-    for (unsigned i = 0; i < patches_.Size(); ++i)
+
+    for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
-        if (patches_[i])
-            patches_[i]->SetShadowMask(mask);
+        if (patch)
+            patch->SetShadowMask(mask);
     }
 
     MarkNetworkUpdate();
@@ -452,10 +440,11 @@ void Terrain::SetShadowMask(unsigned mask)
 void Terrain::SetZoneMask(unsigned mask)
 {
     zoneMask_ = mask;
-    for (unsigned i = 0; i < patches_.Size(); ++i)
+
+    for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
-        if (patches_[i])
-            patches_[i]->SetZoneMask(mask);
+        if (patch)
+            patch->SetZoneMask(mask);
     }
 
     MarkNetworkUpdate();
@@ -464,10 +453,11 @@ void Terrain::SetZoneMask(unsigned mask)
 void Terrain::SetMaxLights(unsigned num)
 {
     maxLights_ = num;
-    for (unsigned i = 0; i < patches_.Size(); ++i)
+
+    for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
-        if (patches_[i])
-            patches_[i]->SetMaxLights(num);
+        if (patch)
+            patch->SetMaxLights(num);
     }
 
     MarkNetworkUpdate();
@@ -476,10 +466,11 @@ void Terrain::SetMaxLights(unsigned num)
 void Terrain::SetCastShadows(bool enable)
 {
     castShadows_ = enable;
-    for (unsigned i = 0; i < patches_.Size(); ++i)
+
+    for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
-        if (patches_[i])
-            patches_[i]->SetCastShadows(enable);
+        if (patch)
+            patch->SetCastShadows(enable);
     }
 
     MarkNetworkUpdate();
@@ -488,10 +479,11 @@ void Terrain::SetCastShadows(bool enable)
 void Terrain::SetOccluder(bool enable)
 {
     occluder_ = enable;
-    for (unsigned i = 0; i < patches_.Size(); ++i)
+
+    for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
-        if (patches_[i])
-            patches_[i]->SetOccluder(enable);
+        if (patch)
+            patch->SetOccluder(enable);
     }
 
     MarkNetworkUpdate();
@@ -500,10 +492,11 @@ void Terrain::SetOccluder(bool enable)
 void Terrain::SetOccludee(bool enable)
 {
     occludee_ = enable;
-    for (unsigned i = 0; i < patches_.Size(); ++i)
+
+    for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
-        if (patches_[i])
-            patches_[i]->SetOccludee(enable);
+        if (patch)
+            patch->SetOccludee(enable);
     }
 
     MarkNetworkUpdate();
@@ -525,8 +518,9 @@ Material* Terrain::GetMaterial() const
     return material_;
 }
 
-TerrainPatch* Terrain::GetPatch(unsigned index) const
+TerrainPatch* Terrain::GetPatch(i32 index) const
 {
+    assert(index >= 0);
     return index < patches_.Size() ? patches_[index] : nullptr;
 }
 
@@ -535,7 +529,7 @@ TerrainPatch* Terrain::GetPatch(int x, int z) const
     if (x < 0 || x >= numPatches_.x_ || z < 0 || z >= numPatches_.y_)
         return nullptr;
     else
-        return GetPatch((unsigned)(z * numPatches_.x_ + x));
+        return GetPatch(z * numPatches_.x_ + x);
 }
 
 TerrainPatch* Terrain::GetNeighborPatch(int x, int z) const
@@ -679,9 +673,9 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
         unsigned lodExpand = (1u << (occlusionLevel)) - 1;
         unsigned halfLodExpand = (1u << (occlusionLevel)) / 2;
 
-        for (unsigned z = 0; z <= patchSize_; ++z)
+        for (i32 z = 0; z <= patchSize_; ++z)
         {
-            for (unsigned x = 0; x <= patchSize_; ++x)
+            for (i32 x = 0; x <= patchSize_; ++x)
             {
                 int xPos = coords.x_ * patchSize_ + x;
                 int zPos = coords.y_ * patchSize_ + z;
@@ -765,8 +759,8 @@ void Terrain::UpdatePatchLod(TerrainPatch* patch)
     Geometry* geometry = patch->GetGeometry();
 
     // All LOD levels except the coarsest have 16 versions for stitching
-    unsigned lodLevel = patch->GetLodLevel();
-    unsigned drawRangeIndex = lodLevel << 4u;
+    i32 lodLevel = patch->GetLodLevel();
+    i32 drawRangeIndex = lodLevel << 4;
     if (lodLevel < numLodLevels_ - 1)
     {
         TerrainPatch* north = patch->GetNorthPatch();
@@ -910,9 +904,9 @@ void Terrain::CreateGeometry()
     {
         URHO3D_PROFILE(RemoveOldPatches);
 
-        PODVector<Node*> oldPatchNodes;
+        Vector<Node*> oldPatchNodes;
         node_->GetChildrenWithComponent<TerrainPatch>(oldPatchNodes);
-        for (PODVector<Node*>::Iterator i = oldPatchNodes.Begin(); i != oldPatchNodes.End(); ++i)
+        for (Vector<Node*>::Iterator i = oldPatchNodes.Begin(); i != oldPatchNodes.End(); ++i)
         {
             bool nodeOk = false;
             Vector<String> coords = (*i)->GetName().Substring(6).Split('_');
@@ -930,9 +924,7 @@ void Terrain::CreateGeometry()
     }
 
     // Keep track of which patches actually need an update
-    PODVector<bool> dirtyPatches((unsigned)(numPatches_.x_ * numPatches_.y_));
-    for (unsigned i = 0; i < dirtyPatches.Size(); ++i)
-        dirtyPatches[i] = updateAll;
+    Vector<bool> dirtyPatches(numPatches_.x_ * numPatches_.y_, updateAll);
 
     patches_.Clear();
 
@@ -1081,7 +1073,7 @@ void Terrain::CreateGeometry()
         {
             URHO3D_PROFILE(UpdateSmoothing);
 
-            for (unsigned i = 0; i < patches_.Size(); ++i)
+            for (i32 i = 0; i < patches_.Size(); ++i)
             {
                 if (dirtyPatches[i])
                 {
@@ -1109,7 +1101,7 @@ void Terrain::CreateGeometry()
             }
         }
 
-        for (unsigned i = 0; i < patches_.Size(); ++i)
+        for (i32 i = 0; i < patches_.Size(); ++i)
         {
             TerrainPatch* patch = patches_[i];
 
@@ -1138,7 +1130,7 @@ void Terrain::CreateIndexData()
 {
     URHO3D_PROFILE(CreateIndexData);
 
-    PODVector<unsigned short> indices;
+    Vector<unsigned short> indices;
     drawRanges_.Clear();
     auto row = (unsigned)(patchSize_ + 1);
 
@@ -1367,7 +1359,7 @@ void Terrain::CalculateLodErrors(TerrainPatch* patch)
     URHO3D_PROFILE(CalculateLodErrors);
 
     const IntVector2& coords = patch->GetCoordinates();
-    PODVector<float>& lodErrors = patch->GetLodErrors();
+    Vector<float>& lodErrors = patch->GetLodErrors();
     lodErrors.Clear();
     lodErrors.Reserve(numLodLevels_);
 

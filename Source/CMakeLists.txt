@@ -1,24 +1,5 @@
-#
-# Copyright (c) 2008-2019 the Urho3D project.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
+# Copyright (c) 2008-2022 the Urho3D project
+# License: MIT
 
 # Check existence of various header files and their functions required by some of the third-party libraries and Urho3D library
 # Set the CMake variables in this scope but only add the compiler defines in the respective library's scope
@@ -74,7 +55,7 @@ endforeach ()
 
 if (URHO3D_ANGELSCRIPT)
     add_subdirectory (ThirdParty/AngelScript)
-    if (WEB OR (ARM AND URHO3D_64BIT))
+    if (WEB OR (ARM AND URHO3D_64BIT) OR URHO3D_FORCE_AS_MAX_PORTABILITY)
         add_subdirectory (ThirdParty/boost)
     endif ()
 endif ()
@@ -108,7 +89,6 @@ if (URHO3D_NAVIGATION)
 endif ()
 
 if (URHO3D_URHO2D)
-    add_subdirectory (ThirdParty/Box2D)
     if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/spine)
         add_subdirectory (ThirdParty/spine)
         # Add definition for Spine
@@ -124,32 +104,40 @@ if (URHO3D_PHYSICS)
     add_subdirectory (ThirdParty/Bullet)
 endif ()
 
+if (URHO3D_PHYSICS2D)
+    add_subdirectory (ThirdParty/Box2D)
+endif ()
+
+if (URHO3D_TRACY_PROFILING)
+    add_subdirectory (ThirdParty/Tracy)
+endif ()
+
 if (NOT ANDROID AND NOT ARM AND NOT WEB)
     if (URHO3D_OPENGL)
         add_subdirectory (ThirdParty/GLEW)
-    elseif (NOT URHO3D_D3D11)
+    endif()
+    
+    if (URHO3D_D3D9)
         add_subdirectory (ThirdParty/MojoShader)
     endif ()
+    
     if (NOT CMAKE_SYSTEM_NAME STREQUAL Linux)
         add_subdirectory (ThirdParty/LibCpuId)
     endif ()
 endif ()
 
-# Urho3D game engine library
 add_subdirectory (Urho3D)
 
-# Urho3D Clang tools
 if (URHO3D_CLANG_TOOLS)
     add_subdirectory (Clang-Tools)
 endif ()
 
-# Urho3D tools
-add_subdirectory (Tools)
+# In order to get clean module segregation, always exclude player/samples from AAR
+if (NOT ANDROID)
+    add_subdirectory (Tools)
+    add_subdirectory (Samples)
+endif ()
 
-# Urho3D samples
-add_subdirectory (Samples)
-
-# Urho3D extras
 if (URHO3D_EXTRAS)
     add_subdirectory (Extras)
 endif ()

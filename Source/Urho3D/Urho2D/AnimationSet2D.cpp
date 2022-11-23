@@ -1,31 +1,12 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
 #include "../Container/ArrayPtr.h"
 #include "../Core/Context.h"
 #include "../Graphics/Graphics.h"
-#include "../Graphics/Texture2D.h"
+#include "../GraphicsAPI/Texture2D.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../Math/AreaAllocator.h"
@@ -37,6 +18,8 @@
 #include "../Urho2D/SpriteSheet2D.h"
 
 #include "../DebugNew.h"
+
+using namespace std;
 
 #ifdef URHO3D_SPINE
 #include <spine/spine.h>
@@ -193,7 +176,7 @@ bool AnimationSet2D::HasAnimation(const String& animationName) const
 #endif
     if (spriterData_ && !spriterData_->entities_.Empty())
     {
-        const PODVector<Spriter::Animation*>& animations = spriterData_->entities_[0]->animations_;
+        const Vector<Spriter::Animation*>& animations = spriterData_->entities_[0]->animations_;
         for (unsigned i = 0; i < animations.Size(); ++i)
         {
             if (animationName == animations[i]->name_)
@@ -212,7 +195,7 @@ Sprite2D* AnimationSet2D::GetSprite() const
 Sprite2D* AnimationSet2D::GetSpriterFileSprite(int folderId, int fileId) const
 {
     unsigned key = folderId << 16u | fileId;
-    HashMap<unsigned, SharedPtr<Sprite2D> >::ConstIterator i = spriterFileSprites_.Find(key);
+    HashMap<unsigned, SharedPtr<Sprite2D>>::ConstIterator i = spriterFileSprites_.Find(key);
     if (i != spriterFileSprites_.End())
         return i->second_;
 
@@ -268,7 +251,7 @@ bool AnimationSet2D::EndLoadSpine()
         return false;
     }
 
-    skeletonJson->scale = 0.01f; // PIXEL_SIZE;
+    skeletonJson->scale = PIXEL_SIZE;
     skeletonData_ = spSkeletonJson_readSkeletonData(skeletonJson, &jsonData_[0]);
 
     spSkeletonJson_dispose(skeletonJson);
@@ -293,7 +276,7 @@ bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
     if (source.Read(buffer.Get(), dataSize) != dataSize)
         return false;
 
-    spriterData_ = new Spriter::SpriterData();
+    spriterData_ = make_unique<Spriter::SpriterData>();
     if (!spriterData_->Load(buffer.Get(), dataSize))
     {
         URHO3D_LOGERROR("Could not spriter data from " + source.GetName());
@@ -521,7 +504,7 @@ void AnimationSet2D::Dispose()
     }
 #endif
 
-    spriterData_.Reset();
+    spriterData_.reset();
 
     sprite_.Reset();
     spriteSheet_.Reset();

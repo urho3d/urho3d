@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -249,19 +230,30 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, unsigned v
     float nearest = M_INFINITY;
     const unsigned char* vertices = ((const unsigned char*)vertexData) + vertexStart * vertexStride;
     unsigned index = 0, nearestIdx = M_MAX_UNSIGNED;
+
+    Vector3 tempNormal;
+    Vector3* tempNormalPtr = outNormal ? &tempNormal : nullptr;
+
     Vector3 barycentric;
-    Vector3* outBary = outUV ? &barycentric : nullptr;
+    Vector3 tempBarycentric;
+    Vector3* tempBarycentricPtr = outUV ? &tempBarycentric : nullptr;
 
     while (index + 2 < vertexCount)
     {
         const Vector3& v0 = *((const Vector3*)(&vertices[index * vertexStride]));
         const Vector3& v1 = *((const Vector3*)(&vertices[(index + 1) * vertexStride]));
         const Vector3& v2 = *((const Vector3*)(&vertices[(index + 2) * vertexStride]));
-        float distance = HitDistance(v0, v1, v2, outNormal, outBary);
+        float distance = HitDistance(v0, v1, v2, tempNormalPtr, tempBarycentricPtr);
         if (distance < nearest)
         {
             nearestIdx = index;
             nearest = distance;
+
+            if (outNormal)
+                *outNormal = tempNormal;
+
+            if (outUV)
+                barycentric = tempBarycentric;
         }
         index += 3;
     }
@@ -289,8 +281,13 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void
 {
     float nearest = M_INFINITY;
     const auto* vertices = (const unsigned char*)vertexData;
+
+    Vector3 tempNormal;
+    Vector3* tempNormalPtr = outNormal ? &tempNormal : nullptr;
+
     Vector3 barycentric;
-    Vector3* outBary = outUV ? &barycentric : nullptr;
+    Vector3 tempBarycentric;
+    Vector3* tempBarycentricPtr = outUV ? &tempBarycentric : nullptr;
 
     // 16-bit indices
     if (indexSize == sizeof(unsigned short))
@@ -304,11 +301,17 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void
             const Vector3& v0 = *((const Vector3*)(&vertices[indices[0] * vertexStride]));
             const Vector3& v1 = *((const Vector3*)(&vertices[indices[1] * vertexStride]));
             const Vector3& v2 = *((const Vector3*)(&vertices[indices[2] * vertexStride]));
-            float distance = HitDistance(v0, v1, v2, outNormal, outBary);
+            float distance = HitDistance(v0, v1, v2, tempNormalPtr, tempBarycentricPtr);
             if (distance < nearest)
             {
                 nearestIndices = indices;
                 nearest = distance;
+
+                if (outNormal)
+                    *outNormal = tempNormal;
+
+                if (outUV)
+                    barycentric = tempBarycentric;
             }
             indices += 3;
         }
@@ -340,11 +343,17 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void
             const Vector3& v0 = *((const Vector3*)(&vertices[indices[0] * vertexStride]));
             const Vector3& v1 = *((const Vector3*)(&vertices[indices[1] * vertexStride]));
             const Vector3& v2 = *((const Vector3*)(&vertices[indices[2] * vertexStride]));
-            float distance = HitDistance(v0, v1, v2, outNormal, outBary);
+            float distance = HitDistance(v0, v1, v2, tempNormalPtr, tempBarycentricPtr);
             if (distance < nearest)
             {
                 nearestIndices = indices;
                 nearest = distance;
+
+                if (outNormal)
+                    *outNormal = tempNormal;
+
+                if (outUV)
+                    barycentric = tempBarycentric;
             }
             indices += 3;
         }

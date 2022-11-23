@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -48,21 +29,27 @@ public:
     bool InitializeResourceCache(const VariantMap& parameters, bool removeOld = true);
     /// Run one frame.
     void RunFrame();
-    /// Create the console and return it. May return null if engine configuration does not allow creation (headless mode.)
+    /// Create the console and return it. May return null if engine configuration does not allow creation (headless mode).
     Console* CreateConsole();
     /// Create the debug hud.
     DebugHud* CreateDebugHud();
     /// Set minimum frames per second. If FPS goes lower than this, time will appear to slow down.
+    /// @property
     void SetMinFps(int fps);
     /// Set maximum frames per second. The engine will sleep if FPS is higher than this.
+    /// @property
     void SetMaxFps(int fps);
     /// Set maximum frames per second when the application does not have input focus.
+    /// @property
     void SetMaxInactiveFps(int fps);
     /// Set how many frames to average for timestep smoothing. Default is 2. 1 disables smoothing.
+    /// @property
     void SetTimeStepSmoothing(int frames);
     /// Set whether to pause update events and audio when minimized.
+    /// @property
     void SetPauseMinimized(bool enable);
-    /// Set whether to exit automatically on exit request (window close button.)
+    /// Set whether to exit automatically on exit request (window close button).
+    /// @property
     void SetAutoExit(bool enable);
     /// Override timestep of the next frame. Should be called in between RunFrame() calls.
     void SetNextTimeStep(float seconds);
@@ -79,30 +66,39 @@ public:
     float GetNextTimeStep() const { return timeStep_; }
 
     /// Return the minimum frames per second.
+    /// @property
     int GetMinFps() const { return minFps_; }
 
     /// Return the maximum frames per second.
+    /// @property
     int GetMaxFps() const { return maxFps_; }
 
     /// Return the maximum frames per second when the application does not have input focus.
+    /// @property
     int GetMaxInactiveFps() const { return maxInactiveFps_; }
 
     /// Return how many frames to average for timestep smoothing.
+    /// @property
     int GetTimeStepSmoothing() const { return timeStepSmoothing_; }
 
     /// Return whether to pause update events and audio when minimized.
+    /// @property
     bool GetPauseMinimized() const { return pauseMinimized_; }
 
     /// Return whether to exit automatically on exit request.
+    /// @property
     bool GetAutoExit() const { return autoExit_; }
 
     /// Return whether engine has been initialized.
+    /// @property
     bool IsInitialized() const { return initialized_; }
 
     /// Return whether exit has been requested.
+    /// @property
     bool IsExiting() const { return exiting_; }
 
     /// Return whether the engine has been created in headless mode.
+    /// @property
     bool IsHeadless() const { return headless_; }
 
     /// Send frame update events.
@@ -129,7 +125,7 @@ private:
     /// Frame update timer.
     HiresTimer frameTimer_;
     /// Previous timesteps for smoothing.
-    PODVector<float> lastTimeSteps_;
+    Vector<float> lastTimeSteps_;
     /// Next frame timestep in seconds.
     float timeStep_;
     /// How many frames to average for the smoothed timestep.

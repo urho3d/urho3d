@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -80,11 +61,11 @@ private:
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
 
     /// Cloned models' vertex buffers that we will animate.
-    Vector<SharedPtr<VertexBuffer> > animatingBuffers_;
+    Vector<SharedPtr<VertexBuffer>> animatingBuffers_;
     /// Original vertex positions for the sphere model.
-    PODVector<Vector3> originalVertices_;
+    Vector<Vector3> originalVertices_;
     /// If the vertices are duplicates, indices to the original vertices (to allow seamless animation.)
-    PODVector<unsigned> vertexDuplicates_;
+    Vector<i32> vertexDuplicates_;
     /// Animation flag.
     bool animate_;
     /// Animation's elapsed time.

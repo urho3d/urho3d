@@ -1,30 +1,12 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
 #include "../Core/ProcessUtils.h"
 #include "../Core/Thread.h"
+#include "../Core/Profiler.h"
 #include "../IO/Log.h"
 
 #include "../DebugNew.h"
@@ -60,7 +42,7 @@ bool TypeInfo::IsTypeOf(const TypeInfo* typeInfo) const
 {
     if (typeInfo == nullptr)
         return false;
-    
+
     const TypeInfo* current = this;
     while (current)
     {
@@ -265,7 +247,7 @@ void Object::UnsubscribeFromAllEvents()
     }
 }
 
-void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData)
+void Object::UnsubscribeFromAllEventsExcept(const Vector<StringHash>& exceptions, bool onlyUserData)
 {
     EventHandler* handler = eventHandlers_.First();
     EventHandler* previous = nullptr;
@@ -307,6 +289,13 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
 
     if (blockEvents_)
         return;
+
+#ifdef URHO3D_TRACY_PROFILING
+    URHO3D_PROFILE_COLOR(SendEvent, URHO3D_PROFILE_EVENT_COLOR);
+
+    const String& eventName = GetEventNameRegister().GetString(eventType);
+    URHO3D_PROFILE_STR(eventName.CString(), eventName.Length());
+#endif
 
     // Make a weak pointer to self to check for destruction during event handling
     WeakPtr<Object> self(this);
@@ -448,8 +437,8 @@ bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const
 
 const String& Object::GetCategory() const
 {
-    const HashMap<String, Vector<StringHash> >& objectCategories = context_->GetObjectCategories();
-    for (HashMap<String, Vector<StringHash> >::ConstIterator i = objectCategories.Begin(); i != objectCategories.End(); ++i)
+    const HashMap<String, Vector<StringHash>>& objectCategories = context_->GetObjectCategories();
+    for (HashMap<String, Vector<StringHash>>::ConstIterator i = objectCategories.Begin(); i != objectCategories.End(); ++i)
     {
         if (i->second_.Contains(GetType()))
             return i->first_;

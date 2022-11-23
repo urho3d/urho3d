@@ -6,7 +6,7 @@ class BorderImage : public UIElement
 {
     BorderImage();
     virtual ~BorderImage();
-    
+
     void SetTexture(Texture* texture);
     void SetImageRect(const IntRect& rect);
     void SetFullImageRect();
@@ -18,7 +18,7 @@ class BorderImage : public UIElement
     void SetDisabledOffset(int x, int y);
     void SetBlendMode(BlendMode mode);
     void SetTiled(bool enable);
-    
+
     Texture* GetTexture() const;
     const IntRect& GetImageRect() const;
     const IntRect& GetBorder() const;
@@ -27,8 +27,9 @@ class BorderImage : public UIElement
     const IntVector2& GetDisabledOffset() const;
     BlendMode GetBlendMode() const;
     bool IsTiled() const;
-    
+
     tolua_property__get_set Texture* texture;
+    tolua_property__get_set Material* material;
     tolua_property__get_set IntRect& imageRect;
     tolua_property__get_set IntRect& border;
     tolua_property__get_set IntRect& imageBorder;

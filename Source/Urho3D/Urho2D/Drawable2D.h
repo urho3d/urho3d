@@ -1,29 +1,11 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
 #include "../Graphics/Drawable.h"
-#include "../Graphics/GraphicsDefs.h"
+#include "../GraphicsAPI/GraphicsDefs.h"
+#include "../Urho2D/Urho2D.h"
 
 namespace Urho3D
 {
@@ -62,9 +44,6 @@ struct SourceBatch2D
     Vector<Vertex2D> vertices_;
 };
 
-/// Pixel size (equal 0.01f).
-extern URHO3D_API const float PIXEL_SIZE;
-
 /// Base class for 2D visible components.
 class URHO3D_API Drawable2D : public Drawable
 {
@@ -76,20 +55,25 @@ public:
     /// Destruct.
     ~Drawable2D() override;
     /// Register object factory. Drawable must be registered first.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Handle enabled/disabled state change.
     void OnSetEnabled() override;
 
     /// Set layer.
+    /// @property
     void SetLayer(int layer);
     /// Set order in layer.
+    /// @property
     void SetOrderInLayer(int orderInLayer);
 
     /// Return layer.
+    /// @property
     int GetLayer() const { return layer_; }
 
     /// Return order in layer.
+    /// @property
     int GetOrderInLayer() const { return orderInLayer_; }
 
     /// Return all source batches (called by Renderer2D).

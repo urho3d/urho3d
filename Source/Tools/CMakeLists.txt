@@ -1,29 +1,8 @@
-#
-# Copyright (c) 2008-2019 the Urho3D project.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
+# Copyright (c) 2008-2022 the Urho3D project
+# License: MIT
 
 # Set project name
 project (Urho3D-Tools)
-
-setup_lint ()
 
 # Find Urho3D library
 find_package (Urho3D REQUIRED)
@@ -38,8 +17,8 @@ if (URHO3D_ANGELSCRIPT OR URHO3D_LUA)
     add_subdirectory (Urho3DPlayer)
 endif ()
 
-# Build PackageTool using host compiler toolchain
-if (CMAKE_CROSSCOMPILING AND URHO3D_PACKAGING)
+# Build host-tools using host compiler toolchain
+if (CMAKE_CROSSCOMPILING)
     check_native_compiler_exist ()
     # When cross-compiling, build the host tool as external project
     include (ExternalProject)
@@ -50,15 +29,28 @@ if (CMAKE_CROSSCOMPILING AND URHO3D_PACKAGING)
     else ()
         set (ALTERNATE_COMMAND CMAKE_COMMAND ${CMAKE_COMMAND} -E env CC=${SAVED_CC} CXX=${SAVED_CXX} CI=$ENV{CI} ${CMAKE_COMMAND})
     endif ()
-    ExternalProject_Add (PackageTool
-        SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/Tools/PackageTool
-        CMAKE_ARGS -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DBAKED_CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR} -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
-        ${ALTERNATE_COMMAND})
-    add_make_clean_files (${CMAKE_BINARY_DIR}/bin/tool/PackageTool)
-    if (CMAKE_HOST_WIN32 AND NOT HAS_MKLINK)
-        add_dependencies (PackageTool Urho3D)   # Ensure Urho3D headers are fresh when building PackageTool externally on Windows host system without MKLINK
+    if (URHO3D_PACKAGING)
+        ExternalProject_Add (PackageTool
+            SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/Tools/PackageTool
+            CMAKE_ARGS -D URHO3D_DEPLOYMENT_TARGET=generic -D DEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -D BAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -D BAKED_CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR} -D CMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
+            ${ALTERNATE_COMMAND})
+        add_make_clean_files (${CMAKE_BINARY_DIR}/bin/tool/PackageTool)
+        if (CMAKE_HOST_WIN32 AND NOT HAS_MKLINK)
+            add_dependencies (PackageTool Urho3D)   # Ensure Urho3D headers are fresh when building PackageTool externally on Windows host system without MKLINK
+        endif ()
+        install (PROGRAMS ${CMAKE_BINARY_DIR}/bin/tool/PackageTool DESTINATION ${DEST_RUNTIME_DIR}/tool)
     endif ()
-    install (PROGRAMS ${CMAKE_BINARY_DIR}/bin/tool/PackageTool DESTINATION ${DEST_RUNTIME_DIR}/tool)
+    if (URHO3D_GENERATEBINDINGS)
+        ExternalProject_Add (BindingGenerator
+            SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/Tools/BindingGenerator
+            CMAKE_ARGS -D URHO3D_DEPLOYMENT_TARGET=generic -D DEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -D BAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -D BAKED_CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR} -D CMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
+            ${ALTERNATE_COMMAND})
+        add_make_clean_files (${CMAKE_BINARY_DIR}/bin/tool/BindingGenerator)
+        if (CMAKE_HOST_WIN32 AND NOT HAS_MKLINK)
+            add_dependencies (BindingGenerator Urho3D)
+        endif ()
+        install (PROGRAMS ${CMAKE_BINARY_DIR}/bin/tool/BindingGenerator DESTINATION ${DEST_RUNTIME_DIR}/tool)
+    endif ()
 endif ()
 
 if (URHO3D_TOOLS)
@@ -68,10 +60,15 @@ if (URHO3D_TOOLS)
     add_subdirectory (PackageTool)
     add_subdirectory (RampGenerator)
     add_subdirectory (SpritePacker)
+    add_subdirectory (Tests)
     if (URHO3D_ANGELSCRIPT)
         add_subdirectory (ScriptCompiler)
     endif ()
 elseif (NOT CMAKE_CROSSCOMPILING AND URHO3D_PACKAGING)
     # PackageTool target is required but we are not cross-compiling, so build it as per normal
     add_subdirectory (PackageTool)
+endif ()
+
+if (NOT CMAKE_CROSSCOMPILING AND URHO3D_GENERATEBINDINGS)
+    add_subdirectory (BindingGenerator)
 endif ()

@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Engine/Engine.h>
@@ -356,11 +337,13 @@ bool Navigation::Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawa
     if (!ui->GetCursor()->IsVisible() || ui->GetElementAt(pos, true))
         return false;
 
+    pos = ui->ConvertUIToSystem(pos);
+
     auto* graphics = GetSubsystem<Graphics>();
     auto* camera = cameraNode_->GetComponent<Camera>();
     Ray cameraRay = camera->GetScreenRay((float)pos.x_ / graphics->GetWidth(), (float)pos.y_ / graphics->GetHeight());
     // Pick only geometry objects, not eg. zones or lights, only get the first (closest) hit
-    PODVector<RayQueryResult> results;
+    Vector<RayQueryResult> results;
     RayOctreeQuery query(results, cameraRay, RAY_TRIANGLE, maxDistance, DRAWABLE_GEOMETRY);
     scene_->GetComponent<Octree>()->RaycastSingle(query);
     if (results.Size())
@@ -501,7 +484,7 @@ void Navigation::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventD
 
         if (currentPath_.Size() > 1)
         {
-            for (unsigned i = 0; i < currentPath_.Size() - 1; ++i)
+            for (i32 i = 0; i < currentPath_.Size() - 1; ++i)
                 debug->AddLine(currentPath_[i] + bias, currentPath_[i + 1] + bias, Color(1.0f, 1.0f, 1.0f));
         }
     }

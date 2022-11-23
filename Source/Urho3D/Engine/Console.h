@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -50,25 +31,33 @@ public:
     ~Console() override;
 
     /// Set UI elements' style from an XML file.
+    /// @property
     void SetDefaultStyle(XMLFile* style);
     /// Show or hide.
+    /// @property
     void SetVisible(bool enable);
     /// Toggle visibility.
     void Toggle();
 
     /// Automatically set console to visible when receiving an error log message.
+    /// @property
     void SetAutoVisibleOnError(bool enable) { autoVisibleOnError_ = enable; }
 
     /// Set the command interpreter.
+    /// @property
     void SetCommandInterpreter(const String& interpreter) { commandInterpreter_ = interpreter; }
 
     /// Set number of buffered rows.
-    void SetNumBufferedRows(unsigned rows);
+    /// @property
+    void SetNumBufferedRows(i32 rows);
     /// Set number of displayed rows.
-    void SetNumRows(unsigned rows);
+    /// @property
+    void SetNumRows(i32 rows);
     /// Set command history maximum size, 0 disables history.
-    void SetNumHistoryRows(unsigned rows);
+    /// @property
+    void SetNumHistoryRows(i32 rows);
     /// Set whether to automatically focus the line edit when showing. Default true on desktops and false on mobile devices, as on mobiles it would pop up the screen keyboard.
+    /// @property
     void SetFocusOnShow(bool enable);
     /// Add auto complete option.
     void AddAutoComplete(const String& option);
@@ -78,45 +67,58 @@ public:
     void UpdateElements();
 
     /// Return the UI style file.
+    /// @property
     XMLFile* GetDefaultStyle() const;
 
     /// Return the background element.
+    /// @property
     BorderImage* GetBackground() const { return background_; }
 
     /// Return the line edit element.
+    /// @property
     LineEdit* GetLineEdit() const { return lineEdit_; }
 
     /// Return the close butoon element.
+    /// @property
     Button* GetCloseButton() const { return closeButton_; }
 
     /// Return whether is visible.
+    /// @property
     bool IsVisible() const;
 
     /// Return true when console is set to automatically visible when receiving an error log message.
+    /// @property
     bool IsAutoVisibleOnError() const { return autoVisibleOnError_; }
 
     /// Return the last used command interpreter.
+    /// @property
     const String& GetCommandInterpreter() const { return commandInterpreter_; }
 
     /// Return number of buffered rows.
-    unsigned GetNumBufferedRows() const;
+    /// @property
+    i32 GetNumBufferedRows() const;
 
     /// Return number of displayed rows.
-    unsigned GetNumRows() const { return displayedRows_; }
+    /// @property
+    i32 GetNumRows() const { return displayedRows_; }
 
     /// Copy selected rows to system clipboard.
     void CopySelectedRows() const;
 
     /// Return history maximum size.
-    unsigned GetNumHistoryRows() const { return historyRows_; }
+    /// @property
+    i32 GetNumHistoryRows() const { return historyRows_; }
 
     /// Return current history position.
-    unsigned GetHistoryPosition() const { return historyPosition_; }
+    /// @property
+    i32 GetHistoryPosition() const { return historyPosition_; }
 
     /// Return history row at index.
-    const String& GetHistoryRow(unsigned index) const;
+    /// @property
+    const String& GetHistoryRow(i32 index) const;
 
     /// Return whether automatically focuses the line edit when showing.
+    /// @property
     bool GetFocusOnShow() const { return focusOnShow_; }
 
 private:
@@ -159,15 +161,15 @@ private:
     /// Command history.
     Vector<String> history_;
     /// Pending log message rows.
-    Vector<Pair<int, String> > pendingRows_;
+    Vector<Pair<int, String>> pendingRows_;
     /// Current row being edited.
     String currentRow_;
     /// Maximum displayed rows.
-    unsigned displayedRows_{};
+    i32 displayedRows_{};
     /// Command history maximum rows.
-    unsigned historyRows_;
+    i32 historyRows_;
     /// Command history current position.
-    unsigned historyPosition_;
+    i32 historyPosition_;
 
     /**
     Command auto complete options.
@@ -181,8 +183,8 @@ private:
     */
     Vector<String> autoComplete_;
     /// Command auto complete current position.
-    unsigned autoCompletePosition_;
-    /// Store the original line which is being auto-completed
+    i32 autoCompletePosition_;
+    /// Store the original line which is being auto-completed.
     String autoCompleteLine_;
 
     /// Flag when printing messages to prevent endless loop.

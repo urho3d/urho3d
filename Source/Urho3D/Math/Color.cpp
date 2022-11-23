@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -38,6 +19,16 @@ unsigned Color::ToUInt() const
     auto b = (unsigned)Clamp(((int)(b_ * 255.0f)), 0, 255);
     auto a = (unsigned)Clamp(((int)(a_ * 255.0f)), 0, 255);
     return (a << 24u) | (b << 16u) | (g << 8u) | r;
+}
+
+unsigned Color::ToUIntMask(const ChannelMask& mask) const
+{
+    const auto max = static_cast<double>(M_MAX_UNSIGNED);
+    const auto r = static_cast<unsigned>(Clamp(static_cast<double>(r_) * mask.r_, 0.0, max)) & mask.r_;
+    const auto g = static_cast<unsigned>(Clamp(static_cast<double>(g_) * mask.g_, 0.0, max)) & mask.g_;
+    const auto b = static_cast<unsigned>(Clamp(static_cast<double>(b_) * mask.b_, 0.0, max)) & mask.b_;
+    const auto a = static_cast<unsigned>(Clamp(static_cast<double>(a_) * mask.a_, 0.0, max)) & mask.a_;
+    return r | g | b | a;
 }
 
 Vector3 Color::ToHSL() const
@@ -70,6 +61,15 @@ void Color::FromUInt(unsigned color)
     b_ = ((color >> 16u) & 0xffu) / 255.0f;
     g_ = ((color >> 8u)  & 0xffu) / 255.0f;
     r_ = ((color >> 0u)  & 0xffu) / 255.0f;
+}
+
+void Color::FromUIntMask(unsigned color, const ChannelMask& mask)
+{
+    // Channel offset is irrelevant during division, but double should be used to avoid precision loss.
+    r_ = !mask.r_ ? 0.0f : static_cast<float>((color & mask.r_) / static_cast<double>(mask.r_));
+    g_ = !mask.g_ ? 0.0f : static_cast<float>((color & mask.g_) / static_cast<double>(mask.g_));
+    b_ = !mask.b_ ? 0.0f : static_cast<float>((color & mask.b_) / static_cast<double>(mask.b_));
+    a_ = !mask.a_ ? 1.0f : static_cast<float>((color & mask.a_) / static_cast<double>(mask.a_));
 }
 
 void Color::FromHSL(float h, float s, float l, float a)
@@ -340,6 +340,8 @@ void Color::FromHCM(float h, float c, float m)
 }
 
 
+const Color::ChannelMask Color::ABGR{ 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000 };
+const Color::ChannelMask Color::ARGB{ 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000 };
 const Color Color::WHITE;
 const Color Color::GRAY(0.5f, 0.5f, 0.5f);
 const Color Color::BLACK(0.0f, 0.0f, 0.0f);

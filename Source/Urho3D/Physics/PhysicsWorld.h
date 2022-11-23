@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -30,6 +11,8 @@
 #include "../Scene/Component.h"
 
 #include <Bullet/LinearMath/btIDebugDraw.h>
+
+#include <memory>
 
 class btCollisionConfiguration;
 class btCollisionShape;
@@ -118,11 +101,11 @@ struct PhysicsWorldConfig
     btCollisionConfiguration* collisionConfig_;
 };
 
-static const int DEFAULT_FPS = 60;
-static const float DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY = 100.0f;
+inline constexpr i32 DEFAULT_FPS = 60;
+inline constexpr float DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY = 100.0f;
 
 /// Cache of collision geometry data.
-using CollisionGeometryDataCache = HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >;
+using CollisionGeometryDataCache = HashMap<Pair<Model*, i32>, SharedPtr<CollisionGeometryData>>;
 
 /// Physics simulation world component. Should be added only to the root scene node.
 class URHO3D_API PhysicsWorld : public Component, public btIDebugDraw
@@ -138,6 +121,7 @@ public:
     /// Destruct.
     ~PhysicsWorld() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Check if an AABB is visible for debug drawing.
@@ -166,26 +150,34 @@ public:
     /// Refresh collisions only without updating dynamics.
     void UpdateCollisions();
     /// Set simulation substeps per second.
-    void SetFps(int fps);
+    /// @property
+    void SetFps(i32 fps);
     /// Set gravity.
+    /// @property
     void SetGravity(const Vector3& gravity);
     /// Set maximum number of physics substeps per frame. 0 (default) is unlimited. Positive values cap the amount. Use a negative value to enable an adaptive timestep. This may cause inconsistent physics behavior.
+    /// @property
     void SetMaxSubSteps(int num);
     /// Set number of constraint solver iterations.
+    /// @property
     void SetNumIterations(int num);
     /// Enable or disable automatic physics simulation during scene update. Enabled by default.
+    /// @property
     void SetUpdateEnabled(bool enable);
     /// Set whether to interpolate between simulation steps.
+    /// @property
     void SetInterpolation(bool enable);
     /// Set whether to use Bullet's internal edge utility for trimesh collisions. Disabled by default.
+    /// @property
     void SetInternalEdge(bool enable);
     /// Set split impulse collision mode. This is more accurate, but slower. Disabled by default.
+    /// @property
     void SetSplitImpulse(bool enable);
     /// Set maximum angular velocity for network replication.
     void SetMaxNetworkAngularVelocity(float velocity);
     /// Perform a physics world raycast and return all hits.
     void Raycast
-        (PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+        (Vector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Perform a physics world raycast and return the closest hit.
     void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Perform a physics world segmented raycast and return the closest hit. Useful for big scenes with many bodies.
@@ -203,37 +195,45 @@ public:
     /// Invalidate cached collision geometry for a model.
     void RemoveCachedGeometry(Model* model);
     /// Return rigid bodies by a sphere query.
-    void GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED);
+    void GetRigidBodies(Vector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Return rigid bodies by a box query.
-    void GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED);
+    void GetRigidBodies(Vector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Return rigid bodies by contact test with the specified body. It needs to be active to return all contacts reliably.
-    void GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body);
+    void GetRigidBodies(Vector<RigidBody*>& result, const RigidBody* body);
     /// Return rigid bodies that have been in collision with the specified body on the last simulation step. Only returns collisions that were sent as events (depends on collision event mode) and excludes e.g. static-static collisions.
-    void GetCollidingBodies(PODVector<RigidBody*>& result, const RigidBody* body);
+    void GetCollidingBodies(Vector<RigidBody*>& result, const RigidBody* body);
 
     /// Return gravity.
+    /// @property
     Vector3 GetGravity() const;
 
     /// Return maximum number of physics substeps per frame.
+    /// @property
     int GetMaxSubSteps() const { return maxSubSteps_; }
 
     /// Return number of constraint solver iterations.
+    /// @property
     int GetNumIterations() const;
 
     /// Return whether physics world will automatically simulate during scene update.
+    /// @property
     bool IsUpdateEnabled() const { return updateEnabled_; }
 
     /// Return whether interpolation between simulation steps is enabled.
+    /// @property
     bool GetInterpolation() const { return interpolation_; }
 
     /// Return whether Bullet's internal edge utility for trimesh collisions is enabled.
+    /// @property
     bool GetInternalEdge() const { return internalEdge_; }
 
     /// Return whether split impulse collision mode is enabled.
+    /// @property
     bool GetSplitImpulse() const;
 
     /// Return simulation steps per second.
-    int GetFps() const { return fps_; }
+    /// @property
+    i32 GetFps() const { return fps_; }
 
     /// Return maximum angular velocity for network replication.
     float GetMaxNetworkAngularVelocity() const { return maxNetworkAngularVelocity_; }
@@ -260,7 +260,7 @@ public:
     void SetDebugDepthTest(bool enable);
 
     /// Return the Bullet physics world.
-    btDiscreteDynamicsWorld* GetWorld() { return world_.Get(); }
+    btDiscreteDynamicsWorld* GetWorld() { return world_.get(); }
 
     /// Clean up the geometry cache.
     void CleanupGeometryCache();
@@ -302,26 +302,31 @@ private:
 
     /// Bullet collision configuration.
     btCollisionConfiguration* collisionConfiguration_{};
+
     /// Bullet collision dispatcher.
-    UniquePtr<btDispatcher> collisionDispatcher_;
+    std::unique_ptr<btDispatcher> collisionDispatcher_;
+
     /// Bullet collision broadphase.
-    UniquePtr<btBroadphaseInterface> broadphase_;
+    std::unique_ptr<btBroadphaseInterface> broadphase_;
+
     /// Bullet constraint solver.
-    UniquePtr<btConstraintSolver> solver_;
+    std::unique_ptr<btConstraintSolver> solver_;
+
     /// Bullet physics world.
-    UniquePtr<btDiscreteDynamicsWorld> world_;
+    std::unique_ptr<btDiscreteDynamicsWorld> world_;
+
     /// Extra weak pointer to scene to allow for cleanup in case the world is destroyed before other components.
     WeakPtr<Scene> scene_;
     /// Rigid bodies in the world.
-    PODVector<RigidBody*> rigidBodies_;
+    Vector<RigidBody*> rigidBodies_;
     /// Collision shapes in the world.
-    PODVector<CollisionShape*> collisionShapes_;
+    Vector<CollisionShape*> collisionShapes_;
     /// Constraints in the world.
-    PODVector<Constraint*> constraints_;
+    Vector<Constraint*> constraints_;
     /// Collision pairs on this frame.
-    HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, ManifoldPair> currentCollisions_;
-    /// Collision pairs on the previous frame. Used to check if a collision is "new." Manifolds are not guaranteed to exist anymore.
-    HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, ManifoldPair> previousCollisions_;
+    HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody>>, ManifoldPair> currentCollisions_;
+    /// Collision pairs on the previous frame. Used to check if a collision is "new". Manifolds are not guaranteed to exist anymore.
+    HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody>>, ManifoldPair> previousCollisions_;
     /// Delayed (parented) world transform assignments.
     HashMap<RigidBody*, DelayedWorldTransform> delayedWorldTransforms_;
     /// Cache for trimesh geometry data by model and LOD level.
@@ -337,7 +342,7 @@ private:
     /// Preallocated buffer for physics collision contact data.
     VectorBuffer contacts_;
     /// Simulation substeps per second.
-    unsigned fps_{DEFAULT_FPS};
+    i32 fps_{DEFAULT_FPS};
     /// Maximum number of simulation substeps per frame. 0 (default) unlimited, or negative values for adaptive timestep.
     int maxSubSteps_{};
     /// Time accumulator for non-interpolated mode.
@@ -363,6 +368,7 @@ private:
 };
 
 /// Register Physics library objects.
+/// @nobind
 void URHO3D_API RegisterPhysicsLibrary(Context* context);
 
 }

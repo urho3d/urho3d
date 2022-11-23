@@ -18,7 +18,7 @@ class Rect
     void Merge(const Rect& rect);
     void Clear();
     void Clip(const Rect& rect);
-    
+
     bool Defined() const;
     Vector2 Center() const;
     Vector2 Size() const;
@@ -27,7 +27,7 @@ class Rect
     Intersection IsInside(const Vector2& point) const;
     Intersection IsInside(const Rect& rect) const;
     Vector4 ToVector4() const;
-    
+
     String ToString() const;
 
     Vector2 min_ @ min;

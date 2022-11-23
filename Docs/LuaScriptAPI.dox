@@ -698,6 +698,7 @@ Methods:
 Properties:
 
 - Texture* texture
+- Material* material
 - IntRect& imageRect
 - IntRect& border
 - IntRect& imageBorder
@@ -4042,7 +4043,7 @@ Methods:
 - bool Connect(const String address, short port, Scene* scene)
 - bool Connect(const String address, short port, Scene* scene, const VariantMap& identity)
 - void Disconnect(int waitMSec = 0)
-- bool StartServer(short port)
+- bool StartServer(short port, int maxConnections = 128)
 - void StopServer()
 - void BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0)
 - void BroadcastRemoteEvent(StringHash eventType, bool inOrder)
@@ -5081,6 +5082,7 @@ Methods:
 - void UpdateWheelTransform(int wheel, bool interpolated)
 - void SetSteeringValue(int wheel, float steeringValue)
 - void SetWheelSuspensionStiffness(int wheel, float stiffness)
+- void SetWheelMaxSuspensionForce(int wheel, float force)
 - void SetWheelDampingRelaxation(int wheel, float damping)
 - void SetWheelDampingCompression(int wheel, float compression)
 - void SetWheelFrictionSlip(int wheel, float slip)
@@ -5108,6 +5110,7 @@ Methods:
 - Node* GetWheelNode(int wheel)
 - float GetSteeringValue(int wheel) const
 - float GetWheelSuspensionStiffness(int wheel) const
+- float GetWheelMaxSuspensionForce(int wheel) const
 - float GetWheelDampingRelaxation(int wheel) const
 - float GetWheelDampingCompression(int wheel) const
 - float GetWheelFrictionSlip(int wheel) const
@@ -7949,7 +7952,7 @@ Methods:
 - void SetCullCamera(Camera* camera)
 - void SetRect(const IntRect& rect)
 - void SetRenderPath(RenderPath* path)
-- void SetRenderPath(XMLFile* file)
+- bool SetRenderPath(XMLFile* file)
 - void SetDrawDebug(bool enable)
 - Scene* GetScene() const
 - Camera* GetCamera() const
@@ -8392,6 +8395,11 @@ Properties:
 
 ### Feature
 
+- int WEIGHT_NLERP
+- int INHERIT_PARENT_ROTATION
+
+### Feature
+
 - int JOINT_ROTATIONS
 - int TARGET_ROTATIONS
 - int UPDATE_ORIGINAL_POSE
@@ -8399,11 +8407,6 @@ Properties:
 - int USE_ORIGINAL_POSE
 - int CONSTRAINTS
 - int AUTO_SOLVE
-
-### Feature
-
-- int WEIGHT_NLERP
-- int INHERIT_PARENT_ROTATION
 
 ### FileMode
 
@@ -9358,6 +9361,13 @@ Properties:
 - int VA_BOTTOM
 - int VA_CUSTOM
 
+### ViewOverride
+
+- int VO_NONE
+- int VO_LOW_MATERIAL_QUALITY
+- int VO_DISABLE_SHADOWS
+- int VO_DISABLE_OCCLUSION
+
 ### WindowDragMode
 
 - int DRAG_NONE
@@ -9619,6 +9629,7 @@ Properties:
 - int LOG_TRACE
 - int LOG_WARNING
 - int MAX_VERTEX_LIGHTS
+- int MSG_USER
 - float M_DEGTORAD
 - float M_DEGTORAD_2
 - float M_EPSILON
@@ -9645,10 +9656,6 @@ Properties:
 - String SOUND_MASTER
 - String SOUND_MUSIC
 - String SOUND_VOICE
-- unsigned VO_DISABLE_OCCLUSION
-- unsigned VO_DISABLE_SHADOWS
-- unsigned VO_LOW_MATERIAL_QUALITY
-- unsigned VO_NONE
 
 */
 

@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include <Urho3D/Core/Context.h>
 #include <Urho3D/Core/ProcessUtils.h>
@@ -43,7 +24,7 @@ SharedPtr<XMLFile> meshFile_(new XMLFile(context_));
 SharedPtr<XMLFile> skelFile_(new XMLFile(context_));
 Vector<ModelIndexBuffer> indexBuffers_;
 Vector<ModelVertexBuffer> vertexBuffers_;
-Vector<Vector<ModelSubGeometryLodLevel> > subGeometries_;
+Vector<Vector<ModelSubGeometryLodLevel>> subGeometries_;
 Vector<Vector3> subGeometryCenters_;
 Vector<ModelBone> bones_;
 Vector<ModelMorph> morphs_;
@@ -308,7 +289,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
     unsigned vertexStart = 0;
     unsigned subMeshIndex = 0;
 
-    PODVector<unsigned> vertexStarts;
+    Vector<unsigned> vertexStarts;
     vertexStarts.Resize(numSubMeshes_);
 
     while (subMesh)
@@ -505,7 +486,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                 {
                     HashMap<unsigned, unsigned> usedBoneMap;
                     unsigned remapIndex = 0;
-                    for (HashMap<unsigned, PODVector<BoneWeightAssignment> >::Iterator i =
+                    for (HashMap<unsigned, Vector<BoneWeightAssignment>>::Iterator i =
                         subGeometryLodLevel.boneWeights_.Begin(); i != subGeometryLodLevel.boneWeights_.End(); ++i)
                     {
                         // Sort the bone assigns by weight
@@ -536,7 +517,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                     sorted = true;
                 }
 
-                for (HashMap<unsigned, PODVector<BoneWeightAssignment> >::Iterator i = subGeometryLodLevel.boneWeights_.Begin();
+                for (HashMap<unsigned, Vector<BoneWeightAssignment>>::Iterator i = subGeometryLodLevel.boneWeights_.Begin();
                     i != subGeometryLodLevel.boneWeights_.End(); ++i)
                 {
                     // Sort the bone assigns by weight, if not sorted yet in bone remapping pass
@@ -1060,8 +1041,8 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
 
 void OptimizeIndices(ModelSubGeometryLodLevel* subGeom, ModelVertexBuffer* vb, ModelIndexBuffer* ib)
 {
-    PODVector<Triangle> oldTriangles;
-    PODVector<Triangle> newTriangles;
+    Vector<Triangle> oldTriangles;
+    Vector<Triangle> newTriangles;
 
     if (subGeom->indexCount_ % 3)
     {
@@ -1087,7 +1068,7 @@ void OptimizeIndices(ModelSubGeometryLodLevel* subGeom, ModelVertexBuffer* vb, M
     for (unsigned i = 0; i < vb->vertices_.Size(); ++i)
         CalculateScore(vb->vertices_[i]);
 
-    PODVector<unsigned> vertexCache;
+    Vector<unsigned> vertexCache;
 
     while (oldTriangles.Size())
     {

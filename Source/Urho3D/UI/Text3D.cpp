@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -28,7 +9,7 @@
 #include "../Graphics/Graphics.h"
 #include "../Graphics/Material.h"
 #include "../Graphics/Technique.h"
-#include "../Graphics/VertexBuffer.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Node.h"
@@ -119,13 +100,13 @@ void Text3D::UpdateBatches(const FrameInfo& frame)
     if (faceCameraMode_ != FC_NONE || fixedScreenSize_)
         CalculateFixedScreenSize(frame);
 
-    for (unsigned i = 0; i < batches_.Size(); ++i)
+    for (i32 i = 0; i < batches_.Size(); ++i)
     {
         batches_[i].distance_ = distance_;
         batches_[i].worldTransform_ = faceCameraMode_ != FC_NONE ? &customWorldTransform_ : &node_->GetWorldTransform();
     }
 
-    for (unsigned i = 0; i < uiBatches_.Size(); ++i)
+    for (i32 i = 0; i < uiBatches_.Size(); ++i)
     {
         if (uiBatches_[i].texture_ && uiBatches_[i].texture_->IsDataLost())
         {
@@ -151,7 +132,7 @@ void Text3D::UpdateGeometry(const FrameInfo& frame)
 
     if (geometryDirty_)
     {
-        for (unsigned i = 0; i < batches_.Size() && i < uiBatches_.Size(); ++i)
+        for (i32 i = 0; i < batches_.Size() && i < uiBatches_.Size(); ++i)
         {
             Geometry* geometry = geometries_[i];
             geometry->SetDrawRange(TRIANGLE_LIST, 0, 0, uiBatches_[i].vertexStart_ / UI_VERTEX_SIZE,
@@ -161,7 +142,7 @@ void Text3D::UpdateGeometry(const FrameInfo& frame)
 
     if ((geometryDirty_ || vertexBuffer_->IsDataLost()) && uiVertexData_.Size())
     {
-        unsigned vertexCount = uiVertexData_.Size() / UI_VERTEX_SIZE;
+        i32 vertexCount = uiVertexData_.Size() / UI_VERTEX_SIZE;
         if (vertexBuffer_->GetVertexCount() != vertexCount)
             vertexBuffer_->SetSize(vertexCount, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1);
         vertexBuffer_->SetData(&uiVertexData_[0]);
@@ -470,28 +451,31 @@ int Text3D::GetRowHeight() const
     return text_.GetRowHeight();
 }
 
-unsigned Text3D::GetNumRows() const
+i32 Text3D::GetNumRows() const
 {
     return text_.GetNumRows();
 }
 
-unsigned Text3D::GetNumChars() const
+i32 Text3D::GetNumChars() const
 {
     return text_.GetNumChars();
 }
 
-int Text3D::GetRowWidth(unsigned index) const
+int Text3D::GetRowWidth(i32 index) const
 {
+    assert(index >= 0);
     return text_.GetRowWidth(index);
 }
 
-Vector2 Text3D::GetCharPosition(unsigned index)
+Vector2 Text3D::GetCharPosition(i32 index)
 {
+    assert(index >= 0);
     return text_.GetCharPosition(index);
 }
 
-Vector2 Text3D::GetCharSize(unsigned index)
+Vector2 Text3D::GetCharSize(i32 index)
 {
+    assert(index >= 0);
     return text_.GetCharSize(index);
 }
 
@@ -589,6 +573,9 @@ void Text3D::UpdateTextBatches()
     case HA_RIGHT:
         offset.x_ -= (float)text_.GetWidth();
         break;
+
+    case HA_CUSTOM:
+        break;
     }
 
     switch (text_.GetVerticalAlignment())
@@ -603,13 +590,16 @@ void Text3D::UpdateTextBatches()
     case VA_BOTTOM:
         offset.y_ -= (float)text_.GetHeight();
         break;
+
+    case VA_CUSTOM:
+        break;
     }
 
     if (uiVertexData_.Size())
     {
         boundingBox_.Clear();
 
-        for (unsigned i = 0; i < uiVertexData_.Size(); i += UI_VERTEX_SIZE)
+        for (i32 i = 0; i < uiVertexData_.Size(); i += UI_VERTEX_SIZE)
         {
             Vector3& position = *(reinterpret_cast<Vector3*>(&uiVertexData_[i]));
             position += offset;
@@ -633,7 +623,7 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
     batches_.Resize(uiBatches_.Size());
     geometries_.Resize(uiBatches_.Size());
 
-    for (unsigned i = 0; i < batches_.Size(); ++i)
+    for (i32 i = 0; i < batches_.Size(); ++i)
     {
         if (!geometries_[i])
         {

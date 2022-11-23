@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -98,9 +79,11 @@ public:
     /// Destruct.
     ~DebugRenderer() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Set line antialiasing on/off. Default false.
+    /// @property
     void SetLineAntiAlias(bool enable);
     /// Set the camera viewpoint. Call before rendering, or before adding geometry if you want to use culling.
     void SetView(Camera* camera);
@@ -131,7 +114,7 @@ public:
     /// Add a sphere sector. Angle ranges from 0 to 360. Identity Quaternion yields the filled portion of the sector upwards.
     void AddSphereSector(const Sphere& sphere, const Quaternion& rotation, float angle,
         bool drawLines, const Color& color, bool depthTest = true);
-    /// Add a cylinder
+    /// Add a cylinder.
     void AddCylinder(const Vector3& position, float radius, float height, const Color& color, bool depthTest = true);
     /// Add a skeleton.
     void AddSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest = true);
@@ -152,6 +135,7 @@ public:
     void Render();
 
     /// Return whether line antialiasing is enabled.
+    /// @property
     bool GetLineAntiAlias() const { return lineAntiAlias_; }
 
     /// Return the view transform.
@@ -173,13 +157,13 @@ private:
     void HandleEndFrame(StringHash eventType, VariantMap& eventData);
 
     /// Lines rendered with depth test.
-    PODVector<DebugLine> lines_;
+    Vector<DebugLine> lines_;
     /// Lines rendered without depth test.
-    PODVector<DebugLine> noDepthLines_;
+    Vector<DebugLine> noDepthLines_;
     /// Triangles rendered with depth test.
-    PODVector<DebugTriangle> triangles_;
+    Vector<DebugTriangle> triangles_;
     /// Triangles rendered without depth test.
-    PODVector<DebugTriangle> noDepthTriangles_;
+    Vector<DebugTriangle> noDepthTriangles_;
     /// View transform.
     Matrix3x4 view_;
     /// Projection transform.

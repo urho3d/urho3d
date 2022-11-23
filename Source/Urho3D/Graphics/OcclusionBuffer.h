@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 /// \file
 
@@ -27,7 +8,7 @@
 #include "../Core/Object.h"
 #include "../Core/Timer.h"
 #include "../Container/ArrayPtr.h"
-#include "../Graphics/GraphicsDefs.h"
+#include "../GraphicsAPI/GraphicsDefs.h"
 #include "../Math/Frustum.h"
 
 namespace Urho3D
@@ -79,13 +60,6 @@ struct OcclusionBatch
     /// Index or vertex count.
     unsigned drawCount_;
 };
-
-static const int OCCLUSION_MIN_SIZE = 8;
-static const int OCCLUSION_DEFAULT_MAX_TRIANGLES = 5000;
-static const float OCCLUSION_RELATIVE_BIAS = 0.00001f;
-static const int OCCLUSION_FIXED_BIAS = 16;
-static const float OCCLUSION_X_SCALE = 65536.0f;
-static const float OCCLUSION_Z_SCALE = 16777216.0f;
 
 /// Software renderer for occlusion.
 class URHO3D_API OcclusionBuffer : public Object
@@ -155,7 +129,7 @@ public:
     unsigned GetUseTimer();
 
     /// Draw a batch. Called internally.
-    void DrawBatch(const OcclusionBatch& batch, unsigned threadIndex);
+    void DrawBatch(const OcclusionBatch& batch, i32 threadIndex);
 
 private:
     /// Apply modelview transform to vertex.
@@ -169,22 +143,22 @@ private:
     /// Calculate viewport transform.
     void CalculateViewport();
     /// Draw a triangle.
-    void DrawTriangle(Vector4* vertices, unsigned threadIndex);
+    void DrawTriangle(Vector4* vertices, i32 threadIndex);
     /// Clip vertices against a plane.
     void ClipVertices(const Vector4& plane, Vector4* vertices, bool* triangles, unsigned& numTriangles);
     /// Draw a clipped triangle.
-    void DrawTriangle2D(const Vector3* vertices, bool clockwise, unsigned threadIndex);
+    void DrawTriangle2D(const Vector3* vertices, bool clockwise, i32 threadIndex);
     /// Clear a thread work buffer.
-    void ClearBuffer(unsigned threadIndex);
+    void ClearBuffer(i32 threadIndex);
     /// Merge thread work buffers into the first buffer.
     void MergeBuffers();
 
     /// Highest-level buffer data per thread.
     Vector<OcclusionBufferData> buffers_;
     /// Reduced size depth buffers.
-    Vector<SharedArrayPtr<DepthValue> > mipBuffers_;
+    Vector<SharedArrayPtr<DepthValue>> mipBuffers_;
     /// Submitted render jobs.
-    PODVector<OcclusionBatch> batches_;
+    Vector<OcclusionBatch> batches_;
     /// Buffer width.
     int width_{};
     /// Buffer height.
@@ -192,7 +166,7 @@ private:
     /// Number of rendered triangles.
     unsigned numTriangles_{};
     /// Maximum number of triangles.
-    unsigned maxTriangles_{OCCLUSION_DEFAULT_MAX_TRIANGLES};
+    unsigned maxTriangles_;
     /// Culling mode.
     CullMode cullMode_{CULL_CCW};
     /// Depth hierarchy needs update flag.

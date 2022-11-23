@@ -4,7 +4,7 @@ class Menu : public Button
 {
     Menu();
     virtual ~Menu();
-    
+
     void SetPopup(UIElement* element);
     void SetPopupOffset(const IntVector2& offset);
     void SetPopupOffset(int x, int y);
@@ -16,7 +16,7 @@ class Menu : public Button
     bool GetShowPopup() const;
     int GetAcceleratorKey() const;
     int GetAcceleratorQualifiers() const;
-    
+
     tolua_property__get_set UIElement* popup;
     tolua_property__get_set IntVector2& popupOffset;
     tolua_property__get_set bool showPopup;

@@ -135,7 +135,7 @@ class CreateNodeAction : EditAction
         Node@ parent = editorScene.GetNode(parentID);
         if (parent !is null)
         {
-            Node@ node = parent.CreateChild("", IsReplicatedID(nodeID) ? REPLICATED : LOCAL, nodeID);
+            Node@ node = parent.CreateChild("", Scene::IsReplicatedID(nodeID) ? REPLICATED : LOCAL, nodeID);
             node.LoadXML(nodeData.root);
             FocusNode(node);
         }
@@ -166,7 +166,7 @@ class DeleteNodeAction : EditAction
             // Handle update manually so that the node can be reinserted back into its previous list index
             suppressSceneChanges = true;
 
-            Node@ node = parent.CreateChild("", IsReplicatedID(nodeID) ? REPLICATED : LOCAL, nodeID);
+            Node@ node = parent.CreateChild("", Scene::IsReplicatedID(nodeID) ? REPLICATED : LOCAL, nodeID);
             if (node.LoadXML(nodeData.root))
             {
                 uint listItemIndex = nodeData.root.GetUInt("listItemIndex");
@@ -363,7 +363,7 @@ class CreateComponentAction : EditAction
         Node@ node = editorScene.GetNode(nodeID);
         if (node !is null)
         {
-            Component@ component = node.CreateComponent(componentData.root.GetAttribute("type"), IsReplicatedID(componentID) ?
+            Component@ component = node.CreateComponent(componentData.root.GetAttribute("type"), Scene::IsReplicatedID(componentID) ?
                 REPLICATED : LOCAL, componentID);
             component.LoadXML(componentData.root);
             component.ApplyAttributes();
@@ -397,7 +397,7 @@ class DeleteComponentAction : EditAction
             // Handle update manually so that the component can be reinserted back into its previous list index
             suppressSceneChanges = true;
 
-            Component@ component = node.CreateComponent(componentData.root.GetAttribute("type"), IsReplicatedID(componentID) ?
+            Component@ component = node.CreateComponent(componentData.root.GetAttribute("type"), Scene::IsReplicatedID(componentID) ?
                 REPLICATED : LOCAL, componentID);
             if (component.LoadXML(componentData.root))
             {

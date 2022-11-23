@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -216,7 +197,7 @@ struct DDSurfaceDesc2
     unsigned dwTextureStage_;
 };
 
-bool CompressedLevel::Decompress(unsigned char* dest)
+bool CompressedLevel::Decompress(unsigned char* dest) const
 {
     if (!data_)
         return false;
@@ -228,7 +209,7 @@ bool CompressedLevel::Decompress(unsigned char* dest)
     case CF_DXT5:
         DecompressImageDXT(dest, data_, width_, height_, depth_, format_);
         return true;
-	
+
     // ETC2 format is compatible with ETC1, so we just use the same function.
     case CF_ETC1:
     case CF_ETC2_RGB:
@@ -959,13 +940,13 @@ void Image::SetPixelInt(int x, int y, int z, unsigned uintColor)
     {
     case 4:
         dest[3] = src[3];
-        // Fall through
+        [[fallthrough]];
     case 3:
         dest[2] = src[2];
-        // Fall through
+        [[fallthrough]];
     case 2:
         dest[1] = src[1];
-        // Fall through
+        [[fallthrough]];
     default:
         dest[0] = src[0];
         break;
@@ -1205,13 +1186,13 @@ bool Image::Resize(int width, int height)
             {
             case 4:
                 dest[3] = src[3];
-                // Fall through
+                [[fallthrough]];
             case 3:
                 dest[2] = src[2];
-                // Fall through
+                [[fallthrough]];
             case 2:
                 dest[1] = src[1];
-                // Fall through
+                [[fallthrough]];
             default:
                 dest[0] = src[0];
                 break;
@@ -1364,7 +1345,7 @@ bool Image::SaveDDS(const String& fileName) const
     }
 
     // Write image
-    PODVector<const Image*> levels;
+    Vector<const Image*> levels;
     GetLevels(levels);
 
     outFile.WriteFileID("DDS ");
@@ -1505,10 +1486,10 @@ Color Image::GetPixel(int x, int y, int z) const
     {
     case 4:
         ret.a_ = (float)src[3] / 255.0f;
-        // Fall through
+        [[fallthrough]];
     case 3:
         ret.b_ = (float)src[2] / 255.0f;
-        // Fall through
+        [[fallthrough]];
     case 2:
         ret.g_ = (float)src[1] / 255.0f;
         ret.r_ = (float)src[0] / 255.0f;
@@ -1542,10 +1523,10 @@ unsigned Image::GetPixelInt(int x, int y, int z) const
     {
     case 4:
         ret |= (unsigned)src[3] << 24;
-        // Fall through
+        [[fallthrough]];
     case 3:
         ret |= (unsigned)src[2] << 16;
-        // Fall through
+        [[fallthrough]];
     case 2:
         ret |= (unsigned)src[1] << 8;
         ret |= (unsigned)src[0];
@@ -1889,6 +1870,10 @@ SharedPtr<Image> Image::GetNextLevel() const
                                                       inOuterLower[x * 2 + 2] + inOuterLower[x * 2 + 6] +
                                                       inInnerUpper[x * 2 + 2] + inInnerUpper[x * 2 + 6] +
                                                       inInnerLower[x * 2 + 2] + inInnerLower[x * 2 + 6]) >> 3);
+                        out[x + 3] = (unsigned char)(((unsigned)inOuterUpper[x * 2 + 3] + inOuterUpper[x * 2 + 7] +
+                                                      inOuterLower[x * 2 + 3] + inOuterLower[x * 2 + 7] +
+                                                      inInnerUpper[x * 2 + 3] + inInnerUpper[x * 2 + 7] +
+                                                      inInnerLower[x * 2 + 3] + inInnerLower[x * 2 + 7]) >> 3);
                     }
                 }
             }
@@ -2108,6 +2093,20 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
     }
 }
 
+SharedPtr<Image> Image::GetDecompressedImage() const
+{
+    if (!IsCompressed())
+        return ConvertToRGBA();
+
+    const CompressedLevel compressedLevel = GetCompressedLevel(0);
+
+    auto decompressedImage = MakeShared<Image>(context_);
+    decompressedImage->SetSize(compressedLevel.width_, compressedLevel.height_, 4);
+    compressedLevel.Decompress(decompressedImage->GetData());
+
+    return decompressedImage;
+}
+
 Image* Image::GetSubimage(const IntRect& rect) const
 {
     if (!data_)
@@ -2156,7 +2155,7 @@ Image* Image::GetSubimage(const IntRect& rect) const
         paddedRect.bottom_ = (rect.bottom_ / 4) * 4;
         IntRect currentRect = paddedRect;
 
-        PODVector<unsigned char> subimageData;
+        Vector<unsigned char> subimageData;
         unsigned subimageLevels = 0;
 
         // Save as many mips as possible until the next mip would cross a block boundary
@@ -2308,7 +2307,7 @@ void Image::CleanupLevels()
     nextLevel_.Reset();
 }
 
-void Image::GetLevels(PODVector<Image*>& levels)
+void Image::GetLevels(Vector<Image*>& levels)
 {
     levels.Clear();
 
@@ -2320,7 +2319,7 @@ void Image::GetLevels(PODVector<Image*>& levels)
     }
 }
 
-void Image::GetLevels(PODVector<const Image*>& levels) const
+void Image::GetLevels(Vector<const Image*>& levels) const
 {
     levels.Clear();
 

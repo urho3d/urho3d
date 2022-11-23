@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -31,7 +12,7 @@
 #include "../Graphics/Material.h"
 #include "../Graphics/OcclusionBuffer.h"
 #include "../Graphics/OctreeQuery.h"
-#include "../Graphics/VertexBuffer.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
@@ -71,7 +52,7 @@ void StaticModel::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Occlusion LOD Level", int, occlusionLodLevel_, M_MAX_UNSIGNED, AM_DEFAULT);
 }
 
-void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
+void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results)
 {
     RayQueryLevel level = query.level_;
 
@@ -89,13 +70,13 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
         float distance = localRay.HitDistance(boundingBox_);
         Vector3 normal = -query.ray_.direction_;
         Vector2 geometryUV;
-        unsigned hitBatch = M_MAX_UNSIGNED;
+        i32 hitBatch = NINDEX;
 
         if (level >= RAY_TRIANGLE && distance < query.maxDistance_)
         {
             distance = M_INFINITY;
 
-            for (unsigned i = 0; i < batches_.Size(); ++i)
+            for (i32 i = 0; i < batches_.Size(); ++i)
             {
                 Geometry* geometry = batches_[i].geometry_;
                 if (geometry)
@@ -209,7 +190,7 @@ bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
         unsigned vertexSize;
         const unsigned char* indexData;
         unsigned indexSize;
-        const PODVector<VertexElement>* elements;
+        const Vector<VertexElement>* elements;
 
         geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
         // Check for valid geometry data
@@ -250,8 +231,8 @@ void StaticModel::SetModel(Model* model)
 
         // Copy the subgeometry & LOD level structure
         SetNumGeometries(model->GetNumGeometries());
-        const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
-        const PODVector<Vector3>& geometryCenters = model->GetGeometryCenters();
+        const Vector<Vector<SharedPtr<Geometry>>>& geometries = model->GetGeometries();
+        const Vector<Vector3>& geometryCenters = model->GetGeometryCenters();
         const Matrix3x4* worldTransform = node_ ? &node_->GetWorldTransform() : nullptr;
         for (unsigned i = 0; i < geometries.Size(); ++i)
         {
@@ -421,7 +402,7 @@ void StaticModel::CalculateLodLevels()
 {
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
-        const Vector<SharedPtr<Geometry> >& batchGeometries = geometries_[i];
+        const Vector<SharedPtr<Geometry>>& batchGeometries = geometries_[i];
         // If only one LOD geometry, no reason to go through the LOD calculation
         if (batchGeometries.Size() <= 1)
             continue;

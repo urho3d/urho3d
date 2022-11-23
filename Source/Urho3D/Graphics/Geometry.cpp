@@ -1,31 +1,12 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
 #include "../Graphics/Geometry.h"
 #include "../Graphics/Graphics.h"
-#include "../Graphics/IndexBuffer.h"
-#include "../Graphics/VertexBuffer.h"
+#include "../GraphicsAPI/IndexBuffer.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #include "../IO/Log.h"
 #include "../Math/Ray.h"
 
@@ -153,7 +134,7 @@ void Geometry::SetLodDistance(float distance)
     lodDistance_ = distance;
 }
 
-void Geometry::SetRawVertexData(const SharedArrayPtr<unsigned char>& data, const PODVector<VertexElement>& elements)
+void Geometry::SetRawVertexData(const SharedArrayPtr<unsigned char>& data, const Vector<VertexElement>& elements)
 {
     rawVertexData_ = data;
     rawVertexSize_ = VertexBuffer::GetVertexSize(elements);
@@ -193,24 +174,24 @@ VertexBuffer* Geometry::GetVertexBuffer(unsigned index) const
     return index < vertexBuffers_.Size() ? vertexBuffers_[index] : nullptr;
 }
 
-unsigned short Geometry::GetBufferHash() const
+u16 Geometry::GetBufferHash() const
 {
-    unsigned short hash = 0;
+    u16 hash = 0;
 
-    for (unsigned i = 0; i < vertexBuffers_.Size(); ++i)
+    for (i32 i = 0; i < vertexBuffers_.Size(); ++i)
     {
         VertexBuffer* vBuf = vertexBuffers_[i];
-        hash += *((unsigned short*)&vBuf);
+        hash += *((u16*)&vBuf);
     }
 
     IndexBuffer* iBuf = indexBuffer_;
-    hash += *((unsigned short*)&iBuf);
+    hash += *((u16*)&iBuf);
 
     return hash;
 }
 
 void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData,
-    unsigned& indexSize, const PODVector<VertexElement>*& elements) const
+    unsigned& indexSize, const Vector<VertexElement>*& elements) const
 {
     if (rawVertexData_)
     {
@@ -255,7 +236,7 @@ void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize
 }
 
 void Geometry::GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, unsigned& vertexSize,
-    SharedArrayPtr<unsigned char>& indexData, unsigned& indexSize, const PODVector<VertexElement>*& elements) const
+    SharedArrayPtr<unsigned char>& indexData, unsigned& indexSize, const Vector<VertexElement>*& elements) const
 {
     if (rawVertexData_)
     {
@@ -305,7 +286,7 @@ float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal, Vector2* outU
     const unsigned char* indexData;
     unsigned vertexSize;
     unsigned indexSize;
-    const PODVector<VertexElement>* elements;
+    const Vector<VertexElement>* elements;
 
     GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
 
@@ -332,7 +313,7 @@ bool Geometry::IsInside(const Ray& ray) const
     const unsigned char* indexData;
     unsigned vertexSize;
     unsigned indexSize;
-    const PODVector<VertexElement>* elements;
+    const Vector<VertexElement>* elements;
 
     GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
 

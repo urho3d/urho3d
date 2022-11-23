@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Core/Context.h"
 #include "../Physics/PhysicsUtils.h"
@@ -173,6 +154,7 @@ static const StringVector wheelElementNames =
     "   Contact position",
     "   Contact normal",
     "   Suspension stiffness",
+    "   Max suspension force",
     "   Damping relaxation",
     "   Damping compression",
     "   Friction slip",
@@ -228,6 +210,7 @@ void RaycastVehicle::ApplyAttributes()
         Vector3 contactPosition = value[index++].GetVector3();
         Vector3 contactNormal = value[index++].GetVector3();
         float suspensionStiffness = value[index++].GetFloat();
+        float maxSuspensionForce = value[index++].GetFloat();
         float dampingRelaxation = value[index++].GetFloat();
         float dampingCompression = value[index++].GetFloat();
         float frictionSlip = value[index++].GetFloat();
@@ -262,6 +245,7 @@ void RaycastVehicle::ApplyAttributes()
         wheel.m_raycastInfo.m_contactNormalWS = btVector3(contactNormal.x_, contactNormal.y_, contactNormal.z_);
         wheel.m_raycastInfo.m_contactPointWS = btVector3(contactPosition.x_, contactPosition.y_, contactPosition.z_);
         wheel.m_suspensionStiffness = suspensionStiffness;
+        wheel.m_maxSuspensionForce = maxSuspensionForce;
         wheel.m_wheelsDampingRelaxation = dampingRelaxation;
         wheel.m_wheelsDampingCompression = dampingCompression;
         wheel.m_frictionSlip = frictionSlip;
@@ -335,10 +319,9 @@ void RaycastVehicle::FixedPostUpdate(float timeStep)
                 whInfo.m_rotation += delta - whInfo.m_deltaRotation;
                 whInfo.m_deltaRotation = delta;
             }
+
             if (skidInfoCumulative_[i] > 0.05f)
-            {
-                skidInfoCumulative_[i] -= 0.002;
-            }
+                skidInfoCumulative_[i] -= 0.002f;
         }
         else
         {
@@ -458,6 +441,20 @@ float RaycastVehicle::GetWheelSuspensionStiffness(int wheel) const
     btRaycastVehicle* vehicle = vehicleData_->Get();
     btWheelInfo whInfo = vehicle->getWheelInfo(wheel);
     return whInfo.m_suspensionStiffness;
+}
+
+void RaycastVehicle::SetWheelMaxSuspensionForce(int wheel, float force)
+{
+    btRaycastVehicle* vehicle = vehicleData_->Get();
+    btWheelInfo& whInfo = vehicle->getWheelInfo(wheel);
+    whInfo.m_maxSuspensionForce = force;
+}
+
+float RaycastVehicle::GetWheelMaxSuspensionForce(int wheel) const
+{
+    btRaycastVehicle* vehicle = vehicleData_->Get();
+    btWheelInfo whInfo = vehicle->getWheelInfo(wheel);
+    return whInfo.m_maxSuspensionForce;
 }
 
 void RaycastVehicle::SetWheelDampingRelaxation(int wheel, float damping)
@@ -725,6 +722,7 @@ VariantVector RaycastVehicle::GetWheelDataAttr() const
         ret.Push(GetContactPosition(i));
         ret.Push(GetContactNormal(i));       // 14
         ret.Push(GetWheelSuspensionStiffness(i));
+        ret.Push(GetWheelMaxSuspensionForce(i));
         ret.Push(GetWheelDampingRelaxation(i));
         ret.Push(GetWheelDampingCompression(i));
         ret.Push(GetWheelFrictionSlip(i));

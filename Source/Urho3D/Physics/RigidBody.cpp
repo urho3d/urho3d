@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -40,6 +21,8 @@
 #include <Bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 #include <Bullet/BulletDynamics/Dynamics/btRigidBody.h>
 #include <Bullet/BulletCollision/CollisionShapes/btCompoundShape.h>
+
+using namespace std;
 
 namespace Urho3D
 {
@@ -79,8 +62,8 @@ RigidBody::RigidBody(Context* context) :
     enableMassUpdate_(true),
     hasSimulated_(false)
 {
-    compoundShape_ = new btCompoundShape();
-    shiftedCompoundShape_ = new btCompoundShape();
+    compoundShape_ = make_unique<btCompoundShape>();
+    shiftedCompoundShape_ = make_unique<btCompoundShape>();
 }
 
 RigidBody::~RigidBody()
@@ -119,7 +102,7 @@ void RigidBody::RegisterObject(Context* context)
         AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("CCD Radius", GetCcdRadius, SetCcdRadius, float, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("CCD Motion Threshold", GetCcdMotionThreshold, SetCcdMotionThreshold, float, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Network Angular Velocity", GetNetAngularVelocityAttr, SetNetAngularVelocityAttr, PODVector<unsigned char>,
+    URHO3D_ACCESSOR_ATTRIBUTE("Network Angular Velocity", GetNetAngularVelocityAttr, SetNetAngularVelocityAttr, Vector<unsigned char>,
         Variant::emptyBuffer, AM_NET | AM_LATESTDATA | AM_NOEDIT);
     URHO3D_ENUM_ATTRIBUTE_EX("Collision Event Mode", collisionEventMode_, MarkBodyDirty, collisionEventModeNames, COLLISION_ACTIVE, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Use Gravity", GetUseGravity, SetUseGravity, bool, true, AM_DEFAULT);
@@ -161,6 +144,9 @@ void RigidBody::getWorldTransform(btTransform& worldTrans) const
 
 void RigidBody::setWorldTransform(const btTransform& worldTrans)
 {
+    if (!body_->isActive()) // Fix #2491
+        return;
+
     Quaternion newWorldRotation = ToQuaternion(worldTrans.getRotation());
     Vector3 newWorldPosition = ToVector3(worldTrans.getOrigin()) - newWorldRotation * centerOfMass_;
     RigidBody* parentRigidBody = nullptr;
@@ -201,7 +187,7 @@ void RigidBody::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         physicsWorld_->SetDebugDepthTest(depthTest);
 
         btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
-        world->debugDrawObject(body_->getWorldTransform(), shiftedCompoundShape_.Get(), IsActive() ? btVector3(1.0f, 1.0f, 1.0f) :
+        world->debugDrawObject(body_->getWorldTransform(), shiftedCompoundShape_.get(), IsActive() ? btVector3(1.0f, 1.0f, 1.0f) :
             btVector3(0.0f, 1.0f, 0.0f));
 
         physicsWorld_->SetDebugRenderer(nullptr);
@@ -697,7 +683,7 @@ bool RigidBody::IsActive() const
     return body_ ? body_->isActive() : false;
 }
 
-void RigidBody::GetCollidingBodies(PODVector<RigidBody*>& result) const
+void RigidBody::GetCollidingBodies(Vector<RigidBody*>& result) const
 {
     if (physicsWorld_)
         physicsWorld_->GetCollidingBodies(result, this);
@@ -746,7 +732,7 @@ void RigidBody::UpdateMass()
     auto numShapes = (unsigned)compoundShape_->getNumChildShapes();
     if (numShapes)
     {
-        PODVector<float> masses(numShapes);
+        Vector<float> masses(numShapes);
         for (unsigned i = 0; i < numShapes; ++i)
         {
             // The actual mass does not matter, divide evenly between child shapes
@@ -779,7 +765,7 @@ void RigidBody::UpdateMass()
     }
 
     btCollisionShape* oldCollisionShape = body_->getCollisionShape();
-    body_->setCollisionShape(useCompound ? shiftedCompoundShape_.Get() : shiftedCompoundShape_->getChildShape(0));
+    body_->setCollisionShape(useCompound ? shiftedCompoundShape_.get() : shiftedCompoundShape_->getChildShape(0));
 
     // If we have one shape and this is a triangle mesh, we use a custom material callback in order to adjust internal edges
     if (!useCompound && body_->getCollisionShape()->getShapeType() == SCALED_TRIANGLE_MESH_SHAPE_PROXYTYPE &&
@@ -803,7 +789,7 @@ void RigidBody::UpdateMass()
     // Reapply constraint positions for new center of mass shift
     if (node_)
     {
-        for (PODVector<Constraint*>::Iterator i = constraints_.Begin(); i != constraints_.End(); ++i)
+        for (Vector<Constraint*>::Iterator i = constraints_.Begin(); i != constraints_.End(); ++i)
             (*i)->ApplyFrames();
     }
 
@@ -811,8 +797,8 @@ void RigidBody::UpdateMass()
     if (inWorld_ && body_->getCollisionShape() != oldCollisionShape && physicsWorld_)
     {
         btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
-        world->removeRigidBody(body_.Get());
-        world->addRigidBody(body_.Get(), (short)collisionLayer_, (short)collisionMask_);
+        world->removeRigidBody(body_.get());
+        world->addRigidBody(body_.get(), (short)collisionLayer_, (short)collisionMask_);
     }
 }
 
@@ -842,14 +828,14 @@ void RigidBody::UpdateGravity()
     }
 }
 
-void RigidBody::SetNetAngularVelocityAttr(const PODVector<unsigned char>& value)
+void RigidBody::SetNetAngularVelocityAttr(const Vector<unsigned char>& value)
 {
     float maxVelocity = physicsWorld_ ? physicsWorld_->GetMaxNetworkAngularVelocity() : DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY;
     MemoryBuffer buf(value);
     SetAngularVelocity(buf.ReadPackedVector3(maxVelocity));
 }
 
-const PODVector<unsigned char>& RigidBody::GetNetAngularVelocityAttr() const
+const Vector<unsigned char>& RigidBody::GetNetAngularVelocityAttr() const
 {
     float maxVelocity = physicsWorld_ ? physicsWorld_->GetMaxNetworkAngularVelocity() : DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY;
     attrBuffer_.Clear();
@@ -875,13 +861,13 @@ void RigidBody::ReleaseBody()
     {
         // Release all constraints which refer to this body
         // Make a copy for iteration
-        PODVector<Constraint*> constraints = constraints_;
-        for (PODVector<Constraint*>::Iterator i = constraints.Begin(); i != constraints.End(); ++i)
+        Vector<Constraint*> constraints = constraints_;
+        for (Vector<Constraint*>::Iterator i = constraints.Begin(); i != constraints.End(); ++i)
             (*i)->ReleaseConstraint();
 
         RemoveBodyFromWorld();
 
-        body_.Reset();
+        body_.reset();
     }
 }
 
@@ -962,7 +948,7 @@ void RigidBody::AddBodyToWorld()
     {
         // Correct inertia will be calculated below
         btVector3 localInertia(0.0f, 0.0f, 0.0f);
-        body_ = new btRigidBody(mass_, this, shiftedCompoundShape_.Get(), localInertia);
+        body_ = make_unique<btRigidBody>(mass_, this, shiftedCompoundShape_.get(), localInertia);
         body_->setUserPointer(this);
 
         // Check for existence of the SmoothedTransform component, which should be created by now in network client mode.
@@ -976,16 +962,16 @@ void RigidBody::AddBodyToWorld()
 
         // Check if CollisionShapes already exist in the node and add them to the compound shape.
         // Do not update mass yet, but do it once all shapes have been added
-        PODVector<CollisionShape*> shapes;
+        Vector<CollisionShape*> shapes;
         node_->GetComponents<CollisionShape>(shapes);
-        for (PODVector<CollisionShape*>::Iterator i = shapes.Begin(); i != shapes.End(); ++i)
+        for (Vector<CollisionShape*>::Iterator i = shapes.Begin(); i != shapes.End(); ++i)
             (*i)->NotifyRigidBody(false);
 
         // Check if this node contains Constraint components that were waiting for the rigid body to be created, and signal them
         // to create themselves now
-        PODVector<Constraint*> constraints;
+        Vector<Constraint*> constraints;
         node_->GetComponents<Constraint>(constraints);
-        for (PODVector<Constraint*>::Iterator i = constraints.Begin(); i != constraints.End(); ++i)
+        for (Vector<Constraint*>::Iterator i = constraints.Begin(); i != constraints.End(); ++i)
             (*i)->CreateConstraint();
     }
 
@@ -1008,7 +994,7 @@ void RigidBody::AddBodyToWorld()
         return;
 
     btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
-    world->addRigidBody(body_.Get(), (short)collisionLayer_, (short)collisionMask_);
+    world->addRigidBody(body_.get(), (short)collisionLayer_, (short)collisionMask_);
     inWorld_ = true;
     readdBody_ = false;
     hasSimulated_ = false;
@@ -1027,7 +1013,7 @@ void RigidBody::RemoveBodyFromWorld()
     if (physicsWorld_ && body_ && inWorld_)
     {
         btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
-        world->removeRigidBody(body_.Get());
+        world->removeRigidBody(body_.get());
         inWorld_ = false;
     }
 }

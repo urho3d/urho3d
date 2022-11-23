@@ -1607,7 +1607,7 @@ void CreateResourcePreview(String path, Node@ previewNode)
                 Material@ material =  cache.GetResource("Material", "Materials/Editor/TexturedUnlit.xml");
                 Texture2D@ texture = Texture2D();
                 texture.SetData(@image, true);
-                material.textures[0] = texture;
+                material.textures[TextureUnit(0)] = texture;
                 staticModel.material = material;
                 return;
             }
@@ -1650,7 +1650,7 @@ void CreateResourcePreview(String path, Node@ previewNode)
     Texture2D@ texture = Texture2D();
     Image@ noPreviewImage = cache.GetResource("Image", "Textures/Editor/NoPreviewAvailable.png");
     texture.SetData(noPreviewImage, false);
-    material.textures[0] = texture;
+    material.textures[TextureUnit(0)] = texture;
     staticModel.material = material;
 
     return;

@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include <Urho3D/Urho2D/AnimatedSprite2D.h>
 #include <Urho3D/Urho2D/AnimationSet2D.h>
@@ -49,7 +30,7 @@ void Mover::RegisterObject(Context* context)
 
     // These macros register the class attribute to the Context for automatic load / save handling.
     // We specify the Default attribute mode which means it will be used both for saving into file, and network replication.
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Path", GetPathAttr, SetPathAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Path", GetPathAttr, SetPathAttr, Vector<unsigned char>, Variant::emptyBuffer, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Speed", float, speed_, 0.8f, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Current Path ID", int, currentPathID_, 1, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Emit Time", float, emitTime_, 0.0f, AM_DEFAULT);
@@ -57,7 +38,7 @@ void Mover::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Flip Animation", float, flip_, 0.0f, AM_DEFAULT);
 }
 
-void Mover::SetPathAttr(const PODVector<unsigned char>& value)
+void Mover::SetPathAttr(const Vector<unsigned char>& value)
 {
     if (value.Empty())
         return;
@@ -67,12 +48,12 @@ void Mover::SetPathAttr(const PODVector<unsigned char>& value)
         path_.Push(buffer.ReadVector2());
 }
 
-PODVector<unsigned char> Mover::GetPathAttr() const
+Vector<unsigned char> Mover::GetPathAttr() const
 {
     VectorBuffer buffer;
 
-    for (unsigned i = 0; i < path_.Size(); ++i)
-        buffer.WriteVector2(path_[i]);
+    for (const Vector2& point : path_)
+        buffer.WriteVector2(point);
 
     return buffer.GetBuffer();
 }

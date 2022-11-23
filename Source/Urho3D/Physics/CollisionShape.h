@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 /// \file
 
@@ -28,6 +9,8 @@
 #include "../Math/BoundingBox.h"
 #include "../Math/Quaternion.h"
 #include "../Scene/Component.h"
+
+#include <memory>
 
 class btBvhTriangleMeshShape;
 class btCollisionShape;
@@ -70,46 +53,48 @@ struct CollisionGeometryData : public RefCounted
 
 /// Cache of collision geometry data.
 /// \todo Remove duplicate declaration
-using CollisionGeometryDataCache = HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >;
+using CollisionGeometryDataCache = HashMap<Pair<Model*, i32>, SharedPtr<CollisionGeometryData>>;
 
 /// Triangle mesh geometry data.
 struct TriangleMeshData : public CollisionGeometryData
 {
     /// Construct from a model.
-    TriangleMeshData(Model* model, unsigned lodLevel);
+    TriangleMeshData(Model* model, i32 lodLevel);
     /// Construct from a custom geometry.
     explicit TriangleMeshData(CustomGeometry* custom);
 
     /// Bullet triangle mesh interface.
-    UniquePtr<TriangleMeshInterface> meshInterface_;
+    std::unique_ptr<TriangleMeshInterface> meshInterface_;
+
     /// Bullet triangle mesh collision shape.
-    UniquePtr<btBvhTriangleMeshShape> shape_;
+    std::unique_ptr<btBvhTriangleMeshShape> shape_;
+
     /// Bullet triangle info map.
-    UniquePtr<btTriangleInfoMap> infoMap_;
+    std::unique_ptr<btTriangleInfoMap> infoMap_;
 };
 
 /// Triangle mesh geometry data.
 struct GImpactMeshData : public CollisionGeometryData
 {
     /// Construct from a model.
-    GImpactMeshData(Model* model, unsigned lodLevel);
+    GImpactMeshData(Model* model, i32 lodLevel);
     /// Construct from a custom geometry.
     explicit GImpactMeshData(CustomGeometry* custom);
 
     /// Bullet triangle mesh interface.
-    UniquePtr<TriangleMeshInterface> meshInterface_;
+    std::unique_ptr<TriangleMeshInterface> meshInterface_;
 };
 
 /// Convex hull geometry data.
 struct ConvexData : public CollisionGeometryData
 {
     /// Construct from a model.
-    ConvexData(Model* model, unsigned lodLevel);
+    ConvexData(Model* model, i32 lodLevel);
     /// Construct from a custom geometry.
     explicit ConvexData(CustomGeometry* custom);
 
     /// Build the convex hull from vertices.
-    void BuildHull(const PODVector<Vector3>& vertices);
+    void BuildHull(const Vector<Vector3>& vertices);
 
     /// Vertex data.
     SharedArrayPtr<Vector3> vertexData_;
@@ -125,7 +110,7 @@ struct ConvexData : public CollisionGeometryData
 struct HeightfieldData : public CollisionGeometryData
 {
     /// Construct from a terrain.
-    HeightfieldData(Terrain* terrain, unsigned lodLevel);
+    HeightfieldData(Terrain* terrain, i32 lodLevel);
 
     /// Height data. On LOD level 0 the original height data will be used.
     SharedArrayPtr<float> heightData_;
@@ -150,6 +135,7 @@ public:
     /// Destruct. Free the geometry data and clean up unused data from the geometry data cache.
     ~CollisionShape() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
@@ -172,44 +158,51 @@ public:
     /// Set as a cone.
     void SetCone(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a triangle mesh from Model. If you update a model's geometry and want to reapply the shape, call physicsWorld->RemoveCachedGeometry(model) first.
-    void SetTriangleMesh(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
+    void SetTriangleMesh(Model* model, i32 lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
         const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a triangle mesh from CustomGeometry.
     void SetCustomTriangleMesh(CustomGeometry* custom, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
         const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a convex hull from Model.
-    void SetConvexHull(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
+    void SetConvexHull(Model* model, i32 lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
         const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a convex hull from CustomGeometry.
     void SetCustomConvexHull(CustomGeometry* custom, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
         const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a triangle mesh from Model. If you update a model's geometry and want to reapply the shape, call physicsWorld->RemoveCachedGeometry(model) first.
-    void SetGImpactMesh(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
+    void SetGImpactMesh(Model* model, i32 lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
         const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a triangle mesh from CustomGeometry.
     void SetCustomGImpactMesh(CustomGeometry* custom, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
         const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a terrain. Only works if the same scene node contains a Terrain component.
-    void SetTerrain(unsigned lodLevel = 0);
+    void SetTerrain(i32 lodLevel = 0);
     /// Set shape type.
+    /// @property
     void SetShapeType(ShapeType type);
     /// Set shape size.
+    /// @property
     void SetSize(const Vector3& size);
     /// Set offset position.
+    /// @property
     void SetPosition(const Vector3& position);
     /// Set offset rotation.
+    /// @property
     void SetRotation(const Quaternion& rotation);
     /// Set offset transform.
     void SetTransform(const Vector3& position, const Quaternion& rotation);
     /// Set collision margin.
+    /// @property
     void SetMargin(float margin);
     /// Set triangle mesh / convex hull model.
+    /// @property
     void SetModel(Model* model);
     /// Set model LOD level.
-    void SetLodLevel(unsigned lodLevel);
+    /// @property
+    void SetLodLevel(i32 lodLevel);
 
     /// Return Bullet collision shape.
-    btCollisionShape* GetCollisionShape() const { return shape_.Get(); }
+    btCollisionShape* GetCollisionShape() const { return shape_.get(); }
 
     /// Return the shared geometry data.
     CollisionGeometryData* GetGeometryData() const { return geometry_; }
@@ -218,27 +211,35 @@ public:
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
 
     /// Return shape type.
+    /// @property
     ShapeType GetShapeType() const { return shapeType_; }
 
     /// Return shape size.
+    /// @property
     const Vector3& GetSize() const { return size_; }
 
     /// Return offset position.
+    /// @property
     const Vector3& GetPosition() const { return position_; }
 
     /// Return offset rotation.
+    /// @property
     const Quaternion& GetRotation() const { return rotation_; }
 
     /// Return collision margin.
+    /// @property
     float GetMargin() const { return margin_; }
 
     /// Return triangle mesh / convex hull model.
+    /// @property
     Model* GetModel() const { return model_; }
 
     /// Return model LOD level.
-    unsigned GetLodLevel() const { return lodLevel_; }
+    /// @property
+    i32 GetLodLevel() const { return lodLevel_; }
 
     /// Return world-space bounding box.
+    /// @property
     BoundingBox GetWorldBoundingBox() const;
 
     /// Update the new collision shape to the RigidBody.
@@ -274,7 +275,7 @@ private:
     /// Update cached geometry collision shape.
     void UpdateCachedGeometryShape(CollisionGeometryDataCache& cache);
     /// Set as specified shape type using model and LOD.
-    void SetModelShape(ShapeType shapeType, Model* model, unsigned lodLevel,
+    void SetModelShape(ShapeType shapeType, Model* model, i32 lodLevel,
         const Vector3& scale, const Vector3& position, const Quaternion& rotation);
     /// Set as specified shape type using CustomGeometry.
     void SetCustomShape(ShapeType shapeType, CustomGeometry* custom,
@@ -288,16 +289,22 @@ private:
 
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;
+
     /// Rigid body.
     WeakPtr<RigidBody> rigidBody_;
+
     /// Model.
     SharedPtr<Model> model_;
+
     /// Shared geometry data.
     SharedPtr<CollisionGeometryData> geometry_;
+
     /// Bullet collision shape.
-    UniquePtr<btCollisionShape> shape_;
+    std::unique_ptr<btCollisionShape> shape_;
+
     /// Collision shape type.
     ShapeType shapeType_;
+
     /// Offset position.
     Vector3 position_;
     /// Offset rotation.
@@ -307,7 +314,7 @@ private:
     /// Cached world scale for determining if the collision shape needs update.
     Vector3 cachedWorldScale_;
     /// Model LOD level.
-    unsigned lodLevel_;
+    i32 lodLevel_;
     /// CustomGeometry component ID. 0 if not creating the convex hull / triangle mesh from a CustomGeometry.
     unsigned customGeometryID_;
     /// Collision margin.

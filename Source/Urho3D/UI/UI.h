@@ -1,38 +1,19 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 /// \file
 
 #pragma once
 
 #include "../Core/Object.h"
-#include "../Graphics/VertexBuffer.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #include "../UI/Cursor.h"
 #include "../UI/UIBatch.h"
 
 namespace Urho3D
 {
 
-/// Font hinting level (only used for FreeType fonts)
+/// Font hinting level (only used for FreeType fonts).
 enum FontHintLevel
 {
     /// Completely disable font hinting. Output will be blurrier but more "correct".
@@ -68,13 +49,14 @@ public:
     ~UI() override;
 
     /// Set cursor UI element.
+    /// @property
     void SetCursor(Cursor* cursor);
     /// Set focused UI element.
     void SetFocusElement(UIElement* element, bool byKey = false);
     /// Set modal element. Until all the modal elements are dismissed, all the inputs and events are only sent to them. Return true when successful.
     /// Only the modal element can clear its modal status or when it is being destructed.
     bool SetModalElement(UIElement* modalElement, bool enable);
-    /// Clear the UI (excluding the cursor.)
+    /// Clear the UI (excluding the cursor).
     void Clear();
     /// Update the UI logic. Called by HandlePostUpdate().
     void Update(float timeStep);
@@ -91,70 +73,98 @@ public:
     /// Save a UI layout to an XML file. Return true if successful.
     bool SaveLayout(Serializer& dest, UIElement* element);
     /// Set clipboard text.
+    /// @property
     void SetClipboardText(const String& text);
     /// Set UI element double click interval in seconds.
+    /// @property
     void SetDoubleClickInterval(float interval);
     /// Set max screen distance in pixels between double click clicks.
+    /// @property
     void SetMaxDoubleClickDistance(float distPixels);
     /// Set UI drag event start interval in seconds.
+    /// @property
     void SetDragBeginInterval(float interval);
     /// Set UI drag event start distance threshold in pixels.
+    /// @property
     void SetDragBeginDistance(int pixels);
     /// Set tooltip default display delay in seconds.
+    /// @property
     void SetDefaultToolTipDelay(float delay);
     /// Set maximum font face texture size. Must be a power of two. Default is 2048.
+    /// @property
     void SetMaxFontTextureSize(int size);
     /// Set whether mouse wheel can control also a non-focused element.
+    /// @property
     void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel);
     /// Set whether to use system clipboard. Default false.
+    /// @property
     void SetUseSystemClipboard(bool enable);
     /// Set whether to show the on-screen keyboard (if supported) when a %LineEdit is focused. Default true on mobile devices.
+    /// @property
     void SetUseScreenKeyboard(bool enable);
     /// Set whether to use mutable (eraseable) glyphs to ensure a font face never expands to more than one texture. Default false.
+    /// @property
     void SetUseMutableGlyphs(bool enable);
     /// Set whether to force font autohinting instead of using FreeType's TTF bytecode interpreter.
+    /// @property
     void SetForceAutoHint(bool enable);
     /// Set the hinting level used by FreeType fonts.
+    /// @property
     void SetFontHintLevel(FontHintLevel level);
     /// Set the font subpixel threshold. Below this size, if the hint level is LIGHT or NONE, fonts will use subpixel positioning plus oversampling for higher-quality rendering. Has no effect at hint level NORMAL.
+    /// @property
     void SetFontSubpixelThreshold(float threshold);
     /// Set the oversampling (horizonal stretching) used to improve subpixel font rendering. Only affects fonts smaller than the subpixel limit.
+    /// @property
     void SetFontOversampling(int oversampling);
     /// Set %UI scale. 1.0 is default (pixel perfect). Resize the root element to match.
+    /// @property
     void SetScale(float scale);
     /// Scale %UI to the specified width in pixels.
     void SetWidth(float width);
     /// Scale %UI to the specified height in pixels.
     void SetHeight(float height);
     /// Set custom size of the root element. This disables automatic resizing of the root element according to window size. Set custom size 0,0 to return to automatic resizing.
+    /// @property
     void SetCustomSize(const IntVector2& size);
     /// Set custom size of the root element.
     void SetCustomSize(int width, int height);
 
     /// Return root UI element.
+    /// @property
     UIElement* GetRoot() const { return rootElement_; }
 
     /// Return root modal element.
+    /// @property{get_modalRoot}
     UIElement* GetRootModalElement() const { return rootModalElement_; }
 
     /// Return cursor.
+    /// @property
     Cursor* GetCursor() const { return cursor_; }
 
     /// Return cursor position.
+    /// @property
     IntVector2 GetCursorPosition() const;
     /// Return UI element at global screen coordinates. By default returns only input-enabled elements.
     UIElement* GetElementAt(const IntVector2& position, bool enabledOnly = true);
     /// Return UI element at global screen coordinates. By default returns only input-enabled elements.
     UIElement* GetElementAt(int x, int y, bool enabledOnly = true);
     /// Get a child element at element's screen position relative to specified root element.
-    UIElement* GetElementAt(UIElement* root, const IntVector2& position, bool enabledOnly=true);
+    UIElement* GetElementAt(UIElement* root, const IntVector2& position, bool enabledOnly = true);
+    /// Convert system mouse position (or offset) to scaled UI position (or offset).
+    IntVector2 ConvertSystemToUI(const IntVector2& systemPos) const;
+    /// Convert scaled UI position (or offset) to system mouse position (or offset).
+    IntVector2 ConvertUIToSystem(const IntVector2& uiPos) const;
 
     /// Return focused element.
+    /// @property
     UIElement* GetFocusElement() const { return focusElement_; }
 
     /// Return topmost enabled root-level non-modal element.
+    /// @property
     UIElement* GetFrontElement() const;
     /// Return currently dragged elements.
+    /// @nobindtemp
     const Vector<UIElement*> GetDragElements();
 
     /// Return the number of currently dragged elements.
@@ -163,48 +173,63 @@ public:
     /// Return the drag element at index.
     UIElement* GetDragElement(unsigned index);
     /// Return clipboard text.
+    /// @property
     const String& GetClipboardText() const;
 
     /// Return UI element double click interval in seconds.
+    /// @property
     float GetDoubleClickInterval() const { return doubleClickInterval_; }
-    
-    /// Get max screen distance in pixels for double clicks to register. 
+
+    /// Return max screen distance in pixels for double clicks to register.
+    /// @property
     float GetMaxDoubleClickDistance() const { return maxDoubleClickDist_;}
-    
+
     /// Return UI drag start event interval in seconds.
+    /// @property
     float GetDragBeginInterval() const { return dragBeginInterval_; }
 
     /// Return UI drag start event distance threshold in pixels.
+    /// @property
     int GetDragBeginDistance() const { return dragBeginDistance_; }
 
     /// Return tooltip default display delay in seconds.
+    /// @property
     float GetDefaultToolTipDelay() const { return defaultToolTipDelay_; }
 
     /// Return font texture maximum size.
+    /// @property
     int GetMaxFontTextureSize() const { return maxFontTextureSize_; }
 
     /// Return whether mouse wheel can control also a non-focused element.
+    /// @property
     bool IsNonFocusedMouseWheel() const { return nonFocusedMouseWheel_; }
 
     /// Return whether is using the system clipboard.
+    /// @property
     bool GetUseSystemClipboard() const { return useSystemClipboard_; }
 
     /// Return whether focusing a %LineEdit will show the on-screen keyboard.
+    /// @property
     bool GetUseScreenKeyboard() const { return useScreenKeyboard_; }
 
     /// Return whether is using mutable (eraseable) glyphs for fonts.
+    /// @property
     bool GetUseMutableGlyphs() const { return useMutableGlyphs_; }
 
     /// Return whether is using forced autohinting.
+    /// @property
     bool GetForceAutoHint() const { return forceAutoHint_; }
 
     /// Return the current FreeType font hinting level.
+    /// @property
     FontHintLevel GetFontHintLevel() const { return fontHintLevel_; }
 
     /// Get the font subpixel threshold. Below this size, if the hint level is LIGHT or NONE, fonts will use subpixel positioning plus oversampling for higher-quality rendering. Has no effect at hint level NORMAL.
+    /// @property
     float GetFontSubpixelThreshold() const { return fontSubpixelThreshold_; }
 
     /// Get the oversampling (horizonal stretching) used to improve subpixel font rendering. Only affects fonts smaller than the subpixel limit.
+    /// @property
     int GetFontOversampling() const { return fontOversampling_; }
 
     /// Return true when UI has modal element(s).
@@ -214,9 +239,11 @@ public:
     bool IsDragging() const { return dragConfirmedCount_ > 0; };
 
     /// Return current UI scale.
+    /// @property
     float GetScale() const { return uiScale_; }
 
-    /// Return root element custom size. Returns 0,0 when custom size is not being used and automatic resizing according to window size is in use instead (default.)
+    /// Return root element custom size. Returns 0,0 when custom size is not being used and automatic resizing according to window size is in use instead (default).
+    /// @property
     const IntVector2& GetCustomSize() const { return customSize_; }
 
     /// Set texture to which element will be rendered.
@@ -228,8 +255,8 @@ public:
         /// Which button combo initiated the drag.
         MouseButtonFlags dragButtons;
         /// How many buttons initiated the drag.
-        int numDragButtons;
-        /// Sum of all touch locations
+        i32 numDragButtons;
+        /// Sum of all touch locations.
         IntVector2 sumPos;
         /// Flag for a drag start event pending.
         bool dragBeginPending;
@@ -248,15 +275,15 @@ private:
         /// Texture that UIElement will be rendered into.
         SharedPtr<Texture2D> texture_;
         /// UI rendering batches.
-        PODVector<UIBatch> batches_;
+        Vector<UIBatch> batches_;
         /// UI rendering vertex data.
-        PODVector<float> vertexData_;
+        Vector<float> vertexData_;
         /// UI vertex buffer.
         SharedPtr<VertexBuffer> vertexBuffer_;
         /// UI rendering batches for debug draw.
-        PODVector<UIBatch> debugDrawBatches_;
+        Vector<UIBatch> debugDrawBatches_;
         /// UI rendering vertex data for debug draw.
-        PODVector<float> debugVertexData_;
+        Vector<float> debugVertexData_;
         /// UI debug geometry vertex buffer.
         SharedPtr<VertexBuffer> debugVertexBuffer_;
     };
@@ -266,11 +293,11 @@ private:
     /// Update UI element logic recursively.
     void Update(float timeStep, UIElement* element);
     /// Upload UI geometry into a vertex buffer.
-    void SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData);
+    void SetVertexData(VertexBuffer* dest, const Vector<float>& vertexData);
     /// Render UI batches to the current rendertarget. Geometry must have been uploaded first.
-    void Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd);
+    void Render(VertexBuffer* buffer, const Vector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd);
     /// Generate batches from an UI element recursively. Skip the cursor element.
-    void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, UIElement* element, IntRect currentScissor);
+    void GetBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, UIElement* element, IntRect currentScissor);
     /// Return UI element at global screen coordinates. Return position converted to element's screen coordinates.
     UIElement* GetElementAt(const IntVector2& position, bool enabledOnly, IntVector2* elementScreenPosition);
     /// Return UI element at screen position recursively.
@@ -301,9 +328,9 @@ private:
         (StringHash eventType, UIElement* beginElement, UIElement* endElement, const IntVector2& pos, MouseButton button, MouseButtonFlags buttons,
             QualifierFlags qualifiers);
 
-    /// Send a UI double click event
+    /// Send a UI double click event.
     void SendDoubleClickEvent(UIElement* beginElement, UIElement* endElement, const IntVector2& firstPos, const IntVector2& secondPos, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers);
-    
+
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle mouse button down event.
@@ -354,19 +381,19 @@ private:
     /// Currently focused element.
     WeakPtr<UIElement> focusElement_;
     /// UI rendering batches.
-    PODVector<UIBatch> batches_;
+    Vector<UIBatch> batches_;
     /// UI rendering vertex data.
-    PODVector<float> vertexData_;
+    Vector<float> vertexData_;
     /// UI rendering batches for debug draw.
-    PODVector<UIBatch> debugDrawBatches_;
+    Vector<UIBatch> debugDrawBatches_;
     /// UI rendering vertex data for debug draw.
-    PODVector<float> debugVertexData_;
+    Vector<float> debugVertexData_;
     /// UI vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
     /// UI debug geometry vertex buffer.
     SharedPtr<VertexBuffer> debugVertexBuffer_;
     /// UI element query vector.
-    PODVector<UIElement*> tempElements_;
+    Vector<UIElement*> tempElements_;
     /// Clipboard text.
     mutable String clipBoard_;
     /// Seconds between clicks to register a double click.
@@ -431,13 +458,14 @@ private:
     Vector<UIElement*> dragElementsConfirmed_;
     /// Current scale of UI.
     float uiScale_;
-    /// Root element custom size. 0,0 for automatic resizing (default.)
+    /// Root element custom size. 0,0 for automatic resizing (default).
     IntVector2 customSize_;
     /// Elements that should be rendered to textures.
     HashMap<UIElement*, RenderToTextureData> renderToTexture_;
 };
 
 /// Register UI library objects.
+/// @nobind
 void URHO3D_API RegisterUILibrary(Context* context);
 
 }

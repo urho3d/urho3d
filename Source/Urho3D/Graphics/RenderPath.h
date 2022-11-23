@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 /// \file
 
@@ -26,13 +7,15 @@
 
 #include "../Container/Ptr.h"
 #include "../Container/RefCounted.h"
-#include "../Graphics/GraphicsDefs.h"
+#include "../Core/Variant.h"
+#include "../GraphicsAPI/GraphicsDefs.h"
 #include "../Math/Color.h"
 #include "../Math/Vector4.h"
 
 namespace Urho3D
 {
 
+class Variant;
 class XMLElement;
 class XMLFile;
 
@@ -102,36 +85,48 @@ struct URHO3D_API RenderPathCommand
     /// Read from an XML element.
     void Load(const XMLElement& element);
     /// Set a texture resource name. Can also refer to a rendertarget defined in the rendering path.
+    /// @property{set_textureNames}
     void SetTextureName(TextureUnit unit, const String& name);
     /// Set a shader parameter.
+    /// @property{set_shaderParameters}
     void SetShaderParameter(const String& name, const Variant& value);
     /// Remove a shader parameter.
     void RemoveShaderParameter(const String& name);
     /// Set number of output rendertargets.
-    void SetNumOutputs(unsigned num);
+    /// @property
+    void SetNumOutputs(i32 num);
     /// Set output rendertarget name and face index for cube maps.
-    void SetOutput(unsigned index, const String& name, CubeMapFace face = FACE_POSITIVE_X);
+    void SetOutput(i32 index, const String& name, CubeMapFace face = FACE_POSITIVE_X);
     /// Set output rendertarget name.
-    void SetOutputName(unsigned index, const String& name);
+    /// @property{set_outputNames}
+    void SetOutputName(i32 index, const String& name);
     /// Set output rendertarget face index for cube maps.
-    void SetOutputFace(unsigned index, CubeMapFace face);
+    /// @property{set_outputFaces}
+    void SetOutputFace(i32 index, CubeMapFace face);
     /// Set depth-stencil output name. When empty, will assign a depth-stencil buffer automatically.
+    /// @property
     void SetDepthStencilName(const String& name);
 
     /// Return texture resource name.
+    /// @property{get_textureNames}
     const String& GetTextureName(TextureUnit unit) const;
     /// Return shader parameter.
+    /// @property{get_shaderParameters}
     const Variant& GetShaderParameter(const String& name) const;
 
     /// Return number of output rendertargets.
-    unsigned GetNumOutputs() const { return outputs_.Size(); }
+    /// @property
+    i32 GetNumOutputs() const { return outputs_.Size(); }
 
     /// Return output rendertarget name.
-    const String& GetOutputName(unsigned index) const;
+    /// @property{get_outputNames}
+    const String& GetOutputName(i32 index) const;
     /// Return output rendertarget face index.
-    CubeMapFace GetOutputFace(unsigned index) const;
+    /// @property{get_outputFaces}
+    CubeMapFace GetOutputFace(i32 index) const;
 
     /// Return depth-stencil output name.
+    /// @property
     const String& GetDepthStencilName() const { return depthStencilName_; }
 
     /// Tag name.
@@ -159,7 +154,7 @@ struct URHO3D_API RenderPathCommand
     /// %Shader parameters.
     HashMap<StringHash, Variant> shaderParameters_;
     /// Output rendertarget names and faces.
-    Vector<Pair<String, CubeMapFace> > outputs_;
+    Vector<Pair<String, CubeMapFace>> outputs_;
     /// Depth-stencil output name.
     String depthStencilName_;
     /// Clear flags. Affects clear command only.
@@ -204,12 +199,15 @@ public:
     /// Enable/disable commands and rendertargets by tag.
     void SetEnabled(const String& tag, bool active);
     /// Return true of any of render targets or commands with specified tag are enabled.
+    /// @property
     bool IsEnabled(const String& tag) const;
     /// Return true if renderpath or command with given tag exists.
+    /// @property
     bool IsAdded(const String& tag) const;
     /// Toggle enabled state of commands and rendertargets by tag.
     void ToggleEnabled(const String& tag);
     /// Assign rendertarget at index.
+    /// @property{set_renderTargets}
     void SetRenderTarget(unsigned index, const RenderTargetInfo& info);
     /// Add a rendertarget.
     void AddRenderTarget(const RenderTargetInfo& info);
@@ -220,6 +218,7 @@ public:
     /// Remove rendertargets by tag name.
     void RemoveRenderTargets(const String& tag);
     /// Assign command at index.
+    /// @property{set_commands}
     void SetCommand(unsigned index, const RenderPathCommand& command);
     /// Add a command to the end of the list.
     void AddCommand(const RenderPathCommand& command);
@@ -230,18 +229,26 @@ public:
     /// Remove commands by tag name.
     void RemoveCommands(const String& tag);
     /// Set a shader parameter in all commands that define it.
+    /// @property{set_shaderParameters}
     void SetShaderParameter(const String& name, const Variant& value);
 
     /// Return number of rendertargets.
-    unsigned GetNumRenderTargets() const { return renderTargets_.Size(); }
+    /// @property
+    i32 GetNumRenderTargets() const { return renderTargets_.Size(); }
 
     /// Return number of commands.
-    unsigned GetNumCommands() const { return commands_.Size(); }
+    /// @property
+    i32 GetNumCommands() const { return commands_.Size(); }
 
     /// Return command at index, or null if does not exist.
-    RenderPathCommand* GetCommand(unsigned index) { return index < commands_.Size() ? &commands_[index] : nullptr; }
+    RenderPathCommand* GetCommand(i32 index)
+    {
+        assert(index >= 0);
+        return index < commands_.Size() ? &commands_[index] : nullptr;
+    }
 
-    /// Return a shader parameter (first appearance in any command.)
+    /// Return a shader parameter (first appearance in any command).
+    /// @property{get_shaderParameters}
     const Variant& GetShaderParameter(const String& name) const;
 
     /// Rendertargets.

@@ -12,7 +12,7 @@ struct BiasParameters
     BiasParameters();
     BiasParameters(float constantBias, float slopeScaledBias, float normalOffset = 0.0f);
     ~BiasParameters();
-    
+
     float constantBias_ @ constantBias;
     float slopeScaledBias_ @ slopeScaledBias;
     float normalOffset_ @ normalOffset;
@@ -23,7 +23,7 @@ struct CascadeParameters
     CascadeParameters();
     CascadeParameters(float split1, float split2, float split3, float split4, float fadeStart, float biasAutoAdjust = 1.0f);
     ~CascadeParameters();
-    
+
     float fadeStart_ @ fadeStart;
     float biasAutoAdjust_ @ biasAutoAdjust;
 };
@@ -33,7 +33,7 @@ struct FocusParameters
     FocusParameters();
     FocusParameters(bool focus, bool nonUniform, bool autoSize, float quantize, float minView);
     ~FocusParameters();
-    
+
     bool focus_ @ focus;
     bool nonUniform_ @ nonUniform;
     bool autoSize_ @ autoSize;
@@ -96,7 +96,7 @@ class Light : public Drawable
     Frustum GetFrustum() const;
     int GetNumShadowSplits() const;
     bool IsNegative() const;
-    
+
     tolua_property__get_set LightType lightType;
     tolua_property__get_set bool perVertex;
     tolua_property__get_set Color& color;

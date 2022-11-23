@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -26,10 +7,16 @@
 #include "../Core/Thread.h"
 #include "../Core/Timer.h"
 
+#ifdef URHO3D_TRACY_PROFILING
+#define TRACY_ENABLE 1
+#include "Tracy/Tracy.hpp"
+#endif
+
 namespace Urho3D
 {
 
 /// Profiling data for one block in the profiling tree.
+/// @nobind
 class URHO3D_API ProfilerBlock
 {
 public:
@@ -52,16 +39,16 @@ public:
     {
         if (name)
         {
-            unsigned nameLength = String::CStringLength(name);
-            name_ = new char[nameLength + 1];
-            memcpy(name_, name, nameLength + 1);
+            size_t size = (size_t)String::CStringLength(name) + 1;
+            name_ = new char[size];
+            memcpy(name_, name, size);
         }
     }
 
     /// Destruct. Free the child blocks.
     virtual ~ProfilerBlock()
     {
-        for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
+        for (Vector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
         {
             delete *i;
             *i = nullptr;
@@ -104,7 +91,7 @@ public:
         maxTime_ = 0;
         count_ = 0;
 
-        for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
+        for (Vector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
             (*i)->EndFrame();
     }
 
@@ -115,14 +102,14 @@ public:
         intervalMaxTime_ = 0;
         intervalCount_ = 0;
 
-        for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
+        for (Vector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
             (*i)->BeginInterval();
     }
 
     /// Return child block with the specified name.
     ProfilerBlock* GetChild(const char* name)
     {
-        for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
+        for (Vector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
         {
             if (!String::Compare((*i)->name_, name, true))
                 return *i;
@@ -147,7 +134,7 @@ public:
     /// Parent block.
     ProfilerBlock* parent_;
     /// Child blocks.
-    PODVector<ProfilerBlock*> children_;
+    Vector<ProfilerBlock*> children_;
     /// Time on the previous frame.
     long long frameTime_;
     /// Maximum time on the previous frame.
@@ -227,7 +214,8 @@ protected:
     unsigned intervalFrames_;
 };
 
-/// Helper class for automatically beginning and ending a profiling block
+/// Helper class for automatically beginning and ending a profiling block.
+/// @nobind
 class URHO3D_API AutoProfileBlock
 {
 public:
@@ -251,10 +239,41 @@ private:
     Profiler* profiler_;
 };
 
-#ifdef URHO3D_PROFILING
-#define URHO3D_PROFILE(name) Urho3D::AutoProfileBlock profile_ ## name (GetSubsystem<Urho3D::Profiler>(), #name)
-#else
-#define URHO3D_PROFILE(name)
+#ifdef URHO3D_TRACY_PROFILING // Use Tracy profiler
+    /// Macro for scoped profiling with a name.
+    #define URHO3D_PROFILE(name) ZoneScopedN(#name)
+#elif defined(URHO3D_PROFILING) // Use default profiler
+    /// Macro for scoped profiling with a name.
+    #define URHO3D_PROFILE(name) Urho3D::AutoProfileBlock profile_ ## name (GetSubsystem<Urho3D::Profiler>(), #name)
+#else // Profiling off
+    #define URHO3D_PROFILE(name)
+#endif
+
+#ifdef URHO3D_TRACY_PROFILING // Use Tracy profiler
+    /// Macro for scoped profiling with a name and color.
+    #define URHO3D_PROFILE_COLOR(name, color) ZoneScopedNC(#name, color)
+    /// Macro for scoped profiling with a dynamic string name.
+    #define URHO3D_PROFILE_STR(nameStr, size) ZoneName(nameStr, size)
+    /// Macro for marking a game frame.
+    #define URHO3D_PROFILE_FRAME() FrameMark
+    /// Macro for recording name of current thread.
+    #define URHO3D_PROFILE_THREAD(name) tracy::SetThreadName(name)
+    /// Macro for scoped profiling of a function.
+    #define URHO3D_PROFILE_FUNCTION() ZoneScopedN(__FUNCTION__)
+
+    /// Color used for highlighting event.
+    #define URHO3D_PROFILE_EVENT_COLOR tracy::Color::OrangeRed
+    /// Color used for highlighting resource.
+    #define URHO3D_PROFILE_RESOURCE_COLOR tracy::Color::MediumSeaGreen
+#else // Tracy profiler off
+    #define URHO3D_PROFILE_COLOR(name, color)
+    #define URHO3D_PROFILE_STR(nameStr, size)
+    #define URHO3D_PROFILE_FRAME()
+    #define URHO3D_PROFILE_THREAD(name)
+    #define URHO3D_PROFILE_FUNCTION()
+
+    #define URHO3D_PROFILE_EVENT_COLOR
+    #define URHO3D_PROFILE_RESOURCE_COLOR
 #endif
 
 }

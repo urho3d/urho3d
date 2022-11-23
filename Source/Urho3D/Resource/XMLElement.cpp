@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -29,6 +10,8 @@
 #include <PugiXml/pugixml.hpp>
 
 #include "../DebugNew.h"
+
+using namespace std;
 
 namespace Urho3D
 {
@@ -336,7 +319,7 @@ bool XMLElement::SetBuffer(const String& name, const void* data, unsigned size)
     return SetAttribute(name, dataStr);
 }
 
-bool XMLElement::SetBuffer(const String& name, const PODVector<unsigned char>& value)
+bool XMLElement::SetBuffer(const String& name, const Vector<unsigned char>& value)
 {
     if (!value.Size())
         return SetAttribute(name, String::EMPTY);
@@ -765,9 +748,9 @@ BoundingBox XMLElement::GetBoundingBox() const
     return ret;
 }
 
-PODVector<unsigned char> XMLElement::GetBuffer(const String& name) const
+Vector<unsigned char> XMLElement::GetBuffer(const String& name) const
 {
-    PODVector<unsigned char> ret;
+    Vector<unsigned char> ret;
     StringToBuffer(ret, GetAttribute(name));
     return ret;
 }
@@ -1070,20 +1053,22 @@ XPathQuery::~XPathQuery() = default;
 void XPathQuery::Bind()
 {
     // Delete previous query object and create a new one binding it with variable set
-    query_ = new pugi::xpath_query(queryString_.CString(), variables_.Get());
+    query_ = make_unique<pugi::xpath_query>(queryString_.CString(), variables_.get());
 }
 
 bool XPathQuery::SetVariable(const String& name, bool value)
 {
     if (!variables_)
-        variables_ = new pugi::xpath_variable_set();
+        variables_ = make_unique<pugi::xpath_variable_set>();
+
     return variables_->set(name.CString(), value);
 }
 
 bool XPathQuery::SetVariable(const String& name, float value)
 {
     if (!variables_)
-        variables_ = new pugi::xpath_variable_set();
+        variables_ = make_unique<pugi::xpath_variable_set>();
+
     return variables_->set(name.CString(), value);
 }
 
@@ -1095,14 +1080,15 @@ bool XPathQuery::SetVariable(const String& name, const String& value)
 bool XPathQuery::SetVariable(const char* name, const char* value)
 {
     if (!variables_)
-        variables_ = new pugi::xpath_variable_set();
+        variables_ = make_unique<pugi::xpath_variable_set>();
+
     return variables_->set(name, value);
 }
 
 bool XPathQuery::SetVariable(const String& name, const XPathResultSet& value)
 {
     if (!variables_)
-        variables_ = new pugi::xpath_variable_set();
+        variables_ = make_unique<pugi::xpath_variable_set>();
 
     pugi::xpath_node_set* nodeSet = value.GetXPathNodeSet();
     if (!nodeSet)
@@ -1116,7 +1102,7 @@ bool XPathQuery::SetQuery(const String& queryString, const String& variableStrin
     if (!variableString.Empty())
     {
         Clear();
-        variables_ = new pugi::xpath_variable_set();
+        variables_ = make_unique<pugi::xpath_variable_set>();
 
         // Parse the variable string having format "name1:type1,name2:type2,..." where type is one of "Bool", "Float", "String", "ResultSet"
         Vector<String> vars = variableString.Split(',');
@@ -1155,8 +1141,8 @@ void XPathQuery::Clear()
 {
     queryString_.Clear();
 
-    variables_.Reset();
-    query_.Reset();
+    variables_.reset();
+    query_.reset();
 }
 
 bool XPathQuery::EvaluateToBool(const XMLElement& element) const

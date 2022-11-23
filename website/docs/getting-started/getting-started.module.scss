@@ -1,0 +1,33 @@
+// A quick and dirty hack to keep the tab panel with less content to have the same height as others
+div {
+  > div > div > div > div > div, .fixedHeight {
+    .dbeInstall + & {
+      min-height: 120px;
+    }
+
+    .dbeBuildUrhoApp + & {
+      min-height: 142px;
+    }
+
+    .requirements + & {
+      min-height: 340px;
+    }
+
+    .cliInstall + &, .cliUrhoApp + & {
+      min-height: 208px;
+    }
+
+    .ideInstall + & {
+      min-height: 412px;
+    }
+
+    .ideUrhoApp + & {
+      min-height: 356px;
+    }
+  }
+}
+
+// As the info content may be changed in the future, adjust the minimum height here to prevent jumping elements
+.infoFixedHeight {
+  min-height: 86px;
+}

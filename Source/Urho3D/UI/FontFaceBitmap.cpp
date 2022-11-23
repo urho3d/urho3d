@@ -1,30 +1,11 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
 #include "../Graphics/Graphics.h"
-#include "../Graphics/Texture2D.h"
+#include "../GraphicsAPI/Texture2D.h"
 #include "../IO/File.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
@@ -138,7 +119,8 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
         glyph.offsetX_ = (short)charElem.GetInt("xoffset");
         glyph.offsetY_ = (short)charElem.GetInt("yoffset");
         glyph.advanceX_ = (short)charElem.GetInt("xadvance");
-        glyph.page_ = charElem.GetUInt("page");
+        glyph.page_ = charElem.GetInt("page");
+        assert(glyph.page_ >= 0);
 
         glyphMapping_[id] = glyph;
 
@@ -189,7 +171,7 @@ bool FontFaceBitmap::Load(FontFace* fontFace, bool usedGlyphs)
     int maxTextureSize = font_->GetSubsystem<UI>()->GetMaxFontTextureSize();
     AreaAllocator allocator(FONT_TEXTURE_MIN_SIZE, FONT_TEXTURE_MIN_SIZE, maxTextureSize, maxTextureSize);
 
-    for (HashMap<unsigned, FontGlyph>::ConstIterator i = fontFace->glyphMapping_.Begin(); i != fontFace->glyphMapping_.End(); ++i)
+    for (HashMap<c32, FontGlyph>::ConstIterator i = fontFace->glyphMapping_.Begin(); i != fontFace->glyphMapping_.End(); ++i)
     {
         FontGlyph fontGlyph = i->second_;
         if (!fontGlyph.used_)
@@ -216,11 +198,11 @@ bool FontFaceBitmap::Load(FontFace* fontFace, bool usedGlyphs)
     unsigned components = ConvertFormatToNumComponents(fontFace->textures_[0]->GetFormat());
 
     // Save the existing textures as image resources
-    Vector<SharedPtr<Image> > oldImages;
+    Vector<SharedPtr<Image>> oldImages;
     for (unsigned i = 0; i < fontFace->textures_.Size(); ++i)
         oldImages.Push(SaveFaceTexture(fontFace->textures_[i]));
 
-    Vector<SharedPtr<Image> > newImages(numPages);
+    Vector<SharedPtr<Image>> newImages(numPages);
     for (unsigned i = 0; i < numPages; ++i)
     {
         SharedPtr<Image> image(new Image(font_->GetContext()));
@@ -239,7 +221,7 @@ bool FontFaceBitmap::Load(FontFace* fontFace, bool usedGlyphs)
         newImages[i] = image;
     }
 
-    for (HashMap<unsigned, FontGlyph>::Iterator i = glyphMapping_.Begin(); i != glyphMapping_.End(); ++i)
+    for (HashMap<c32, FontGlyph>::Iterator i = glyphMapping_.Begin(); i != glyphMapping_.End(); ++i)
     {
         FontGlyph& newGlyph = i->second_;
         const FontGlyph& oldGlyph = fontFace->glyphMapping_[i->first_];
@@ -251,7 +233,7 @@ bool FontFaceBitmap::Load(FontFace* fontFace, bool usedGlyphs)
     for (unsigned i = 0; i < newImages.Size(); ++i)
         textures_[i] = LoadFaceTexture(newImages[i]);
 
-    for (HashMap<unsigned, float>::ConstIterator i = fontFace->kerningMapping_.Begin(); i != fontFace->kerningMapping_.End(); ++i)
+    for (HashMap<u32, float>::ConstIterator i = fontFace->kerningMapping_.Begin(); i != fontFace->kerningMapping_.End(); ++i)
     {
         unsigned first = (i->first_) >> 16u;
         unsigned second = (i->first_) & 0xffffu;
@@ -309,7 +291,7 @@ bool FontFaceBitmap::Save(Serializer& dest, int pointSize, const String& indenta
     unsigned numGlyphs = glyphMapping_.Size();
     charsElem.SetInt("count", numGlyphs);
 
-    for (HashMap<unsigned, FontGlyph>::ConstIterator i = glyphMapping_.Begin(); i != glyphMapping_.End(); ++i)
+    for (HashMap<c32, FontGlyph>::ConstIterator i = glyphMapping_.Begin(); i != glyphMapping_.End(); ++i)
     {
         // Char
         XMLElement charElem = charsElem.CreateChild("char");
@@ -323,13 +305,13 @@ bool FontFaceBitmap::Save(Serializer& dest, int pointSize, const String& indenta
         charElem.SetInt("xoffset", glyph.offsetX_);
         charElem.SetInt("yoffset", glyph.offsetY_);
         charElem.SetInt("xadvance", glyph.advanceX_);
-        charElem.SetUInt("page", glyph.page_);
+        charElem.SetInt("page", glyph.page_);
     }
 
     if (!kerningMapping_.Empty())
     {
         XMLElement kerningsElem = rootElem.CreateChild("kernings");
-        for (HashMap<unsigned, float>::ConstIterator i = kerningMapping_.Begin(); i != kerningMapping_.End(); ++i)
+        for (HashMap<u32, float>::ConstIterator i = kerningMapping_.Begin(); i != kerningMapping_.End(); ++i)
         {
             XMLElement kerningElem = kerningsElem.CreateChild("kerning");
             kerningElem.SetInt("first", i->first_ >> 16u);

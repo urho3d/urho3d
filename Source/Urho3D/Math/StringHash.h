@@ -1,28 +1,10 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
 #include "../Container/Str.h"
+#include "../Math/MathDefs.h"
 
 namespace Urho3D
 {
@@ -34,8 +16,8 @@ class URHO3D_API StringHash
 {
 public:
     /// Construct with zero value.
-    StringHash() noexcept :
-        value_(0)
+    StringHash() noexcept
+        : value_(0)
     {
     }
 
@@ -43,13 +25,21 @@ public:
     StringHash(const StringHash& rhs) noexcept = default;
 
     /// Construct with an initial value.
-    explicit StringHash(unsigned value) noexcept :
-        value_(value)
+    constexpr explicit StringHash(unsigned value) noexcept
+        : value_(value)
     {
     }
 
+#ifdef URHO3D_HASH_DEBUG
     /// Construct from a C string.
     StringHash(const char* str) noexcept;        // NOLINT(google-explicit-constructor)
+#else
+    constexpr StringHash(const char* str) noexcept
+        : value_(Calculate(str))
+    {
+    }
+#endif
+
     /// Construct from a string.
     StringHash(const String& str) noexcept;      // NOLINT(google-explicit-constructor)
 
@@ -87,6 +77,7 @@ public:
     explicit operator bool() const { return value_ != 0; }
 
     /// Return hash value.
+    /// @property
     unsigned Value() const { return value_; }
 
     /// Return as string.
@@ -99,7 +90,18 @@ public:
     unsigned ToHash() const { return value_; }
 
     /// Calculate hash value from a C string.
-    static unsigned Calculate(const char* str, unsigned hash = 0);
+    static constexpr u32 Calculate(const char* str, unsigned hash = 0)
+    {
+        if (!str)
+            return hash;
+
+        while (*str)
+        {
+            hash = SDBMHash(hash, (unsigned char)*str++);
+        }
+
+        return hash;
+    }
 
     /// Get global StringHashRegister. Use for debug purposes only. Return nullptr if URHO3D_HASH_DEBUG is off.
     static StringHashRegister* GetGlobalStringHashRegister();
@@ -111,5 +113,10 @@ private:
     /// Hash value.
     unsigned value_;
 };
+
+constexpr StringHash operator ""_hash(const char* str, size_t)
+{
+    return StringHash(StringHash::Calculate(str));
+}
 
 }

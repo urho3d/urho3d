@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -29,33 +10,30 @@
 namespace Urho3D
 {
 
-/// Type trait which enables Enum to be used as FlagSet template parameter. Bitwise operators (| & ^ ~) over enabled Enum will result in FlagSet<Enum>.
-template <typename T> struct IsFlagSet
-{
-    constexpr static bool value_ = false;
-};
+/// Make bitwise operators (| & ^ ~) automatically construct FlagSet from Enum.
+#define URHO3D_AUTOMATIC_FLAGSET(Enum) \
+    inline Urho3D::FlagSet<Enum> operator | (const Enum lhs, const Enum rhs) { return Urho3D::FlagSet<Enum>(lhs) | rhs; } \
+    inline Urho3D::FlagSet<Enum> operator & (const Enum lhs, const Enum rhs) { return Urho3D::FlagSet<Enum>(lhs) & rhs; } \
+    inline Urho3D::FlagSet<Enum> operator ^ (const Enum lhs, const Enum rhs) { return Urho3D::FlagSet<Enum>(lhs) ^ rhs; } \
+    inline Urho3D::FlagSet<Enum> operator ~ (const Enum rhs) { return ~Urho3D::FlagSet<Enum>(rhs); }
 
-/// Enable enum for using in FlagSet. Shall be called within Urho3D namespace.
-#define URHO3D_ENABLE_FLAGSET(enumName) \
-    template<> struct IsFlagSet<enumName> { constexpr static bool value_ = true; } \
-
-/// Enable enum for using in FlagSet and declare FlagSet specialization. Shall be called within Urho3D namespace.
+/// Declare FlagSet for specific enum and create operators for automatic FlagSet construction.
 #define URHO3D_FLAGSET(enumName, flagsetName) \
-    URHO3D_ENABLE_FLAGSET(enumName); \
-    using flagsetName = FlagSet<enumName>
+    URHO3D_AUTOMATIC_FLAGSET(enumName) \
+    using flagsetName = Urho3D::FlagSet<enumName>
 
 /// A set of flags defined by an Enum.
-template <class E, class = typename std::enable_if<IsFlagSet<E>::value_>::type>
+template <class E>
 class FlagSet
 {
 public:
-    /// Enum type
+    /// Enum type.
     using Enum = E;
-    /// Integer type
+    /// Integer type.
     using Integer = typename std::underlying_type<Enum>::type;
 
 public:
-    /// Ctor by integer
+    /// Ctor by integer.
     explicit FlagSet(Integer value)
         : value_(value)
     {
@@ -166,7 +144,7 @@ public:
     }
 
     /// Returns true if any flag is set.
-    operator bool () const
+    explicit operator bool () const
     {
         return value_ != 0;
     }
@@ -231,37 +209,12 @@ public:
     /// Return underlying integer (non-constant).
     Integer& AsInteger() { return value_; }
 
+    /// Return hash value.
+    unsigned ToHash() const { return static_cast<unsigned>(value_); }
+
 protected:
-    /// Value
+    /// Value.
     Integer value_ = 0;
 };
 
-}
-
-/// Bitwise Operator OR for against Enum values
-template <class Enum, class = typename std::enable_if<Urho3D::IsFlagSet<Enum>::value_>::type>
-Urho3D::FlagSet<Enum> operator |(const Enum lhs, const Enum rhs)
-{
-    return Urho3D::FlagSet<Enum>(lhs) | rhs;
-}
-
-/// Bitwise Operator AND for against Enum values
-template <class Enum, class = typename std::enable_if<Urho3D::IsFlagSet<Enum>::value_>::type>
-Urho3D::FlagSet<Enum> operator & (const Enum lhs, const Enum rhs)
-{
-    return Urho3D::FlagSet<Enum>(lhs) & rhs;
-}
-
-/// Bitwise Operator XOR for against Enum values
-template <class Enum, class = typename std::enable_if<Urho3D::IsFlagSet<Enum>::value_>::type>
-Urho3D::FlagSet<Enum> operator ^ (const Enum lhs, const Enum rhs)
-{
-    return Urho3D::FlagSet<Enum>(lhs) ^ rhs;
-}
-
-/// Bitwise Operator INVERSION for against Enum values
-template <class Enum, class = typename std::enable_if<Urho3D::IsFlagSet<Enum>::value_>::type>
-Urho3D::FlagSet<Enum> operator ~ (const Enum rhs)
-{
-    return ~Urho3D::FlagSet<Enum>(rhs);
 }

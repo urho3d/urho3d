@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -122,7 +103,7 @@ public:
         overlayContainer_->SetChildOffset(IntVector2(-x + panelBorder.left_, -y + panelBorder.top_));
     }
 
-    /// Handle mouse click on overlays by toggling the expansion state of the corresponding item
+    /// Handle mouse click on overlays by toggling the expansion state of the corresponding item.
     void HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
     {
         using namespace UIMouseClick;
@@ -130,8 +111,8 @@ public:
         auto* overlay = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
         if (overlay)
         {
-            const Vector<SharedPtr<UIElement> >& children = overlayContainer_->GetChildren();
-            Vector<SharedPtr<UIElement> >::ConstIterator i = children.Find(SharedPtr<UIElement>(overlay));
+            const Vector<SharedPtr<UIElement>>& children = overlayContainer_->GetChildren();
+            Vector<SharedPtr<UIElement>>::ConstIterator i = children.Find(SharedPtr<UIElement>(overlay));
             if (i != children.End())
                 listView_->ToggleExpand((unsigned)(i - children.Begin()));
         }
@@ -253,7 +234,7 @@ void ListView::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
 
         case KEY_PAGEUP:
             pageDirection = -1;
-            // Fallthru
+            [[fallthrough]];
 
         case KEY_PAGEDOWN:
             {
@@ -347,8 +328,10 @@ void ListView::AddItem(UIElement* item)
     InsertItem(M_MAX_UNSIGNED, item);
 }
 
-void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem)
+void ListView::InsertItem(i32 index, UIElement* item, UIElement* parentItem)
 {
+    assert(index >= 0 || index == ENDPOS);
+
     if (!item || item->GetParent() == contentElement_)
         return;
 
@@ -356,7 +339,7 @@ void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem
     item->SetEnabled(true);
     item->SetSelected(false);
 
-    const unsigned numItems = contentElement_->GetNumChildren();
+    const i32 numItems = contentElement_->GetNumChildren();
     if (hierarchyMode_)
     {
         int baseIndent = baseIndent_;
@@ -366,22 +349,26 @@ void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem
             SetItemHierarchyParent(parentItem, true);
 
             // Hide item if parent is collapsed
-            const unsigned parentIndex = FindItem(parentItem);
+            const i32 parentIndex = FindItem(parentItem);
             if (!IsExpanded(parentIndex))
                 item->SetVisible(false);
 
             // Adjust the index to ensure it is within the children index limit of the parent item
-            unsigned indexLimit = parentIndex;
-            if (index <= indexLimit)
-                index = indexLimit + 1;
+            if (index <= parentIndex && index != ENDPOS)
+            {
+                index = parentIndex + 1;
+            }
             else
             {
+                i32 indexLimit = parentIndex;
+
                 while (++indexLimit < numItems)
                 {
                     if (contentElement_->GetChild(indexLimit)->GetIndent() <= baseIndent)
                         break;
                 }
-                if (index > indexLimit)
+
+                if (index > indexLimit || index == ENDPOS)
                     index = indexLimit;
             }
         }
@@ -393,7 +380,7 @@ void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem
     }
     else
     {
-        if (index > numItems)
+        if (index > numItems || index == ENDPOS)
             index = numItems;
 
         contentElement_->InsertChild(index, item);
@@ -402,7 +389,7 @@ void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem
     // If necessary, shift the following selections
     if (!selections_.Empty())
     {
-        for (unsigned i = 0; i < selections_.Size(); ++i)
+        for (i32 i = 0; i < selections_.Size(); ++i)
         {
             if (selections_[i] >= index)
                 ++selections_[i];
@@ -440,7 +427,8 @@ void ListView::RemoveItem(UIElement* item, unsigned index)
                         if (childItem->GetIndent() > baseIndent)
                         {
                             childItem->SetSelected(false);
-                            selections_.Erase(j);
+                            if (j < selections_.Size()) // TODO: Rework?
+                                selections_.Erase(j);
                             contentElement_->RemoveChildAtIndex(i + 1);
                             overlayContainer_->RemoveChildAtIndex(i + 1);
                             ++removed;
@@ -488,8 +476,9 @@ void ListView::RemoveItem(UIElement* item, unsigned index)
     }
 }
 
-void ListView::RemoveItem(unsigned index)
+void ListView::RemoveItem(i32 index)
 {
+    assert(index >= 0);
     RemoveItem(GetItem(index), index);
 }
 
@@ -508,13 +497,13 @@ void ListView::RemoveAllItems()
 
 void ListView::SetSelection(unsigned index)
 {
-    PODVector<unsigned> indices;
+    Vector<unsigned> indices;
     indices.Push(index);
     SetSelections(indices);
     EnsureItemVisibility(index);
 }
 
-void ListView::SetSelections(const PODVector<unsigned>& indices)
+void ListView::SetSelections(const Vector<unsigned>& indices)
 {
     // Make a weak pointer to self to check for destruction as a response to events
     WeakPtr<ListView> self(this);
@@ -522,7 +511,7 @@ void ListView::SetSelections(const PODVector<unsigned>& indices)
     unsigned numItems = GetNumItems();
 
     // Remove first items that should no longer be selected
-    for (PODVector<unsigned>::Iterator i = selections_.Begin(); i != selections_.End();)
+    for (Vector<unsigned>::Iterator i = selections_.Begin(); i != selections_.End();)
     {
         unsigned index = *i;
         if (!indices.Contains(index))
@@ -546,7 +535,7 @@ void ListView::SetSelections(const PODVector<unsigned>& indices)
     bool added = false;
 
     // Then add missing items
-    for (PODVector<unsigned>::ConstIterator i = indices.Begin(); i != indices.End(); ++i)
+    for (Vector<unsigned>::ConstIterator i = indices.Begin(); i != indices.End(); ++i)
     {
         unsigned index = *i;
         if (index < numItems)
@@ -671,7 +660,7 @@ void ListView::ChangeSelection(int delta, bool additive)
     int direction = delta > 0 ? 1 : -1;
     unsigned newSelection = selection;
     unsigned okSelection = selection;
-    PODVector<unsigned> indices = selections_;
+    Vector<unsigned> indices = selections_;
 
     while (delta != 0)
     {
@@ -695,7 +684,7 @@ void ListView::ChangeSelection(int delta, bool additive)
 
 void ListView::ClearSelection()
 {
-    SetSelections(PODVector<unsigned>());
+    SetSelections(Vector<unsigned>());
 }
 
 void ListView::SetHighlightMode(HighlightMode mode)
@@ -783,7 +772,7 @@ void ListView::Expand(unsigned index, bool enable, bool recursive)
     SetItemExpanded(item, enable);
     int baseIndent = item->GetIndent();
 
-    PODVector<bool> expanded((unsigned)(baseIndent + 1));
+    Vector<bool> expanded((unsigned)(baseIndent + 1));
     expanded[baseIndent] = enable;
 
     contentElement_->DisableLayoutUpdate();
@@ -835,9 +824,9 @@ UIElement* ListView::GetItem(unsigned index) const
     return contentElement_->GetChild(index);
 }
 
-PODVector<UIElement*> ListView::GetItems() const
+Vector<UIElement*> ListView::GetItems() const
 {
-    PODVector<UIElement*> items;
+    Vector<UIElement*> items;
     contentElement_->GetChildren(items);
     return items;
 }
@@ -851,7 +840,7 @@ unsigned ListView::FindItem(UIElement* item) const
     if (item->GetParent() != contentElement_)
         return M_MAX_UNSIGNED;
 
-    const Vector<SharedPtr<UIElement> >& children = contentElement_->GetChildren();
+    const Vector<SharedPtr<UIElement>>& children = contentElement_->GetChildren();
 
     // Binary search for list item based on screen coordinate Y
     if (contentElement_->GetLayoutMode() == LM_VERTICAL && item->GetHeight())
@@ -894,11 +883,11 @@ UIElement* ListView::GetSelectedItem() const
     return contentElement_->GetChild(GetSelection());
 }
 
-PODVector<UIElement*> ListView::GetSelectedItems() const
+Vector<UIElement*> ListView::GetSelectedItems() const
 {
-    PODVector<UIElement*> ret;
+    Vector<UIElement*> ret;
 
-    for (PODVector<unsigned>::ConstIterator i = selections_.Begin(); i != selections_.End(); ++i)
+    for (Vector<unsigned>::ConstIterator i = selections_.Begin(); i != selections_.End(); ++i)
     {
         UIElement* item = GetItem(*i);
         if (item)
@@ -912,7 +901,7 @@ void ListView::CopySelectedItemsToClipboard() const
 {
     String selectedText;
 
-    for (PODVector<unsigned>::ConstIterator i = selections_.Begin(); i != selections_.End(); ++i)
+    for (Vector<unsigned>::ConstIterator i = selections_.Begin(); i != selections_.End(); ++i)
     {
         // Only handle Text UI element
         auto* text = dynamic_cast<Text*>(GetItem(*i));
@@ -1056,7 +1045,7 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
                 {
                     unsigned first = selections_.Front();
                     unsigned last = selections_.Back();
-                    PODVector<unsigned> newSelections = selections_;
+                    Vector<unsigned> newSelections = selections_;
                     if (i == first || i == last)
                     {
                         for (unsigned j = first; j <= last; ++j)

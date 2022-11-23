@@ -14,7 +14,7 @@ class AnimatedSprite2D : StaticSprite2D
     void SetAnimation(const String name, LoopMode2D loopMode = LM_DEFAULT);
     void SetLoopMode(LoopMode2D loopMode);
     void SetSpeed(float speed);
-    
+
     AnimationSet2D* GetAnimationSet() const;
     const String GetEntity() const;
     const String GetAnimation() const;

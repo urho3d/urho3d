@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -622,12 +603,12 @@ void BufferToString(String& dest, const void* data, unsigned size)
     }
 }
 
-void StringToBuffer(PODVector<unsigned char>& dest, const String& source)
+void StringToBuffer(Vector<unsigned char>& dest, const String& source)
 {
     StringToBuffer(dest, source.CString());
 }
 
-void StringToBuffer(PODVector<unsigned char>& dest, const char* source)
+void StringToBuffer(Vector<unsigned char>& dest, const char* source)
 {
     if (!source)
     {
@@ -670,14 +651,14 @@ void StringToBuffer(PODVector<unsigned char>& dest, const char* source)
         dest[index] = (unsigned char)value;
 }
 
-unsigned GetStringListIndex(const String& value, const String* strings, unsigned defaultIndex, bool caseSensitive)
+i32 GetStringListIndex(const String& value, const String* strings, i32 defaultIndex, bool caseSensitive)
 {
     return GetStringListIndex(value.CString(), strings, defaultIndex, caseSensitive);
 }
 
-unsigned GetStringListIndex(const char* value, const String* strings, unsigned defaultIndex, bool caseSensitive)
+i32 GetStringListIndex(const char* value, const String* strings, i32 defaultIndex, bool caseSensitive)
 {
-    unsigned i = 0;
+    i32 i = 0;
 
     while (!strings[i].Empty())
     {
@@ -689,9 +670,9 @@ unsigned GetStringListIndex(const char* value, const String* strings, unsigned d
     return defaultIndex;
 }
 
-unsigned GetStringListIndex(const char* value, const char** strings, unsigned defaultIndex, bool caseSensitive)
+i32 GetStringListIndex(const char* value, const char** strings, i32 defaultIndex, bool caseSensitive)
 {
-    unsigned i = 0;
+    i32 i = 0;
 
     while (strings[i])
     {
@@ -792,14 +773,14 @@ static inline bool IsBase64(char c) {
     return (isalnum(c) || (c == '+') || (c == '/'));
 }
 
-PODVector<unsigned char> DecodeBase64(String encodedString)
+Vector<unsigned char> DecodeBase64(String encodedString)
 {
     int inLen = encodedString.Length();
     int i = 0;
     int j = 0;
     int in_ = 0;
     unsigned char charArray4[4], charArray3[3];
-    PODVector<unsigned char> ret;
+    Vector<unsigned char> ret;
 
     while (inLen-- && (encodedString[in_] != '=') && IsBase64(encodedString[in_]))
     {

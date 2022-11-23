@@ -1,29 +1,10 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
-#include "../Graphics/Texture2D.h"
+#include "../GraphicsAPI/Texture2D.h"
 #include "../Resource/ResourceCache.h"
 #include "../UI/BorderImage.h"
 
@@ -67,7 +48,7 @@ void BorderImage::RegisterObject(Context* context)
         AM_FILE);
 }
 
-void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
+void BorderImage::GetBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, const IntRect& currentScissor)
 {
     if (enabled_)
         GetBatches(batches, vertexData, currentScissor, (hovering_ || selected_ || HasFocus()) ? hoverOffset_ : IntVector2::ZERO);
@@ -140,7 +121,7 @@ void BorderImage::SetTiled(bool enable)
     tiled_ = enable;
 }
 
-void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor,
+void BorderImage::GetBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, const IntRect& currentScissor,
     const IntVector2& offset)
 {
     bool allOpaque = true;
@@ -152,7 +133,7 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vert
         batch(this, blendMode_ == BLEND_REPLACE && !allOpaque ? BLEND_ALPHA : blendMode_, currentScissor, texture_, &vertexData);
 
     if (material_)
-        batch.custom_material_ = material_;
+        batch.customMaterial_ = material_;
 
     // Calculate size of the inner rect, and texture dimensions of the inner rect
     const IntRect& uvBorder = (imageBorder_ == IntRect::ZERO) ? border_ : imageBorder_;

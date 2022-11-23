@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -419,19 +400,19 @@ bool ParticleEffect::Save(XMLElement& dest) const
 
     if (colorFrames_.Size() > 1)
     {
-        for (unsigned i = 0; i < colorFrames_.Size(); ++i)
+        for (const ColorFrame& colorFrame : colorFrames_)
         {
             childElem = dest.CreateChild("colorfade");
-            childElem.SetColor("color", colorFrames_[i].color_);
-            childElem.SetFloat("time", colorFrames_[i].time_);
+            childElem.SetColor("color", colorFrame.color_);
+            childElem.SetFloat("time", colorFrame.time_);
         }
     }
 
-    for (unsigned i = 0; i < textureFrames_.Size(); ++i)
+    for (const TextureFrame& textureFrame : textureFrames_)
     {
         childElem = dest.CreateChild("texanim");
-        childElem.SetRect("uv", textureFrames_[i].uv_);
-        childElem.SetFloat("time", textureFrames_[i].time_);
+        childElem.SetRect("uv", textureFrame.uv_);
+        childElem.SetFloat("time", textureFrame.time_);
     }
 
     return true;
@@ -659,8 +640,8 @@ void ParticleEffect::SortColorFrames()
 {
     Vector<ColorFrame> cf = colorFrames_;
     colorFrames_.Clear();
-    for (unsigned i = 0; i < cf.Size(); i++)
-        AddColorFrame(cf[i]);
+    for (const ColorFrame& colorFrame : cf)
+        AddColorFrame(colorFrame);
 }
 
 void ParticleEffect::AddTextureTime(const Rect& uv, const float time)
@@ -729,8 +710,8 @@ void ParticleEffect::SortTextureFrames()
 {
     Vector<TextureFrame> tf = textureFrames_;
     textureFrames_.Clear();
-    for (unsigned i = 0; i < tf.Size(); i++)
-        AddTextureFrame(tf[i]);
+    for (const TextureFrame& textureFrame : tf)
+        AddTextureFrame(textureFrame);
 }
 
 SharedPtr<ParticleEffect> ParticleEffect::Clone(const String& cloneName) const

@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 /// \file
 
@@ -51,6 +32,7 @@ enum AsyncLoadState
 };
 
 /// Base class for resources.
+/// @templateversion
 class URHO3D_API Resource : public Object
 {
     URHO3D_OBJECT(Resource, Object);
@@ -69,11 +51,14 @@ public:
     virtual bool Save(Serializer& dest) const;
 
     /// Load resource from file.
+    /// @alias{Load}
     bool LoadFile(const String& fileName);
     /// Save resource to file.
+    /// @alias{Save}
     virtual bool SaveFile(const String& fileName) const;
 
     /// Set name.
+    /// @property
     void SetName(const String& name);
     /// Set memory use in bytes, possibly approximate.
     void SetMemoryUse(unsigned size);
@@ -83,15 +68,18 @@ public:
     void SetAsyncLoadState(AsyncLoadState newState);
 
     /// Return name.
+    /// @property
     const String& GetName() const { return name_; }
 
     /// Return name hash.
     StringHash GetNameHash() const { return nameHash_; }
 
     /// Return memory use in bytes, possibly approximate.
+    /// @property
     unsigned GetMemoryUse() const { return memoryUse_; }
 
     /// Return time since last use in milliseconds. If referred to elsewhere than in the resource cache, returns always zero.
+    /// @property
     unsigned GetUseTimer();
 
     /// Return the asynchronous loading state.
@@ -120,14 +108,17 @@ public:
     explicit ResourceWithMetadata(Context* context) : Resource(context) {}
 
     /// Add new metadata variable or overwrite old value.
+    /// @property{set_metadata}
     void AddMetadata(const String& name, const Variant& value);
     /// Remove metadata variable.
     void RemoveMetadata(const String& name);
     /// Remove all metadata variables.
     void RemoveAllMetadata();
     /// Return metadata variable.
+    /// @property
     const Variant& GetMetadata(const String& name) const;
     /// Return whether the resource has metadata.
+    /// @property
     bool HasMetadata() const;
 
 protected:
@@ -162,7 +153,7 @@ inline ResourceRef GetResourceRef(Resource* resource, StringHash defaultType)
     return ResourceRef(GetResourceType(resource, defaultType), GetResourceName(resource));
 }
 
-template <class T> Vector<String> GetResourceNames(const Vector<SharedPtr<T> >& resources)
+template <class T> Vector<String> GetResourceNames(const Vector<SharedPtr<T>>& resources)
 {
     Vector<String> ret(resources.Size());
     for (unsigned i = 0; i < resources.Size(); ++i)
@@ -171,7 +162,7 @@ template <class T> Vector<String> GetResourceNames(const Vector<SharedPtr<T> >& 
     return ret;
 }
 
-template <class T> ResourceRefList GetResourceRefList(const Vector<SharedPtr<T> >& resources)
+template <class T> ResourceRefList GetResourceRefList(const Vector<SharedPtr<T>>& resources)
 {
     return ResourceRefList(T::GetTypeStatic(), GetResourceNames(resources));
 }

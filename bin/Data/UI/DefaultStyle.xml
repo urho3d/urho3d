@@ -255,6 +255,9 @@
     <element type="ConsoleTraceText" style="ConsoleText" auto="false">
         <attribute name="Color" value="0.85 0.85 0.6 1" />
     </element>
+    <element type="ConsoleTraceText" style="ConsoleText" auto="false">
+        <attribute name="Color" value="0.5 0.5 0.5 1" />
+    </element>
     <element type="ConsoleDebugText" style="ConsoleText" auto="false">
         <attribute name="Color" value="1 0.6 0 1" />
     </element>

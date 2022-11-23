@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -110,9 +91,9 @@ bool ResourceCache::AddResourceDir(const String& pathName, unsigned priority)
     String fixedPath = SanitateResourceDirName(pathName);
 
     // Check that the same path does not already exist
-    for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
+    for (const String& resourceDir : resourceDirs_)
     {
-        if (!resourceDirs_[i].Compare(fixedPath, false))
+        if (!resourceDir.Compare(fixedPath, false))
             return true;
     }
 
@@ -210,7 +191,7 @@ void ResourceCache::RemovePackageFile(PackageFile* package, bool releaseResource
 {
     MutexLock lock(resourceMutex_);
 
-    for (Vector<SharedPtr<PackageFile> >::Iterator i = packages_.Begin(); i != packages_.End(); ++i)
+    for (Vector<SharedPtr<PackageFile>>::Iterator i = packages_.Begin(); i != packages_.End(); ++i)
     {
         if (*i == package)
         {
@@ -230,7 +211,7 @@ void ResourceCache::RemovePackageFile(const String& fileName, bool releaseResour
     // Compare the name and extension only, not the path
     String fileNameNoPath = GetFileNameAndExtension(fileName);
 
-    for (Vector<SharedPtr<PackageFile> >::Iterator i = packages_.Begin(); i != packages_.End(); ++i)
+    for (Vector<SharedPtr<PackageFile>>::Iterator i = packages_.Begin(); i != packages_.End(); ++i)
     {
         if (!GetFileNameAndExtension((*i)->GetName()).Compare(fileNameNoPath, false))
         {
@@ -265,10 +246,10 @@ void ResourceCache::ReleaseResources(StringHash type, bool force)
     HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
     if (i != resourceGroups_.End())
     {
-        for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
+        for (HashMap<StringHash, SharedPtr<Resource>>::Iterator j = i->second_.resources_.Begin();
              j != i->second_.resources_.End();)
         {
-            HashMap<StringHash, SharedPtr<Resource> >::Iterator current = j++;
+            HashMap<StringHash, SharedPtr<Resource>>::Iterator current = j++;
             // If other references exist, do not release, unless forced
             if ((current->second_.Refs() == 1 && current->second_.WeakRefs() == 0) || force)
             {
@@ -289,10 +270,10 @@ void ResourceCache::ReleaseResources(StringHash type, const String& partialName,
     HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
     if (i != resourceGroups_.End())
     {
-        for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
+        for (HashMap<StringHash, SharedPtr<Resource>>::Iterator j = i->second_.resources_.Begin();
              j != i->second_.resources_.End();)
         {
-            HashMap<StringHash, SharedPtr<Resource> >::Iterator current = j++;
+            HashMap<StringHash, SharedPtr<Resource>>::Iterator current = j++;
             if (current->second_->GetName().Contains(partialName))
             {
                 // If other references exist, do not release, unless forced
@@ -320,10 +301,10 @@ void ResourceCache::ReleaseResources(const String& partialName, bool force)
 
         for (HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
         {
-            for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
+            for (HashMap<StringHash, SharedPtr<Resource>>::Iterator j = i->second_.resources_.Begin();
                  j != i->second_.resources_.End();)
             {
-                HashMap<StringHash, SharedPtr<Resource> >::Iterator current = j++;
+                HashMap<StringHash, SharedPtr<Resource>>::Iterator current = j++;
                 if (current->second_->GetName().Contains(partialName))
                 {
                     // If other references exist, do not release, unless forced
@@ -351,10 +332,10 @@ void ResourceCache::ReleaseAllResources(bool force)
         for (HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin();
              i != resourceGroups_.End(); ++i)
         {
-            for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
+            for (HashMap<StringHash, SharedPtr<Resource>>::Iterator j = i->second_.resources_.Begin();
                  j != i->second_.resources_.End();)
             {
-                HashMap<StringHash, SharedPtr<Resource> >::Iterator current = j++;
+                HashMap<StringHash, SharedPtr<Resource>>::Iterator current = j++;
                 // If other references exist, do not release, unless forced
                 if ((current->second_.Refs() == 1 && current->second_.WeakRefs() == 0) || force)
                 {
@@ -409,12 +390,12 @@ void ResourceCache::ReloadResourceWithDependencies(const String& fileName)
     if (!resource || GetExtension(resource->GetName()) == ".xml")
     {
         // Check if this is a dependency resource, reload dependents
-        HashMap<StringHash, HashSet<StringHash> >::ConstIterator j = dependentResources_.Find(fileNameHash);
+        HashMap<StringHash, HashSet<StringHash>>::ConstIterator j = dependentResources_.Find(fileNameHash);
         if (j != dependentResources_.End())
         {
             // Reloading a resource may modify the dependency tracking structure. Therefore collect the
             // resources we need to reload first
-            Vector<SharedPtr<Resource> > dependents;
+            Vector<SharedPtr<Resource>> dependents;
             dependents.Reserve(j->second_.Size());
 
             for (HashSet<StringHash>::ConstIterator k = j->second_.Begin(); k != j->second_.End(); ++k)
@@ -424,10 +405,10 @@ void ResourceCache::ReloadResourceWithDependencies(const String& fileName)
                     dependents.Push(dependent);
             }
 
-            for (unsigned k = 0; k < dependents.Size(); ++k)
+            for (const SharedPtr<Resource>& dependent : dependents)
             {
-                URHO3D_LOGDEBUG("Reloading resource " + dependents[k]->GetName() + " depending on " + fileName);
-                ReloadResource(dependents[k]);
+                URHO3D_LOGDEBUG("Reloading resource " + dependent->GetName() + " depending on " + fileName);
+                ReloadResource(dependent);
             }
         }
     }
@@ -444,15 +425,17 @@ void ResourceCache::SetAutoReloadResources(bool enable)
     {
         if (enable)
         {
-            for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
+            for (const String& resourceDir : resourceDirs_)
             {
                 SharedPtr<FileWatcher> watcher(new FileWatcher(context_));
-                watcher->StartWatching(resourceDirs_[i], true);
+                watcher->StartWatching(resourceDir, true);
                 fileWatchers_.Push(watcher);
             }
         }
         else
+        {
             fileWatchers_.Clear();
+        }
 
         autoReloadResources_ = enable;
     }
@@ -461,9 +444,9 @@ void ResourceCache::SetAutoReloadResources(bool enable)
 void ResourceCache::AddResourceRouter(ResourceRouter* router, bool addAsFirst)
 {
     // Check for duplicate
-    for (unsigned i = 0; i < resourceRouters_.Size(); ++i)
+    for (const SharedPtr<ResourceRouter>& resourceRouter : resourceRouters_)
     {
-        if (resourceRouters_[i] == router)
+        if (resourceRouter == router)
             return;
     }
 
@@ -490,11 +473,14 @@ SharedPtr<File> ResourceCache::GetFile(const String& name, bool sendEventOnFailu
     MutexLock lock(resourceMutex_);
 
     String sanitatedName = SanitateResourceName(name);
+
     if (!isRouting_)
     {
         isRouting_ = true;
-        for (unsigned i = 0; i < resourceRouters_.Size(); ++i)
-            resourceRouters_[i]->Route(sanitatedName, RESOURCE_GETFILE);
+
+        for (const SharedPtr<ResourceRouter>& resourceRouter : resourceRouters_)
+            resourceRouter->Route(sanitatedName, RESOURCE_GETFILE);
+
         isRouting_ = false;
     }
 
@@ -717,13 +703,13 @@ unsigned ResourceCache::GetNumBackgroundLoadResources() const
 #endif
 }
 
-void ResourceCache::GetResources(PODVector<Resource*>& result, StringHash type) const
+void ResourceCache::GetResources(Vector<Resource*>& result, StringHash type) const
 {
     result.Clear();
     HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);
     if (i != resourceGroups_.End())
     {
-        for (HashMap<StringHash, SharedPtr<Resource> >::ConstIterator j = i->second_.resources_.Begin();
+        for (HashMap<StringHash, SharedPtr<Resource>>::ConstIterator j = i->second_.resources_.Begin();
              j != i->second_.resources_.End(); ++j)
             result.Push(j->second_);
     }
@@ -734,27 +720,31 @@ bool ResourceCache::Exists(const String& name) const
     MutexLock lock(resourceMutex_);
 
     String sanitatedName = SanitateResourceName(name);
+
     if (!isRouting_)
     {
         isRouting_ = true;
-        for (unsigned i = 0; i < resourceRouters_.Size(); ++i)
-            resourceRouters_[i]->Route(sanitatedName, RESOURCE_CHECKEXISTS);
+
+        for (const SharedPtr<ResourceRouter>& resourceRouter : resourceRouters_)
+            resourceRouter->Route(sanitatedName, RESOURCE_CHECKEXISTS);
+
         isRouting_ = false;
     }
 
     if (sanitatedName.Empty())
         return false;
 
-    for (unsigned i = 0; i < packages_.Size(); ++i)
+    for (const SharedPtr<PackageFile>& package : packages_)
     {
-        if (packages_[i]->Exists(sanitatedName))
+        if (package->Exists(sanitatedName))
             return true;
     }
 
-    auto* fileSystem = GetSubsystem<FileSystem>();
-    for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+    for (const String& resourceDir : resourceDirs_)
     {
-        if (fileSystem->FileExists(resourceDirs_[i] + sanitatedName))
+        if (fileSystem->FileExists(resourceDir + sanitatedName))
             return true;
     }
 
@@ -784,11 +774,12 @@ unsigned long long ResourceCache::GetTotalMemoryUse() const
 
 String ResourceCache::GetResourceFileName(const String& name) const
 {
-    auto* fileSystem = GetSubsystem<FileSystem>();
-    for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+    for (const String& resourceDir : resourceDirs_)
     {
-        if (fileSystem->FileExists(resourceDirs_[i] + name))
-            return resourceDirs_[i] + name;
+        if (fileSystem->FileExists(resourceDir + name))
+            return resourceDir + name;
     }
 
     if (IsAbsolutePath(name) && fileSystem->FileExists(name))
@@ -902,7 +893,7 @@ void ResourceCache::ResetDependencies(Resource* resource)
 
     StringHash nameHash(resource->GetName());
 
-    for (HashMap<StringHash, HashSet<StringHash> >::Iterator i = dependentResources_.Begin(); i != dependentResources_.End();)
+    for (HashMap<StringHash, HashSet<StringHash>>::Iterator i = dependentResources_.Begin(); i != dependentResources_.End();)
     {
         HashSet<StringHash>& dependents = i->second_;
         dependents.Erase(nameHash);
@@ -932,7 +923,7 @@ String ResourceCache::PrintMemoryUsage() const
         else
             average = 0;
         unsigned long long largest = 0;
-        for (HashMap<StringHash, SharedPtr<Resource> >::ConstIterator resIt = cit->second_.resources_.Begin(); resIt != cit->second_.resources_.End(); ++resIt)
+        for (HashMap<StringHash, SharedPtr<Resource>>::ConstIterator resIt = cit->second_.resources_.Begin(); resIt != cit->second_.resources_.End(); ++resIt)
         {
             if (resIt->second_->GetMemoryUse() > largest)
                 largest = resIt->second_->GetMemoryUse();
@@ -979,7 +970,7 @@ const SharedPtr<Resource>& ResourceCache::FindResource(StringHash type, StringHa
     HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
     if (i == resourceGroups_.End())
         return noResource;
-    HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Find(nameHash);
+    HashMap<StringHash, SharedPtr<Resource>>::Iterator j = i->second_.resources_.Find(nameHash);
     if (j == i->second_.resources_.End())
         return noResource;
 
@@ -992,7 +983,7 @@ const SharedPtr<Resource>& ResourceCache::FindResource(StringHash nameHash)
 
     for (HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
     {
-        HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Find(nameHash);
+        HashMap<StringHash, SharedPtr<Resource>>::Iterator j = i->second_.resources_.Find(nameHash);
         if (j != i->second_.resources_.End())
             return j->second_;
     }
@@ -1012,7 +1003,7 @@ void ResourceCache::ReleasePackageResources(PackageFile* package, bool force)
         // We do not know the actual resource type, so search all type containers
         for (HashMap<StringHash, ResourceGroup>::Iterator j = resourceGroups_.Begin(); j != resourceGroups_.End(); ++j)
         {
-            HashMap<StringHash, SharedPtr<Resource> >::Iterator k = j->second_.resources_.Find(nameHash);
+            HashMap<StringHash, SharedPtr<Resource>>::Iterator k = j->second_.resources_.Find(nameHash);
             if (k != j->second_.resources_.End())
             {
                 // If other references exist, do not release, unless forced
@@ -1040,9 +1031,9 @@ void ResourceCache::UpdateResourceGroup(StringHash type)
     {
         unsigned totalSize = 0;
         unsigned oldestTimer = 0;
-        HashMap<StringHash, SharedPtr<Resource> >::Iterator oldestResource = i->second_.resources_.End();
+        HashMap<StringHash, SharedPtr<Resource>>::Iterator oldestResource = i->second_.resources_.End();
 
-        for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
+        for (HashMap<StringHash, SharedPtr<Resource>>::Iterator j = i->second_.resources_.Begin();
              j != i->second_.resources_.End(); ++j)
         {
             totalSize += j->second_->GetMemoryUse();
@@ -1100,14 +1091,15 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
 
 File* ResourceCache::SearchResourceDirs(const String& name)
 {
-    auto* fileSystem = GetSubsystem<FileSystem>();
-    for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+    for (const String& resourceDir : resourceDirs_)
     {
-        if (fileSystem->FileExists(resourceDirs_[i] + name))
+        if (fileSystem->FileExists(resourceDir + name))
         {
             // Construct the file first with full path, then rename it to not contain the resource path,
             // so that the file's sanitatedName can be used in further GetFile() calls (for example over the network)
-            File* file(new File(context_, resourceDirs_[i] + name));
+            File* file(new File(context_, resourceDir + name));
             file->SetName(name);
             return file;
         }
@@ -1122,10 +1114,10 @@ File* ResourceCache::SearchResourceDirs(const String& name)
 
 File* ResourceCache::SearchPackages(const String& name)
 {
-    for (unsigned i = 0; i < packages_.Size(); ++i)
+    for (const SharedPtr<PackageFile>& package : packages_)
     {
-        if (packages_[i]->Exists(name))
-            return new File(context_, packages_[i], name);
+        if (package->Exists(name))
+            return new File(context_, package, name);
     }
 
     return nullptr;

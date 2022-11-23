@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -26,6 +7,7 @@
 #include "../Graphics/Camera.h"
 #include "../Graphics/DebugRenderer.h"
 #include "../Graphics/Drawable.h"
+#include "../Graphics/Graphics.h"
 #include "../Scene/Node.h"
 
 #include "../DebugNew.h"
@@ -447,19 +429,22 @@ Matrix4 Camera::GetProjection() const
 
 Matrix4 Camera::GetGPUProjection() const
 {
-#ifndef URHO3D_OPENGL
-    return GetProjection(); // Already matches API-specific format
-#else
-    // See formulation for depth range conversion at http://www.ogre3d.org/forums/viewtopic.php?f=4&t=13357
-    Matrix4 ret = GetProjection();
+    if (Graphics::GetGAPI() != GAPI_OPENGL)
+    {
+        return GetProjection(); // Already matches API-specific format
+    }
+    else
+    {
+        // See formulation for depth range conversion at http://www.ogre3d.org/forums/viewtopic.php?f=4&t=13357
+        Matrix4 ret = GetProjection();
 
-    ret.m20_ = 2.0f * ret.m20_ - ret.m30_;
-    ret.m21_ = 2.0f * ret.m21_ - ret.m31_;
-    ret.m22_ = 2.0f * ret.m22_ - ret.m32_;
-    ret.m23_ = 2.0f * ret.m23_ - ret.m33_;
+        ret.m20_ = 2.0f * ret.m20_ - ret.m30_;
+        ret.m21_ = 2.0f * ret.m21_ - ret.m31_;
+        ret.m22_ = 2.0f * ret.m22_ - ret.m32_;
+        ret.m23_ = 2.0f * ret.m23_ - ret.m33_;
 
-    return ret;
-#endif
+        return ret;
+    }
 }
 
 void Camera::GetFrustumSize(Vector3& near, Vector3& far) const

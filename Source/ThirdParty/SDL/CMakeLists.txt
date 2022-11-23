@@ -21,27 +21,8 @@
 
 # Modified by Yao Wei Tjong for Urho3D, the modified portion is licensed under below license
 
-#
-# Copyright (c) 2008-2019 the Urho3D project.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
+# Copyright (c) 2008-2022 the Urho3D project
+# License: MIT
 
 # Urho3D - commented out in-source tree build prevention as Urho3D supports both out-of-source and in-source tree builds
 
@@ -283,9 +264,10 @@ set_option(DUMMYAUDIO          "Support the dummy audio driver" ON)
 set_option(VIDEO_DIRECTFB      "Use DirectFB video driver" OFF)
 dep_option(DIRECTFB_SHARED     "Dynamically load directfb support" ON VIDEO_DIRECTFB OFF)
 set_option(VIDEO_DUMMY         "Use dummy video driver" ON)
-set_option(VIDEO_OPENGL        "Include OpenGL support" ON)
-# Urho3D - hide OpenGLES option from MinGW platform because it does not have the necessary header file to build OpenGLES video driver
-dep_option(VIDEO_OPENGLES      "Include OpenGL ES support" ON "NOT MINGW" OFF)
+# Urho3D - hide OpenGL option from all non-desktop platforms
+dep_option(VIDEO_OPENGL        "Include OpenGL support" ON "NOT ANDROID AND NOT IOS AND NOT TVOS AND NOT ARM AND NOT WEB" OFF)
+# Urho3D - hide OpenGLES option from all desktop platforms, although a few of them appears to have the necessary header file to build SDL OpenGLES video driver
+dep_option(VIDEO_OPENGLES      "Include OpenGL ES support" ON "ANDROID OR IOS OR TVOS OR ARM OR WEB" OFF)
 # Urho3D - only make PTHREADS option available on UNIX-like platforms
 dep_option(PTHREADS            "Use POSIX threads for multi-threading" ON UNIX OFF)
 dep_option(PTHREADS_SEM        "Use pthread semaphores" ON PTHREADS OFF)
@@ -320,7 +302,7 @@ dep_option(WAYLAND_SHARED      "Dynamically load Wayland support" ON VIDEO_WAYLA
 # Urho3D - change the VIDEO_WAYLAND_QT_TOUCH default value to FALSE (this is only needed by Sailfish[?] but we don't know way to auto-detect that yet)
 dep_option(VIDEO_WAYLAND_QT_TOUCH  "QtWayland server support for Wayland video driver" OFF VIDEO_WAYLAND OFF)
 # Urho3D - only make VIDEO_RPI option available on Raspberry-Pi platform
-dep_option(VIDEO_RPI           "Use Raspberry Pi video driver" ON RPI OFF)
+dep_option(VIDEO_RPI           "Use Raspberry Pi video driver" ON "RPI AND NOT RPI_ABI STREQUAL RPI4" OFF)
 # Urho3D - bug fix - make VIDEO_X11 build option available for desktop UNIX (including OSX) only
 dep_option(VIDEO_X11           "Use X11 video driver" ON "UNIX_SYS OR APPLE\;NOT RPI AND NOT IOS AND NOT TVOS" OFF)
 dep_option(X11_SHARED          "Dynamically load X11 support" ON VIDEO_X11 OFF)
@@ -338,13 +320,12 @@ else ()
   set (DIRECTX OFF)  # Make it off explicitly when not targeting Windows platform, just in case user passes it in accidentally via CLI
 endif ()
 dep_option(WASAPI              "Use the Windows WASAPI audio driver" ON WINDOWS OFF)
-# Urho3D - commented out RENDER_D3D as an option to avoid potential conflict with our URHO3D_OPENGL and URHO3D_D3D11 build options on Windows platform
-#          Instead just initialize the variable according to our build options; Urho3D also by default disables the SDL renderer subsystem
+# Urho3D
 if (WINDOWS)
-  if (URHO3D_OPENGL)
-    set (RENDER_D3D FALSE)
-  else ()
+  if (URHO3D_D3D9 OR URHO3D_D3D11)
     set (RENDER_D3D TRUE)
+  else ()
+    set (RENDER_D3D FALSE)
   endif ()
 endif ()
 dep_option(VIDEO_VIVANTE       "Use Vivante EGL video driver" ON UNIX_SYS OFF)
@@ -481,6 +462,9 @@ if(USE_GCC OR USE_CLANG)
   if(HAVE_NO_UNDEFINED)
     list(APPEND EXTRA_LDFLAGS "-Wl,--no-undefined")
   endif()
+
+  # Urho3D - Wayland quick fix
+  list(APPEND EXTRA_CFLAGS "-fcommon")
 endif()
 
 if(ASSEMBLY)
@@ -1075,7 +1059,7 @@ elseif(UNIX)    # Urho3D - at this point both UNIX and UNIX_SYS should be equiva
     CheckRPI()
     CheckX11()
     CheckDirectFB()
-    # Urho3D - raname macros
+    # Urho3D - rename macros
     CheckOpenGL()
     CheckOpenGLES()
     CheckWayland()
@@ -1387,7 +1371,7 @@ elseif(WINDOWS)
     if(HAVE_DINPUT_H)
       set(SDL_JOYSTICK_DINPUT 1)
       list(APPEND EXTRA_LIBS dinput8)
-      if(CMAKE_COMPILER_IS_MINGW)
+      if(MINGW)
         list(APPEND EXTRA_LIBS dxerr8)
       elseif (NOT USE_WINSDK_DIRECTX)
         list(APPEND EXTRA_LIBS dxerr)

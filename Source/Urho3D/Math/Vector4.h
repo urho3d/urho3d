@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -162,10 +143,10 @@ public:
     }
 
     /// Return const value by index.
-    float operator[](unsigned index) const { return (&x_)[index]; }
+    float operator[](i32 index) const { return (&x_)[index]; }
 
     /// Return mutable value by index.
-    float& operator[](unsigned index) { return (&x_)[index]; }
+    float& operator[](i32 index) { return (&x_)[index]; }
 
     /// Calculate dot product.
     float DotProduct(const Vector4& rhs) const { return x_ * rhs.x_ + y_ * rhs.y_ + z_ * rhs.z_ + w_ * rhs.w_; }
@@ -191,8 +172,17 @@ public:
         return Urho3D::Equals(x_, rhs.x_) && Urho3D::Equals(y_, rhs.y_) && Urho3D::Equals(z_, rhs.z_) && Urho3D::Equals(w_, rhs.w_);
     }
 
-    /// Return whether is NaN.
+    /// Return whether any component is NaN.
     bool IsNaN() const { return Urho3D::IsNaN(x_) || Urho3D::IsNaN(y_) || Urho3D::IsNaN(z_) || Urho3D::IsNaN(w_); }
+
+    /// Return whether any component is Inf.
+    bool IsInf() const { return Urho3D::IsInf(x_) || Urho3D::IsInf(y_) || Urho3D::IsInf(z_) || Urho3D::IsInf(w_); }
+
+    /// Convert to Vector2.
+    explicit operator Vector2() const { return { x_, y_ }; }
+
+    /// Convert to Vector3.
+    explicit operator Vector3() const { return { x_, y_, z_ }; }
 
     /// Return float data.
     const float* Data() const { return &x_; }

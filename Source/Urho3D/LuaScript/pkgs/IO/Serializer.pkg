@@ -4,7 +4,7 @@ class Serializer
 {
     // unsigned Write(const void* data, unsigned size);
     tolua_outside unsigned SerializerWrite @ Write(const VectorBuffer& buffer);
-    
+
     bool WriteInt(int value);
     bool WriteInt64(long long value);
     bool WriteShort(short value);
@@ -34,10 +34,10 @@ class Serializer
     bool WriteString(const String value);
     bool WriteFileID(const String value);
     bool WriteStringHash(const StringHash& value);
-    
+
     // bool WriteBuffer(const PODVector<unsigned char>& buffer);
     tolua_outside bool SerializerWriteBuffer @ WriteBuffer(const VectorBuffer& buffer);
-    
+
     bool WriteResourceRef(const ResourceRef& value);
     bool WriteResourceRefList(const ResourceRefList& value);
     bool WriteVariant(const Variant& value);

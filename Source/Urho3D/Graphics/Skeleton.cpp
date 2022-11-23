@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -31,7 +12,7 @@ namespace Urho3D
 {
 
 Skeleton::Skeleton() :
-    rootBoneIndex_(M_MAX_UNSIGNED)
+    rootBoneIndex_(NINDEX)
 {
 }
 
@@ -44,15 +25,15 @@ bool Skeleton::Load(Deserializer& source)
     if (source.IsEof())
         return false;
 
-    unsigned bones = source.ReadUInt();
+    i32 bones = source.ReadInt();
     bones_.Reserve(bones);
 
-    for (unsigned i = 0; i < bones; ++i)
+    for (i32 i = 0; i < bones; ++i)
     {
         Bone newBone;
         newBone.name_ = source.ReadString();
         newBone.nameHash_ = newBone.name_;
-        newBone.parentIndex_ = source.ReadUInt();
+        newBone.parentIndex_ = source.ReadInt();
         newBone.initialPosition_ = source.ReadVector3();
         newBone.initialRotation_ = source.ReadQuaternion();
         newBone.initialScale_ = source.ReadVector3();
@@ -76,14 +57,14 @@ bool Skeleton::Load(Deserializer& source)
 
 bool Skeleton::Save(Serializer& dest) const
 {
-    if (!dest.WriteUInt(bones_.Size()))
+    if (!dest.WriteInt(bones_.Size()))
         return false;
 
-    for (unsigned i = 0; i < bones_.Size(); ++i)
+    for (i32 i = 0; i < bones_.Size(); ++i)
     {
         const Bone& bone = bones_[i];
         dest.WriteString(bone.name_);
-        dest.WriteUInt(bone.parentIndex_);
+        dest.WriteInt(bone.parentIndex_);
         dest.WriteVector3(bone.initialPosition_);
         dest.WriteQuaternion(bone.initialRotation_);
         dest.WriteVector3(bone.initialScale_);
@@ -112,9 +93,11 @@ void Skeleton::Define(const Skeleton& src)
     rootBoneIndex_ = src.rootBoneIndex_;
 }
 
-void Skeleton::SetRootBoneIndex(unsigned index)
+void Skeleton::SetRootBoneIndex(i32 index)
 {
-    if (index < bones_.Size())
+    assert(index >= 0);
+
+    if (index >= 0 && index < bones_.Size())
         rootBoneIndex_ = index;
     else
         URHO3D_LOGERROR("Root bone index out of bounds");
@@ -123,7 +106,7 @@ void Skeleton::SetRootBoneIndex(unsigned index)
 void Skeleton::ClearBones()
 {
     bones_.Clear();
-    rootBoneIndex_ = M_MAX_UNSIGNED;
+    rootBoneIndex_ = NINDEX;
 }
 
 void Skeleton::Reset()
@@ -150,27 +133,27 @@ Bone* Skeleton::GetRootBone()
     return GetBone(rootBoneIndex_);
 }
 
-unsigned Skeleton::GetBoneIndex(const StringHash& boneNameHash) const
+i32 Skeleton::GetBoneIndex(const StringHash& boneNameHash) const
 {
-    const unsigned numBones = bones_.Size();
-    for (unsigned i = 0; i < numBones; ++i)
+    const i32 numBones = bones_.Size();
+    for (i32 i = 0; i < bones_.Size(); ++i)
     {
         if (bones_[i].nameHash_ == boneNameHash)
             return i;
     }
 
-    return M_MAX_UNSIGNED;
+    return NINDEX;
 }
 
-unsigned Skeleton::GetBoneIndex(const Bone* bone) const
+i32 Skeleton::GetBoneIndex(const Bone* bone) const
 {
     if (bones_.Empty() || bone < &bones_.Front() || bone > &bones_.Back())
-        return M_MAX_UNSIGNED;
+        return NINDEX;
 
-    return static_cast<unsigned>(bone - &bones_.Front());
+    return static_cast<i32>(bone - &bones_.Front());
 }
 
-unsigned Skeleton::GetBoneIndex(const String& boneName) const
+i32 Skeleton::GetBoneIndex(const String& boneName) const
 {
     return GetBoneIndex(StringHash(boneName));
 }
@@ -183,9 +166,10 @@ Bone* Skeleton::GetBoneParent(const Bone* bone)
         return GetBone(bone->parentIndex_);
 }
 
-Bone* Skeleton::GetBone(unsigned index)
+Bone* Skeleton::GetBone(i32 index)
 {
-    return index < bones_.Size() ? &bones_[index] : nullptr;
+    assert(index >= 0 || index == NINDEX);
+    return (index >= 0 && index < bones_.Size()) ? &bones_[index] : nullptr;
 }
 
 Bone* Skeleton::GetBone(const String& name)
@@ -200,8 +184,8 @@ Bone* Skeleton::GetBone(const char* name)
 
 Bone* Skeleton::GetBone(const StringHash& boneNameHash)
 {
-    const unsigned index = GetBoneIndex(boneNameHash);
-    return index < bones_.Size() ? &bones_[index] : nullptr;
+    const i32 index = GetBoneIndex(boneNameHash);
+    return (index >= 0 && index < bones_.Size()) ? &bones_[index] : nullptr;
 }
 
 }

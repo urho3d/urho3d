@@ -1,58 +1,40 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
-#include <Urho3D/Urho2D/AnimatedSprite2D.h>
-#include <Urho3D/Urho2D/AnimationSet2D.h>
-#include <Urho3D/UI/BorderImage.h>
-#include <Urho3D/UI/Button.h>
-#include <Urho3D/Graphics/Camera.h>
-#include <Urho3D/Urho2D/CollisionBox2D.h>
-#include <Urho3D/Urho2D/CollisionChain2D.h>
-#include <Urho3D/Urho2D/CollisionCircle2D.h>
-#include <Urho3D/Urho2D/CollisionPolygon2D.h>
-#include <Urho3D/Core/Context.h>
-#include <Urho3D/Core/CoreEvents.h>
-#include <Urho3D/Engine/Engine.h>
-#include <Urho3D/IO/File.h>
-#include <Urho3D/IO/FileSystem.h>
-#include <Urho3D/UI/Font.h>
-#include <Urho3D/Input/Input.h>
-#include <Urho3D/Urho2D/ParticleEffect2D.h>
-#include <Urho3D/Urho2D/ParticleEmitter2D.h>
-#include <Urho3D/Resource/ResourceCache.h>
-#include <Urho3D/Urho2D/RigidBody2D.h>
-#include <Urho3D/Scene/Scene.h>
 #include <Urho3D/Audio/Sound.h>
 #include <Urho3D/Audio/SoundSource.h>
+#include <Urho3D/Core/Context.h>
+#include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Core/StringUtils.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Graphics/Camera.h>
+#include <Urho3D/GraphicsAPI/Texture2D.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/IO/File.h>
+#include <Urho3D/IO/FileSystem.h>
+#include <Urho3D/Physics2D/CollisionBox2D.h>
+#include <Urho3D/Physics2D/CollisionChain2D.h>
+#include <Urho3D/Physics2D/CollisionCircle2D.h>
+#include <Urho3D/Physics2D/CollisionEdge2D.h>
+#include <Urho3D/Physics2D/CollisionPolygon2D.h>
+#include <Urho3D/Physics2D/RigidBody2D.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/Scene/ValueAnimation.h>
+#include <Urho3D/UI/BorderImage.h>
+#include <Urho3D/UI/Button.h>
+#include <Urho3D/UI/Font.h>
 #include <Urho3D/UI/Text.h>
-#include <Urho3D/Graphics/Texture2D.h>
+#include <Urho3D/UI/UI.h>
+#include <Urho3D/UI/UIEvents.h>
+#include <Urho3D/UI/Window.h>
+#include <Urho3D/Urho2D/AnimatedSprite2D.h>
+#include <Urho3D/Urho2D/AnimationSet2D.h>
+#include <Urho3D/Urho2D/ParticleEffect2D.h>
+#include <Urho3D/Urho2D/ParticleEmitter2D.h>
 #include <Urho3D/Urho2D/TileMap2D.h>
 #include <Urho3D/Urho2D/TileMapLayer2D.h>
 #include <Urho3D/Urho2D/TmxFile2D.h>
-#include <Urho3D/UI/UI.h>
-#include <Urho3D/UI/UIEvents.h>
-#include <Urho3D/Scene/ValueAnimation.h>
-#include <Urho3D/UI/Window.h>
 
 #include "Utilities2D/Mover.h"
 #include "Sample2D.h"
@@ -63,14 +45,14 @@ Sample2D::Sample2D(Context* context) :
 {
 }
 
-void Sample2D::CreateCollisionShapesFromTMXObjects(Node* tileMapNode, TileMapLayer2D* tileMapLayer, TileMapInfo2D info)
+void Sample2D::CreateCollisionShapesFromTMXObjects(Node* tileMapNode, TileMapLayer2D* tileMapLayer, const TileMapInfo2D& info)
 {
     // Create rigid body to the root node
     auto* body = tileMapNode->CreateComponent<RigidBody2D>();
     body->SetBodyType(BT_STATIC);
 
     // Generate physics collision shapes and rigid bodies from the tmx file's objects located in "Physics" layer
-    for (int i = 0; i < tileMapLayer->GetNumObjects(); ++i)
+    for (unsigned i = 0; i < tileMapLayer->GetNumObjects(); ++i)
     {
         TileMapObject2D* tileMapObject = tileMapLayer->GetObject(i); // Get physics objects
 
@@ -104,7 +86,7 @@ void Sample2D::CreateCollisionShapesFromTMXObjects(Node* tileMapNode, TileMapLay
     }
 }
 
-CollisionBox2D* Sample2D::CreateRectangleShape(Node* node, TileMapObject2D* object, Vector2 size, TileMapInfo2D info)
+CollisionBox2D* Sample2D::CreateRectangleShape(Node* node, TileMapObject2D* object, const Vector2& size, const TileMapInfo2D& info)
 {
     auto* shape = node->CreateComponent<CollisionBox2D>();
     shape->SetSize(size);
@@ -121,7 +103,7 @@ CollisionBox2D* Sample2D::CreateRectangleShape(Node* node, TileMapObject2D* obje
     return shape;
 }
 
-CollisionCircle2D* Sample2D::CreateCircleShape(Node* node, TileMapObject2D* object, float radius, TileMapInfo2D info)
+CollisionCircle2D* Sample2D::CreateCircleShape(Node* node, TileMapObject2D* object, float radius, const TileMapInfo2D& info)
 {
     auto* shape = node->CreateComponent<CollisionCircle2D>();
     Vector2 size = object->GetSize();
@@ -152,8 +134,9 @@ CollisionPolygon2D* Sample2D::CreatePolygonShape(Node* node, TileMapObject2D* ob
     return shape;
 }
 
-CollisionChain2D* Sample2D::CreatePolyLineShape(Node* node, TileMapObject2D* object)
+void Sample2D::CreatePolyLineShape(Node* node, TileMapObject2D* object)
 {
+    /*
     auto* shape = node->CreateComponent<CollisionChain2D>();
     int numVertices = object->GetNumPoints();
     shape->SetVertexCount(numVertices);
@@ -163,9 +146,24 @@ CollisionChain2D* Sample2D::CreatePolyLineShape(Node* node, TileMapObject2D* obj
     if (object->HasProperty("Friction"))
         shape->SetFriction(ToFloat(object->GetProperty("Friction")));
     return shape;
+    */
+
+    // Latest Box2D supports only one sided chains with ghost vertices, use two sided edges instead.
+    // But this can cause stuck at the edges ends https://box2d.org/posts/2020/06/ghost-collisions/
+
+    u32 numVertices = object->GetNumPoints();
+
+    for (u32 i = 1; i < numVertices; ++i)
+    {
+        CollisionEdge2D* shape = node->CreateComponent<CollisionEdge2D>();
+        shape->SetVertices(object->GetPoint(i - 1), object->GetPoint(i));
+        shape->SetFriction(0.8f);
+        if (object->HasProperty("Friction"))
+            shape->SetFriction(ToFloat(object->GetProperty("Friction")));
+    }
 }
 
-Node* Sample2D::CreateCharacter(TileMapInfo2D info, float friction, Vector3 position, float scale)
+Node* Sample2D::CreateCharacter(const TileMapInfo2D& info, float friction, const Vector3& position, float scale)
 {
     auto* cache = GetSubsystem<ResourceCache>();
     Node* spriteNode = scene_->CreateChild("Imp");
@@ -180,10 +178,12 @@ Node* Sample2D::CreateCharacter(TileMapInfo2D info, float friction, Vector3 posi
     auto* impBody = spriteNode->CreateComponent<RigidBody2D>();
     impBody->SetBodyType(BT_DYNAMIC);
     impBody->SetAllowSleep(false);
+    impBody->SetFixedRotation(true);
     auto* shape = spriteNode->CreateComponent<CollisionCircle2D>();
     shape->SetRadius(1.1f); // Set shape size
     shape->SetFriction(friction); // Set friction
     shape->SetRestitution(0.1f); // Bounce
+    shape->SetDensity(6.6f);
 
     return spriteNode;
 }
@@ -269,7 +269,7 @@ void Sample2D::PopulateMovingEntities(TileMapLayer2D* movingEntitiesLayer)
     Node* platformNode = CreateMovingPlatform();
 
     // Instantiate enemies and moving platforms at each placeholder (placeholders are Poly Line objects defining a path from points)
-    for (int i=0; i < movingEntitiesLayer->GetNumObjects(); ++i)
+    for (unsigned i=0; i < movingEntitiesLayer->GetNumObjects(); ++i)
     {
         // Get placeholder object
         TileMapObject2D* movingObject = movingEntitiesLayer->GetObject(i); // Get placeholder object
@@ -295,7 +295,7 @@ void Sample2D::PopulateMovingEntities(TileMapLayer2D* movingEntitiesLayer)
             auto* mover = movingClone->CreateComponent<Mover>();
 
             // Set path from points
-            PODVector<Vector2> path = CreatePathFromPoints(movingObject, offset);
+            Vector<Vector2> path = CreatePathFromPoints(movingObject, offset);
             mover->path_ = path;
 
             // Override default speed
@@ -316,7 +316,7 @@ void Sample2D::PopulateCoins(TileMapLayer2D* coinsLayer)
     Node* coinNode = CreateCoin();
 
     // Instantiate coins to pick at each placeholder
-    for (int i=0; i < coinsLayer->GetNumObjects(); ++i)
+    for (unsigned i=0; i < coinsLayer->GetNumObjects(); ++i)
     {
         TileMapObject2D* coinObject = coinsLayer->GetObject(i); // Get placeholder object
         Node* coinClone = coinNode->Clone();
@@ -334,7 +334,7 @@ void Sample2D::PopulateTriggers(TileMapLayer2D* triggersLayer)
     Node* triggerNode = CreateTrigger();
 
     // Instantiate triggers at each placeholder (Rectangle objects)
-    for (int i=0; i < triggersLayer->GetNumObjects(); ++i)
+    for (unsigned i=0; i < triggersLayer->GetNumObjects(); ++i)
     {
         TileMapObject2D* triggerObject = triggersLayer->GetObject(i); // Get placeholder object
         if (triggerObject->GetObjectType() == OT_RECTANGLE)
@@ -374,10 +374,10 @@ float Sample2D::Zoom(Camera* camera)
     return zoom_;
 }
 
-PODVector<Vector2> Sample2D::CreatePathFromPoints(TileMapObject2D* object, Vector2 offset)
+Vector<Vector2> Sample2D::CreatePathFromPoints(TileMapObject2D* object, const Vector2& offset)
 {
-    PODVector<Vector2> path;
-    for (int i=0; i < object->GetNumPoints(); ++i)
+    Vector<Vector2> path;
+    for (unsigned i=0; i < object->GetNumPoints(); ++i)
         path.Push(object->GetPoint(i) + offset);
     return path;
 }
@@ -496,7 +496,7 @@ void Sample2D::SaveScene(bool initial)
     scene_->SaveXML(saveFile);
 }
 
-void Sample2D::CreateBackgroundSprite(TileMapInfo2D info, float scale, const String& texture, bool animate)
+void Sample2D::CreateBackgroundSprite(const TileMapInfo2D& info, float scale, const String& texture, bool animate)
 {
     auto* cache = GetSubsystem<ResourceCache>();
     Node* node = scene_->CreateChild("Background");
@@ -523,7 +523,7 @@ void Sample2D::SpawnEffect(Node* node)
 {
     auto* cache = GetSubsystem<ResourceCache>();
     Node* particleNode = node->CreateChild("Emitter");
-    particleNode->SetScale(0.5 / node->GetScale().x_);
+    particleNode->SetScale(0.5f / node->GetScale().x_);
     auto* particleEmitter = particleNode->CreateComponent<ParticleEmitter2D>();
     particleEmitter->SetLayer(2);
     particleEmitter->SetEffect(cache->GetResource<ParticleEffect2D>("Urho2D/sun.pex"));

@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -50,10 +31,12 @@ public:
     ~FileSystem() override;
 
     /// Set the current working directory.
+    /// @property
     bool SetCurrentDir(const String& pathName);
     /// Create a directory.
     bool CreateDir(const String& pathName);
     /// Set whether to execute engine console commands as OS-specific system command.
+    /// @property
     void SetExecuteConsoleCommands(bool enable);
     /// Run a program using the command interpreter, block until it exits and return the exit code. Will fail if any allowed paths are defined.
     int SystemCommand(const String& commandLine, bool redirectStdOutToLog = false);
@@ -77,9 +60,11 @@ public:
     bool SetLastModifiedTime(const String& fileName, unsigned newTime);
 
     /// Return the absolute current working directory.
+    /// @property
     String GetCurrentDir() const;
 
     /// Return whether is executing engine console commands as OS-specific system command.
+    /// @property
     bool GetExecuteConsoleCommands() const { return executeConsoleCommands_; }
 
     /// Return whether paths have been registered.
@@ -96,12 +81,15 @@ public:
     /// Scan a directory for specified files.
     void ScanDir(Vector<String>& result, const String& pathName, const String& filter, unsigned flags, bool recursive) const;
     /// Return the program's directory.
+    /// @property
     String GetProgramDir() const;
     /// Return the user documents directory.
+    /// @property
     String GetUserDocumentsDir() const;
     /// Return the application preferences directory.
     String GetAppPreferencesDir(const String& org, const String& app) const;
     /// Return path of temporary directory. Path always ends with a forward slash.
+    /// @property
     String GetTemporaryDir() const;
 
 private:
@@ -136,13 +124,13 @@ URHO3D_API String GetExtension(const String& fullPath, bool lowercaseExtension =
 URHO3D_API String GetFileNameAndExtension(const String& fileName, bool lowercaseExtension = false);
 /// Replace the extension of a file name with another.
 URHO3D_API String ReplaceExtension(const String& fullPath, const String& newExtension);
-/// Add a slash at the end of the path if missing and convert to internal format (use slashes.)
+/// Add a slash at the end of the path if missing and convert to internal format (use slashes).
 URHO3D_API String AddTrailingSlash(const String& pathName);
-/// Remove the slash from the end of a path if exists and convert to internal format (use slashes.)
+/// Remove the slash from the end of a path if exists and convert to internal format (use slashes).
 URHO3D_API String RemoveTrailingSlash(const String& pathName);
 /// Return the parent path, or the path itself if not available.
 URHO3D_API String GetParentPath(const String& path);
-/// Convert a path to internal format (use slashes.)
+/// Convert a path to internal format (use slashes).
 URHO3D_API String GetInternalPath(const String& pathName);
 /// Convert a path to the format required by the operating system.
 URHO3D_API String GetNativePath(const String& pathName);

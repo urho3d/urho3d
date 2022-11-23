@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -53,6 +34,15 @@ HttpRequest::HttpRequest(const String& url, const String& verb, const Vector<Str
 
     URHO3D_LOGDEBUG("HTTP " + verb_ + " request to URL " + url_);
 
+#ifdef URHO3D_SSL
+    static bool sslInitialized = false;
+    if (!sslInitialized)
+    {
+        mg_init_library(MG_FEATURES_TLS);
+        sslInitialized = true;
+    }
+#endif
+
 #ifdef URHO3D_THREADING
     // Start the worker thread to actually create the connection and read the response data.
     Run();
@@ -68,12 +58,14 @@ HttpRequest::~HttpRequest()
 
 void HttpRequest::ThreadFunction()
 {
+    URHO3D_PROFILE_THREAD("HttpRequest Thread");
+
     String protocol = "http";
     String host;
     String path = "/";
     int port = 80;
 
-    unsigned protocolEnd = url_.Find("://");
+    i32 protocolEnd = url_.Find("://");
     if (protocolEnd != String::NPOS)
     {
         protocol = url_.Substring(0, protocolEnd);
@@ -82,19 +74,20 @@ void HttpRequest::ThreadFunction()
     else
         host = url_;
 
-    unsigned pathStart = host.Find('/');
+    i32 pathStart = host.Find('/');
     if (pathStart != String::NPOS)
     {
         path = host.Substring(pathStart);
         host = host.Substring(0, pathStart);
     }
 
-    unsigned portStart = host.Find(':');
+    i32 portStart = host.Find(':');
     if (portStart != String::NPOS)
     {
         port = ToInt(host.Substring(portStart + 1));
         host = host.Substring(0, portStart);
-    }
+    } else if (protocol.Compare("https", false) >= 0)
+        port = 443;
 
     char errorBuffer[ERROR_BUFFER_SIZE];
     memset(errorBuffer, 0, sizeof(errorBuffer));
@@ -109,11 +102,11 @@ void HttpRequest::ThreadFunction()
     }
 
     // Initiate the connection. This may block due to DNS query
-    /// \todo SSL mode will not actually work unless Civetweb's SSL mode is initialized with an external SSL DLL
     mg_connection* connection = nullptr;
+
     if (postData_.Empty())
     {
-        connection = mg_download(host.CString(), port, protocol.Compare("https", false) ? 0 : 1, errorBuffer, sizeof(errorBuffer),
+        connection = mg_download(host.CString(), port, protocol.Compare("https", false) >= 0 ? 1 : 0, errorBuffer, sizeof(errorBuffer),
             "%s %s HTTP/1.0\r\n"
             "Host: %s\r\n"
             "%s"
@@ -121,7 +114,7 @@ void HttpRequest::ThreadFunction()
     }
     else
     {
-        connection = mg_download(host.CString(), port, protocol.Compare("https", false) ? 0 : 1, errorBuffer, sizeof(errorBuffer),
+        connection = mg_download(host.CString(), port, protocol.Compare("https", false) >= 0 ? 1 : 0, errorBuffer, sizeof(errorBuffer),
             "%s %s HTTP/1.0\r\n"
             "Host: %s\r\n"
             "%s"

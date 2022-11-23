@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -44,15 +25,23 @@ enum ClipMask : unsigned
 };
 URHO3D_FLAGSET(ClipMask, ClipMaskFlags);
 
-void DrawOcclusionBatchWork(const WorkItem* item, unsigned threadIndex)
+static constexpr int OCCLUSION_MIN_SIZE = 8;
+static constexpr int OCCLUSION_DEFAULT_MAX_TRIANGLES = 5000;
+static constexpr float OCCLUSION_RELATIVE_BIAS = 0.00001f;
+static constexpr int OCCLUSION_FIXED_BIAS = 16;
+static constexpr float OCCLUSION_X_SCALE = 65536.0f;
+static constexpr float OCCLUSION_Z_SCALE = 16777216.0f;
+
+void DrawOcclusionBatchWork(const WorkItem* item, i32 threadIndex)
 {
     auto* buffer = reinterpret_cast<OcclusionBuffer*>(item->aux_);
     OcclusionBatch& batch = *reinterpret_cast<OcclusionBatch*>(item->start_);
     buffer->DrawBatch(batch, threadIndex);
 }
 
-OcclusionBuffer::OcclusionBuffer(Context* context) :
-    Object(context)
+OcclusionBuffer::OcclusionBuffer(Context* context)
+    : Object(context)
+    , maxTriangles_(OCCLUSION_DEFAULT_MAX_TRIANGLES)
 {
 }
 
@@ -155,8 +144,8 @@ void OcclusionBuffer::Clear()
 
     // Only clear the main thread buffer. Rest are cleared on-demand when drawing the first batch
     ClearBuffer(0);
-    for (unsigned i = 1; i < buffers_.Size(); ++i)
-        buffers_[i].used_ = false;
+    for (OcclusionBufferData& buffer : buffers_)
+        buffer.used_ = false;
 
     depthHierarchyDirty_ = true;
 }
@@ -215,14 +204,14 @@ void OcclusionBuffer::DrawTriangles()
         for (Vector<OcclusionBatch>::Iterator i = batches_.Begin(); i != batches_.End(); ++i)
         {
             SharedPtr<WorkItem> item = queue->GetFreeItem();
-            item->priority_ = M_MAX_UNSIGNED;
+            item->priority_ = WI_MAX_PRIORITY;
             item->workFunction_ = DrawOcclusionBatchWork;
             item->aux_ = this;
             item->start_ = &(*i);
             queue->AddWorkItem(item);
         }
 
-        queue->Complete(M_MAX_UNSIGNED);
+        queue->Complete(WI_MAX_PRIORITY);
 
         MergeBuffers();
         depthHierarchyDirty_ = true;
@@ -281,7 +270,7 @@ void OcclusionBuffer::BuildDepthHierarchy()
     }
 
     // Build the rest of the mip levels
-    for (unsigned i = 1; i < mipBuffers_.Size(); ++i)
+    for (i32 i = 1; i < mipBuffers_.Size(); ++i)
     {
         int prevWidth = width;
         int prevHeight = height;
@@ -461,8 +450,10 @@ unsigned OcclusionBuffer::GetUseTimer()
 }
 
 
-void OcclusionBuffer::DrawBatch(const OcclusionBatch& batch, unsigned threadIndex)
+void OcclusionBuffer::DrawBatch(const OcclusionBatch& batch, i32 threadIndex)
 {
+    assert(threadIndex >= 0);
+
     // If buffer not yet used, clear it
     if (threadIndex > 0 && !buffers_[threadIndex].used_)
     {
@@ -586,8 +577,10 @@ void OcclusionBuffer::CalculateViewport()
     projOffsetScaleY_ = projection_.m11_ * scaleY_;
 }
 
-void OcclusionBuffer::DrawTriangle(Vector4* vertices, unsigned threadIndex)
+void OcclusionBuffer::DrawTriangle(Vector4* vertices, i32 threadIndex)
 {
+    assert(threadIndex >= 0);
+
     ClipMaskFlags clipMask{};
     ClipMaskFlags andClipMask{};
     bool drawOk = false;
@@ -812,8 +805,10 @@ struct Edge
     int invZStep_;
 };
 
-void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices, bool clockwise, unsigned threadIndex)
+void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices, bool clockwise, i32 threadIndex)
 {
+    assert(threadIndex >= 0);
+
     int top, middle, bottom;
     bool middleIsRight;
 
@@ -1005,7 +1000,7 @@ void OcclusionBuffer::MergeBuffers()
 {
     URHO3D_PROFILE(MergeBuffers);
 
-    for (unsigned i = 1; i < buffers_.Size(); ++i)
+    for (i32 i = 1; i < buffers_.Size(); ++i)
     {
         if (!buffers_[i].used_)
             continue;
@@ -1025,8 +1020,10 @@ void OcclusionBuffer::MergeBuffers()
     }
 }
 
-void OcclusionBuffer::ClearBuffer(unsigned threadIndex)
+void OcclusionBuffer::ClearBuffer(i32 threadIndex)
 {
+    assert(threadIndex >= 0);
+
     if (threadIndex >= buffers_.Size())
         return;
 

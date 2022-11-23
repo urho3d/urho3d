@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 /// \file
 
@@ -53,8 +34,12 @@ struct CharLocation
 };
 
 /// Glyph and its location within the text. Used when preparing text rendering.
+/// @nobind
 struct GlyphLocation
 {
+    /// Fields are not initialized.
+    GlyphLocation() = default;
+
     /// Construct.
     GlyphLocation(float x, float y, const FontGlyph* glyph) :
         x_(x),
@@ -84,12 +69,13 @@ public:
     /// Destruct.
     ~Text() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately.
     void ApplyAttributes() override;
     /// Return UI rendering batches.
-    void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) override;
+    void GetBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, const IntRect& currentScissor) override;
     /// React to resize.
     void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
     /// React to indent change.
@@ -100,89 +86,120 @@ public:
     /// Set font and font size. Return true if successful.
     bool SetFont(Font* font, float size = DEFAULT_FONT_SIZE);
     /// Set font size only while retaining the existing font. Return true if successful.
+    /// @property
     bool SetFontSize(float size);
     /// Set text. Text is assumed to be either ASCII or UTF8-encoded.
+    /// @property
     void SetText(const String& text);
     /// Set row alignment.
+    /// @property
     void SetTextAlignment(HorizontalAlignment align);
     /// Set row spacing, 1.0 for original font spacing.
+    /// @property
     void SetRowSpacing(float spacing);
     /// Set wordwrap. In wordwrap mode the text element will respect its current width. Otherwise it resizes itself freely.
+    /// @property
     void SetWordwrap(bool enable);
     /// The text will be automatically translated. The text value used as string identifier.
+    /// @property
     void SetAutoLocalizable(bool enable);
     /// Set selection. When length is not provided, select until the text ends.
-    void SetSelection(unsigned start, unsigned length = M_MAX_UNSIGNED);
+    void SetSelection(i32 start, i32 length = M_MAX_INT);
     /// Clear selection.
     void ClearSelection();
     /// Set text effect.
+    /// @property
     void SetTextEffect(TextEffect textEffect);
     /// Set shadow offset.
+    /// @property
     void SetEffectShadowOffset(const IntVector2& offset);
     /// Set stroke thickness.
+    /// @property
     void SetEffectStrokeThickness(int thickness);
     /// Set stroke rounding. Corners of the font will be rounded off in the stroke so the stroke won't have corners.
+    /// @property
     void SetEffectRoundStroke(bool roundStroke);
     /// Set effect color.
+    /// @property
     void SetEffectColor(const Color& effectColor);
 
     /// Return font.
+    /// @property
     Font* GetFont() const { return font_; }
 
     /// Return font size.
+    /// @property
     float GetFontSize() const { return fontSize_; }
 
     /// Return text.
+    /// @property
     const String& GetText() const { return text_; }
 
     /// Return row alignment.
+    /// @property
     HorizontalAlignment GetTextAlignment() const { return textAlignment_; }
 
     /// Return row spacing.
+    /// @property
     float GetRowSpacing() const { return rowSpacing_; }
 
     /// Return wordwrap mode.
+    /// @property
     bool GetWordwrap() const { return wordWrap_; }
 
     /// Return auto localizable mode.
+    /// @property
     bool GetAutoLocalizable() const { return autoLocalizable_; }
 
     /// Return selection start.
-    unsigned GetSelectionStart() const { return selectionStart_; }
+    /// @property
+    i32 GetSelectionStart() const { return selectionStart_; }
 
     /// Return selection length.
-    unsigned GetSelectionLength() const { return selectionLength_; }
+    /// @property
+    i32 GetSelectionLength() const { return selectionLength_; }
 
     /// Return text effect.
+    /// @property
     TextEffect GetTextEffect() const { return textEffect_; }
 
     /// Return effect shadow offset.
+    /// @property
     const IntVector2& GetEffectShadowOffset() const { return shadowOffset_; }
 
     /// Return effect stroke thickness.
+    /// @property
     int GetEffectStrokeThickness() const { return strokeThickness_; }
 
     /// Return effect round stroke.
+    /// @property
     bool GetEffectRoundStroke() const { return roundStroke_; }
 
     /// Return effect color.
+    /// @property
     const Color& GetEffectColor() const { return effectColor_; }
 
     /// Return row height.
+    /// @property
     float GetRowHeight() const { return rowHeight_; }
 
     /// Return number of rows.
-    unsigned GetNumRows() const { return rowWidths_.Size(); }
+    /// @property
+    i32 GetNumRows() const { return rowWidths_.Size(); }
 
     /// Return number of characters.
-    unsigned GetNumChars() const { return unicodeText_.Size(); }
+    /// @property
+    i32 GetNumChars() const { return unicodeText_.Size(); }
 
     /// Return width of row by index.
-    float GetRowWidth(unsigned index) const;
+    /// @property{get_rowWidths}
+    float GetRowWidth(i32 index) const;
     /// Return position of character by index relative to the text element origin.
-    Vector2 GetCharPosition(unsigned index);
+    /// @property{get_charPositions}
+    Vector2 GetCharPosition(i32 index);
     /// Return size of character by index.
-    Vector2 GetCharSize(unsigned index);
+    /// @property{get_charSizes}
+    Vector2 GetCharSize(i32 index);
 
     /// Set text effect Z bias. Zero by default, adjusted only in 3D mode.
     void SetEffectDepthBias(float bias);
@@ -209,10 +226,10 @@ protected:
     /// Validate text selection to be within the text.
     void ValidateSelection();
     /// Return row start X position.
-    int GetRowStartPosition(unsigned rowIndex) const;
+    int GetRowStartPosition(i32 rowIndex) const;
     /// Construct batch.
     void ConstructBatch
-        (UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, float dx = 0, float dy = 0, Color* color = nullptr,
+        (UIBatch& pageBatch, const Vector<GlyphLocation>& pageGlyphLocation, float dx = 0, float dy = 0, Color* color = nullptr,
             float depthBias = 0.0f);
 
     /// Font.
@@ -232,9 +249,9 @@ protected:
     /// Char positions dirty flag.
     bool charLocationsDirty_;
     /// Selection start.
-    unsigned selectionStart_;
+    i32 selectionStart_;
     /// Selection length.
-    unsigned selectionLength_;
+    i32 selectionLength_;
     /// Text effect.
     TextEffect textEffect_;
     /// Text effect shadow offset.
@@ -250,17 +267,17 @@ protected:
     /// Row height.
     float rowHeight_;
     /// Text as Unicode characters.
-    PODVector<unsigned> unicodeText_;
+    Vector<c32> unicodeText_;
     /// Text modified into printed form.
-    PODVector<unsigned> printText_;
+    Vector<c32> printText_;
     /// Mapping of printed form back to original char indices.
-    PODVector<unsigned> printToText_;
+    Vector<i32> printToText_;
     /// Row widths.
-    PODVector<float> rowWidths_;
+    Vector<float> rowWidths_;
     /// Glyph locations per each texture in the font.
-    Vector<PODVector<GlyphLocation> > pageGlyphLocations_;
+    Vector<Vector<GlyphLocation>> pageGlyphLocations_;
     /// Cached locations of each character in the text.
-    PODVector<CharLocation> charLocations_;
+    Vector<CharLocation> charLocations_;
     /// The text will be automatically translated.
     bool autoLocalizable_;
     /// Localization string id storage. Used when autoLocalizable flag is set.

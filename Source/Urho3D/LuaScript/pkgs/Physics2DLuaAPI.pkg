@@ -1,0 +1,25 @@
+$pfile "Physics2D/RigidBody2D.pkg"
+$pfile "Physics2D/PhysicsWorld2D.pkg"
+
+$pfile "Physics2D/CollisionShape2D.pkg"
+$pfile "Physics2D/CollisionBox2D.pkg"
+$pfile "Physics2D/CollisionChain2D.pkg"
+$pfile "Physics2D/CollisionCircle2D.pkg"
+$pfile "Physics2D/CollisionEdge2D.pkg"
+$pfile "Physics2D/CollisionPolygon2D.pkg"
+
+$pfile "Physics2D/Constraint2D.pkg"
+$pfile "Physics2D/ConstraintDistance2D.pkg"
+$pfile "Physics2D/ConstraintFriction2D.pkg"
+$pfile "Physics2D/ConstraintGear2D.pkg"
+$pfile "Physics2D/ConstraintMotor2D.pkg"
+$pfile "Physics2D/ConstraintMouse2D.pkg"
+$pfile "Physics2D/ConstraintPrismatic2D.pkg"
+$pfile "Physics2D/ConstraintPulley2D.pkg"
+$pfile "Physics2D/ConstraintRevolute2D.pkg"
+$pfile "Physics2D/ConstraintRope2D.pkg"
+$pfile "Physics2D/ConstraintWeld2D.pkg"
+$pfile "Physics2D/ConstraintWheel2D.pkg"
+
+$using namespace Urho3D;
+$#pragma warning(disable:4800)

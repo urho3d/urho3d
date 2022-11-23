@@ -1,45 +1,24 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
-#include "../Graphics/Texture2D.h"
 #include "../Graphics/Graphics.h"
+#include "../GraphicsAPI/Texture2D.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
+#include "../Math/AreaAllocator.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
 #include "../Urho2D/Sprite2D.h"
 #include "../Urho2D/TmxFile2D.h"
-#include "../Math/AreaAllocator.h"
 
 #include "../DebugNew.h"
 
 
 namespace Urho3D
 {
-
-extern const float PIXEL_SIZE;
 
 TmxLayer2D::TmxLayer2D(TmxFile2D* tmxFile, TileMapLayerType2D type) :
     tmxFile_(tmxFile),
@@ -186,7 +165,7 @@ bool TmxTileLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
         while (!IsAlpha(dataValue[startPosition]) && !IsDigit(dataValue[startPosition])
               && dataValue[startPosition] != '+' && dataValue[startPosition] != '/') ++startPosition;
         dataValue = dataValue.Substring(startPosition);
-        PODVector<unsigned char> buffer = DecodeBase64(dataValue);
+        Vector<unsigned char> buffer = DecodeBase64(dataValue);
         int currentIndex = 0;
         for (int y = 0; y < height_; ++y)
         {
@@ -455,9 +434,9 @@ bool TmxFile2D::EndLoad()
 
     XMLElement rootElem = loadXMLFile_->GetRoot("map");
     String version = rootElem.GetAttribute("version");
-    if (version != "1.0")
+    if (!version.StartsWith("1."))
     {
-        URHO3D_LOGERROR("Invalid version");
+        URHO3D_LOGERRORF("Invalid TMX version: %s", version.CString());
         return false;
     }
 
@@ -554,17 +533,17 @@ void TmxFile2D::AddLayer(TmxLayer2D *layer)
 
 Sprite2D* TmxFile2D::GetTileSprite(unsigned gid) const
 {
-    HashMap<unsigned, SharedPtr<Sprite2D> >::ConstIterator i = gidToSpriteMapping_.Find(gid);
+    HashMap<unsigned, SharedPtr<Sprite2D>>::ConstIterator i = gidToSpriteMapping_.Find(gid);
     if (i == gidToSpriteMapping_.End())
         return nullptr;
 
     return i->second_;
 }
 
-Vector<SharedPtr<TileMapObject2D> > TmxFile2D::GetTileCollisionShapes(unsigned gid) const
+Vector<SharedPtr<TileMapObject2D>> TmxFile2D::GetTileCollisionShapes(unsigned gid) const
 {
-    Vector<SharedPtr<TileMapObject2D> > tileShapes;
-    HashMap<unsigned, Vector<SharedPtr<TileMapObject2D> > >::ConstIterator i = gidToCollisionShapeMapping_.Find(gid);
+    Vector<SharedPtr<TileMapObject2D>> tileShapes;
+    HashMap<unsigned, Vector<SharedPtr<TileMapObject2D>>>::ConstIterator i = gidToCollisionShapeMapping_.Find(gid);
     if (i == gidToCollisionShapeMapping_.End())
         return tileShapes;
 
@@ -573,7 +552,7 @@ Vector<SharedPtr<TileMapObject2D> > TmxFile2D::GetTileCollisionShapes(unsigned g
 
 PropertySet2D* TmxFile2D::GetTilePropertySet(unsigned gid) const
 {
-    HashMap<unsigned, SharedPtr<PropertySet2D> >::ConstIterator i = gidToPropertySetMapping_.Find(gid);
+    HashMap<unsigned, SharedPtr<PropertySet2D>>::ConstIterator i = gidToPropertySetMapping_.Find(gid);
     if (i == gidToPropertySetMapping_.End())
         return nullptr;
     return i->second_;
@@ -625,7 +604,7 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
     if (element.HasAttribute("source"))
     {
         String source = element.GetAttribute("source");
-        HashMap<String, SharedPtr<XMLFile> >::Iterator i = tsxXMLFiles_.Find(source);
+        HashMap<String, SharedPtr<XMLFile>>::Iterator i = tsxXMLFiles_.Find(source);
         if (i == tsxXMLFiles_.End())
         {
             SharedPtr<XMLFile> tsxXMLFile = LoadTSXFile(source);
@@ -719,7 +698,7 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
         TmxObjectGroup2D objectGroup(this);
         for (XMLElement collisionElem = tileElem.GetChild("objectgroup"); collisionElem; collisionElem = collisionElem.GetNext("objectgroup"))
         {
-            Vector<SharedPtr<TileMapObject2D> > objects;
+            Vector<SharedPtr<TileMapObject2D>> objects;
             for (XMLElement objectElem = collisionElem.GetChild("object"); objectElem; objectElem = objectElem.GetNext("object"))
             {
                 SharedPtr<TileMapObject2D> object(new TileMapObject2D());

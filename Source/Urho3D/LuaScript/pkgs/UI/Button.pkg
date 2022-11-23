@@ -4,7 +4,7 @@ class Button : public BorderImage
 {
     Button();
     virtual ~Button();
-    
+
     void SetPressedOffset(const IntVector2& offset);
     void SetPressedOffset(int x, int y);
     void SetPressedChildOffset(const IntVector2& offset);
@@ -12,13 +12,13 @@ class Button : public BorderImage
     void SetRepeat(float delay, float rate);
     void SetRepeatDelay(float delay);
     void SetRepeatRate(float rate);
-    
+
     const IntVector2& GetPressedOffset() const;
     const IntVector2& GetPressedChildOffset() const;
     float GetRepeatDelay() const;
     float GetRepeatRate() const;
     bool IsPressed() const;
-    
+
     tolua_property__get_set IntVector2& pressedOffset;
     tolua_property__get_set IntVector2& pressedChildOffset;
     tolua_property__get_set float repeatDelay;

@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -41,7 +22,7 @@ namespace Urho3D
 
 namespace
 {
-    /// Convert float to 26.6 fixed-point (as used internally by FreeType)
+    // Convert float to 26.6 fixed-point (as used internally by FreeType)
     inline int FloatToFixed(float value)
     {
         return (int)(value * 64);
@@ -151,7 +132,7 @@ FontFace* Font::GetFace(float pointSize)
 
     // For outline fonts, we return the nearest size in 1/64th increments, as that's what FreeType supports.
     int key = FloatToFixed(pointSize);
-    HashMap<int, SharedPtr<FontFace> >::Iterator i = faces_.Find(key);
+    HashMap<int, SharedPtr<FontFace>>::Iterator i = faces_.Find(key);
     if (i != faces_.End())
     {
         if (!i->second_->IsDataLost())

@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -26,6 +7,7 @@
 #include "../Core/Context.h"
 #include "../Core/CoreEvents.h"
 #include "../Core/Thread.h"
+#include "../Core/Profiler.h"
 #include "../Engine/EngineEvents.h"
 #include "../IO/File.h"
 #include "../IO/FileSystem.h"
@@ -178,7 +160,7 @@ int DoSystemRun(const String& fileName, const Vector<String>& arguments)
     pid_t pid = fork();
     if (!pid)
     {
-        PODVector<const char*> argPtrs;
+        Vector<const char*> argPtrs;
         argPtrs.Push(fixedFileName.CString());
         for (unsigned i = 0; i < arguments.Size(); ++i)
             argPtrs.Push(arguments[i].CString());
@@ -246,6 +228,8 @@ public:
     /// The function to run in the thread.
     void ThreadFunction() override
     {
+        URHO3D_PROFILE_THREAD("AsyncSystemCommand Thread");
+
         exitCode_ = DoSystemCommand(commandLine_, false, nullptr);
         completed_ = true;
     }
@@ -271,6 +255,8 @@ public:
     /// The function to run in the thread.
     void ThreadFunction() override
     {
+        URHO3D_PROFILE_THREAD("AsyncSystemRun Thread");
+
         exitCode_ = DoSystemRun(fileName_, arguments_);
         completed_ = true;
     }
@@ -643,7 +629,7 @@ bool FileSystem::DirExists(const String& pathName) const
         // Split the pathname into two components: the longest parent directory path and the last name component
         String assetPath(URHO3D_ASSET((fixedName + "/")));
         String parentPath;
-        unsigned pos = assetPath.FindLast('/', assetPath.Length() - 2);
+        i32 pos = assetPath.FindLast('/', assetPath.Length() - 2);
         if (pos != String::NPOS)
         {
             parentPath = assetPath.Substring(0, pos);
@@ -903,7 +889,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
 
 void FileSystem::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
 {
-    /// Go through the execution queue and post + remove completed requests
+    // Go through the execution queue and post + remove completed requests
     for (List<AsyncExecRequest*>::Iterator i = asyncExecQueue_.Begin(); i != asyncExecQueue_.End();)
     {
         AsyncExecRequest* request = *i;
@@ -935,8 +921,8 @@ void SplitPath(const String& fullPath, String& pathName, String& fileName, Strin
 {
     String fullPathCopy = GetInternalPath(fullPath);
 
-    unsigned extPos = fullPathCopy.FindLast('.');
-    unsigned pathPos = fullPathCopy.FindLast('/');
+    i32 extPos = fullPathCopy.FindLast('.');
+    i32 pathPos = fullPathCopy.FindLast('/');
 
     if (extPos != String::NPOS && (pathPos == String::NPOS || extPos > pathPos))
     {
@@ -1016,7 +1002,7 @@ String RemoveTrailingSlash(const String& pathName)
 
 String GetParentPath(const String& path)
 {
-    unsigned pos = RemoveTrailingSlash(path).FindLast('/');
+    i32 pos = RemoveTrailingSlash(path).FindLast('/');
     if (pos != String::NPOS)
         return path.Substring(0, pos + 1);
     else

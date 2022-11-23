@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -28,13 +9,13 @@
 #include "../Graphics/Camera.h"
 #include "../Graphics/Geometry.h"
 #include "../Graphics/GraphicsEvents.h"
-#include "../Graphics/IndexBuffer.h"
 #include "../Graphics/Material.h"
 #include "../Graphics/OctreeQuery.h"
 #include "../Graphics/Technique.h"
-#include "../Graphics/Texture2D.h"
-#include "../Graphics/VertexBuffer.h"
 #include "../Graphics/View.h"
+#include "../GraphicsAPI/IndexBuffer.h"
+#include "../GraphicsAPI/Texture2D.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #include "../IO/Log.h"
 #include "../Scene/Node.h"
 #include "../Scene/Scene.h"
@@ -101,7 +82,7 @@ static inline bool CompareRayQueryResults(RayQueryResult& lr, RayQueryResult& rr
     return lhs->GetID() > rhs->GetID();
 }
 
-void Renderer2D::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
+void Renderer2D::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results)
 {
     unsigned resultSize = results.Size();
     for (unsigned i = 0; i < drawables_.Size(); ++i)
@@ -200,7 +181,7 @@ void Renderer2D::UpdateGeometry(const FrameInfo& frame)
             auto* dest = reinterpret_cast<Vertex2D*>(vertexBuffer->Lock(0, vertexCount, true));
             if (dest)
             {
-                const PODVector<const SourceBatch2D*>& sourceBatches = viewBatchInfo.sourceBatches_;
+                const Vector<const SourceBatch2D*>& sourceBatches = viewBatchInfo.sourceBatches_;
                 for (unsigned b = 0; b < sourceBatches.Size(); ++b)
                 {
                     const Vector<Vertex2D>& vertices = sourceBatches[b]->vertices_;
@@ -245,7 +226,7 @@ Material* Renderer2D::GetMaterial(Texture2D* texture, BlendMode blendMode)
     if (!texture)
         return material_;
 
-    HashMap<Texture2D*, HashMap<int, SharedPtr<Material> > >::Iterator t = cachedMaterials_.Find(texture);
+    HashMap<Texture2D*, HashMap<int, SharedPtr<Material>>>::Iterator t = cachedMaterials_.Find(texture);
     if (t == cachedMaterials_.End())
     {
         SharedPtr<Material> newMaterial = CreateMaterial(texture, blendMode);
@@ -253,8 +234,8 @@ Material* Renderer2D::GetMaterial(Texture2D* texture, BlendMode blendMode)
         return newMaterial;
     }
 
-    HashMap<int, SharedPtr<Material> >& materials = t->second_;
-    HashMap<int, SharedPtr<Material> >::Iterator b = materials.Find(blendMode);
+    HashMap<int, SharedPtr<Material>>& materials = t->second_;
+    HashMap<int, SharedPtr<Material>>::Iterator b = materials.Find(blendMode);
     if (b != materials.End())
         return b->second_;
 
@@ -284,7 +265,7 @@ SharedPtr<Material> Renderer2D::CreateMaterial(Texture2D* texture, BlendMode ble
 {
     SharedPtr<Material> newMaterial = material_->Clone();
 
-    HashMap<int, SharedPtr<Technique> >::Iterator techIt = cachedTechniques_.Find((int)blendMode);
+    HashMap<int, SharedPtr<Technique>>::Iterator techIt = cachedTechniques_.Find((int)blendMode);
     if (techIt == cachedTechniques_.End())
     {
         SharedPtr<Technique> tech(new Technique(context_));
@@ -303,7 +284,7 @@ SharedPtr<Material> Renderer2D::CreateMaterial(Texture2D* texture, BlendMode ble
     return newMaterial;
 }
 
-void CheckDrawableVisibilityWork(const WorkItem* item, unsigned threadIndex)
+void CheckDrawableVisibilityWork(const WorkItem* item, i32 threadIndex)
 {
     auto* renderer = reinterpret_cast<Renderer2D*>(item->aux_);
     auto** start = reinterpret_cast<Drawable2D**>(item->start_);
@@ -341,15 +322,15 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
         int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
         int drawablesPerItem = drawables_.Size() / numWorkItems;
 
-        PODVector<Drawable2D*>::Iterator start = drawables_.Begin();
+        Vector<Drawable2D*>::Iterator start = drawables_.Begin();
         for (int i = 0; i < numWorkItems; ++i)
         {
             SharedPtr<WorkItem> item = queue->GetFreeItem();
-            item->priority_ = M_MAX_UNSIGNED;
+            item->priority_ = WI_MAX_PRIORITY;
             item->workFunction_ = CheckDrawableVisibilityWork;
             item->aux_ = this;
 
-            PODVector<Drawable2D*>::Iterator end = drawables_.End();
+            Vector<Drawable2D*>::Iterator end = drawables_.End();
             if (i < numWorkItems - 1 && end - start > drawablesPerItem)
                 end = start + drawablesPerItem;
 
@@ -360,7 +341,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
             start = end;
         }
 
-        queue->Complete(M_MAX_UNSIGNED);
+        queue->Complete(WI_MAX_PRIORITY);
     }
 
     ViewBatchInfo2D& viewBatchInfo = viewBatchInfos_[camera];
@@ -384,21 +365,21 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
     }
 }
 
-void Renderer2D::GetDrawables(PODVector<Drawable2D*>& drawables, Node* node)
+void Renderer2D::GetDrawables(Vector<Drawable2D*>& drawables, Node* node)
 {
     if (!node || !node->IsEnabled())
         return;
 
-    const Vector<SharedPtr<Component> >& components = node->GetComponents();
-    for (Vector<SharedPtr<Component> >::ConstIterator i = components.Begin(); i != components.End(); ++i)
+    const Vector<SharedPtr<Component>>& components = node->GetComponents();
+    for (Vector<SharedPtr<Component>>::ConstIterator i = components.Begin(); i != components.End(); ++i)
     {
         auto* drawable = dynamic_cast<Drawable2D*>(i->Get());
         if (drawable && drawable->IsEnabled())
             drawables.Push(drawable);
     }
 
-    const Vector<SharedPtr<Node> >& children = node->GetChildren();
-    for (Vector<SharedPtr<Node> >::ConstIterator i = children.Begin(); i != children.End(); ++i)
+    const Vector<SharedPtr<Node>>& children = node->GetChildren();
+    for (Vector<SharedPtr<Node>>::ConstIterator i = children.Begin(); i != children.End(); ++i)
         GetDrawables(drawables, i->Get());
 }
 
@@ -422,7 +403,7 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
     if (viewBatchInfo.batchUpdatedFrameNumber_ == frame_.frameNumber_)
         return;
 
-    PODVector<const SourceBatch2D*>& sourceBatches = viewBatchInfo.sourceBatches_;
+    Vector<const SourceBatch2D*>& sourceBatches = viewBatchInfo.sourceBatches_;
     sourceBatches.Clear();
     for (unsigned d = 0; d < drawables_.Size(); ++d)
     {
@@ -430,16 +411,16 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
             continue;
 
         const Vector<SourceBatch2D>& batches = drawables_[d]->GetSourceBatches();
-        for (unsigned b = 0; b < batches.Size(); ++b)
+
+        for (const SourceBatch2D& batch : batches)
         {
-            if (batches[b].material_ && !batches[b].vertices_.Empty())
-                sourceBatches.Push(&batches[b]);
+            if (batch.material_ && !batch.vertices_.Empty())
+                sourceBatches.Push(&batch);
         }
     }
 
-    for (unsigned i = 0; i < sourceBatches.Size(); ++i)
+    for (const SourceBatch2D* sourceBatch : sourceBatches)
     {
-        const SourceBatch2D* sourceBatch = sourceBatches[i];
         Vector3 worldPos = sourceBatch->owner_->GetNode()->GetWorldPosition();
         sourceBatch->distance_ = camera->GetDistance(worldPos);
     }

@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 /// \file
 
@@ -165,6 +146,7 @@ struct URHO3D_API ResourceRefList
 };
 
 /// Custom variant value. This type is not abstract to store it in the VariantValue by value.
+/// @nobindtemp
 class CustomVariantValue
 {
     // GetValuePtr expects that CustomVariantValue is always convertible to CustomVariantValueImpl<T>.
@@ -304,14 +286,24 @@ union VariantValue
     StringVector stringVector_;
     VariantVector variantVector_;
     VariantMap variantMap_;
-    PODVector<unsigned char> buffer_;
+    Vector<unsigned char> buffer_;
     ResourceRef resourceRef_;
     ResourceRefList resourceRefList_;
     CustomVariantValue* customValueHeap_;
     CustomVariantValue customValueStack_;
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:26495)
+#endif
+
     /// Construct uninitialized.
     VariantValue() { }      // NOLINT(modernize-use-equals-default)
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
     /// Non-copyable.
     VariantValue(const VariantValue& value) = delete;
     /// Destruct.
@@ -418,7 +410,7 @@ public:
     }
 
     /// Construct from a buffer.
-    Variant(const PODVector<unsigned char>& value)      // NOLINT(google-explicit-constructor)
+    Variant(const Vector<unsigned char>& value)      // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
@@ -597,7 +589,7 @@ public:
         return *this;
     }
 
-    /// Assign from a StringHash (convert to integer.)
+    /// Assign from a StringHash (convert to integer).
     Variant& operator =(const StringHash& rhs)
     {
         SetType(VAR_INT);
@@ -686,7 +678,7 @@ public:
     }
 
     /// Assign from a buffer.
-    Variant& operator =(const PODVector<unsigned char>& rhs)
+    Variant& operator =(const Vector<unsigned char>& rhs)
     {
         SetType(VAR_BUFFER);
         value_.buffer_ = rhs;
@@ -822,13 +814,13 @@ public:
     /// Test for equality with an integer. To return true, both the type and value must match.
     bool operator ==(int rhs) const { return type_ == VAR_INT ? value_.int_ == rhs : false; }
 
-    /// Test for equality with an unsigned 64 bit integer. To return true, both the type and value must match.
+    /// Test for equality with an unsigned integer. To return true, both the type and value must match.
     bool operator ==(unsigned rhs) const { return type_ == VAR_INT ? value_.int_ == static_cast<int>(rhs) : false; }
 
     /// Test for equality with an 64 bit integer. To return true, both the type and value must match.
     bool operator ==(long long rhs) const { return type_ == VAR_INT64 ? value_.int64_ == rhs : false; }
 
-    /// Test for equality with an unsigned integer. To return true, both the type and value must match.
+    /// Test for equality with an unsigned 64 bit integer. To return true, both the type and value must match.
     bool operator ==(unsigned long long rhs) const { return type_ == VAR_INT64 ? value_.int64_ == static_cast<long long>(rhs) : false; }
 
     /// Test for equality with a bool. To return true, both the type and value must match.
@@ -877,7 +869,7 @@ public:
     }
 
     /// Test for equality with a buffer. To return true, both the type and value must match.
-    bool operator ==(const PODVector<unsigned char>& rhs) const;
+    bool operator ==(const Vector<unsigned char>& rhs) const;
     /// Test for equality with a %VectorBuffer. To return true, both the type and value must match.
     bool operator ==(const VectorBuffer& rhs) const;
 
@@ -1018,7 +1010,7 @@ public:
     bool operator !=(const String& rhs) const { return !(*this == rhs); }
 
     /// Test for inequality with a buffer.
-    bool operator !=(const PODVector<unsigned char>& rhs) const { return !(*this == rhs); }
+    bool operator !=(const Vector<unsigned char>& rhs) const { return !(*this == rhs); }
 
     /// Test for inequality with a %VectorBuffer.
     bool operator !=(const VectorBuffer& rhs) const { return !(*this == rhs); }
@@ -1197,7 +1189,7 @@ public:
     const String& GetString() const { return type_ == VAR_STRING ? value_.string_ : String::EMPTY; }
 
     /// Return buffer or empty on type mismatch.
-    const PODVector<unsigned char>& GetBuffer() const
+    const Vector<unsigned char>& GetBuffer() const
     {
         return type_ == VAR_BUFFER ? value_.buffer_ : emptyBuffer;
     }
@@ -1326,16 +1318,20 @@ public:
     }
 
     /// Return value's type.
+    /// @property
     VariantType GetType() const { return type_; }
 
     /// Return value's type name.
+    /// @property
     String GetTypeName() const;
     /// Convert value to string. Pointers are returned as null, and VariantBuffer or VariantMap are not supported and return empty.
     String ToString() const;
     /// Return true when the variant value is considered zero according to its actual type.
+    /// @property
     bool IsZero() const;
 
     /// Return true when the variant is empty (i.e. not initialized yet).
+    /// @property
     bool IsEmpty() const { return type_ == VAR_NONE; }
 
     /// Return true when the variant stores custom type.
@@ -1345,7 +1341,7 @@ public:
     template <class T> T Get() const;
 
     /// Return a pointer to a modifiable buffer or null on type mismatch.
-    PODVector<unsigned char>* GetBufferPtr()
+    Vector<unsigned char>* GetBufferPtr()
     {
         return type_ == VAR_BUFFER ? &value_.buffer_ : nullptr;
     }
@@ -1380,7 +1376,7 @@ public:
     /// Empty variant.
     static const Variant EMPTY;
     /// Empty buffer.
-    static const PODVector<unsigned char> emptyBuffer;
+    static const Vector<unsigned char> emptyBuffer;
     /// Empty resource reference.
     static const ResourceRef emptyResourceRef;
     /// Empty resource reference list.
@@ -1434,7 +1430,7 @@ template <> inline VariantType GetVariantType<String>() { return VAR_STRING; }
 
 template <> inline VariantType GetVariantType<StringHash>() { return VAR_INT; }
 
-template <> inline VariantType GetVariantType<PODVector<unsigned char> >() { return VAR_BUFFER; }
+template <> inline VariantType GetVariantType<Vector<unsigned char>>() { return VAR_BUFFER; }
 
 template <> inline VariantType GetVariantType<ResourceRef>() { return VAR_RESOURCEREF; }
 
@@ -1497,7 +1493,7 @@ template <> URHO3D_API const IntVector2& Variant::Get<const IntVector2&>() const
 
 template <> URHO3D_API const IntVector3& Variant::Get<const IntVector3&>() const;
 
-template <> URHO3D_API const PODVector<unsigned char>& Variant::Get<const PODVector<unsigned char>&>() const;
+template <> URHO3D_API const Vector<unsigned char>& Variant::Get<const Vector<unsigned char>&>() const;
 
 template <> URHO3D_API void* Variant::Get<void*>() const;
 
@@ -1539,7 +1535,7 @@ template <> URHO3D_API IntVector2 Variant::Get<IntVector2>() const;
 
 template <> URHO3D_API IntVector3 Variant::Get<IntVector3>() const;
 
-template <> URHO3D_API PODVector<unsigned char> Variant::Get<PODVector<unsigned char> >() const;
+template <> URHO3D_API Vector<unsigned char> Variant::Get<Vector<unsigned char>>() const;
 
 template <> URHO3D_API Matrix3 Variant::Get<Matrix3>() const;
 

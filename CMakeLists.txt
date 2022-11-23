@@ -1,45 +1,14 @@
-#
-# Copyright (c) 2008-2019 the Urho3D project.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
+# Copyright (c) 2008-2022 the Urho3D project
+# License: MIT
 
-# Set CMake minimum version and CMake policy required by UrhoCommon module
-cmake_minimum_required (VERSION 3.2.3)
-if (COMMAND cmake_policy)
-    # Libraries linked via full path no longer produce linker search paths
-    cmake_policy (SET CMP0003 NEW)
-    # INTERFACE_LINK_LIBRARIES defines the link interface
-    cmake_policy (SET CMP0022 NEW)
-    # Disallow use of the LOCATION target property - so we set to OLD as we still need it
-    cmake_policy (SET CMP0026 OLD)
-    # MACOSX_RPATH is enabled by default
-    cmake_policy (SET CMP0042 NEW)
-    # Honor the visibility properties for SHARED target types only
-    cmake_policy (SET CMP0063 OLD)
-endif ()
+# Set CMake minimum version
+cmake_minimum_required (VERSION 3.15)
 
 # Set project name
 project (Urho3D)
 
 # Set CMake modules search path
-set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
+set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
 # Include UrhoCommon.cmake module after setting project name
 include (UrhoCommon)
@@ -50,6 +19,9 @@ if (WIN32)
     set (SCRIPT_EXT .bat)
     if (CMAKE_HOST_WIN32)
         set (PATH_SUFFIX .)
+        if (URHO3D_64BIT AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+            string (REPLACE " (x86)" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
+        endif ()
     endif ()
 else ()
     set (SCRIPT_EXT .sh)
@@ -70,10 +42,11 @@ set (DEST_PKGCONFIG_DIR lib${LIB_SUFFIX}/pkgconfig)
 file (GLOB APP_SCRIPTS ${CMAKE_SOURCE_DIR}/bin/*${SCRIPT_EXT})
 install (PROGRAMS ${APP_SCRIPTS} DESTINATION ${DEST_RUNTIME_DIR})   # DEST_RUNTIME_DIR variable is set by the set_output_directories() macro call in the UrhoCommon module
 # Install CMake modules and toolchains provided by and for Urho3D
-install (DIRECTORY ${CMAKE_SOURCE_DIR}/CMake/ DESTINATION ${DEST_SHARE_DIR}/CMake)    # Note: the trailing slash is significant
-# Install CMake build scripts
+install (DIRECTORY ${CMAKE_SOURCE_DIR}/cmake/ DESTINATION ${DEST_SHARE_DIR}/cmake)    # Note: the trailing slash is significant
+# Install CMake build scripts and rakefile
 file (GLOB CMAKE_SCRIPTS ${CMAKE_SOURCE_DIR}/script/*${SCRIPT_EXT})
-install (PROGRAMS ${CMAKE_SCRIPTS} DESTINATION ${DEST_SHARE_DIR}/Scripts)
+install (PROGRAMS ${CMAKE_SCRIPTS} DESTINATION ${DEST_SHARE_DIR}/scripts)
+install (FILES rakefile DESTINATION ${DEST_SHARE_DIR})
 
 # Setup package variables
 set (URHO3D_DESCRIPTION "Urho3D is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. Greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D (http://www.horde3d.org).")
@@ -81,7 +54,7 @@ set (CPACK_PACKAGE_DESCRIPTION_SUMMARY ${URHO3D_DESCRIPTION})
 set (URHO3D_URL "https://github.com/urho3d/Urho3D")
 set (CPACK_PACKAGE_VENDOR ${URHO3D_URL})
 set (CPACK_PACKAGE_CONTACT ${URHO3D_URL})
-execute_process (COMMAND ${CMAKE_COMMAND} -P ${CMAKE_SOURCE_DIR}/CMake/Modules/GetUrhoRevision.cmake WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_VARIABLE URHO3D_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process (COMMAND ${CMAKE_COMMAND} -P ${CMAKE_SOURCE_DIR}/cmake/Modules/GetUrhoRevision.cmake WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_VARIABLE URHO3D_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 set (CPACK_PACKAGE_VERSION ${URHO3D_VERSION})
 string (REGEX MATCH "([^.]+)\\.([^.]+)\\.(.+)" MATCHED ${URHO3D_VERSION})
 if (MATCHED)
@@ -160,8 +133,6 @@ elseif (ARM_ABI_FLAGS)
     string (REGEX REPLACE .*- - CPU_NAME "${CPU_NAME}")
     string (TOUPPER "${CPU_NAME}" CPU_NAME)
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}${CPU_NAME})
-elseif (EMSCRIPTEN_WASM)
-    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-WASM)
 endif ()
 if (NOT DEFINED ENV{RELEASE_TAG})
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-snapshot)
@@ -183,16 +154,12 @@ if (URHO3D_MACOSX_BUNDLE OR (APPLE AND ARM))
         set (MACOSX_BUNDLE_SHORT_VERSION_STRING ${URHO3D_VERSION})
     endif ()
     if (NOT MACOSX_BUNDLE_COPYRIGHT)
-        set (MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2008-2019 the Urho3D project.")
+        set (MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2008-2022 the Urho3D project.")
     endif ()
 endif ()
 
 # Setup SDK-like include dir in the build tree for building the Urho3D library
-if (ANDROID AND GRADLE_BUILD_DIR)
-    set (THIRD_PARTY_INCLUDE_DIR ${GRADLE_BUILD_DIR}/tree/${CMAKE_BUILD_TYPE}/${ANDROID_ABI}/${DEST_INCLUDE_DIR}/ThirdParty)
-else ()
-    set (THIRD_PARTY_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
-endif ()
+set (THIRD_PARTY_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
 file (MAKE_DIRECTORY ${THIRD_PARTY_INCLUDE_DIR})
 
 # Urho3D source

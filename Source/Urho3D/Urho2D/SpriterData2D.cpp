@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -46,15 +27,15 @@ void SpriterData::Reset()
 {
     if (!folders_.Empty())
     {
-        for (unsigned i = 0; i < folders_.Size(); ++i)
-            delete folders_[i];
+        for (const Folder* folder : folders_)
+            delete folder;
         folders_.Clear();
     }
 
     if (!entities_.Empty())
     {
-        for (unsigned i = 0; i < entities_.Size(); ++i)
-            delete entities_[i];
+        for (const Entity* entity : entities_)
+            delete entity;
         entities_.Clear();
     }
 }
@@ -103,8 +84,8 @@ Folder::~Folder()
 
 void Folder::Reset()
 {
-    for (unsigned i = 0; i < files_.Size(); ++i)
-        delete files_[i];
+    for (const File* file : files_)
+        delete file;
     files_.Clear();
 }
 
@@ -155,12 +136,12 @@ Entity::~Entity()
 
 void Entity::Reset()
 {
-    for (unsigned i = 0; i < characterMaps_.Size(); ++i)
-        delete characterMaps_[i];
+    for (const CharacterMap* characterMap : characterMaps_)
+        delete characterMap;
     characterMaps_.Clear();
 
-    for (unsigned i = 0; i < animations_.Size(); ++i)
-        delete animations_[i];
+    for (const Animation* animation : animations_)
+        delete animation;
     animations_.Clear();
 }
 
@@ -198,8 +179,8 @@ CharacterMap::~CharacterMap()
 
 void CharacterMap::Reset()
 {
-    for (unsigned i = 0; i < maps_.Size(); ++i)
-        delete maps_[i];
+    for (const MapInstruction* map : maps_)
+        delete map;
     maps_.Clear();
 }
 
@@ -220,7 +201,7 @@ bool CharacterMap::Load(const pugi::xml_node& node)
             return false;
     }
 
-    return false;
+    return true;
 }
 
 bool MapInstruction::Load(const pugi::xml_node& node)
@@ -245,13 +226,13 @@ void Animation::Reset()
 {
     if (!mainlineKeys_.Empty())
     {
-        for (unsigned i = 0; i < mainlineKeys_.Size(); ++i)
-            delete mainlineKeys_[i];
+        for (const MainlineKey* mainlineKey : mainlineKeys_)
+            delete mainlineKey;
         mainlineKeys_.Clear();
     }
 
-    for (unsigned i = 0; i < timelines_.Size(); ++i)
-        delete timelines_[i];
+    for (const Timeline* timeline : timelines_)
+        delete timeline;
     timelines_.Clear();
 }
 
@@ -292,12 +273,12 @@ MainlineKey::~MainlineKey()
 
 void MainlineKey::Reset()
 {
-    for (unsigned i = 0; i < boneRefs_.Size(); ++i)
-        delete boneRefs_[i];
+    for (const Ref* boneRef : boneRefs_)
+        delete boneRef;
     boneRefs_.Clear();
 
-    for (unsigned i = 0; i < objectRefs_.Size(); ++i)
-        delete objectRefs_[i];
+    for (const Ref* objectRef : objectRefs_)
+        delete objectRef;
     objectRefs_.Clear();
 }
 
@@ -344,8 +325,8 @@ Timeline::~Timeline()
 
 void Timeline::Reset()
 {
-    for (unsigned i = 0; i < keys_.Size(); ++i)
-        delete keys_[i];
+    for (const SpatialTimelineKey* key : keys_)
+        delete key;
     keys_.Clear();
 }
 

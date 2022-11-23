@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -53,7 +34,7 @@ public:
     void Remove(Object* object);
 
     /// Receivers. May contain holes during sending.
-    PODVector<Object*> receivers_;
+    Vector<Object*> receivers_;
 
 private:
     /// "In send" recursion counter.
@@ -133,23 +114,23 @@ public:
     /// Return subsystem by type.
     Object* GetSubsystem(StringHash type) const;
 
-    /// Return global variable based on key
+    /// Return global variable based on key.
     const Variant& GetGlobalVar(StringHash key) const;
 
     /// Return all global variables.
     const VariantMap& GetGlobalVars() const { return globalVars_; }
 
-    /// Set global variable with the respective key and value
+    /// Set global variable with the respective key and value.
     void SetGlobalVar(StringHash key, const Variant& value);
 
     /// Return all subsystems.
-    const HashMap<StringHash, SharedPtr<Object> >& GetSubsystems() const { return subsystems_; }
+    const HashMap<StringHash, SharedPtr<Object>>& GetSubsystems() const { return subsystems_; }
 
     /// Return all object factories.
-    const HashMap<StringHash, SharedPtr<ObjectFactory> >& GetObjectFactories() const { return factories_; }
+    const HashMap<StringHash, SharedPtr<ObjectFactory>>& GetObjectFactories() const { return factories_; }
 
     /// Return all object categories.
-    const HashMap<String, Vector<StringHash> >& GetObjectCategories() const { return objectCategories_; }
+    const HashMap<String, Vector<StringHash>>& GetObjectCategories() const { return objectCategories_; }
 
     /// Return active event sender. Null outside event handling.
     Object* GetEventSender() const;
@@ -169,27 +150,27 @@ public:
     /// Return attribute descriptions for an object type, or null if none defined.
     const Vector<AttributeInfo>* GetAttributes(StringHash type) const
     {
-        HashMap<StringHash, Vector<AttributeInfo> >::ConstIterator i = attributes_.Find(type);
+        HashMap<StringHash, Vector<AttributeInfo>>::ConstIterator i = attributes_.Find(type);
         return i != attributes_.End() ? &i->second_ : nullptr;
     }
 
     /// Return network replication attribute descriptions for an object type, or null if none defined.
     const Vector<AttributeInfo>* GetNetworkAttributes(StringHash type) const
     {
-        HashMap<StringHash, Vector<AttributeInfo> >::ConstIterator i = networkAttributes_.Find(type);
+        HashMap<StringHash, Vector<AttributeInfo>>::ConstIterator i = networkAttributes_.Find(type);
         return i != networkAttributes_.End() ? &i->second_ : nullptr;
     }
 
     /// Return all registered attributes.
-    const HashMap<StringHash, Vector<AttributeInfo> >& GetAllAttributes() const { return attributes_; }
+    const HashMap<StringHash, Vector<AttributeInfo>>& GetAllAttributes() const { return attributes_; }
 
     /// Return event receivers for a sender and event type, or null if they do not exist.
     EventReceiverGroup* GetEventReceivers(Object* sender, StringHash eventType)
     {
-        HashMap<Object*, HashMap<StringHash, SharedPtr<EventReceiverGroup> > >::Iterator i = specificEventReceivers_.Find(sender);
+        HashMap<Object*, HashMap<StringHash, SharedPtr<EventReceiverGroup>>>::Iterator i = specificEventReceivers_.Find(sender);
         if (i != specificEventReceivers_.End())
         {
-            HashMap<StringHash, SharedPtr<EventReceiverGroup> >::Iterator j = i->second_.Find(eventType);
+            HashMap<StringHash, SharedPtr<EventReceiverGroup>>::Iterator j = i->second_.Find(eventType);
             return j != i->second_.End() ? j->second_ : nullptr;
         }
         else
@@ -199,7 +180,7 @@ public:
     /// Return event receivers for an event type, or null if they do not exist.
     EventReceiverGroup* GetEventReceivers(StringHash eventType)
     {
-        HashMap<StringHash, SharedPtr<EventReceiverGroup> >::Iterator i = eventReceivers_.Find(eventType);
+        HashMap<StringHash, SharedPtr<EventReceiverGroup>>::Iterator i = eventReceivers_.Find(eventType);
         return i != eventReceivers_.End() ? i->second_ : nullptr;
     }
 
@@ -223,25 +204,25 @@ private:
     void SetEventHandler(EventHandler* handler) { eventHandler_ = handler; }
 
     /// Object factories.
-    HashMap<StringHash, SharedPtr<ObjectFactory> > factories_;
+    HashMap<StringHash, SharedPtr<ObjectFactory>> factories_;
     /// Subsystems.
-    HashMap<StringHash, SharedPtr<Object> > subsystems_;
+    HashMap<StringHash, SharedPtr<Object>> subsystems_;
     /// Attribute descriptions per object type.
-    HashMap<StringHash, Vector<AttributeInfo> > attributes_;
+    HashMap<StringHash, Vector<AttributeInfo>> attributes_;
     /// Network replication attribute descriptions per object type.
-    HashMap<StringHash, Vector<AttributeInfo> > networkAttributes_;
+    HashMap<StringHash, Vector<AttributeInfo>> networkAttributes_;
     /// Event receivers for non-specific events.
-    HashMap<StringHash, SharedPtr<EventReceiverGroup> > eventReceivers_;
+    HashMap<StringHash, SharedPtr<EventReceiverGroup>> eventReceivers_;
     /// Event receivers for specific senders' events.
-    HashMap<Object*, HashMap<StringHash, SharedPtr<EventReceiverGroup> > > specificEventReceivers_;
+    HashMap<Object*, HashMap<StringHash, SharedPtr<EventReceiverGroup>>> specificEventReceivers_;
     /// Event sender stack.
-    PODVector<Object*> eventSenders_;
+    Vector<Object*> eventSenders_;
     /// Event data stack.
-    PODVector<VariantMap*> eventDataMaps_;
+    Vector<VariantMap*> eventDataMaps_;
     /// Active event handler. Not stored in a stack for performance reasons; is needed only in esoteric cases.
     EventHandler* eventHandler_;
     /// Object categories.
-    HashMap<String, Vector<StringHash> > objectCategories_;
+    HashMap<String, Vector<StringHash>> objectCategories_;
     /// Variant map for global variables that can persist throughout application execution.
     VariantMap globalVars_;
 };

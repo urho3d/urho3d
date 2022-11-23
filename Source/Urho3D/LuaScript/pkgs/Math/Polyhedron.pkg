@@ -21,6 +21,6 @@ class Polyhedron
     Polyhedron Transformed(const Matrix3& transform) const;
     Polyhedron Transformed(const Matrix3x4& transform) const;
     bool Empty() const;
-    
+
     tolua_readonly tolua_property__no_prefix bool empty;
 };

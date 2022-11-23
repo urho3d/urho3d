@@ -1,29 +1,9 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
 #include "../Container/HashSet.h"
-#include "../Container/List.h"
 #include "../Core/Object.h"
 #include "../Graphics/Batch.h"
 #include "../Graphics/Light.h"
@@ -57,9 +37,9 @@ struct LightQueryResult
     /// Light.
     Light* light_;
     /// Lit geometries.
-    PODVector<Drawable*> litGeometries_;
+    Vector<Drawable*> litGeometries_;
     /// Shadow casters.
-    PODVector<Drawable*> shadowCasters_;
+    Vector<Drawable*> shadowCasters_;
     /// Shadow cameras.
     Camera* shadowCameras_[MAX_LIGHT_SPLITS];
     /// Shadow caster start indices.
@@ -68,9 +48,9 @@ struct LightQueryResult
     unsigned shadowCasterEnd_[MAX_LIGHT_SPLITS];
     /// Combined bounding box of shadow casters in light projection space. Only used for focused spot lights.
     BoundingBox shadowCasterBox_[MAX_LIGHT_SPLITS];
-    /// Shadow camera near splits (directional lights only.)
+    /// Shadow camera near splits (directional lights only).
     float shadowNearSplits_[MAX_LIGHT_SPLITS];
-    /// Shadow camera far splits (directional lights only.)
+    /// Shadow camera far splits (directional lights only).
     float shadowFarSplits_[MAX_LIGHT_SPLITS];
     /// Shadow map split count.
     unsigned numSplits_;
@@ -95,9 +75,9 @@ struct ScenePassInfo
 struct PerThreadSceneResult
 {
     /// Geometry objects.
-    PODVector<Drawable*> geometries_;
+    Vector<Drawable*> geometries_;
     /// Lights.
-    PODVector<Light*> lights_;
+    Vector<Light*> lights_;
     /// Scene minimum Z value.
     float minZ_;
     /// Scene maximum Z value.
@@ -109,8 +89,8 @@ static const unsigned MAX_VIEWPORT_TEXTURES = 2;
 /// Internal structure for 3D rendering work. Created for each backbuffer and texture viewport, but not for shadow cameras.
 class URHO3D_API View : public Object
 {
-    friend void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex);
-    friend void ProcessLightWork(const WorkItem* item, unsigned threadIndex);
+    friend void CheckVisibilityWork(const WorkItem* item, i32 threadIndex);
+    friend void ProcessLightWork(const WorkItem* item, i32 threadIndex);
 
     URHO3D_OBJECT(View, Object);
 
@@ -160,13 +140,13 @@ public:
     const IntVector2& GetViewSize() const { return viewSize_; }
 
     /// Return geometry objects.
-    const PODVector<Drawable*>& GetGeometries() const { return geometries_; }
+    const Vector<Drawable*>& GetGeometries() const { return geometries_; }
 
     /// Return occluder objects.
-    const PODVector<Drawable*>& GetOccluders() const { return occluders_; }
+    const Vector<Drawable*>& GetOccluders() const { return occluders_; }
 
     /// Return lights.
-    const PODVector<Light*>& GetLights() const { return lights_; }
+    const Vector<Light*>& GetLights() const { return lights_; }
 
     /// Return light batch queues.
     const Vector<LightBatchQueue>& GetLightQueues() const { return lightQueues_; }
@@ -214,7 +194,7 @@ private:
     void ExecuteRenderPathCommands();
     /// Set rendertargets for current render command.
     void SetRenderTargets(RenderPathCommand& command);
-    /// Set textures for current render command. Return whether depth write is allowed (depth-stencil not bound as a texture.)
+    /// Set textures for current render command. Return whether depth write is allowed (depth-stencil not bound as a texture).
     bool SetTextures(RenderPathCommand& command);
     /// Perform a quad rendering command.
     void RenderQuad(RenderPathCommand& command);
@@ -225,22 +205,22 @@ private:
     /// Check if a command writes into the destination render target.
     bool CheckViewportWrite(const RenderPathCommand& command);
     /// Check whether a command should use pingponging instead of resolve from destination render target to viewport texture.
-    bool CheckPingpong(unsigned index);
+    bool CheckPingpong(i32 index);
     /// Allocate needed screen buffers.
     void AllocateScreenBuffers();
     /// Blit the viewport from one surface to another.
     void BlitFramebuffer(Texture* source, RenderSurface* destination, bool depthWrite);
     /// Query for occluders as seen from a camera.
-    void UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera);
+    void UpdateOccluders(Vector<Drawable*>& occluders, Camera* camera);
     /// Draw occluders to occlusion buffer.
-    void DrawOccluders(OcclusionBuffer* buffer, const PODVector<Drawable*>& occluders);
+    void DrawOccluders(OcclusionBuffer* buffer, const Vector<Drawable*>& occluders);
     /// Query for lit geometries and shadow casters for a light.
-    void ProcessLight(LightQueryResult& query, unsigned threadIndex);
+    void ProcessLight(LightQueryResult& query, i32 threadIndex);
     /// Process shadow casters' visibilities and build their combined view- or projection-space bounding box.
-    void ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawable*>& drawables, unsigned splitIndex);
+    void ProcessShadowCasters(LightQueryResult& query, const Vector<Drawable*>& drawables, unsigned splitIndex);
     /// Set up initial shadow camera view(s).
     void SetupShadowCameras(LightQueryResult& query);
-    /// Set up a directional light shadow camera
+    /// Set up a directional light shadow camera.
     void SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float nearSplit, float farSplit);
     /// Finalize shadow camera view after shadow casters and the shadow map are known.
     void
@@ -257,7 +237,7 @@ private:
     void FindZone(Drawable* drawable);
     /// Return material technique, considering the drawable's LOD distance.
     Technique* GetTechnique(Drawable* drawable, Material* material);
-    /// Check if material should render an auxiliary view (if it has a camera attached.)
+    /// Check if material should render an auxiliary view (if it has a camera attached).
     void CheckMaterialForAuxView(Material* material);
     /// Set shader defines for a batch queue if used.
     void SetQueueShaderDefines(BatchQueue& queue, const RenderPathCommand& command);
@@ -300,10 +280,10 @@ private:
     }
 
     /// Return hash code for a vertex light queue.
-    unsigned long long GetVertexLightQueueHash(const PODVector<Light*>& vertexLights)
+    unsigned long long GetVertexLightQueueHash(const Vector<Light*>& vertexLights)
     {
         unsigned long long hash = 0;
-        for (PODVector<Light*>::ConstIterator i = vertexLights.Begin(); i != vertexLights.End(); ++i)
+        for (Vector<Light*>::ConstIterator i = vertexLights.Begin(); i != vertexLights.End(); ++i)
             hash += (unsigned long long)(*i);
         return hash;
     }
@@ -385,21 +365,21 @@ private:
     /// Renderpath.
     RenderPath* renderPath_{};
     /// Per-thread octree query results.
-    Vector<PODVector<Drawable*> > tempDrawables_;
+    Vector<Vector<Drawable*>> tempDrawables_;
     /// Per-thread geometries, lights and Z range collection results.
     Vector<PerThreadSceneResult> sceneResults_;
     /// Visible zones.
-    PODVector<Zone*> zones_;
+    Vector<Zone*> zones_;
     /// Visible geometry objects.
-    PODVector<Drawable*> geometries_;
+    Vector<Drawable*> geometries_;
     /// Geometry objects that will be updated in the main thread.
-    PODVector<Drawable*> nonThreadedGeometries_;
+    Vector<Drawable*> nonThreadedGeometries_;
     /// Geometry objects that will be updated in worker threads.
-    PODVector<Drawable*> threadedGeometries_;
+    Vector<Drawable*> threadedGeometries_;
     /// Occluder objects.
-    PODVector<Drawable*> occluders_;
+    Vector<Drawable*> occluders_;
     /// Lights.
-    PODVector<Light*> lights_;
+    Vector<Light*> lights_;
     /// Number of active occluders.
     unsigned activeOccluders_{};
 
@@ -410,7 +390,7 @@ private:
     /// Intermediate light processing results.
     Vector<LightQueryResult> lightQueryResults_;
     /// Info for scene render passes defined by the renderpath.
-    PODVector<ScenePassInfo> scenePasses_;
+    Vector<ScenePassInfo> scenePasses_;
     /// Per-pixel light queues.
     Vector<LightBatchQueue> lightQueues_;
     /// Per-vertex light queues.

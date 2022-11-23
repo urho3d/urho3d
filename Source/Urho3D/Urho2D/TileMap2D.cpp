@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -36,7 +17,6 @@
 namespace Urho3D
 {
 
-extern const float PIXEL_SIZE;
 extern const char* URHO2D_CATEGORY;
 
 TileMap2D::TileMap2D(Context* context) :
@@ -96,8 +76,8 @@ void TileMap2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         break;
     }
 
-    for (unsigned i = 0; i < layers_.Size(); ++i)
-        layers_[i]->DrawDebugGeometry(debug, depthTest);
+    for (const WeakPtr<TileMapLayer2D>& layer : layers_)
+        layer->DrawDebugGeometry(debug, depthTest);
 }
 
 void TileMap2D::DrawDebugGeometry()
@@ -185,9 +165,9 @@ ResourceRef TileMap2D::GetTmxFileAttr() const
     return GetResourceRef(tmxFile_, TmxFile2D::GetTypeStatic());
 }
 
-Vector<SharedPtr<TileMapObject2D> > TileMap2D::GetTileCollisionShapes(unsigned gid) const
+Vector<SharedPtr<TileMapObject2D>> TileMap2D::GetTileCollisionShapes(unsigned gid) const
 {
-    Vector<SharedPtr<TileMapObject2D> > shapes;
+    Vector<SharedPtr<TileMapObject2D>> shapes;
     return tmxFile_ ? tmxFile_->GetTileCollisionShapes(gid) : shapes;
 }
 

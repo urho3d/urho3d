@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 /// \file
 
@@ -84,6 +65,7 @@ public:
     /// Destruct.
     ~CrowdAgent() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     void ApplyAttributes() override;
@@ -96,87 +78,118 @@ public:
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Submit a new target position request for this agent.
+    /// @property
     void SetTargetPosition(const Vector3& position);
     /// Submit a new target velocity request for this agent.
+    /// @property
     void SetTargetVelocity(const Vector3& velocity);
     /// Reset any target request for the specified agent. Note that the agent will continue to move into the current direction; set a zero target velocity to actually stop.
     void ResetTarget();
     /// Update the node position. When set to false, the node position should be updated by other means (e.g. using Physics) in response to the E_CROWD_AGENT_REPOSITION event.
+    /// @property
     void SetUpdateNodePosition(bool unodepos);
     /// Set the agent's max acceleration.
+    /// @property
     void SetMaxAccel(float maxAccel);
     /// Set the agent's max velocity.
+    /// @property
     void SetMaxSpeed(float maxSpeed);
     /// Set the agent's radius.
+    /// @property
     void SetRadius(float radius);
     /// Set the agent's height.
+    /// @property
     void SetHeight(float height);
     /// Set the agent's query filter type.
+    /// @property
     void SetQueryFilterType(unsigned queryFilterType);
     /// Set the agent's obstacle avoidance type.
+    /// @property
     void SetObstacleAvoidanceType(unsigned obstacleAvoidanceType);
     /// Set the agent's navigation quality.
+    /// @property
     void SetNavigationQuality(NavigationQuality val);
     /// Set the agent's navigation pushiness.
+    /// @property
     void SetNavigationPushiness(NavigationPushiness val);
 
     /// Return the agent's position.
+    /// @property
     Vector3 GetPosition() const;
     /// Return the agent's desired velocity.
+    /// @property
     Vector3 GetDesiredVelocity() const;
     /// Return the agent's actual velocity.
+    /// @property
     Vector3 GetActualVelocity() const;
 
     /// Return the agent's requested target position.
+    /// @property
     const Vector3& GetTargetPosition() const { return targetPosition_; }
 
     /// Return the agent's requested target velocity.
+    /// @property
     const Vector3& GetTargetVelocity() const { return targetVelocity_; }
 
     /// Return the agent's requested target type, if any.
+    /// @property
     CrowdAgentRequestedTarget GetRequestedTargetType() const { return requestedTargetType_; }
 
     /// Return the agent's  state.
+    /// @property
     CrowdAgentState GetAgentState() const;
     /// Return the agent's target state.
+    /// @property
     CrowdAgentTargetState GetTargetState() const;
 
     /// Return true when the node's position should be updated by the CrowdManager.
+    /// @property
     bool GetUpdateNodePosition() const { return updateNodePosition_; }
 
     /// Return the agent id.
     int GetAgentCrowdId() const { return agentCrowdId_; }
 
     /// Get the agent's max acceleration.
+    /// @property
     float GetMaxAccel() const { return maxAccel_; }
 
     /// Get the agent's max velocity.
+    /// @property
     float GetMaxSpeed() const { return maxSpeed_; }
 
     /// Get the agent's radius.
+    /// @property
     float GetRadius() const { return radius_; }
 
     /// Get the agent's height.
+    /// @property
     float GetHeight() const { return height_; }
 
     /// Get the agent's query filter type.
+    /// @property
     unsigned GetQueryFilterType() const { return queryFilterType_; }
 
     /// Get the agent's obstacle avoidance type.
+    /// @property
     unsigned GetObstacleAvoidanceType() const { return obstacleAvoidanceType_; }
 
     /// Get the agent's navigation quality.
+    /// @property
     NavigationQuality GetNavigationQuality() const { return navQuality_; }
 
     /// Get the agent's navigation pushiness.
+    /// @property
     NavigationPushiness GetNavigationPushiness() const { return navPushiness_; }
 
     /// Return true when the agent has a target.
+    /// @property{get_requestedTarget}
     bool HasRequestedTarget() const { return requestedTargetType_ != CA_REQUESTEDTARGET_NONE; }
 
     /// Return true when the agent has arrived at its target.
+    /// @property{get_arrived}
     bool HasArrived() const;
     /// Return true when the agent is in crowd (being managed by a crowd manager).
+    /// @property
     bool IsInCrowd() const;
 
 protected:

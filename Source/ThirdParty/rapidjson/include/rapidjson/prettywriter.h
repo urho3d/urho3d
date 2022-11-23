@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -11,8 +11,6 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-
-// Modified by Ali Kamarainen for Urho3D
 
 #ifndef RAPIDJSON_PRETTYWRITER_H_
 #define RAPIDJSON_PRETTYWRITER_H_
@@ -41,7 +39,7 @@ enum PrettyFormatOptions {
 
 //! Writer with indentation and spacing.
 /*!
-    \tparam OutputStream Type of ouptut os.
+    \tparam OutputStream Type of output os.
     \tparam SourceEncoding Encoding of source string.
     \tparam TargetEncoding Encoding of output stream.
     \tparam StackAllocator Type of allocator for allocating memory of stack.
@@ -62,7 +60,7 @@ public:
 
 
     explicit PrettyWriter(StackAllocator* allocator = 0, size_t levelDepth = Base::kDefaultLevelDepth) : 
-        Base(allocator, levelDepth), indentChar_(' '), indentCharCount_(4) {}
+        Base(allocator, levelDepth), indentChar_(' '), indentCharCount_(4), formatOptions_(kFormatDefault) {}
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
     PrettyWriter(PrettyWriter&& rhs) :
@@ -75,8 +73,7 @@ public:
         \note The default indentation is 4 spaces.
     */
     PrettyWriter& SetIndent(Ch indentChar, unsigned indentCharCount) {
-        // Urho3D: in order to be consistent with the XMLFile API, allow any character.
-        //RAPIDJSON_ASSERT(indentChar == ' ' || indentChar == '\t' || indentChar == '\n' || indentChar == '\r');
+        RAPIDJSON_ASSERT(indentChar == ' ' || indentChar == '\t' || indentChar == '\n' || indentChar == '\r');
         indentChar_ = indentChar;
         indentCharCount_ = indentCharCount;
         return *this;
@@ -95,26 +92,26 @@ public:
     */
     //@{
 
-    bool Null()                 { PrettyPrefix(kNullType);   return Base::WriteNull(); }
-    bool Bool(bool b)           { PrettyPrefix(b ? kTrueType : kFalseType); return Base::WriteBool(b); }
-    bool Int(int i)             { PrettyPrefix(kNumberType); return Base::WriteInt(i); }
-    bool Uint(unsigned u)       { PrettyPrefix(kNumberType); return Base::WriteUint(u); }
-    bool Int64(int64_t i64)     { PrettyPrefix(kNumberType); return Base::WriteInt64(i64); }
-    bool Uint64(uint64_t u64)   { PrettyPrefix(kNumberType); return Base::WriteUint64(u64);  }
-    bool Double(double d)       { PrettyPrefix(kNumberType); return Base::WriteDouble(d); }
+    bool Null()                 { PrettyPrefix(kNullType);   return Base::EndValue(Base::WriteNull()); }
+    bool Bool(bool b)           { PrettyPrefix(b ? kTrueType : kFalseType); return Base::EndValue(Base::WriteBool(b)); }
+    bool Int(int i)             { PrettyPrefix(kNumberType); return Base::EndValue(Base::WriteInt(i)); }
+    bool Uint(unsigned u)       { PrettyPrefix(kNumberType); return Base::EndValue(Base::WriteUint(u)); }
+    bool Int64(int64_t i64)     { PrettyPrefix(kNumberType); return Base::EndValue(Base::WriteInt64(i64)); }
+    bool Uint64(uint64_t u64)   { PrettyPrefix(kNumberType); return Base::EndValue(Base::WriteUint64(u64));  }
+    bool Double(double d)       { PrettyPrefix(kNumberType); return Base::EndValue(Base::WriteDouble(d)); }
 
     bool RawNumber(const Ch* str, SizeType length, bool copy = false) {
         RAPIDJSON_ASSERT(str != 0);
         (void)copy;
         PrettyPrefix(kNumberType);
-        return Base::WriteString(str, length);
+        return Base::EndValue(Base::WriteString(str, length));
     }
 
     bool String(const Ch* str, SizeType length, bool copy = false) {
         RAPIDJSON_ASSERT(str != 0);
         (void)copy;
         PrettyPrefix(kStringType);
-        return Base::WriteString(str, length);
+        return Base::EndValue(Base::WriteString(str, length));
     }
 
 #if RAPIDJSON_HAS_STDSTRING
@@ -149,7 +146,7 @@ public:
             Base::os_->Put('\n');
             WriteIndent();
         }
-        bool ret = Base::WriteEndObject();
+        bool ret = Base::EndValue(Base::WriteEndObject());
         (void)ret;
         RAPIDJSON_ASSERT(ret == true);
         if (Base::level_stack_.Empty()) // end of json text
@@ -173,7 +170,7 @@ public:
             Base::os_->Put('\n');
             WriteIndent();
         }
-        bool ret = Base::WriteEndArray();
+        bool ret = Base::EndValue(Base::WriteEndArray());
         (void)ret;
         RAPIDJSON_ASSERT(ret == true);
         if (Base::level_stack_.Empty()) // end of json text
@@ -204,7 +201,7 @@ public:
     bool RawValue(const Ch* json, size_t length, Type type) {
         RAPIDJSON_ASSERT(json != 0);
         PrettyPrefix(type);
-        return Base::WriteRawValue(json, length);
+        return Base::EndValue(Base::WriteRawValue(json, length));
     }
 
 protected:

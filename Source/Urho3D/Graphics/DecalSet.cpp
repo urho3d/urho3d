@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -30,10 +11,10 @@
 #include "../Graphics/DecalSet.h"
 #include "../Graphics/Geometry.h"
 #include "../Graphics/Graphics.h"
-#include "../Graphics/IndexBuffer.h"
 #include "../Graphics/Material.h"
 #include "../Graphics/Tangent.h"
-#include "../Graphics/VertexBuffer.h"
+#include "../GraphicsAPI/IndexBuffer.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
 #include "../Resource/ResourceCache.h"
@@ -41,10 +22,6 @@
 #include "../Scene/SceneEvents.h"
 
 #include "../DebugNew.h"
-
-#ifdef _MSC_VER
-#pragma warning(disable:6293)
-#endif
 
 namespace Urho3D
 {
@@ -93,7 +70,7 @@ static DecalVertex ClipEdge(const DecalVertex& v0, const DecalVertex& v1, float 
     return ret;
 }
 
-static void ClipPolygon(PODVector<DecalVertex>& dest, const PODVector<DecalVertex>& src, const Plane& plane, bool skinned)
+static void ClipPolygon(Vector<DecalVertex>& dest, const Vector<DecalVertex>& src, const Plane& plane, bool skinned)
 {
     unsigned last = 0;
     float lastDistance = 0.0f;
@@ -190,7 +167,7 @@ void DecalSet::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Decals", GetDecalsAttr, SetDecalsAttr, PODVector<unsigned char>, Variant::emptyBuffer,
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Decals", GetDecalsAttr, SetDecalsAttr, Vector<unsigned char>, Variant::emptyBuffer,
         AM_FILE | AM_NOEDIT);
 }
 
@@ -207,7 +184,7 @@ void DecalSet::OnSetEnabled()
     UpdateEventSubscription(true);
 }
 
-void DecalSet::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
+void DecalSet::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results)
 {
     // Do not return raycast hits
 }
@@ -383,8 +360,8 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     Decal& newDecal = decals_.Back();
     newDecal.timeToLive_ = timeToLive;
 
-    Vector<PODVector<DecalVertex> > faces;
-    PODVector<DecalVertex> tempFace;
+    Vector<Vector<DecalVertex>> faces;
+    Vector<DecalVertex> tempFace;
 
     unsigned numBatches = target->GetBatches().Size();
 
@@ -402,7 +379,7 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     {
         for (unsigned j = 0; j < faces.Size(); ++j)
         {
-            PODVector<DecalVertex>& face = faces[j];
+            Vector<DecalVertex>& face = faces[j];
             if (face.Empty())
                 continue;
 
@@ -414,7 +391,7 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     // Now triangulate the resulting faces into decal vertices
     for (unsigned i = 0; i < faces.Size(); ++i)
     {
-        PODVector<DecalVertex>& face = faces[i];
+        Vector<DecalVertex>& face = faces[i];
         if (face.Size() < 3)
             continue;
 
@@ -521,7 +498,7 @@ void DecalSet::SetMaterialAttr(const ResourceRef& value)
     SetMaterial(cache->GetResource<Material>(value.name_));
 }
 
-void DecalSet::SetDecalsAttr(const PODVector<unsigned char>& value)
+void DecalSet::SetDecalsAttr(const Vector<unsigned char>& value)
 {
     RemoveAllDecals();
 
@@ -543,7 +520,7 @@ void DecalSet::SetDecalsAttr(const PODVector<unsigned char>& value)
         newDecal.vertices_.Resize(buffer.ReadVLE());
         newDecal.indices_.Resize(buffer.ReadVLE());
 
-        for (PODVector<DecalVertex>::Iterator i = newDecal.vertices_.Begin(); i != newDecal.vertices_.End(); ++i)
+        for (Vector<DecalVertex>::Iterator i = newDecal.vertices_.Begin(); i != newDecal.vertices_.End(); ++i)
         {
             i->position_ = buffer.ReadVector3();
             i->normal_ = buffer.ReadVector3();
@@ -558,7 +535,7 @@ void DecalSet::SetDecalsAttr(const PODVector<unsigned char>& value)
             }
         }
 
-        for (PODVector<unsigned short>::Iterator i = newDecal.indices_.Begin(); i != newDecal.indices_.End(); ++i)
+        for (Vector<unsigned short>::Iterator i = newDecal.indices_.Begin(); i != newDecal.indices_.End(); ++i)
             *i = buffer.ReadUShort();
 
         newDecal.CalculateBoundingBox();
@@ -599,7 +576,7 @@ ResourceRef DecalSet::GetMaterialAttr() const
     return GetResourceRef(batches_[0].material_, Material::GetTypeStatic());
 }
 
-PODVector<unsigned char> DecalSet::GetDecalsAttr() const
+Vector<unsigned char> DecalSet::GetDecalsAttr() const
 {
     VectorBuffer ret;
 
@@ -613,7 +590,7 @@ PODVector<unsigned char> DecalSet::GetDecalsAttr() const
         ret.WriteVLE(i->vertices_.Size());
         ret.WriteVLE(i->indices_.Size());
 
-        for (PODVector<DecalVertex>::ConstIterator j = i->vertices_.Begin(); j != i->vertices_.End(); ++j)
+        for (Vector<DecalVertex>::ConstIterator j = i->vertices_.Begin(); j != i->vertices_.End(); ++j)
         {
             ret.WriteVector3(j->position_);
             ret.WriteVector3(j->normal_);
@@ -628,7 +605,7 @@ PODVector<unsigned char> DecalSet::GetDecalsAttr() const
             }
         }
 
-        for (PODVector<unsigned short>::ConstIterator j = i->indices_.Begin(); j != i->indices_.End(); ++j)
+        for (Vector<unsigned short>::ConstIterator j = i->indices_.Begin(); j != i->indices_.End(); ++j)
             ret.WriteUShort(*j);
     }
 
@@ -694,7 +671,7 @@ void DecalSet::OnWorldBoundingBoxUpdate()
     }
 }
 
-void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, const Frustum& frustum,
+void DecalSet::GetFaces(Vector<Vector<DecalVertex>>& faces, Drawable* target, unsigned batchIndex, const Frustum& frustum,
     const Vector3& decalNormal, float normalCutoff)
 {
     // Try to use the most accurate LOD level if possible
@@ -751,7 +728,7 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target
     if (!positionData)
     {
         // As a fallback, try to get the geometry's raw vertex/index data
-        const PODVector<VertexElement>* elements;
+        const Vector<VertexElement>* elements;
         geometry->GetRawData(positionData, positionStride, indexData, indexStride, elements);
         if (!positionData)
         {
@@ -807,7 +784,7 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target
     }
 }
 
-void DecalSet::GetFace(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, unsigned i0, unsigned i1,
+void DecalSet::GetFace(Vector<Vector<DecalVertex>>& faces, Drawable* target, unsigned batchIndex, unsigned i0, unsigned i1,
     unsigned i2, const unsigned char* positionData, const unsigned char* normalData, const unsigned char* skinningData,
     unsigned positionStride, unsigned normalStride, unsigned skinningStride, const Frustum& frustum, const Vector3& decalNormal,
     float normalCutoff)
@@ -841,7 +818,7 @@ void DecalSet::GetFace(Vector<PODVector<DecalVertex> >& faces, Drawable* target,
         return;
 
     // Check if face is culled completely by any of the planes
-    for (unsigned i = PLANE_FAR; i < NUM_FRUSTUM_PLANES; --i)
+    for (i32 i = PLANE_FAR; i >= 0; --i)
     {
         const Plane& plane = frustum.planes_[i];
         if (plane.Distance(v0) < 0.0f && plane.Distance(v1) < 0.0f && plane.Distance(v2) < 0.0f)
@@ -849,7 +826,7 @@ void DecalSet::GetFace(Vector<PODVector<DecalVertex> >& faces, Drawable* target,
     }
 
     faces.Resize(faces.Size() + 1);
-    PODVector<DecalVertex>& face = faces.Back();
+    Vector<DecalVertex>& face = faces.Back();
     if (!hasSkinning)
     {
         face.Reserve(3);
@@ -889,8 +866,8 @@ bool DecalSet::GetBones(Drawable* target, unsigned batchIndex, const float* blen
         return false;
 
     // Check whether target is using global or per-geometry skinning
-    const Vector<PODVector<Matrix3x4> >& geometrySkinMatrices = animatedModel->GetGeometrySkinMatrices();
-    const Vector<PODVector<unsigned> >& geometryBoneMappings = animatedModel->GetGeometryBoneMappings();
+    const Vector<Vector<Matrix3x4>>& geometrySkinMatrices = animatedModel->GetGeometrySkinMatrices();
+    const Vector<Vector<unsigned>>& geometryBoneMappings = animatedModel->GetGeometryBoneMappings();
 
     for (unsigned i = 0; i < 4; ++i)
     {
@@ -962,7 +939,7 @@ void DecalSet::CalculateUVs(Decal& decal, const Matrix3x4& view, const Matrix4& 
 {
     Matrix4 viewProj = projection * view;
 
-    for (PODVector<DecalVertex>::Iterator i = decal.vertices_.Begin(); i != decal.vertices_.End(); ++i)
+    for (Vector<DecalVertex>::Iterator i = decal.vertices_.Begin(); i != decal.vertices_.End(); ++i)
     {
         Vector3 projected = viewProj * i->position_;
         i->texCoord_ = Vector2(
@@ -974,7 +951,7 @@ void DecalSet::CalculateUVs(Decal& decal, const Matrix3x4& view, const Matrix4& 
 
 void DecalSet::TransformVertices(Decal& decal, const Matrix3x4& transform)
 {
-    for (PODVector<DecalVertex>::Iterator i = decal.vertices_.Begin(); i != decal.vertices_.End(); ++i)
+    for (Vector<DecalVertex>::Iterator i = decal.vertices_.Begin(); i != decal.vertices_.End(); ++i)
     {
         i->position_ = transform * i->position_;
         i->normal_ = (transform * Vector4(i->normal_, 0.0f)).Normalized();

@@ -48,7 +48,7 @@ struct RenderTargetInfo
 struct RenderPathCommand
 {
     RenderPathCommand();
-    
+
     void Load(const XMLElement& element);
     void SetTextureName(TextureUnit unit, const String name);
     void SetShaderParameter(const String name, const Variant& value);
@@ -106,7 +106,7 @@ class RenderPath
     void RemoveRenderTarget(const String name);
     void RemoveRenderTarget(unsigned index);
     void RemoveRenderTargets(const String tag);
-    
+
     void SetCommand(unsigned index, const RenderPathCommand& command);
     void AddCommand(const RenderPathCommand& command);
     void InsertCommand(unsigned index, const RenderPathCommand& command);
@@ -117,7 +117,7 @@ class RenderPath
 
     unsigned GetNumRenderTargets() const;
     unsigned GetNumCommands() const;
-    RenderPathCommand* GetCommand(unsigned index); 
+    RenderPathCommand* GetCommand(unsigned index);
     const Variant& GetShaderParameter(const String name) const;
 };
 

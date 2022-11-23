@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -42,23 +23,28 @@ public:
     /// Destruct.
     ~TileMap2D() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Visualize the component as debug geometry.
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set tmx file.
+    /// @property
     void SetTmxFile(TmxFile2D* tmxFile);
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry();
 
     /// Return tmx file.
+    /// @property
     TmxFile2D* GetTmxFile() const;
 
     /// Return information.
+    /// @property
     const TileMapInfo2D& GetInfo() const { return info_; }
 
     /// Return number of layers.
+    /// @property
     unsigned GetNumLayers() const { return layers_.Size(); }
 
     /// Return tile map layer at index.
@@ -73,7 +59,7 @@ public:
     /// Return tile map file attribute.
     ResourceRef GetTmxFileAttr() const;
     ///
-    Vector<SharedPtr<TileMapObject2D> > GetTileCollisionShapes(unsigned gid) const;
+    Vector<SharedPtr<TileMapObject2D>> GetTileCollisionShapes(unsigned gid) const;
 private:
     /// Tmx file.
     SharedPtr<TmxFile2D> tmxFile_;
@@ -82,7 +68,7 @@ private:
     /// Root node for tile map layer.
     SharedPtr<Node> rootNode_;
     /// Tile map layers.
-    Vector<WeakPtr<TileMapLayer2D> > layers_;
+    Vector<WeakPtr<TileMapLayer2D>> layers_;
 };
 
 }

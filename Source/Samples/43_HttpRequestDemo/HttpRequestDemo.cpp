@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Core/ProcessUtils.h>
@@ -85,7 +66,11 @@ void HttpRequestDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
     auto* network = GetSubsystem<Network>();
 
     if (httpRequest_.Null())
+#ifdef URHO3D_SSL
+        httpRequest_ = network->MakeHttpRequest("https://api.ipify.org/?format=json");
+#else
         httpRequest_ = network->MakeHttpRequest("http://httpbin.org/ip");
+#endif
     else
     {
         // Initializing HTTP request
@@ -94,8 +79,9 @@ void HttpRequestDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
         // An error has occurred
         else if (httpRequest_->GetState() == HTTP_ERROR)
         {
-            text_->SetText("An error has occurred.");
+            text_->SetText("An error has occurred: " + httpRequest_->GetError());
             UnsubscribeFromEvent("Update");
+            URHO3D_LOGERRORF("HttpRequest error: %s", httpRequest_->GetError().CString());
         }
         // Get message data
         else
@@ -109,10 +95,14 @@ void HttpRequestDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
                 SharedPtr<JSONFile> json(new JSONFile(context_));
                 json->FromString(message_);
 
+#ifdef URHO3D_SSL
+                JSONValue val = json->GetRoot().Get("ip");
+#else
                 JSONValue val = json->GetRoot().Get("origin");
+#endif
 
                 if (val.IsNull())
-                    text_->SetText("Invalid string.");
+                    text_->SetText("Invalid JSON response retrieved!");
                 else
                     text_->SetText("Your IP is: " + val.GetString());
 

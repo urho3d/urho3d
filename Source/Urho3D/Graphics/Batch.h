@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -169,7 +150,7 @@ struct BatchGroup : public Batch
     void Draw(View* view, Camera* camera, bool allowDepthWrite) const;
 
     /// Instance data.
-    PODVector<InstanceData> instances_;
+    Vector<InstanceData> instances_;
     /// Instance stream start index, or M_MAX_UNSIGNED if transforms not pre-set.
     unsigned startIndex_;
 };
@@ -233,7 +214,7 @@ public:
     /// Sort instanced and non-instanced draw calls front to back.
     void SortFrontToBack();
     /// Sort batches front to back while also maintaining state sorting.
-    void SortFrontToBack2Pass(PODVector<Batch*>& batches);
+    void SortFrontToBack2Pass(Vector<Batch*>& batches);
     /// Pre-set instance data of all groups. The vertex buffer must be big enough to hold all data.
     void SetInstancingData(void* lockedData, unsigned stride, unsigned& freeIndex);
     /// Draw.
@@ -254,11 +235,11 @@ public:
     HashMap<unsigned short, unsigned short> geometryRemapping_;
 
     /// Unsorted non-instanced draw calls.
-    PODVector<Batch> batches_;
+    Vector<Batch> batches_;
     /// Sorted non-instanced draw calls.
-    PODVector<Batch*> sortedBatches_;
+    Vector<Batch*> sortedBatches_;
     /// Sorted instanced draw calls.
-    PODVector<BatchGroup*> sortedBatchGroups_;
+    Vector<BatchGroup*> sortedBatchGroups_;
     /// Maximum sorted instances.
     unsigned maxSortedInstances_;
     /// Whether the pass command contains extra shader defines.
@@ -273,7 +254,7 @@ public:
     StringHash psExtraDefinesHash_;
 };
 
-/// Queue for shadow map draw calls
+/// Queue for shadow map draw calls.
 struct ShadowBatchQueue
 {
     /// Shadow map camera.
@@ -297,16 +278,16 @@ struct LightBatchQueue
     bool negative_;
     /// Shadow map depth texture.
     Texture2D* shadowMap_;
-    /// Lit geometry draw calls, base (replace blend mode)
+    /// Lit geometry draw calls, base (replace blend mode).
     BatchQueue litBaseBatches_;
-    /// Lit geometry draw calls, non-base (additive)
+    /// Lit geometry draw calls, non-base (additive).
     BatchQueue litBatches_;
     /// Shadow map split queues.
     Vector<ShadowBatchQueue> shadowSplits_;
     /// Per-vertex lights.
-    PODVector<Light*> vertexLights_;
+    Vector<Light*> vertexLights_;
     /// Light volume draw calls.
-    PODVector<Batch> volumeBatches_;
+    Vector<Batch> volumeBatches_;
 };
 
 }

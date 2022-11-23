@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -35,6 +16,12 @@ namespace Urho3D
 class URHO3D_API Quaternion
 {
 public:
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:26495)
+#endif
+
     /// Construct an identity quaternion.
     Quaternion() noexcept
 #ifndef URHO3D_SSE
@@ -92,6 +79,17 @@ public:
 #endif
     }
 
+#ifdef URHO3D_SSE
+    explicit Quaternion(__m128 wxyz) noexcept
+    {
+        _mm_storeu_ps(&w_, wxyz);
+    }
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
     /// Construct from an angle (in degrees) and axis.
     Quaternion(float angle, const Vector3& axis) noexcept
     {
@@ -104,10 +102,16 @@ public:
         FromAngleAxis(angle, Vector3::FORWARD);
     }
 
-    /// Construct from Euler angles (in degrees.) Equivalent to Y*X*Z.
+    /// Construct from Euler angles (in degrees). Equivalent to Y*X*Z.
     Quaternion(float x, float y, float z) noexcept
     {
         FromEulerAngles(x, y, z);
+    }
+
+    /// Construct from Euler angles (in degrees).
+    explicit Quaternion(const Vector3& angles) noexcept
+    {
+        FromEulerAngles(angles.x_, angles.y_, angles.z_);
     }
 
     /// Construct from the rotation difference between two direction vectors.
@@ -127,13 +131,6 @@ public:
     {
         FromRotationMatrix(matrix);
     }
-
-#ifdef URHO3D_SSE
-    explicit Quaternion(__m128 wxyz) noexcept
-    {
-        _mm_storeu_ps(&w_, wxyz);
-    }
-#endif
 
     /// Assign from another quaternion.
     Quaternion& operator =(const Quaternion& rhs) noexcept
@@ -292,7 +289,7 @@ public:
 
     /// Define from an angle (in degrees) and axis.
     void FromAngleAxis(float angle, const Vector3& axis);
-    /// Define from Euler angles (in degrees.) Equivalent to Y*X*Z.
+    /// Define from Euler angles (in degrees). Equivalent to Y*X*Z.
     void FromEulerAngles(float x, float y, float z);
     /// Define from the rotation difference between two direction vectors.
     void FromRotationTo(const Vector3& start, const Vector3& end);
@@ -409,8 +406,11 @@ public:
         return Urho3D::Equals(w_, rhs.w_) && Urho3D::Equals(x_, rhs.x_) && Urho3D::Equals(y_, rhs.y_) && Urho3D::Equals(z_, rhs.z_);
     }
 
-    /// Return whether is NaN.
+    /// Return whether any element is NaN.
     bool IsNaN() const { return Urho3D::IsNaN(w_) || Urho3D::IsNaN(x_) || Urho3D::IsNaN(y_) || Urho3D::IsNaN(z_); }
+
+    /// Return whether any element is Inf.
+    bool IsInf() const { return Urho3D::IsInf(w_) || Urho3D::IsInf(x_) || Urho3D::IsInf(y_) || Urho3D::IsInf(z_); }
 
     /// Return conjugate.
     Quaternion Conjugate() const
@@ -424,18 +424,25 @@ public:
     }
 
     /// Return Euler angles in degrees.
+    /// @property
     Vector3 EulerAngles() const;
     /// Return yaw angle in degrees.
+    /// @property{get_yaw}
     float YawAngle() const;
     /// Return pitch angle in degrees.
+    /// @property{get_pitch}
     float PitchAngle() const;
     /// Return roll angle in degrees.
+    /// @property{get_roll}
     float RollAngle() const;
     /// Return rotation axis.
+    /// @property
     Vector3 Axis() const;
     /// Return rotation angle.
+    /// @property
     float Angle() const;
     /// Return the rotation matrix that corresponds to this quaternion.
+    /// @property
     Matrix3 RotationMatrix() const;
     /// Spherical interpolation with another quaternion.
     Quaternion Slerp(const Quaternion& rhs, float t) const;

@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Engine/Engine.h>
@@ -186,6 +167,20 @@ void SceneReplication::CreateUI()
     // Hide until connected
     instructionsText_->SetVisible(false);
 
+    packetsIn_ = ui->GetRoot()->CreateChild<Text>();
+    packetsIn_->SetText("Packets in : 0");
+    packetsIn_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
+    packetsIn_->SetHorizontalAlignment(HA_LEFT);
+    packetsIn_->SetVerticalAlignment(VA_CENTER);
+    packetsIn_->SetPosition(10, -10);
+
+    packetsOut_ = ui->GetRoot()->CreateChild<Text>();
+    packetsOut_->SetText("Packets out: 0");
+    packetsOut_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
+    packetsOut_->SetHorizontalAlignment(HA_LEFT);
+    packetsOut_->SetVerticalAlignment(VA_CENTER);
+    packetsOut_->SetPosition(10, 10);
+
     buttonContainer_ = root->CreateChild<UIElement>();
     buttonContainer_->SetFixedSize(500, 20);
     buttonContainer_->SetPosition(20, 20);
@@ -343,6 +338,26 @@ void SceneReplication::HandlePostUpdate(StringHash eventType, VariantMap& eventD
 {
     // We only rotate the camera according to mouse movement since last frame, so do not need the time step
     MoveCamera();
+
+    if (packetCounterTimer_.GetMSec(false) > 1000 && GetSubsystem<Network>()->GetServerConnection())
+    {
+        packetsIn_->SetText("Packets  in: " + String(GetSubsystem<Network>()->GetServerConnection()->GetPacketsInPerSec()));
+        packetsOut_->SetText("Packets out: " + String(GetSubsystem<Network>()->GetServerConnection()->GetPacketsOutPerSec()));
+        packetCounterTimer_.Reset();
+    }
+    if (packetCounterTimer_.GetMSec(false) > 1000 && GetSubsystem<Network>()->GetClientConnections().Size())
+    {
+        int packetsIn = 0;
+        int packetsOut = 0;
+        auto connections = GetSubsystem<Network>()->GetClientConnections();
+        for (auto it = connections.Begin(); it != connections.End(); ++it ) {
+            packetsIn += (*it)->GetPacketsInPerSec();
+            packetsOut += (*it)->GetPacketsOutPerSec();
+        }
+        packetsIn_->SetText("Packets  in: " + String(packetsIn));
+        packetsOut_->SetText("Packets out: " + String(packetsOut));
+        packetCounterTimer_.Reset();
+    }
 }
 
 void SceneReplication::HandlePhysicsPreStep(StringHash eventType, VariantMap& eventData)
@@ -380,17 +395,16 @@ void SceneReplication::HandlePhysicsPreStep(StringHash eventType, VariantMap& ev
     // Server: apply controls to client objects
     else if (network->IsServerRunning())
     {
-        const Vector<SharedPtr<Connection> >& connections = network->GetClientConnections();
+        const Vector<SharedPtr<Connection>>& connections = network->GetClientConnections();
 
-        for (unsigned i = 0; i < connections.Size(); ++i)
+        for (Connection* connection : connections)
         {
-            Connection* connection = connections[i];
             // Get the object this connection is controlling
             Node* ballNode = serverObjects_[connection];
             if (!ballNode)
                 continue;
 
-            auto* body = ballNode->GetComponent<RigidBody>();
+            RigidBody* body = ballNode->GetComponent<RigidBody>();
 
             // Get the last controls sent by the client
             const Controls& controls = connection->GetControls();

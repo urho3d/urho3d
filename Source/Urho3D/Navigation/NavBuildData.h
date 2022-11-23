@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -61,19 +42,19 @@ struct URHO3D_API NavBuildData
     /// World-space bounding box of the navigation mesh tile.
     BoundingBox worldBoundingBox_;
     /// Vertices from geometries.
-    PODVector<Vector3> vertices_;
+    Vector<Vector3> vertices_;
     /// Triangle indices from geometries.
-    PODVector<int> indices_;
+    Vector<int> indices_;
     /// Offmesh connection vertices.
-    PODVector<Vector3> offMeshVertices_;
+    Vector<Vector3> offMeshVertices_;
     /// Offmesh connection radii.
-    PODVector<float> offMeshRadii_;
+    Vector<float> offMeshRadii_;
     /// Offmesh connection flags.
-    PODVector<unsigned short> offMeshFlags_;
+    Vector<unsigned short> offMeshFlags_;
     /// Offmesh connection areas.
-    PODVector<unsigned char> offMeshAreas_;
+    Vector<unsigned char> offMeshAreas_;
     /// Offmesh connection direction.
-    PODVector<unsigned char> offMeshDir_;
+    Vector<unsigned char> offMeshDir_;
     /// Recast context.
     rcContext* ctx_;
     /// Recast heightfield.
@@ -81,7 +62,7 @@ struct URHO3D_API NavBuildData
     /// Recast compact heightfield.
     rcCompactHeightfield* compactHeightField_;
     /// Pretransformed navigation areas, no correlation to the geometry above.
-    PODVector<NavAreaStub> navAreas_;
+    Vector<NavAreaStub> navAreas_;
 };
 
 struct SimpleNavBuildData : public NavBuildData
@@ -99,6 +80,7 @@ struct SimpleNavBuildData : public NavBuildData
     rcPolyMeshDetail* polyMeshDetail_;
 };
 
+/// @nobind
 struct DynamicNavBuildData : public NavBuildData
 {
     /// Constructor.

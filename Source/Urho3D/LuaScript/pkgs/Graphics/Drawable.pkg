@@ -26,7 +26,7 @@ class Drawable : public Component
     void SetOccluder(bool enable);
     void SetOccludee(bool enable);
     void MarkForUpdate();
-    
+
     const BoundingBox& GetBoundingBox() const;
     const BoundingBox& GetWorldBoundingBox();
     unsigned char GetDrawableFlags() const;

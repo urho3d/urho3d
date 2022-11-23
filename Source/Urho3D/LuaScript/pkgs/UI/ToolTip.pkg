@@ -10,9 +10,9 @@ class ToolTip : public UIElement
     void AddAltTarget(UIElement* target);
 
     void SetDelay(float delay);
-    
+
     float GetDelay() const;
-    
+
     tolua_property__get_set float delay;
 };
 

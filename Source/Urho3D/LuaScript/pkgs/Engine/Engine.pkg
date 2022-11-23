@@ -3,7 +3,7 @@ $#include "Engine/Engine.h"
 class Engine : public Object
 {
     void RunFrame();
-    
+
     Console* CreateConsole();
     DebugHud* CreateDebugHud();
 

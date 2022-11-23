@@ -123,7 +123,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
     #ifdef BLUR2
     oColor = GaussianBlur(BlurKernelSize, cBloomHDRBlurDir, cBright2InvSize * cBloomHDRBlurRadius, cBloomHDRBlurSigma, sDiffMap, iTexCoord);
     #endif
-    
+
     #else
 
     #ifdef BLUR16
@@ -141,7 +141,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
     #ifdef BLUR2
     oColor = GaussianBlur(BlurKernelSize, cBloomHDRBlurDir, cBright2InvSize * cBloomHDRBlurRadius, cBloomHDRBlurSigma, tDiffMap, sDiffMap, iTexCoord);
     #endif
-    
+
     #endif
 
     #ifdef COMBINE16

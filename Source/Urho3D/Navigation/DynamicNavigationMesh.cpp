@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -45,6 +26,8 @@
 #include <DetourTileCache/DetourTileCache.h>
 #include <DetourTileCache/DetourTileCacheBuilder.h>
 #include <Recast/Recast.h>
+
+using namespace std;
 
 // DebugNew is deliberately not used because the macro 'free' conflicts with DetourTileCache's LinearAllocator interface
 //#include "../DebugNew.h"
@@ -90,11 +73,11 @@ struct TileCompressor : public dtTileCacheCompressor
 struct MeshProcess : public dtTileCacheMeshProcess
 {
     DynamicNavigationMesh* owner_;
-    PODVector<Vector3> offMeshVertices_;
-    PODVector<float> offMeshRadii_;
-    PODVector<unsigned short> offMeshFlags_;
-    PODVector<unsigned char> offMeshAreas_;
-    PODVector<unsigned char> offMeshDir_;
+    Vector<Vector3> offMeshVertices_;
+    Vector<float> offMeshRadii_;
+    Vector<unsigned short> offMeshFlags_;
+    Vector<unsigned char> offMeshAreas_;
+    Vector<unsigned char> offMeshDir_;
 
     inline explicit MeshProcess(DynamicNavigationMesh* owner) :
         owner_(owner)
@@ -116,7 +99,7 @@ struct MeshProcess : public dtTileCacheMeshProcess
         rcVcopy(&bounds.max_.x_, params->bmin);
 
         // collect off-mesh connections
-        PODVector<OffMeshConnection*> offMeshConnections = owner_->CollectOffMeshConnections(bounds);
+        Vector<OffMeshConnection*> offMeshConnections = owner_->CollectOffMeshConnections(bounds);
 
         if (offMeshConnections.Size() > 0)
         {
@@ -215,9 +198,9 @@ DynamicNavigationMesh::DynamicNavigationMesh(Context* context) :
     // 64 is the largest tile-size that DetourTileCache will tolerate without silently failing
     tileSize_ = 64;
     partitionType_ = NAVMESH_PARTITION_MONOTONE;
-    allocator_ = new LinearAllocator(32000); //32kb to start
-    compressor_ = new TileCompressor();
-    meshProcessor_ = new MeshProcess(this);
+    allocator_ = make_unique<LinearAllocator>(32000); //32kb to start
+    compressor_ = make_unique<TileCompressor>();
+    meshProcessor_ = make_unique<MeshProcess>(this);
 }
 
 DynamicNavigationMesh::~DynamicNavigationMesh()
@@ -304,7 +287,7 @@ bool DynamicNavigationMesh::Allocate(const BoundingBox& boundingBox, unsigned ma
         return false;
     }
 
-    if (dtStatusFailed(tileCache_->init(&tileCacheParams, allocator_.Get(), compressor_.Get(), meshProcessor_.Get())))
+    if (dtStatusFailed(tileCache_->init(&tileCacheParams, allocator_.get(), compressor_.get(), meshProcessor_.get())))
     {
         URHO3D_LOGERROR("Could not initialize tile cache");
         ReleaseNavigationMesh();
@@ -314,7 +297,7 @@ bool DynamicNavigationMesh::Allocate(const BoundingBox& boundingBox, unsigned ma
     URHO3D_LOGDEBUG("Allocated empty navigation mesh with max " + String(maxTiles) + " tiles");
 
     // Scan for obstacles to insert into us
-    PODVector<Node*> obstacles;
+    Vector<Node*> obstacles;
     GetScene()->GetChildrenWithComponent<Obstacle>(obstacles, true);
     for (unsigned i = 0; i < obstacles.Size(); ++i)
     {
@@ -419,7 +402,7 @@ bool DynamicNavigationMesh::Build()
             return false;
         }
 
-        if (dtStatusFailed(tileCache_->init(&tileCacheParams, allocator_.Get(), compressor_.Get(), meshProcessor_.Get())))
+        if (dtStatusFailed(tileCache_->init(&tileCacheParams, allocator_.get(), compressor_.get(), meshProcessor_.get())))
         {
             URHO3D_LOGERROR("Could not initialize tile cache");
             ReleaseNavigationMesh();
@@ -466,7 +449,7 @@ bool DynamicNavigationMesh::Build()
         }
 
         // Scan for obstacles to insert into us
-        PODVector<Node*> obstacles;
+        Vector<Node*> obstacles;
         GetScene()->GetChildrenWithComponent<Obstacle>(obstacles, true);
         for (unsigned i = 0; i < obstacles.Size(); ++i)
         {
@@ -538,7 +521,7 @@ bool DynamicNavigationMesh::Build(const IntVector2& from, const IntVector2& to)
     return true;
 }
 
-PODVector<unsigned char> DynamicNavigationMesh::GetTileData(const IntVector2& tile) const
+Vector<unsigned char> DynamicNavigationMesh::GetTileData(const IntVector2& tile) const
 {
     VectorBuffer ret;
     WriteTiles(ret, tile.x_, tile.y_);
@@ -552,7 +535,7 @@ bool DynamicNavigationMesh::IsObstacleInTile(Obstacle* obstacle, const IntVector
     return tileBoundingBox.DistanceToPoint(obstaclePosition) < obstacle->GetRadius();
 }
 
-bool DynamicNavigationMesh::AddTile(const PODVector<unsigned char>& tileData)
+bool DynamicNavigationMesh::AddTile(const Vector<unsigned char>& tileData)
 {
     MemoryBuffer buffer(tileData);
     return ReadTiles(buffer, false);
@@ -623,7 +606,7 @@ void DynamicNavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTe
         // Draw Obstacle components
         if (drawObstacles_)
         {
-            PODVector<Node*> obstacles;
+            Vector<Node*> obstacles;
             scene->GetChildrenWithComponent<Obstacle>(obstacles, true);
             for (unsigned i = 0; i < obstacles.Size(); ++i)
             {
@@ -636,7 +619,7 @@ void DynamicNavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTe
         // Draw OffMeshConnection components
         if (drawOffMeshConnections_)
         {
-            PODVector<Node*> connections;
+            Vector<Node*> connections;
             scene->GetChildrenWithComponent<OffMeshConnection>(connections, true);
             for (unsigned i = 0; i < connections.Size(); ++i)
             {
@@ -649,7 +632,7 @@ void DynamicNavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTe
         // Draw NavArea components
         if (drawNavAreas_)
         {
-            PODVector<Node*> areas;
+            Vector<Node*> areas;
             scene->GetChildrenWithComponent<NavArea>(areas, true);
             for (unsigned i = 0; i < areas.Size(); ++i)
             {
@@ -672,7 +655,7 @@ void DynamicNavigationMesh::DrawDebugGeometry(bool depthTest)
     }
 }
 
-void DynamicNavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>& value)
+void DynamicNavigationMesh::SetNavigationDataAttr(const Vector<unsigned char>& value)
 {
     ReleaseNavigationMesh();
 
@@ -711,7 +694,7 @@ void DynamicNavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>
         ReleaseNavigationMesh();
         return;
     }
-    if (dtStatusFailed(tileCache_->init(&tcParams, allocator_.Get(), compressor_.Get(), meshProcessor_.Get())))
+    if (dtStatusFailed(tileCache_->init(&tcParams, allocator_.get(), compressor_.get(), meshProcessor_.get())))
     {
         URHO3D_LOGERROR("Could not initialize tile cache");
         ReleaseNavigationMesh();
@@ -722,7 +705,7 @@ void DynamicNavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>
     // \todo Shall we send E_NAVIGATION_MESH_REBUILT here?
 }
 
-PODVector<unsigned char> DynamicNavigationMesh::GetNavigationDataAttr() const
+Vector<unsigned char> DynamicNavigationMesh::GetNavigationDataAttr() const
 {
     VectorBuffer ret;
     if (navMesh_ && tileCache_)
@@ -825,7 +808,7 @@ int DynamicNavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryLis
 
     const BoundingBox tileBoundingBox = GetTileBoundingBox(IntVector2(x, z));
 
-    DynamicNavBuildData build(allocator_.Get());
+    DynamicNavBuildData build(allocator_.get());
 
     rcConfig cfg;   // NOLINT(hicpp-member-init)
     memset(&cfg, 0, sizeof cfg);
@@ -972,7 +955,7 @@ int DynamicNavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryLis
         header.hmax = (unsigned short)layer->hmax;
 
         if (dtStatusFailed(
-            dtBuildTileCacheLayer(compressor_.Get()/*compressor*/, &header, layer->heights, layer->areas/*areas*/, layer->cons,
+            dtBuildTileCacheLayer(compressor_.get(), &header, layer->heights, layer->areas, layer->cons,
                 &(tiles[retCt].data), &tiles[retCt].dataSize)))
         {
             URHO3D_LOGERROR("Failed to build tile cache layers");
@@ -1036,9 +1019,9 @@ unsigned DynamicNavigationMesh::BuildTiles(Vector<NavigationGeometryInfo>& geome
     return numTiles;
 }
 
-PODVector<OffMeshConnection*> DynamicNavigationMesh::CollectOffMeshConnections(const BoundingBox& bounds)
+Vector<OffMeshConnection*> DynamicNavigationMesh::CollectOffMeshConnections(const BoundingBox& bounds)
 {
-    PODVector<OffMeshConnection*> connections;
+    Vector<OffMeshConnection*> connections;
     node_->GetComponents<OffMeshConnection>(connections, true);
     for (unsigned i = 0; i < connections.Size(); ++i)
     {

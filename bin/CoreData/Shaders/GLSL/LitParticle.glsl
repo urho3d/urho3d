@@ -55,14 +55,14 @@ void VS()
         #ifdef SHADOW
             // Shadow projection: transform from world space to shadow space
             for (int i = 0; i < NUMCASCADES; i++)
-                vShadowPos[i] = GetShadowPos(i, vec3(0, 0, 0), projWorldPos);
+                vShadowPos[i] = GetShadowPos(i, vec3(0.0, 0.0, 0.0), projWorldPos);
         #endif
 
         #ifdef SPOTLIGHT
             // Spotlight projection: transform from world space to projector texture coordinates
             vSpotPos = projWorldPos * cLightMatrices[0];
         #endif
-    
+
         #ifdef POINTLIGHT
             vCubeMaskVec = (worldPos - cLightPos.xyz) * mat3(cLightMatrices[0][0].xyz, cLightMatrices[0][1].xyz, cLightMatrices[0][2].xyz);
         #endif
@@ -139,7 +139,7 @@ void PS()
         #ifdef SHADOW
             diff *= GetShadow(vShadowPos, vWorldPos.w);
         #endif
-    
+
         #if defined(SPOTLIGHT)
             lightColor = vSpotPos.w > 0.0 ? texture2DProj(sLightSpotMap, vSpotPos).rgb * cLightColor.rgb : vec3(0.0, 0.0, 0.0);
         #elif defined(CUBEMASK)

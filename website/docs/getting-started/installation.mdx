@@ -1,0 +1,433 @@
+---
+sidebar_position: 20
+---
+
+import clsx from "clsx";
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import CompilerMatrix from '../../src/components/CompilerMatrix';
+import styles from './getting-started.module.scss';
+
+# Installation
+
+Using native and cross-compiler toolchains to install Urho3D library
+
+## Requirements
+
+First prepares the build environment by installing a compiler toolchain for your target platform, and the required build tools. The compiler can be GCC, Clang, MSVC, MinGW-w64, or the one bundled in the SDK like Android SDK, Emscripten SDK, etc. On Ubuntu you can easily prepare the build environment by installing the `build-essential` package, on Windows by installing Visual Studio IDE, and on macOS by installing Xcode IDE. However, for cross-compiling usually you have to download and install the corresponding SDK manually. Make sure at the minimum the build environment has these build tools installed:
+- CMake
+- Git
+- Rake
+
+Optionally these as well:
+- ccache - for speeding up the build
+- Doxygen and Graphviz - for building documentation
+
+Although Urho3D project has included all required third-party libraries as source code, there may be system-level dependency packages that must be satisfied before Urho3D can be built from source successfully. The list below is by no mean comprehensive nor canonical, this is especially true on platforms with Linux operating system, but it should get you started.
+
+:::note
+
+This may change in the future when the project uses better package manager and Modern CMake. Ideally, the project should bootstrap itself with more ease than currently is.
+
+:::
+
+<Tabs
+  className={styles.requirements}
+  groupId={'target-platform'}
+  defaultValue={'android'}
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'Apple', value: 'apple'},
+    {label: 'Arm', value: 'arm'},
+    {label: 'Linux', value: 'linux'},
+    {label: 'RPI', value: 'rpi'},
+    {label: 'Web', value: 'web'},
+    {label: 'Windows', value: 'win'},
+  ]
+  }>
+  <TabItem value={'android'}>
+    <div className={clsx('textBlock', styles.fixedHeight)}>
+      Install <strong>OpenJDK</strong>, and <strong>Android Studio</strong> or <strong>IntelliJ IDEA</strong>.<br/>
+      Remember to complete the <strong>Android SDK</strong> installation as per instructed by IDE.<br/>
+      <br/>
+      Tested tool version: <strong>29.0.2</strong><br/>
+      Tested NDK version: <strong>21.3.6528147</strong><br/>
+      Tested Android gradle plugin version: <strong>4.0.2</strong><br/>
+      <br/>
+      Required RAM size: <strong>16 GB</strong>
+    </div>
+  </TabItem>
+  <TabItem value={'apple'}>
+    <div className={clsx('textBlock', styles.fixedHeight)}>
+      Install <strong>Xcode</strong> and it should provide almost everything required.<br/>
+      You may use <strong>homebrew</strong> to install other missing development packages, like <strong>openssl</strong>.
+    </div>
+  </TabItem>
+  <TabItem value={'arm'}>
+
+```bash
+# Urho3D only supports ARM platform on Linux OS, so it has the same deps as building Linux platform
+apt install \
+    # !!! MESA is not needed on system with proprietary kernel module/driver !!!
+    libgl1-mesa-dev \
+    # Display server, still default to X11 at the moment
+    libx11-dev \
+    # Sound server, still default to PulseAudio at the moment
+    libpulse-dev \
+    # D-BUS and udev, for game controller hot-plugging
+    libdbus-1-dev libudev-dev \
+    # IME, optional for Chinese/Japanese/Korean text inputting
+    libibus-1.0-dev \
+    # SSL, optional for secure networking
+    libssl-dev
+```
+
+  </TabItem>
+  <TabItem value={'linux'}>
+
+```bash
+# Building as 32-bit on a 64-bit host requires installation of 32-bit development packages too
+apt install \
+    # !!! MESA is not needed on system with proprietary kernel module/driver !!!
+    libgl1-mesa-dev \
+    # Display server, still default to X11 at the moment
+    libx11-dev \
+    # Sound server, still default to PulseAudio at the moment
+    libpulse-dev \
+    # D-BUS and udev, for game controller hot-plugging
+    libdbus-1-dev libudev-dev \
+    # IME, optional for Chinese/Japanese/Korean text inputting
+    libibus-1.0-dev \
+    # SSL, optional for secure networking
+    libssl-dev
+```
+
+  </TabItem>
+  <TabItem value={'rpi'}>
+
+```bash
+# This list was compiled for RPI3 in mind, with proprietary Broadcom Video Core proprietary driver
+# However, you can still use it for RPI4 by also installing MESA and X11 on top of it
+apt install \
+    # Sound server, still default to PulseAudio at the moment
+    libpulse-dev \
+    # D-BUS and udev, for game controller hot-plugging
+    libdbus-1-dev libudev-dev \
+    # Generic Linux input driver
+    libevdev2 \
+    # IME, optional for Chinese/Japanese/Korean text inputting
+    libibus-1.0-dev \
+    # SSL, optional for secure networking
+    libssl-dev
+```
+
+  </TabItem>
+  <TabItem value={'web'}>
+    <div className={clsx('textBlock', styles.fixedHeight)}>
+      Install <strong>Emscripten SDK</strong> and it should already provide everything required.<br/>
+      <br/>
+      Tested SDK version: <strong>2.0.8</strong>
+    </div>
+  </TabItem>
+  <TabItem value={'win'}>
+    <div className={clsx('textBlock', styles.fixedHeight)}>
+      Install <strong>Visual Studio</strong> together with <strong>Windows SDK</strong>.
+      Alternatively, install <strong>MinGW-w64</strong>.<br/>
+      Both should already provide everything required.
+    </div>
+  </TabItem>
+</Tabs>
+
+In general when cross-compiling the build system requires both the cross-compiler and native compiler toolchains to be installed on the host machine. This is because Urho3D build system builds the host-tool using the native compiler on the fly while cross-compiling the library for the target platform in one go. Check the table below on the supported cross-compiling scenario using Linux, Mac, and Windows host machine, respectively.
+
+<CompilerMatrix infoClassName={styles.infoFixedHeight}>
+
+  |               |       |Linux|Mac|Windows|
+  |---------------|-------|:---:|:-:|:-----:|
+  |Target Platform|Android|Cross-compiler: Android NDK<br/>Native compiler: Clang or GCC|Cross-compiler: Android NDK<br/>Native compiler: Apple Clang|Cross-compiler: Android NDK<br/>Native compiler: MinGW-w64|
+  |               |Apple  ||Native compiler: Apple Clang, can actually target macOS, iOS, and tvOS||
+  |               |Arm    |Cross-compiler: ?, no need for native build<br/>Native compiler: Clang or GCC||
+  |               |Linux  |Native compiler: Clang or GCC||
+  |               |RPI    |Cross-compiler: ?, no need for native build<br/>Native compiler: Clang or GCC||
+  |               |Web    |Cross-compiler: Emscripten EMCC<br/>Native compiler: Clang or GCC|Cross-compiler: Emscripten EMCC<br/>Native compiler: Apple Clang|Cross-compiler: Emscripten EMCC<br/>Native compiler: MinGW-w64|
+  |               |Windows|Cross-compiler: MinGW-w64<br/>Native compiler: Clang or GCC||Native compiler: MinGW-w64 or MSVC
+
+</CompilerMatrix>
+
+### Setup ccache
+
+It is highly recommended having `ccache` installed on Linux build environment. It reduces the recompilation time drastically. To activate it, simply export these environment variables:
+
+```bash title=~/.bash_profile
+export USE_CCACHE=1 CCACHE_SLOPPINESS=pch_defines,time_macros CCACHE_COMPRESS=1
+
+# When also targeting Android platform
+export ANDROID_CCACHE=$(which ccache)
+```
+
+Adjust the `PATH` environment variable so that the ccache symlinks directory is in front of the `/usr/bin` entry, if it has not been automatically system-wide adjusted after installing the package. Basically by doing so, whenever a compiler command is about to be invoked, it would be "intercepted" and invoking one of the ccache symlinks instead.
+
+```bash title=~/.bashrc
+
+PATH=$(whereis -b ccache |grep -o '[^ ]*$'):$PATH
+
+```
+
+Finally, below is an easy way to verify the setup.
+
+```bash
+
+[[ -L $(which gcc) ]] && echo "Good!" || echo "Oh no!"
+
+```
+
+:::info
+
+This is the reason Dockerized Build Environment is fast.
+
+:::
+
+## Install Urho3D Library
+
+### Using CLI {#install-urho3d-library-using-cli}
+
+Clone the Urho3D project from the main branch, change directory to its project root, and execute **only one of the following commands** to install the library for your desired target platform. For simplicity's sake, this section provides instruction that install the Urho3D library into a default install location under user's home directory that does not require superuser privilege. Unless specified otherwise, the default install location is <code>~/.urho3d/install/<em>&lt;platform&gt;</em>/</code>. For example, on Linux platform with GCC it is `~/.urho3d/install/linux/`. For Clang on Linux platform it is `~/.urho3d/install/linux-clang/` to prevent clash with GCC. For Android platform, it is installed in `~/.m2/repository/` as AAR in Maven format.
+
+:::caution
+
+On Windows host the environment variables have to be set on separate command before invoking Rake task.
+
+:::
+
+<Tabs
+  className={styles.cliInstall}
+  groupId={'target-platform'}
+  defaultValue={'android'}
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'Apple', value: 'apple'},
+    {label: 'Arm', value: 'arm'},
+    {label: 'Linux', value: 'linux'},
+    {label: 'RPI', value: 'rpi'},
+    {label: 'Web', value: 'web'},
+    {label: 'Windows', value: 'win'},
+  ]
+  }>
+  <TabItem value={'android'}>
+
+```bash
+# When using Rake task, always install to Maven local repository
+PLATFORM=android rake build install
+
+# When using Gradle wrapper on Linux or Mac
+./gradlew build publishToMavenLocal
+
+# When using Gradle wrapper on Windows
+gradlew.bat build publishToMavenLocal
+```
+
+  </TabItem>
+  <TabItem value={'apple'}>
+
+```bash
+# When targeting macOS, "PLATFORM=macOS" is the default on Mac
+rake build install
+
+# When targeting iOS
+PLATFORM=iOS rake build install
+
+# When targeting tvOS
+PLATFORM=tvOS rake build install
+```
+
+  </TabItem>
+  <TabItem value={'arm'}>
+
+```bash
+# When compiling natively on the ARM board, "PLATFORM=arm" should be already set
+rake build install
+
+# When cross-compiling on Linux host machine, substitute '?' accordingly
+ARM_ABI_FLAGS=? ARM_PREFIX=? ARM_SYSROOT=? PLATFORM=arm rake build install
+```
+
+  </TabItem>
+  <TabItem value={'linux'}>
+
+```bash
+# When using GCC, "PLATFORM=linux" is the default on Linux
+rake build install
+
+# When using Clang, override the "CC" and "CXX" environment variables
+CC=clang CXX=clang++ rake build install
+```
+
+  </TabItem>
+  <TabItem value={'rpi'}>
+
+```bash
+# When compiling natively on the RPI board, "PLATFORM=rpi" should be already set
+RPI_ABI=RPI3 rake build install
+
+# When cross-compiling on Linux host machine, substitute '?' accordingly
+RPI_ABI=RPI3 RPI_PREFIX=? RPI_SYSROOT=? PLATFORM=rpi rake build install
+```
+
+  </TabItem>
+  <TabItem value={'web'}>
+
+```bash
+# When using Rake task on Linux or Mac
+PLATFORM=web rake build install
+
+# When using Rake task on Windows
+set "PLATFORM=web" && rake build install
+```
+
+  </TabItem>
+  <TabItem value={'win'}>
+
+```bash
+# When compiling natively using VS, "PLATFORM=win" is the default on Windows
+rake build install
+
+# When compiling natively using MinGW-w64
+set "GENERATOR=mingw" && rake build install
+
+# When cross-compiling on Linux host machine, substitute '?' accordingly
+MINGW_PREFIX=? PLATFORM=mingw rake build install
+```
+
+  </TabItem>
+</Tabs>
+
+### Using IDE {#install-urho3d-library-using-ide}
+
+The Urho3D project can be opened directly in the IDE that supports CMake or Gradle build system, like **Android Studio**, **CLion**, **IntelliJ IDEA**, and **Visual Studio**. For other IDEs, like **Xcode**, use CMake to generate the initial build tree first. This section tries to cover a few of the IDEs available in the market. The steps outlined here should be easily adaptable for other IDEs.
+
+<Tabs
+    className={styles.ideInstall}
+    groupId={'ide'}
+    defaultValue={'android-studio'}
+    values={[
+      {label: 'Android Studio', value: 'android-studio'},
+      {label: 'CLion', value: 'clion'},
+      {label: 'Code::Blocks', value: 'code-blocks'},
+      {label: 'CodeLite', value: 'codelite'},
+      {label: 'IntelliJ IDEA', value: 'intellij'},
+      {label: 'Visual Studio', value: 'visual-studio'},
+      {label: 'Xcode', value: 'xcode'},
+    ]
+    }>
+  <TabItem value={'android-studio'}>
+
+<div className={clsx('textBlock', styles.fixedHeight)}>
+
+:::caution
+
+Do not update the Android Gradle Plugin when being prompted, unless you know what you are doing.
+
+:::
+
+- Choose "Open an Existing Project" or "Get from Version Control" if you haven't cloned the Urho3D project yet.
+- After Gradle sync is completed, select "launcher-app" from the "Edit Run/Debug Configurations" drop down list, and press "Ctrl+F9" to build the sample launcher app. This should build the Urho3D library as well.
+- To run the sample app, press "Shift+F10".
+- To install the Urho3D library for later use, locate the Gradle task called `publishToMavenLocal` and execute it.
+
+</div>
+
+  </TabItem>
+  <TabItem value={'clion'}>
+
+<div className={clsx('textBlock', styles.fixedHeight)}>
+
+:::caution
+
+Disable the Gradle plugin and Gradle Native plugin as they may interfere and prevent proper project setup.
+
+:::
+
+- Choose "Open" or "Get from VCS" if you haven't cloned the Urho3D project yet.
+- In the "Open Project Wizard" or in the "CMake Settings", set the `CMAKE_INSTALL_PREFIX` accordingly in the "CMake options" field, e.g.:
+  - `~/.urho3d/install/linux` when targeting Linux platform with GCC
+  - `%USERPROFILE%\.urho3d\install\win` when targeting Windows platform with MSVC
+- Select "01_HelloWorld" or any other samples from the "Select Run/Debug Configuration" drop down list and press "Ctrl+F9" to build the sample app. This should build the Urho3D library as well.
+- To run the sample app, press "Shift+F10".
+- To install the Urho3D library for later use, run "Install" under the "Build" menu.
+
+</div>
+
+  </TabItem>
+  <TabItem value={'code-blocks'}>
+
+<div className={clsx('textBlock', styles.fixedHeight)}>
+
+- Generate a build tree using CMake's Code::Blocks generator. One way to do it is by using rake task, like so: `GENERATOR=codeblocks rake cmake`.
+- Open the "Urho3D.cbp" Code::Blocks project file in the build tree. In the above case, the project file can be found in `build/linux-codeblocks/` directory.
+- **// FIXME: Please submit PR to complete the install steps.**
+
+</div>
+
+  </TabItem>
+  <TabItem value={'codelite'}>
+
+<div className={clsx('textBlock', styles.fixedHeight)}>
+
+- Generate a build tree using CMake's CodeLite generator. One way to do it is by using rake task, like so: `GENERATOR=codelite rake cmake`
+- Open the "Urho3D.workspace" CodeLite workspace file in the build tree. In the above case, the workspace file can be found in `build/linux-codelite/` directory.
+- **// FIXME: Please submit PR to complete the install steps.**
+
+</div>
+
+  </TabItem>
+  <TabItem value={'intellij'}>
+
+<div className={clsx('textBlock', styles.fixedHeight)}>
+
+:::caution
+
+Do not update the Android Gradle Plugin when being prompted, unless you know what you are doing.
+
+:::
+
+- Choose "Open" or "Get from VCS" if you haven't cloned the Urho3D project yet.
+- After Gradle sync is completed, select "launcher-app" from the "Select Run/Debug Configuration" drop down list, and press "Ctrl+F9" to build the sample launcher app. This should build the Urho3D library as well.
+- To run the sample app, press "Shift+F10".
+- To install the Urho3D library for later use, locate the Gradle task called `publishToMavenLocal` and execute it.
+
+</div>
+
+  </TabItem>
+  <TabItem value={'visual-studio'}>
+
+<div className={clsx('textBlock', styles.fixedHeight)}>
+
+- Choose "Open a project or solution" or "Clone a repository" if you haven't clone the Urho3D project yet.
+- After CMake initial build tree is generated, open the "CMake Settings for Urho3D" under the "Project" menu, then in the "CMake variables and cache" section:
+  - Disable the `URHO3D_PCH` build option
+  - Set the `CMAKE_INSTALL_PREFIX` to `%USERPROFILE%\.urho3d\install\win`
+- Save the above changes to allow CMake to reconfigure the build tree.
+- Double click the "Folder View" in the "Solution Explorer", then select the "01_HelloWorld.exe" from the "Select Startup Item" drop down list and press "Ctrl+B" to build the sample app. This should build the Urho3D library as well.
+- To run the sample app, press "Ctrl+F5".
+- To install the Urho3D library for later use, run "Install Urho3D" under the "Build" menu.
+
+</div>
+
+  </TabItem>
+  <TabItem value={'xcode'}>
+
+<div className={clsx('textBlock', styles.fixedHeight)}>
+
+- Generate a build tree using CMake's Xcode generator. One way to do it is by using rake task, like so:
+  - `rake cmake` for targeting macOS
+  - `PLATFORM=iOS rake cmake` for targeting iOS
+  - `PLATFORM=tvOS rake cmake` for targeting tvOS
+- Open the "Urho3D.xcodeproj" Xcode project file in the build tree. In the above case, the project file can be found in "build/macos", "build/ios", and "build/tvos", respectively.
+- Select "01_HelloWorld" or any other samples from the list of targets and press "⌘+B" to build the sample app. This should build the Urho3D library as well.
+- To run the sample app, press "⌘+R".
+- Select "Install" from the list of targets and press "⌘+B" to actually install the Urho3D library for later use.
+
+</div>
+
+  </TabItem>
+</Tabs>

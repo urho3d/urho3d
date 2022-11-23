@@ -1,10 +1,10 @@
-// Urho2D tile map example.
+// Tile map example.
 // This sample demonstrates:
 //     - Creating an isometric 2D scene with tile map
 //     - Displaying the scene using the Renderer subsystem
 //     - Handling keyboard to move a 2D character and zoom 2D camera
 //     - Generating physics shapes from the tmx file's objects
-//    - Displaying debug geometry for physics and tile map
+//     - Displaying debug geometry for physics and tile map
 // Note that this sample uses some functions from Sample2D utility class.
 
 #include "Scripts/Utilities/Sample.as"
@@ -52,7 +52,7 @@ void CreateScene()
     Node@ tileMapNode = scene_.CreateChild("TileMap");
     TileMap2D@ tileMap = tileMapNode.CreateComponent("TileMap2D");
     tileMap.tmxFile = tmxFile;
-    TileMapInfo2D@ info = tileMap.info;
+    const TileMapInfo2D@ info = tileMap.info;
 
     // Create Spriter Imp character (from sample 33_SpriterAnimation)
     CreateCharacter(info, true, 0.0f, Vector3(-5.0f, 11.0f, 0.0f), 0.15f);

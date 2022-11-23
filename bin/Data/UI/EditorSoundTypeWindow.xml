@@ -57,7 +57,7 @@
 		</element>
 	</element>
     <element>
-        <attribute name="Max Size" value="2147483647 30" />   
+        <attribute name="Max Size" value="2147483647 30" />
         <attribute name="Layout Mode" value="Horizontal" />
         <element type="LineEdit">
             <attribute name="Name" value="Key" />

@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -41,7 +22,7 @@ class IKEffector;
  */
 class URHO3D_API IKSolver : public Component
 {
-    URHO3D_OBJECT(IKSolver, Component)
+    URHO3D_OBJECT(IKSolver, Component);
 
 public:
 
@@ -170,12 +151,15 @@ public:
     /// Default destructor.
     ~IKSolver() override;
     /// Registers this class to the context.
+    /// @nobind
     static void RegisterObject(Context* context);
 
-    /// Returns the active algorithm
+    /// Returns the active algorithm.
+    /// @manualbind
     Algorithm GetAlgorithm() const;
 
     /*!
+     * @manualbind
      * @brief Selects the solver algorithm. Default is FABRIK. Note that this
      * may not be the most efficient algorithm available. The specialized
      * solvers will be a lot faster.
@@ -192,15 +176,19 @@ public:
      */
     void SetAlgorithm(Algorithm algorithm);
 
-    /// Test if a certain feature is enabled (see IKSolver::Feature)
+    /// Test if a certain feature is enabled (see IKSolver::Feature).
+    /// @nobind
     bool GetFeature(Feature feature) const;
-    /// Enable or disable a certain feature (see IKSolver::Feature)
+    /// Enable or disable a certain feature (see IKSolver::Feature).
+    /// @nobind
     void SetFeature(Feature feature, bool enable);
 
     /// Returns the configured maximum number of iterations.
+    /// @property
     unsigned GetMaximumIterations() const;
 
     /*!
+     * @property
      * @brief Sets the maximum number of iterations the solver is allowed to
      * perform before applying the result.
      *
@@ -220,9 +208,11 @@ public:
     void SetMaximumIterations(unsigned iterations);
 
     /// Returns the configured tolerance.
+    /// @property
     float GetTolerance() const;
 
     /*!
+     * @property
      * @brief Sets the distance at which the effector is "close enough" to the
      * target node, at which point the algorithm will stop iterating.
      *
@@ -313,22 +303,22 @@ private:
 
     /// Indicates that the internal structures of the IK library need to be updated. See the documentation of ik_solver_rebuild_chain_trees() for more info on when this happens.
     void MarkChainsNeedUpdating();
-    /// Indicates that the tree structure has changed in some way and needs updating (nodes added or removed, components added or removed)
+    /// Indicates that the tree structure has changed in some way and needs updating (nodes added or removed, components added or removed).
     void MarkTreeNeedsRebuild();
     /// Returns false if calling Solve() would cause the IK library to abort. Urho3D's error handling philosophy is to log an error and continue, not crash.
     bool IsSolverTreeValid() const;
 
-    /// Subscribe to drawable update finished event here
+    /// Subscribe to drawable update finished event here.
     void OnSceneSet(Scene* scene) override;
-    /// Destroys and creates the tree
+    /// Destroys and creates the tree.
     void OnNodeSet(Node* node) override;
 
     /// Creates the ik library node and sets the current rotation/position and user data correctly.
     ik_node_t* CreateIKNodeFromUrhoNode(const Node* node);
 
-    /// Destroys the solver's tree
+    /// Destroys the solver's tree.
     void DestroyTree();
-    /// Builds the solver's tree to match the scene graph's tree. If a tree already exists, it is first destroyed
+    /// Builds the solver's tree to match the scene graph's tree. If a tree already exists, it is first destroyed.
     void RebuildTree();
     /// Builds a chain of nodes up to the node of the specified effector component.
     bool BuildTreeToEffector(IKEffector* effector);
@@ -345,30 +335,44 @@ private:
     void HandleComponentRemoved(StringHash eventType, VariantMap& eventData);
     void HandleNodeAdded(StringHash eventType, VariantMap& eventData);
     void HandleNodeRemoved(StringHash eventType, VariantMap& eventData);
-    /// Invokes the IK solver
+    /// Invokes the IK solver.
     void HandleSceneDrawableUpdateFinished(StringHash eventType, VariantMap& eventData);
 
-    /// Need these wrapper functions flags of GetFeature/SetFeature can be correctly exposed to the editor and to AngelScript and lua
+    // Need these wrapper functions flags of GetFeature/SetFeature can be correctly exposed to the editor and to AngelScript and lua
 public:
+    /// @property{get_JOINT_ROTATIONS}
     bool GetJOINT_ROTATIONS() const;
+    /// @property{get_TARGET_ROTATIONS}
     bool GetTARGET_ROTATIONS() const;
+    /// @property{get_UPDATE_ORIGINAL_POSE}
     bool GetUPDATE_ORIGINAL_POSE() const;
+    /// @property{get_UPDATE_ACTIVE_POSE(}
     bool GetUPDATE_ACTIVE_POSE() const;
+    /// @property{get_USE_ORIGINAL_POSE}
     bool GetUSE_ORIGINAL_POSE() const;
+    /// @property{get_CONSTRAINTS}
     bool GetCONSTRAINTS() const;
+    /// @property{get_AUTO_SOLVE}
     bool GetAUTO_SOLVE() const;
 
+    /// @property{set_JOINT_ROTATIONS}
     void SetJOINT_ROTATIONS(bool enable);
+    /// @property{set_TARGET_ROTATIONS}
     void SetTARGET_ROTATIONS(bool enable);
+    /// @property{set_UPDATE_ORIGINAL_POSE}
     void SetUPDATE_ORIGINAL_POSE(bool enable);
+    /// @property{set_UPDATE_ACTIVE_POSE}
     void SetUPDATE_ACTIVE_POSE(bool enable);
+    /// @property{set_USE_ORIGINAL_POSE}
     void SetUSE_ORIGINAL_POSE(bool enable);
+    /// @property{set_CONSTRAINTS}
     void SetCONSTRAINTS(bool enable);
+    /// @property{set_AUTO_SOLVE}
     void SetAUTO_SOLVE(bool enable);
 
 private:
-    PODVector<IKEffector*> effectorList_;
-    PODVector<IKConstraint*> constraintList_;
+    Vector<IKEffector*> effectorList_;
+    Vector<IKConstraint*> constraintList_;
     ik_solver_t* solver_;
     Algorithm algorithm_;
     unsigned features_;

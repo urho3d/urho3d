@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -26,6 +7,7 @@
 #include "../Core/Object.h"
 
 #include <cstddef>
+#include <memory>
 
 namespace Urho3D
 {
@@ -82,6 +64,7 @@ public:
     virtual void MarkNetworkUpdate() { }
 
     /// Set attribute by index. Return true if successfully set.
+    /// @property{set_attributes}
     bool SetAttribute(unsigned index, const Variant& value);
     /// Set attribute by name. Return true if successfully set.
     bool SetAttribute(const String& name, const Variant& value);
@@ -92,6 +75,7 @@ public:
     /// Remove instance's default values if they are set previously.
     void RemoveInstanceDefault();
     /// Set temporary flag. Temporary objects will not be saved.
+    /// @property
     void SetTemporary(bool enable);
     /// Enable interception of an attribute from network updates. Intercepted attributes are sent as events instead of applying directly. This can be used to implement client side prediction.
     void SetInterceptNetworkUpdate(const String& attributeName, bool enable);
@@ -109,30 +93,34 @@ public:
     bool ReadLatestDataUpdate(Deserializer& source);
 
     /// Return attribute value by index. Return empty if illegal index.
+    /// @property{get_attributes}
     Variant GetAttribute(unsigned index) const;
     /// Return attribute value by name. Return empty if not found.
     Variant GetAttribute(const String& name) const;
     /// Return attribute default value by index. Return empty if illegal index.
+    /// @property{get_attributeDefaults}
     Variant GetAttributeDefault(unsigned index) const;
     /// Return attribute default value by name. Return empty if not found.
     Variant GetAttributeDefault(const String& name) const;
     /// Return number of attributes.
+    /// @property
     unsigned GetNumAttributes() const;
     /// Return number of network replication attributes.
     unsigned GetNumNetworkAttributes() const;
 
     /// Return whether is temporary.
+    /// @property
     bool IsTemporary() const { return temporary_; }
 
     /// Return whether an attribute's network updates are being intercepted.
     bool GetInterceptNetworkUpdate(const String& attributeName) const;
 
     /// Return the network attribute state, if allocated.
-    NetworkState* GetNetworkState() const { return networkState_.Get(); }
+    NetworkState* GetNetworkState() const { return networkState_.get(); }
 
 protected:
     /// Network attribute state.
-    UniquePtr<NetworkState> networkState_;
+    std::unique_ptr<NetworkState> networkState_;
 
 private:
     /// Set instance-level default value. Allocate the internal data structure as necessary.
@@ -141,9 +129,11 @@ private:
     Variant GetInstanceDefault(const String& name) const;
 
     /// Attribute default value at each instance level.
-    UniquePtr<VariantMap> instanceDefaultValues_;
+    std::unique_ptr<VariantMap> instanceDefaultValues_;
+
     /// When true, store the attribute value as instance's default value (internal use only).
     bool setInstanceDefault_;
+
     /// Temporary flag.
     bool temporary_;
 };
@@ -204,7 +194,7 @@ SharedPtr<AttributeAccessor> MakeVariantAttributeAccessor(TGetFunction getFuncti
     [](const ClassName& self, Urho3D::Variant& value) { value = self.getFunction(); }, \
     [](ClassName& self, const Urho3D::Variant& value) { self.setFunction(value.Get<typeName>()); })
 
-/// Make member enum attribute accessor
+/// Make member enum attribute accessor.
 #define URHO3D_MAKE_MEMBER_ENUM_ATTRIBUTE_ACCESSOR(variable) Urho3D::MakeVariantAttributeAccessor<ClassName>( \
     [](const ClassName& self, Urho3D::Variant& value) { value = static_cast<int>(self.variable); }, \
     [](ClassName& self, const Urho3D::Variant& value) { self.variable = static_cast<decltype(self.variable)>(value.Get<int>()); })
@@ -238,13 +228,13 @@ namespace AttributeMetadata
 
 /// Define an object member attribute.
 #define URHO3D_ATTRIBUTE(name, typeName, variable, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
-    Urho3D::GetVariantType<typeName >(), name, URHO3D_MAKE_MEMBER_ATTRIBUTE_ACCESSOR(typeName, variable), nullptr, defaultValue, mode))
+    Urho3D::GetVariantType<typeName>(), name, URHO3D_MAKE_MEMBER_ATTRIBUTE_ACCESSOR(typeName, variable), nullptr, defaultValue, mode))
 /// Define an object member attribute. Post-set member function callback is called when attribute set.
 #define URHO3D_ATTRIBUTE_EX(name, typeName, variable, postSetCallback, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
-    Urho3D::GetVariantType<typeName >(), name, URHO3D_MAKE_MEMBER_ATTRIBUTE_ACCESSOR_EX(typeName, variable, postSetCallback), nullptr, defaultValue, mode))
+    Urho3D::GetVariantType<typeName>(), name, URHO3D_MAKE_MEMBER_ATTRIBUTE_ACCESSOR_EX(typeName, variable, postSetCallback), nullptr, defaultValue, mode))
 /// Define an attribute that uses get and set functions.
 #define URHO3D_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
-    Urho3D::GetVariantType<typeName >(), name, URHO3D_MAKE_GET_SET_ATTRIBUTE_ACCESSOR(getFunction, setFunction, typeName), nullptr, defaultValue, mode))
+    Urho3D::GetVariantType<typeName>(), name, URHO3D_MAKE_GET_SET_ATTRIBUTE_ACCESSOR(getFunction, setFunction, typeName), nullptr, defaultValue, mode))
 
 /// Define an object member attribute. Zero-based enum values are mapped to names through an array of C string pointers.
 #define URHO3D_ENUM_ATTRIBUTE(name, variable, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
@@ -258,7 +248,7 @@ namespace AttributeMetadata
 
 /// Define an attribute with custom setter and getter.
 #define URHO3D_CUSTOM_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
-    Urho3D::GetVariantType<typeName >(), name, Urho3D::MakeVariantAttributeAccessor<ClassName>(getFunction, setFunction), nullptr, defaultValue, mode))
+    Urho3D::GetVariantType<typeName>(), name, Urho3D::MakeVariantAttributeAccessor<ClassName>(getFunction, setFunction), nullptr, defaultValue, mode))
 /// Define an enum attribute with custom setter and getter. Zero-based enum values are mapped to names through an array of C string pointers.
 #define URHO3D_CUSTOM_ENUM_ATTRIBUTE(name, getFunction, setFunction, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
     Urho3D::VAR_INT, name, Urho3D::MakeVariantAttributeAccessor<ClassName>(getFunction, setFunction), enumNames, static_cast<int>(defaultValue), mode))

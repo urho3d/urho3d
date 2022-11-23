@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -82,29 +63,37 @@ public:
     explicit ParticleEmitter2D(Context* context);
     /// Destruct.
     ~ParticleEmitter2D() override;
-    /// Register object factory. drawable2d must be registered first.
+    /// Register object factory. Drawable2D must be registered first.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Handle enabled/disabled state change.
     void OnSetEnabled() override;
 
     /// Set particle effect.
+    /// @property
     void SetEffect(ParticleEffect2D* effect);
     /// Set sprite.
+    /// @property
     void SetSprite(Sprite2D* sprite);
     /// Set blend mode.
+    /// @property
     void SetBlendMode(BlendMode blendMode);
     /// Set max particles.
     void SetMaxParticles(unsigned maxParticles);
     /// Set whether should be emitting. If the state was changed, also resets the emission period timer.
+    /// @property
     void SetEmitting(bool enable);
 
     /// Return particle effect.
+    /// @property
     ParticleEffect2D* GetEffect() const;
     /// Return sprite.
+    /// @property
     Sprite2D* GetSprite() const;
 
     /// Return blend mode.
+    /// @property
     BlendMode GetBlendMode() const { return blendMode_; }
 
     /// Return max particles.
@@ -119,6 +108,7 @@ public:
     /// Return sprite attribute.
     ResourceRef GetSpriteAttr() const;
     /// Return whether is currently emitting.
+    /// @property
     bool IsEmitting() const { return emitting_; }
 
 private:
@@ -151,7 +141,7 @@ private:
     unsigned numParticles_;
     /// Emission time.
     float emissionTime_;
-    /// Emit particle time
+    /// Emit particle time.
     float emitParticleTime_;
     /// Currently emitting flag.
     bool emitting_;

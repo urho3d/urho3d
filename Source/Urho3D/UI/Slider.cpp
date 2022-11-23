@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -81,7 +62,7 @@ void Slider::Update(float timeStep)
     knob_->SetSelected(hovering_);
 }
 
-void Slider::OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void Slider::OnHover(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor)
 {
     BorderImage::OnHover(position, screenPosition, buttons, qualifiers, cursor);
 
@@ -93,7 +74,7 @@ void Slider::OnHover(const IntVector2& position, const IntVector2& screenPositio
         Page(position, (bool)(buttons & MOUSEB_LEFT));
 }
 
-void Slider::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers,
+void Slider::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers,
     Cursor* cursor)
 {
     selected_ = true;
@@ -102,7 +83,7 @@ void Slider::OnClickBegin(const IntVector2& position, const IntVector2& screenPo
         Page(position, true);
 }
 
-void Slider::OnClickEnd(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers,
+void Slider::OnClickEnd(const IntVector2& position, const IntVector2& screenPosition, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers,
     Cursor* cursor, UIElement* beginElement)
 {
     hovering_ = knob_->IsInside(screenPosition, true);
@@ -110,7 +91,7 @@ void Slider::OnClickEnd(const IntVector2& position, const IntVector2& screenPosi
         Page(position, false);
 }
 
-void Slider::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void Slider::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor)
 {
     UIElement::OnDragBegin(position, screenPosition, buttons, qualifiers, cursor);
 
@@ -122,8 +103,8 @@ void Slider::OnDragBegin(const IntVector2& position, const IntVector2& screenPos
     }
 }
 
-void Slider::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons,
-    int qualifiers, Cursor* cursor)
+void Slider::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, MouseButtonFlags buttons,
+    QualifierFlags qualifiers, Cursor* cursor)
 {
     if (!editable_ || !dragSlider_ || GetSize() == knob_->GetSize())
         return;
@@ -147,9 +128,9 @@ void Slider::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
     SetValue(newValue);
 }
 
-void Slider::OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons, Cursor* cursor)
+void Slider::OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags dragButtons, MouseButtonFlags releaseButtons, Cursor* cursor)
 {
-    UIElement::OnDragEnd(position, screenPosition, dragButtons, buttons, cursor);
+    UIElement::OnDragEnd(position, screenPosition, dragButtons, releaseButtons, cursor);
 
     if (dragButtons == MOUSEB_LEFT)
     {

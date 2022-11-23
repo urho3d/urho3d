@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -127,10 +108,9 @@ void ScrollView::Update(float timeStep)
     {
         Vector<UIElement*> dragElements = GetSubsystem<UI>()->GetDragElements();
 
-        for (unsigned i = 0; i < dragElements.Size(); i++)
+        for (const UIElement* dragElement : dragElements)
         {
-            UIElement* dragElement = dragElements[i];
-            int dragButtons = dragElement->GetDragButtonCombo();
+            MouseButtonFlags dragButtons = dragElement->GetDragButtonCombo();
 
             if (dragButtons != MOUSEB_LEFT)
                 continue;
@@ -220,7 +200,7 @@ void ScrollView::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifi
 
     case KEY_HOME:
         qualifiers |= QUAL_CTRL;
-        // Fallthru
+        [[fallthrough]];
 
     case KEY_UP:
         if (verticalScrollBar_->IsVisible())
@@ -234,7 +214,7 @@ void ScrollView::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifi
 
     case KEY_END:
         qualifiers |= QUAL_CTRL;
-        // Fallthru
+        [[fallthrough]];
 
     case KEY_DOWN:
         if (verticalScrollBar_->IsVisible())

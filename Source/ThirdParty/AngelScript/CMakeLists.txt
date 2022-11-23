@@ -1,24 +1,5 @@
-#
-# Copyright (c) 2008-2019 the Urho3D project.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
+# Copyright (c) 2008-2022 the Urho3D project
+# License: MIT
 
 # Define target name
 set (TARGET_NAME AngelScript)
@@ -30,8 +11,10 @@ endif ()
 if (NOT EXCEPTIONS)
     add_definitions (-DAS_NO_EXCEPTIONS)
 endif ()
-# Add compiler define to build the library with the normal function/method macros
-add_definitions (-DAS_IS_BUILDING)
+
+if (URHO3D_FORCE_AS_MAX_PORTABILITY)
+    add_definitions (-DAS_MAX_PORTABILITY)
+endif ()
 
 # Define source files
 define_source_files (GLOB_CPP_PATTERNS source/*.cpp GLOB_H_PATTERNS include/*.h source/*.h)
@@ -41,7 +24,11 @@ if (ARM)
         # It is safe to add this assembler code in universal binary build because it has sufficient preprocessor define guards to exclude unsupported archs
         set (ASM_FILES source/as_callfunc_arm_xcode.S)
     else ()
-        set (ASM_FILES source/as_callfunc_arm_gcc.S)
+		if (URHO3D_64BIT)
+			set (ASM_FILES source/as_callfunc_arm64_gcc.S)
+		else ()
+			set (ASM_FILES source/as_callfunc_arm_gcc.S)
+		endif ()
         set (CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} ${ARM_CFLAGS}")
     endif ()
 elseif (MSVC AND URHO3D_64BIT)

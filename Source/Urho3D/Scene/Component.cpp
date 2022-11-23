@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -31,15 +12,11 @@
 #ifdef URHO3D_PHYSICS
 #include "../Physics/PhysicsWorld.h"
 #endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/PhysicsWorld2D.h"
+#ifdef URHO3D_PHYSICS2D
+#include "../Physics2D/PhysicsWorld2D.h"
 #endif
 
 #include "../DebugNew.h"
-
-#ifdef _MSC_VER
-#pragma warning(disable:6293)
-#endif
 
 namespace Urho3D
 {
@@ -109,7 +86,7 @@ void Component::MarkNetworkUpdate()
     }
 }
 
-void Component::GetDependencyNodes(PODVector<Node*>& dest)
+void Component::GetDependencyNodes(Vector<Node*>& dest)
 {
 }
 
@@ -191,7 +168,7 @@ void Component::PrepareNetworkUpdate()
             networkState_->previousValues_[i] = networkState_->currentValues_[i];
 
             // Mark the attribute dirty in all replication states that are tracking this component
-            for (PODVector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin();
+            for (Vector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin();
                  j != networkState_->replicationStates_.End(); ++j)
             {
                 auto* compState = static_cast<ComponentReplicationState*>(*j);
@@ -215,7 +192,7 @@ void Component::CleanupConnection(Connection* connection)
 {
     if (networkState_)
     {
-        for (unsigned i = networkState_->replicationStates_.Size() - 1; i < networkState_->replicationStates_.Size(); --i)
+        for (i32 i = networkState_->replicationStates_.Size() - 1; i >= 0; --i)
         {
             if (networkState_->replicationStates_[i]->connection_ == connection)
                 networkState_->replicationStates_.Erase(i);
@@ -272,7 +249,7 @@ bool Component::IsEnabledEffective() const
     return enabled_ && node_ && node_->IsEnabled();
 }
 
-void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const
+void Component::GetComponents(Vector<Component*>& dest, StringHash type) const
 {
     if (node_)
         node_->GetComponents(dest, type);
@@ -297,7 +274,7 @@ Component* Component::GetFixedUpdateSource()
 #ifdef URHO3D_PHYSICS
         ret = scene->GetComponent<PhysicsWorld>();
 #endif
-#ifdef URHO3D_URHO2D
+#ifdef URHO3D_PHYSICS2D
         if (!ret)
             ret = scene->GetComponent<PhysicsWorld2D>();
 #endif

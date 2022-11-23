@@ -9,7 +9,7 @@ class View3D : public Window
     void SetFormat(unsigned format);
     void SetAutoUpdate(bool enable);
     void QueueUpdate();
-    
+
     unsigned GetFormat() const;
     bool GetAutoUpdate() const;
     Scene* GetScene() const;
@@ -17,7 +17,7 @@ class View3D : public Window
     Texture2D* GetRenderTexture() const;
     Texture2D* GetDepthTexture() const;
     Viewport* GetViewport() const;
-    
+
     tolua_property__get_set unsigned format;
     tolua_property__get_set bool autoUpdate;
 };

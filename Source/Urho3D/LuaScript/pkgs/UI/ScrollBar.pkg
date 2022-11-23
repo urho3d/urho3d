@@ -4,7 +4,7 @@ class ScrollBar : public BorderImage
 {
     ScrollBar();
     virtual ~ScrollBar();
-    
+
     void SetOrientation(Orientation orientation);
     void SetRange(float range);
     void SetValue(float value);
@@ -13,7 +13,7 @@ class ScrollBar : public BorderImage
     void SetStepFactor(float factor);
     void StepBack();
     void StepForward();
-    
+
     Orientation GetOrientation() const;
     float GetRange() const;
     float GetValue() const;
@@ -23,7 +23,7 @@ class ScrollBar : public BorderImage
     Button* GetBackButton() const;
     Button* GetForwardButton() const;
     Slider* GetSlider() const;
-    
+
     tolua_property__get_set Orientation orientation;
     tolua_property__get_set float range;
     tolua_property__get_set float value;

@@ -13,7 +13,7 @@ class Time : public Object
     static unsigned GetTimeSinceEpoch();
     static String GetTimeStamp();
     static void Sleep(unsigned mSec);
-    
+
     tolua_readonly tolua_property__get_set unsigned frameNumber;
     tolua_readonly tolua_property__get_set float timeStep;
     tolua_readonly tolua_property__get_set unsigned timerPeriod;

@@ -1,25 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
-
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Engine/Engine.h>
@@ -84,15 +64,15 @@ void Urho2DSprite::CreateScene()
     // Set camera's position
     cameraNode_->SetPosition(Vector3(0.0f, 0.0f, -10.0f));
 
-    auto* camera = cameraNode_->CreateComponent<Camera>();
+    Camera* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetOrthographic(true);
 
-    auto* graphics = GetSubsystem<Graphics>();
+    Graphics* graphics = GetSubsystem<Graphics>();
     camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
 
-    auto* cache = GetSubsystem<ResourceCache>();
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
     // Get sprite
-    auto* sprite = cache->GetResource<Sprite2D>("Urho2D/Aster.png");
+    Sprite2D* sprite = cache->GetResource<Sprite2D>("Urho2D/Aster.png");
     if (!sprite)
         return;
 
@@ -104,7 +84,7 @@ void Urho2DSprite::CreateScene()
         SharedPtr<Node> spriteNode(scene_->CreateChild("StaticSprite2D"));
         spriteNode->SetPosition(Vector3(Random(-halfWidth, halfWidth), Random(-halfHeight, halfHeight), 0.0f));
 
-        auto* staticSprite = spriteNode->CreateComponent<StaticSprite2D>();
+        StaticSprite2D* staticSprite = spriteNode->CreateComponent<StaticSprite2D>();
         // Set random color
         staticSprite->SetColor(Color(Random(1.0f), Random(1.0f), Random(1.0f), 1.0f));
         // Set blend mode
@@ -122,14 +102,14 @@ void Urho2DSprite::CreateScene()
     }
 
     // Get animation set
-    auto* animationSet = cache->GetResource<AnimationSet2D>("Urho2D/GoldIcon.scml");
+    AnimationSet2D* animationSet = cache->GetResource<AnimationSet2D>("Urho2D/GoldIcon.scml");
     if (!animationSet)
         return;
 
     SharedPtr<Node> spriteNode(scene_->CreateChild("AnimatedSprite2D"));
     spriteNode->SetPosition(Vector3(0.0f, 0.0f, -1.0f));
 
-    auto* animatedSprite = spriteNode->CreateComponent<AnimatedSprite2D>();
+    AnimatedSprite2D* animatedSprite = spriteNode->CreateComponent<AnimatedSprite2D>();
     // Set animation
     animatedSprite->SetAnimationSet(animationSet);
     animatedSprite->SetAnimation("idle");
@@ -137,11 +117,11 @@ void Urho2DSprite::CreateScene()
 
 void Urho2DSprite::CreateInstructions()
 {
-    auto* cache = GetSubsystem<ResourceCache>();
-    auto* ui = GetSubsystem<UI>();
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    UI* ui = GetSubsystem<UI>();
 
     // Construct new Text object, set string to display and font to use
-    auto* instructionText = ui->GetRoot()->CreateChild<Text>();
+    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText("Use WASD keys to move, use PageUp PageDown keys to zoom.");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
 
@@ -153,7 +133,7 @@ void Urho2DSprite::CreateInstructions()
 
 void Urho2DSprite::SetupViewport()
 {
-    auto* renderer = GetSubsystem<Renderer>();
+    Renderer* renderer = GetSubsystem<Renderer>();
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
@@ -166,7 +146,7 @@ void Urho2DSprite::MoveCamera(float timeStep)
     if (GetSubsystem<UI>()->GetFocusElement())
         return;
 
-    auto* input = GetSubsystem<Input>();
+    Input* input = GetSubsystem<Input>();
 
     // Movement speed as world units per second
     const float MOVE_SPEED = 4.0f;
@@ -183,13 +163,13 @@ void Urho2DSprite::MoveCamera(float timeStep)
 
     if (input->GetKeyDown(KEY_PAGEUP))
     {
-        auto* camera = cameraNode_->GetComponent<Camera>();
+        Camera* camera = cameraNode_->GetComponent<Camera>();
         camera->SetZoom(camera->GetZoom() * 1.01f);
     }
 
     if (input->GetKeyDown(KEY_PAGEDOWN))
     {
-        auto* camera = cameraNode_->GetComponent<Camera>();
+        Camera* camera = cameraNode_->GetComponent<Camera>();
         camera->SetZoom(camera->GetZoom() * 0.99f);
     }
 }
@@ -213,14 +193,12 @@ void Urho2DSprite::HandleUpdate(StringHash eventType, VariantMap& eventData)
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
 
-    auto* graphics = GetSubsystem<Graphics>();
+    Graphics* graphics = GetSubsystem<Graphics>();
     float halfWidth = (float)graphics->GetWidth() * 0.5f * PIXEL_SIZE;
     float halfHeight = (float)graphics->GetHeight() * 0.5f * PIXEL_SIZE;
 
-    for (unsigned i = 0; i < spriteNodes_.Size(); ++i)
+    for (const SharedPtr<Node>& node : spriteNodes_)
     {
-        SharedPtr<Node> node = spriteNodes_[i];
-
         Vector3 position = node->GetPosition();
         Vector3 moveSpeed = node->GetVar(VAR_MOVESPEED).GetVector3();
         Vector3 newPosition = position + moveSpeed * timeStep;

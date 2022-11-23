@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include <Urho3D/Core/Context.h>
 #include <Urho3D/Core/ProcessUtils.h>
@@ -176,22 +157,21 @@ void Run(Vector<String>& arguments)
         ErrorExit("Both output xml and png must be in the same folder");
 
     // check all input files exist
-    for (unsigned i = 0; i < inputFiles.Size(); ++i)
+    for (const String& inputFile : inputFiles)
     {
-        URHO3D_LOGINFO("Checking " + inputFiles[i] + " to see if file exists.");
-        if (!fileSystem->FileExists(inputFiles[i]))
-            ErrorExit("File " + inputFiles[i] + " does not exist.");
+        URHO3D_LOGINFO("Checking " + inputFile + " to see if file exists.");
+        if (!fileSystem->FileExists(inputFile))
+            ErrorExit("File " + inputFile + " does not exist.");
     }
 
     // Set the max offset equal to padding to prevent images from going out of bounds
     offsetX = Min((int)offsetX, (int)padX);
     offsetY = Min((int)offsetY, (int)padY);
 
-    Vector<SharedPtr<PackerInfo > > packerInfos;
+    Vector<SharedPtr<PackerInfo>> packerInfos;
 
-    for (unsigned i = 0; i < inputFiles.Size(); ++i)
+    for (const String& path : inputFiles)
     {
-        String path = inputFiles[i];
         String name = ReplaceExtension(GetFileName(path), "");
         File file(context, path);
         Image image(context);
@@ -265,9 +245,9 @@ void Run(Vector<String>& arguments)
                 tries.Push(IntVector2((1u<<x), (1u<<y)));
         }
 
-        // load rectangles
-        auto* packerRects = new stbrp_rect[packerInfos.Size()];
-        for (unsigned i = 0; i < packerInfos.Size(); ++i)
+        // Load rectangles
+        stbrp_rect* packerRects = new stbrp_rect[packerInfos.Size()];
+        for (i32 i = 0; i < packerInfos.Size(); ++i)
         {
             PackerInfo* packerInfo = packerInfos[i];
             stbrp_rect* packerRect = &packerRects[i];
@@ -300,7 +280,7 @@ void Run(Vector<String>& arguments)
             {
                 success = true;
                 // distribute values to packer info
-                for (unsigned i = 0; i < packerInfos.Size(); ++i)
+                for (i32 i = 0; i < packerInfos.Size(); ++i)
                 {
                     stbrp_rect* packerRect = &packerRects[i];
                     PackerInfo* packerInfo = packerInfos[packerRect->id];
@@ -327,9 +307,8 @@ void Run(Vector<String>& arguments)
     XMLElement root = xml.CreateRoot("TextureAtlas");
     root.SetAttribute("imagePath", GetFileNameAndExtension(outputFile));
 
-    for (unsigned i = 0; i < packerInfos.Size(); ++i)
+    for (const SharedPtr<PackerInfo>& packerInfo : packerInfos)
     {
-        SharedPtr<PackerInfo> packerInfo = packerInfos[i];
         XMLElement subTexture = root.CreateChild("SubTexture");
         subTexture.SetString("name", packerInfo->name);
         subTexture.SetInt("x", packerInfo->x + offsetX);
@@ -370,10 +349,8 @@ void Run(Vector<String>& arguments)
         unsigned INNER_BOUNDS_DEBUG_COLOR = Color::GREEN.ToUInt();
 
         URHO3D_LOGINFO("Drawing debug information.");
-        for (unsigned i = 0; i < packerInfos.Size(); ++i)
+        for (const SharedPtr<PackerInfo>& packerInfo : packerInfos)
         {
-            SharedPtr<PackerInfo> packerInfo = packerInfos[i];
-
             // Draw outer bounds
             for (int x = 0; x < packerInfo->frameWidth; ++x)
             {

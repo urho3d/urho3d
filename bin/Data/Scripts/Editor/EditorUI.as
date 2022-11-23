@@ -98,6 +98,7 @@ void CreateUI()
     CreateCamera();
     CreateLayerEditor();
     CreateColorWheel();
+    CreateDuplicatorEditor();
 
 	terrainEditor.Create();
 
@@ -113,13 +114,13 @@ void CreateUI()
 void ResizeUI()
 {
     // Resize menu bar
-    uiMenuBar.SetFixedWidth(graphics.width);
+    uiMenuBar.SetFixedWidth(graphics.width / ui.scale);
 
     // Resize tool bar
-    toolBar.SetFixedWidth(graphics.width);
+    toolBar.SetFixedWidth(graphics.width / ui.scale);
 
     // Resize secondary tool bar
-    secondaryToolBar.SetFixedHeight(graphics.height);
+    secondaryToolBar.SetFixedHeight(graphics.height / ui.scale);
 
     // Relayout windows
     Array<UIElement@> children = ui.root.GetChildren();
@@ -132,8 +133,8 @@ void ResizeUI()
     // Relayout root UI element
     editorUIElement.SetSize(graphics.width, graphics.height);
 
-    // Set new viewport area and reset the viewport layout
-    viewportArea = IntRect(0, 0, graphics.width, graphics.height);
+    // Set new viewport area and reset the viewport layout. Note: viewportArea is in scaled UI position.
+    viewportArea = IntRect(0, 0, graphics.width / ui.scale, graphics.height / ui.scale);
     SetViewportMode(viewportMode);
 }
 
@@ -319,7 +320,7 @@ void CreateMenuBar()
     uiMenuBar.style = "EditorMenuBar";
     uiMenuBar.SetLayout(LM_HORIZONTAL);
     uiMenuBar.opacity = uiMaxOpacity;
-    uiMenuBar.SetFixedWidth(graphics.width);
+    uiMenuBar.SetFixedWidth(graphics.width / ui.scale);
 
     {
         Menu@ menu = CreateMenu("File");
@@ -535,6 +536,7 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Particle editor", @ToggleParticleEffectEditor));
         popup.AddChild(CreateMenuItem("Terrain editor", TerrainEditorShowCallback(terrainEditor.Show)));
         popup.AddChild(CreateMenuItem("Spawn editor", @ToggleSpawnEditor));
+        popup.AddChild(CreateMenuItem("Duplicator editor", @ToggleDuplicatorEditor));
         popup.AddChild(CreateMenuItem("Sound Type editor", @ToggleSoundTypeEditor));
         popup.AddChild(CreateMenuItem("Editor settings", @ToggleEditorSettingsDialog));
         popup.AddChild(CreateMenuItem("Editor preferences", @ToggleEditorPreferencesDialog));

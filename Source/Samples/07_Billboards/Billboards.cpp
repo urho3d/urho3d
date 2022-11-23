@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Engine/Engine.h>
@@ -289,8 +270,8 @@ void Billboards::MoveCamera(float timeStep)
 void Billboards::AnimateScene(float timeStep)
 {
     // Get the light and billboard scene nodes
-    PODVector<Node*> lightNodes;
-    PODVector<Node*> billboardNodes;
+    Vector<Node*> lightNodes;
+    Vector<Node*> billboardNodes;
     scene_->GetChildrenWithComponent<Light>(lightNodes);
     scene_->GetChildrenWithComponent<BillboardSet>(billboardNodes);
 
@@ -298,13 +279,13 @@ void Billboards::AnimateScene(float timeStep)
     const float BILLBOARD_ROTATION_SPEED = 50.0f;
 
     // Rotate the lights around the world Y-axis
-    for (unsigned i = 0; i < lightNodes.Size(); ++i)
-        lightNodes[i]->Rotate(Quaternion(0.0f, LIGHT_ROTATION_SPEED * timeStep, 0.0f), TS_WORLD);
+    for (Node* lightNode : lightNodes)
+        lightNode->Rotate(Quaternion(0.0f, LIGHT_ROTATION_SPEED * timeStep, 0.0f), TS_WORLD);
 
     // Rotate the individual billboards within the billboard sets, then recommit to make the changes visible
-    for (unsigned i = 0; i < billboardNodes.Size(); ++i)
+    for (i32 i = 0; i < billboardNodes.Size(); ++i)
     {
-        auto* billboardObject = billboardNodes[i]->GetComponent<BillboardSet>();
+        BillboardSet* billboardObject = billboardNodes[i]->GetComponent<BillboardSet>();
 
         for (unsigned j = 0; j < billboardObject->GetNumBillboards(); ++j)
         {

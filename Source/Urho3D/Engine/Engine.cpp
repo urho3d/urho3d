@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -53,6 +34,9 @@
 #ifdef URHO3D_PHYSICS
 #include "../Physics/PhysicsWorld.h"
 #include "../Physics/RaycastVehicle.h"
+#endif
+#ifdef URHO3D_PHYSICS2D
+#include "../Physics2D/Physics2D.h"
 #endif
 #include "../Resource/ResourceCache.h"
 #include "../Resource/Localization.h"
@@ -151,6 +135,10 @@ Engine::Engine(Context* context) :
     RegisterPhysicsLibrary(context_);
 #endif
 
+#ifdef URHO3D_PHYSICS2D
+    RegisterPhysics2DLibrary(context_);
+#endif
+
 #ifdef URHO3D_NAVIGATION
     RegisterNavigationLibrary(context_);
 #endif
@@ -173,7 +161,49 @@ bool Engine::Initialize(const VariantMap& parameters)
     // Register the rest of the subsystems
     if (!headless_)
     {
-        context_->RegisterSubsystem(new Graphics(context_));
+        GAPI gapi = GAPI_NONE;
+
+        // Try to set any possible graphics API as default
+
+#ifdef URHO3D_OPENGL
+        gapi = GAPI_OPENGL;
+#endif
+
+#ifdef URHO3D_D3D9
+        gapi = GAPI_D3D9;
+#endif
+
+#ifdef URHO3D_D3D11
+        gapi = GAPI_D3D11;
+#endif
+
+        // Use command line parameters
+
+#ifdef URHO3D_OPENGL
+        bool gapi_gl = GetParameter(parameters, EP_OPENGL, false).GetBool();
+        if (gapi_gl)
+            gapi = GAPI_OPENGL;
+#endif
+
+#ifdef URHO3D_D3D9
+        bool gapi_d3d9 = GetParameter(parameters, EP_DIRECT3D9, false).GetBool();
+        if (gapi_d3d9)
+            gapi = GAPI_D3D9;
+#endif
+
+#ifdef URHO3D_D3D11
+        bool gapi_d3d11 = GetParameter(parameters, EP_DIRECT3D11, false).GetBool();
+        if (gapi_d3d11)
+            gapi = GAPI_D3D11;
+#endif
+
+        if (gapi == GAPI_NONE)
+        {
+            URHO3D_LOGERROR("Graphics API not selected");
+            return false;
+        }
+
+        context_->RegisterSubsystem(new Graphics(context_, gapi));
         context_->RegisterSubsystem(new Renderer(context_));
     }
     else
@@ -240,10 +270,11 @@ bool Engine::Initialize(const VariantMap& parameters)
             graphics->SetWindowPosition(GetParameter(parameters, EP_WINDOW_POSITION_X).GetInt(),
                 GetParameter(parameters, EP_WINDOW_POSITION_Y).GetInt());
 
-#ifdef URHO3D_OPENGL
-        if (HasParameter(parameters, EP_FORCE_GL2))
-            graphics->SetForceGL2(GetParameter(parameters, EP_FORCE_GL2).GetBool());
-#endif
+        if (Graphics::GetGAPI() == GAPI_OPENGL)
+        {
+            if (HasParameter(parameters, EP_FORCE_GL2))
+                graphics->SetForceGL2(GetParameter(parameters, EP_FORCE_GL2).GetBool());
+        }
 
         if (!graphics->SetMode(
             GetParameter(parameters, EP_WINDOW_WIDTH, 0).GetInt(),
@@ -327,7 +358,7 @@ bool Engine::InitializeResourceCache(const VariantMap& parameters, bool removeOl
     if (removeOld)
     {
         Vector<String> resourceDirs = cache->GetResourceDirs();
-        Vector<SharedPtr<PackageFile> > packageFiles = cache->GetPackageFiles();
+        Vector<SharedPtr<PackageFile>> packageFiles = cache->GetPackageFiles();
         for (unsigned i = 0; i < resourceDirs.Size(); ++i)
             cache->RemoveResourceDir(resourceDirs[i]);
         for (unsigned i = 0; i < packageFiles.Size(); ++i)
@@ -521,6 +552,9 @@ void Engine::RunFrame()
     ApplyFrameLimit();
 
     time->EndFrame();
+
+    // Mark a frame for profiling
+    URHO3D_PROFILE_FRAME();
 }
 
 Console* Engine::CreateConsole()
@@ -628,10 +662,10 @@ void Engine::DumpResources(bool dumpFileName)
         URHO3D_LOGRAW("Used resources:\n");
         for (HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups.Begin(); i != resourceGroups.End(); ++i)
         {
-            const HashMap<StringHash, SharedPtr<Resource> >& resources = i->second_.resources_;
+            const HashMap<StringHash, SharedPtr<Resource>>& resources = i->second_.resources_;
             if (dumpFileName)
             {
-                for (HashMap<StringHash, SharedPtr<Resource> >::ConstIterator j = resources.Begin(); j != resources.End(); ++j)
+                for (HashMap<StringHash, SharedPtr<Resource>>::ConstIterator j = resources.Begin(); j != resources.End(); ++j)
                     URHO3D_LOGRAW(j->second_->GetName() + "\n");
             }
         }
@@ -815,6 +849,12 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret[EP_FRAME_LIMITER] = false;
             else if (argument == "flushgpu")
                 ret[EP_FLUSH_GPU] = true;
+            else if (argument == "opengl")
+                ret[EP_OPENGL] = true;
+            else if (argument == "d3d9")
+                ret[EP_DIRECT3D9] = true;
+            else if (argument == "d3d11")
+                ret[EP_DIRECT3D11] = true;
             else if (argument == "gl2")
                 ret[EP_FORCE_GL2] = true;
             else if (argument == "landscape")
@@ -858,8 +898,8 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret[EP_LOG_QUIET] = true;
             else if (argument == "log" && !value.Empty())
             {
-                unsigned logLevel = GetStringListIndex(value.CString(), logLevelPrefixes, M_MAX_UNSIGNED);
-                if (logLevel != M_MAX_UNSIGNED)
+                i32 logLevel = GetStringListIndex(value.CString(), logLevelPrefixes, NINDEX);
+                if (logLevel != NINDEX)
                 {
                     ret[EP_LOG_LEVEL] = logLevel;
                     ++i;

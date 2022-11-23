@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -81,7 +62,7 @@ void Window::RegisterObject(Context* context)
     // Instead it should be set false in code when needed
 }
 
-void Window::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
+void Window::GetBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, const IntRect& currentScissor)
 {
     if (modal_)
     {
@@ -113,7 +94,7 @@ void Window::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDat
     BorderImage::GetBatches(batches, vertexData, currentScissor);
 }
 
-void Window::OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void Window::OnHover(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor)
 {
     UIElement::OnHover(position, screenPosition, buttons, qualifiers, cursor);
 
@@ -126,7 +107,7 @@ void Window::OnHover(const IntVector2& position, const IntVector2& screenPositio
         SetCursorShape(dragMode_, cursor);
 }
 
-void Window::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void Window::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor)
 {
     UIElement::OnDragBegin(position, screenPosition, buttons, qualifiers, cursor);
 
@@ -144,7 +125,7 @@ void Window::OnDragBegin(const IntVector2& position, const IntVector2& screenPos
 }
 
 void Window::OnDragMove(const IntVector2& /*position*/, const IntVector2& screenPosition, const IntVector2& /*deltaPos*/,
-    int /*buttons*/, int /*qualifiers*/, Cursor* cursor)
+    MouseButtonFlags /*buttons*/, QualifierFlags /*qualifiers*/, Cursor* cursor)
 {
     if (dragMode_ == DRAG_NONE)
         return;
@@ -229,17 +210,17 @@ void Window::OnDragMove(const IntVector2& /*position*/, const IntVector2& screen
     SetCursorShape(dragMode_, cursor);
 }
 
-void Window::OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons, Cursor* cursor)
+void Window::OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags dragButtons, MouseButtonFlags releaseButtons, Cursor* cursor)
 {
-    UIElement::OnDragEnd(position, screenPosition, dragButtons, buttons, cursor);
+    UIElement::OnDragEnd(position, screenPosition, dragButtons, releaseButtons, cursor);
 
     dragMode_ = DRAG_NONE;
 }
 
-void Window::OnDragCancel(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons,
+void Window::OnDragCancel(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags dragButtons, MouseButtonFlags cancelButtons,
     Cursor* cursor)
 {
-    UIElement::OnDragCancel(position, screenPosition, dragButtons, buttons, cursor);
+    UIElement::OnDragCancel(position, screenPosition, dragButtons, cancelButtons, cursor);
 
     if (dragButtons == MOUSEB_LEFT && dragMode_ != DRAG_NONE)
     {

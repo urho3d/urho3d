@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -118,7 +99,7 @@ void ExtractPropertyInfo(const String& functionName, const String& declaration, 
         if (info->type_.Empty())
         {
             // Extract type from parameters
-            unsigned begin = declaration.Find(',');
+            i32 begin = declaration.Find(',');
             if (begin == String::NPOS)
                 begin = declaration.Find('(');
             else
@@ -127,7 +108,7 @@ void ExtractPropertyInfo(const String& functionName, const String& declaration, 
             if (begin != String::NPOS)
             {
                 ++begin;
-                unsigned end = declaration.Find(')');
+                i32 end = declaration.Find(')');
                 if (end != String::NPOS)
                 {
                     info->type_ = declaration.Substring(begin, end - begin);
@@ -143,8 +124,8 @@ void ExtractPropertyInfo(const String& functionName, const String& declaration, 
 
 bool ComparePropertyStrings(const String& lhs, const String& rhs)
 {
-    int spaceLhs = lhs.Find(' ');
-    int spaceRhs = rhs.Find(' ');
+    i32 spaceLhs = lhs.Find(' ');
+    i32 spaceRhs = rhs.Find(' ');
     if (spaceLhs != String::NPOS && spaceRhs != String::NPOS)
         return String::Compare(lhs.CString() + spaceLhs, rhs.CString() + spaceRhs, true) < 0;
     else
@@ -158,7 +139,7 @@ bool ComparePropertyInfos(const PropertyInfo& lhs, const PropertyInfo& rhs)
 
 void Script::OutputAPIRow(DumpMode mode, const String& row, bool removeReference, const String& separator)
 {
-    String out(row);
+    String out(row.Trimmed());
     out.Replace("&in", "&");
     out.Replace("&out", "&");
     if (removeReference)
@@ -172,19 +153,21 @@ void Script::OutputAPIRow(DumpMode mode, const String& row, bool removeReference
         out.Replace("?&", "void*");
 
         // s/(\w+)\[\]/Array<\1>/g
-        unsigned posBegin = String::NPOS;
+        i32 posBegin = String::NPOS;
         while (true)   // Loop to cater for array of array of T
         {
-            unsigned posEnd = out.Find("[]");
+            i32 posEnd = out.Find("[]");
             if (posEnd == String::NPOS)
                 break;
-            if (posBegin > posEnd)
+            if (posBegin == String::NPOS)
                 posBegin = posEnd - 1;
-            while (posBegin < posEnd && isalnum(out[posBegin]))
+            while (posBegin >= 0 && isalnum(out[posBegin]))
                 --posBegin;
             ++posBegin;
             out.Replace(posBegin, posEnd - posBegin + 2, "Array<" + out.Substring(posBegin, posEnd - posBegin) + ">");
         }
+        // "opIndex" early was replaced to "operator[ ]", so not replaced here to Array<operator>
+        out.Replace("[ ]", "[]");
 
         Log::WriteRaw(out + separator + "\n");
     }
@@ -213,10 +196,10 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
 
         /// \hack Rename any Events2D to 2DEvents to work with the event category creation correctly (currently PhysicsEvents2D)
         Vector<HeaderFile> headerFiles;
-        for (unsigned i = 0; i < headerFileNames.Size(); ++i)
+        for (const String& headerFileName : headerFileNames)
         {
             HeaderFile entry;
-            entry.fileName = headerFileNames[i];
+            entry.fileName = headerFileName;
             entry.sectionName = GetFileNameAndExtension(entry.fileName).Replaced("Events2D", "2DEvents");
             if (entry.sectionName.EndsWith("Events.h"))
                 headerFiles.Push(entry);
@@ -227,15 +210,15 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
             Log::WriteRaw("\n\\page EventList Event list\n");
             Sort(headerFiles.Begin(), headerFiles.End(), CompareHeaderFiles);
 
-            for (unsigned i = 0; i < headerFiles.Size(); ++i)
+            for (const HeaderFile& headerFile : headerFiles)
             {
-                SharedPtr<File> file(new File(context_, path + headerFiles[i].fileName, FILE_READ));
+                SharedPtr<File> file(new File(context_, path + headerFile.fileName, FILE_READ));
                 if (!file->IsOpen())
                     continue;
 
-                const String& sectionName = headerFiles[i].sectionName;
-                unsigned start = sectionName.Find('/') + 1;
-                unsigned end = sectionName.Find("Events.h");
+                const String& sectionName = headerFile.sectionName;
+                i32 start = sectionName.Find('/') + 1;
+                i32 end = sectionName.Find("Events.h");
                 Log::WriteRaw("\n## %" + sectionName.Substring(start, end - start) + " events\n");
 
                 while (!file->IsEof())
@@ -266,46 +249,48 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
 
         Log::WriteRaw("\n\\page AttributeList Attribute list\n");
 
-        const HashMap<StringHash, Vector<AttributeInfo> >& attributes = context_->GetAllAttributes();
+        const HashMap<StringHash, Vector<AttributeInfo>>& attributes = context_->GetAllAttributes();
 
         Vector<String> objectTypes;
-        for (HashMap<StringHash, Vector<AttributeInfo> >::ConstIterator i = attributes.Begin(); i != attributes.End(); ++i)
+        for (HashMap<StringHash, Vector<AttributeInfo>>::ConstIterator i = attributes.Begin(); i != attributes.End(); ++i)
             objectTypes.Push(context_->GetTypeName(i->first_));
 
         Sort(objectTypes.Begin(), objectTypes.End());
 
-        for (unsigned i = 0; i < objectTypes.Size(); ++i)
+        for (const String& objectType : objectTypes)
         {
-            const Vector<AttributeInfo>& attrs = attributes.Find(objectTypes[i])->second_;
-            unsigned usableAttrs = 0;
-            for (unsigned j = 0; j < attrs.Size(); ++j)
+            const Vector<AttributeInfo>& attrs = attributes.Find(objectType)->second_;
+            bool hasEditableAttr = false;
+            for (const AttributeInfo& attr : attrs)
             {
                 // Attributes that are not shown in the editor are typically internal and not usable for eg. attribute
                 // animation
-                if (attrs[j].mode_ & AM_NOEDIT)
-                    continue;
-                ++usableAttrs;
+                if (!(attr.mode_ & AM_NOEDIT))
+                {
+                    hasEditableAttr = true;
+                    break;
+                }
             }
 
-            if (!usableAttrs)
+            if (!hasEditableAttr)
                 continue;
 
-            Log::WriteRaw("\n### " + objectTypes[i] + "\n");
+            Log::WriteRaw("\n### " + objectType + "\n");
 
-            for (unsigned j = 0; j < attrs.Size(); ++j)
+            for (const AttributeInfo& attr : attrs)
             {
-                if (attrs[j].mode_ & AM_NOEDIT)
+                if (attr.mode_ & AM_NOEDIT)
                     continue;
                 // Prepend each word in the attribute name with % to prevent unintended links
-                Vector<String> nameParts = attrs[j].name_.Split(' ');
-                for (unsigned k = 0; k < nameParts.Size(); ++k)
+                Vector<String> nameParts = attr.name_.Split(' ');
+                for (String& namePart : nameParts)
                 {
-                    if (nameParts[k].Length() > 1 && IsAlpha((unsigned)nameParts[k][0]))
-                        nameParts[k] = "%" + nameParts[k];
+                    if (namePart.Length() > 1 && IsAlpha((unsigned)namePart[0]))
+                        namePart = "%" + namePart;
                 }
                 String name;
                 name.Join(nameParts, " ");
-                String type = Variant::GetTypeName(attrs[j].type_);
+                String type = Variant::GetTypeName(attr.type_);
                 // Variant typenames are all uppercase. Convert primitive types to the proper lowercase form for the documentation
                 if (type == "Int" || type == "Bool" || type == "Float")
                     type[0] = (char)ToLower((unsigned)type[0]);
@@ -325,6 +310,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                 "#define int8 signed char\n"
                 "#define int16 signed short\n"
                 "#define int64 long\n"
+                "#define uint unsigned\n"
                 "#define uint8 unsigned char\n"
                 "#define uint16 unsigned short\n"
                 "#define uint64 unsigned long\n"
@@ -338,10 +324,12 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                 "#define cast reinterpret_cast\n"
                 "#define mixin\n"
                 "#define funcdef\n"
-            );
+                "#define protected\n"
+                "#define private\n"
+        );
 
     unsigned types = scriptEngine_->GetObjectTypeCount();
-    Vector<Pair<String, unsigned> > sortedTypes;
+    Vector<Pair<String, unsigned>> sortedTypes;
     for (unsigned i = 0; i < types; ++i)
     {
         asITypeInfo* type = scriptEngine_->GetObjectTypeByIndex(i);
@@ -354,7 +342,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
     Sort(sortedTypes.Begin(), sortedTypes.End());
 
     // Get global constants by namespace
-    HashMap<String, Vector<String> > globalConstants;
+    HashMap<String, Vector<String>> globalConstants;
     unsigned properties = scriptEngine_->GetGlobalPropertyCount();
     for (unsigned i = 0; i < properties; ++i)
     {
@@ -368,7 +356,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
         String type(propertyDeclaration);
         globalConstants[String(propertyNameSpace)].Push(type + " " + String(propertyName));
     }
-    for (HashMap<String, Vector<String> >::Iterator i = globalConstants.Begin(); i != globalConstants.End(); ++i)
+    for (HashMap<String, Vector<String>>::Iterator i = globalConstants.Begin(); i != globalConstants.End(); ++i)
         Sort(i->second_.Begin(), i->second_.End(), ComparePropertyStrings);
 
     if (mode == DOXYGEN)
@@ -418,7 +406,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                     String str = "\ntemplate <";
                     for (asUINT tt = 0, ttm = type->GetSubTypeCount(); tt < ttm; tt++) {
                         asITypeInfo* pSubType = type->GetSubType(tt);
-                        str += String("class ") + pSubType->GetName() + (tt < ttm - 1 ? ", " : ">");
+                        str += String("typename ") + pSubType->GetName() + (tt < ttm - 1 ? ", " : ">");
                     }
                     Log::WriteRaw(str);
                 }
@@ -445,7 +433,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
             {
                 asIScriptFunction* method = type->GetMethodByIndex(j);
                 String methodName(method->GetName());
-                String declaration(method->GetDeclaration());
+                String declaration(method->GetDeclaration(true, false, true));
 
                 // Recreate tab escape sequences
                 declaration.Replace("\t", "\\t");
@@ -456,24 +444,35 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                 {
                     // Sanitate the method name. For some operators fix name
                     if (declaration.Contains("::op")) {
-                        declaration.Replace("::opEquals(", "::operator==(");
-                        declaration.Replace("::opAssign(", "::operator=(");
-                        declaration.Replace("::opAddAssign(", "::operator+=(");
-                        declaration.Replace("::opAdd(", "::operator+(");
-                        declaration.Replace("::opCmp(", "::operator<(");
-                        declaration.Replace("::opPreInc(", "::operator++(");
-                        declaration.Replace("::opPostInc()", "::operator++(int)");
+                        declaration.Replace("::opEquals(", ":: operator==(");
+                        declaration.Replace("::opAssign(", ":: operator=(");
+                        declaration.Replace("::opAddAssign(", ":: operator+=(");
+                        declaration.Replace("::opAdd(", ":: operator+(");
+                        declaration.Replace("::opCmp(", ":: operator<(");
+                        declaration.Replace("::opPreInc(", ":: operator++(");
+                        declaration.Replace("::opPostInc()", ":: operator++(int)");
+                        declaration.Replace("::opIndex(", ":: operator[ ](");
+                        if (declaration.Contains("::opImplCast()") || declaration.Contains("::opImplConv()")) {
+                            int sp = declaration.Find(' ');
+                            String retType = declaration.Substring(0, sp);
+                            if (retType == "const")
+                            {
+                                sp = declaration.Find(' ', sp + 1);
+                                retType = declaration.Substring(0, sp);
+                            }
+                            declaration = "operator " + retType + "() const";
+                        }
                     }
                     if (!declaration.Contains("::op"))
                     {
                         String prefix(typeName + "::");
                         declaration.Replace(prefix, "");
                         ///\todo Is there a better way to mark deprecated API bindings for AngelScript?
-                        unsigned posBegin = declaration.FindLast("const String&in = \"deprecated:");
+                        i32 posBegin = declaration.FindLast("const String&in = \"deprecated:");
                         if (posBegin != String::NPOS)
                         {
                             // Assume this 'mark' is added as the last parameter
-                            unsigned posEnd = declaration.Find(')', posBegin);
+                            i32 posEnd = declaration.Find(')', posBegin);
                             if (posEnd != String::NPOS)
                             {
                                 declaration.Replace(posBegin, posEnd - posBegin, "");
@@ -518,8 +517,8 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                     Log::WriteRaw("\nMethods:\n\n");
                 else if (mode == C_HEADER)
                     Log::WriteRaw("// Methods:\n");
-                for (unsigned j = 0; j < methodDeclarations.Size(); ++j)
-                    OutputAPIRow(mode, methodDeclarations[j]);
+                for (const String& methodDeclaration : methodDeclarations)
+                    OutputAPIRow(mode, methodDeclaration);
             }
 
             if (!propertyInfos.Empty())
@@ -528,13 +527,13 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                     Log::WriteRaw("\nProperties:\n\n");
                 else if (mode == C_HEADER)
                     Log::WriteRaw("\n// Properties:\n");
-                for (unsigned j = 0; j < propertyInfos.Size(); ++j)
+                for (const PropertyInfo& propertyInfo : propertyInfos)
                 {
                     String remark;
                     String cppdoc;
-                    if (!propertyInfos[j].write_)
+                    if (!propertyInfo.write_)
                         remark = "readonly";
-                    else if (!propertyInfos[j].read_)
+                    else if (!propertyInfo.read_)
                         remark = "writeonly";
                     if (!remark.Empty())
                     {
@@ -549,12 +548,12 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                         }
                     }
 
-                    OutputAPIRow(mode, cppdoc + propertyInfos[j].type_ + " " + propertyInfos[j].name_ + remark);
+                    OutputAPIRow(mode, cppdoc + propertyInfo.type_ + " " + propertyInfo.name_ + remark);
                 }
             }
 
             // Check for namespaced constants to be included in the class documentation
-            HashMap<String, Vector<String> >::ConstIterator gcIt = globalConstants.Find(typeName);
+            HashMap<String, Vector<String>>::ConstIterator gcIt = globalConstants.Find(typeName);
             if (gcIt != globalConstants.End())
             {
                 String prefix;
@@ -569,8 +568,8 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                 }
 
                 const Vector<String>& constants = gcIt->second_;
-                for (unsigned j = 0; j < constants.Size(); ++j)
-                    OutputAPIRow(mode, prefix + constants[j]);
+                for (const String& constant : constants)
+                    OutputAPIRow(mode, prefix + constant);
             }
 
 
@@ -589,7 +588,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
     {
         asIScriptFunction* function = scriptEngine_->GetGlobalFunctionByIndex(i);
         String functionName(function->GetName());
-        String declaration(function->GetDeclaration());
+        String declaration(function->GetDeclaration(true, false, true));
 
         // Recreate tab escape sequences
         declaration.Replace("\t", "\\t");
@@ -609,7 +608,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
         Log::WriteRaw("\n// Enumerations\n");
 
     unsigned enums = scriptEngine_->GetEnumCount();
-    Vector<Pair<String, unsigned> > sortedEnums;
+    Vector<Pair<String, unsigned>> sortedEnums;
     for (unsigned i = 0; i < enums; ++i)
         sortedEnums.Push(MakePair(String(scriptEngine_->GetEnumByIndex(i)->GetName()), i));
     Sort(sortedEnums.Begin(), sortedEnums.End());
@@ -642,16 +641,16 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
     else if (mode == C_HEADER)
         Log::WriteRaw("\n// Global functions\n");
 
-    for (unsigned i = 0; i < globalFunctions.Size(); ++i)
-        OutputAPIRow(mode, globalFunctions[i]);
+    for (const String& globalFunction : globalFunctions)
+        OutputAPIRow(mode, globalFunction);
 
     if (mode == DOXYGEN)
         Log::WriteRaw("\\section ScriptAPI_GlobalProperties Global properties\n");
     else if (mode == C_HEADER)
         Log::WriteRaw("\n// Global properties\n");
 
-    for (unsigned i = 0; i < globalPropertyInfos.Size(); ++i)
-        OutputAPIRow(mode, globalPropertyInfos[i].type_ + " " + globalPropertyInfos[i].name_, true);
+    for (const PropertyInfo& globalPropertyInfo : globalPropertyInfos)
+        OutputAPIRow(mode, globalPropertyInfo.type_ + " " + globalPropertyInfo.name_, true);
 
     if (mode == DOXYGEN)
         Log::WriteRaw("\\section ScriptAPI_GlobalConstants Global constants\n");
@@ -659,8 +658,8 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
         Log::WriteRaw("\n// Global constants\n");
 
     const Vector<String>& noNameSpaceConstants = globalConstants[String()];
-    for (unsigned i = 0; i < noNameSpaceConstants.Size(); ++i)
-        OutputAPIRow(mode, noNameSpaceConstants[i], true);
+    for (const String& noNameSpaceConstant : noNameSpaceConstants)
+        OutputAPIRow(mode, noNameSpaceConstant, true);
 
     if (mode == DOXYGEN)
         Log::WriteRaw("*/\n\n}\n");

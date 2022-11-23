@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Core/Profiler.h>
@@ -26,14 +7,14 @@
 #include <Urho3D/Graphics/Camera.h>
 #include <Urho3D/Graphics/Geometry.h>
 #include <Urho3D/Graphics/Graphics.h>
-#include <Urho3D/Graphics/IndexBuffer.h>
 #include <Urho3D/Graphics/Light.h>
 #include <Urho3D/Graphics/Model.h>
 #include <Urho3D/Graphics/Octree.h>
 #include <Urho3D/Graphics/Renderer.h>
 #include <Urho3D/Graphics/StaticModel.h>
-#include <Urho3D/Graphics/VertexBuffer.h>
 #include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/GraphicsAPI/IndexBuffer.h>
+#include <Urho3D/GraphicsAPI/VertexBuffer.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/IO/Log.h>
 #include <Urho3D/Resource/ResourceCache.h>
@@ -126,10 +107,10 @@ void DynamicGeometry::CreateScene()
 
         // Detect duplicate vertices to allow seamless animation
         vertexDuplicates_.Resize(originalVertices_.Size());
-        for (unsigned i = 0; i < originalVertices_.Size(); ++i)
+        for (i32 i = 0; i < originalVertices_.Size(); ++i)
         {
             vertexDuplicates_[i] = i; // Assume not a duplicate
-            for (unsigned j = 0; j < i; ++j)
+            for (i32 j = 0; j < i; ++j)
             {
                 if (originalVertices_[i].Equals(originalVertices_[j]))
                 {
@@ -225,7 +206,7 @@ void DynamicGeometry::CreateScene()
         vb->SetShadowed(true);
         // We could use the "legacy" element bitmask to define elements for more compact code, but let's demonstrate
         // defining the vertex elements explicitly to allow any element types and order
-        PODVector<VertexElement> elements;
+        Vector<VertexElement> elements;
         elements.Push(VertexElement(TYPE_VECTOR3, SEM_POSITION));
         elements.Push(VertexElement(TYPE_VECTOR3, SEM_NORMAL));
         vb->SetSize(numVertices, elements);
@@ -244,13 +225,13 @@ void DynamicGeometry::CreateScene()
         fromScratchModel->SetBoundingBox(BoundingBox(Vector3(-0.5f, -0.5f, -0.5f), Vector3(0.5f, 0.5f, 0.5f)));
 
         // Though not necessary to render, the vertex & index buffers must be listed in the model so that it can be saved properly
-        Vector<SharedPtr<VertexBuffer> > vertexBuffers;
-        Vector<SharedPtr<IndexBuffer> > indexBuffers;
+        Vector<SharedPtr<VertexBuffer>> vertexBuffers;
+        Vector<SharedPtr<IndexBuffer>> indexBuffers;
         vertexBuffers.Push(vb);
         indexBuffers.Push(ib);
         // Morph ranges could also be not defined. Here we simply define a zero range (no morphing) for the vertex buffer
-        PODVector<unsigned> morphRangeStarts;
-        PODVector<unsigned> morphRangeCounts;
+        Vector<unsigned> morphRangeStarts;
+        Vector<unsigned> morphRangeCounts;
         morphRangeStarts.Push(0);
         morphRangeCounts.Push(0);
         fromScratchModel->SetVertexBuffers(vertexBuffers, morphRangeStarts, morphRangeCounts);
@@ -345,7 +326,7 @@ void DynamicGeometry::AnimateObjects(float timeStep)
     time_ += timeStep * 100.0f;
 
     // Repeat for each of the cloned vertex buffers
-    for (unsigned i = 0; i < animatingBuffers_.Size(); ++i)
+    for (i32 i = 0; i < animatingBuffers_.Size(); ++i)
     {
         float startPhase = time_ + i * 30.0f;
         VertexBuffer* buffer = animatingBuffers_[i];

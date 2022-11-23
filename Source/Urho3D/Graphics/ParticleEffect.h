@@ -1,30 +1,11 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 /// \file
 
 #pragma once
 
-#include "../Graphics/GraphicsDefs.h"
+#include "../GraphicsAPI/GraphicsDefs.h"
 #include "../Resource/Resource.h"
 
 namespace Urho3D
@@ -41,6 +22,7 @@ enum EmitterType
 };
 
 /// %Color animation frame definition.
+/// @nocount
 struct ColorFrame
 {
     /// Construct with default values.
@@ -83,6 +65,7 @@ struct ColorFrame
 };
 
 /// %Texture animation frame definition.
+/// @nocount
 struct TextureFrame
 {
     /// Construct with default values.
@@ -115,6 +98,7 @@ public:
     /// Destruct.
     ~ParticleEffect() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
@@ -124,84 +108,119 @@ public:
     /// Save resource. Return true if successful.
     bool Save(Serializer& dest) const override;
 
+    using Resource::Load;
+
     /// Save resource to XMLElement. Return true if successful.
     bool Save(XMLElement& dest) const;
     /// Load resource from XMLElement synchronously. Return true if successful.
     bool Load(const XMLElement& source);
     /// Set material.
+    /// @property
     void SetMaterial(Material* material);
     /// Set maximum number of particles.
+    /// @property
     void SetNumParticles(unsigned num);
     /// Set whether to update when particles are not visible.
+    /// @property
     void SetUpdateInvisible(bool enable);
     /// Set whether billboards are relative to the scene node.
+    /// @property
     void SetRelative(bool enable);
     /// Set whether scene node scale affects billboards' size.
+    /// @property
     void SetScaled(bool enable);
     /// Set whether billboards are sorted by distance.
+    /// @property
     void SetSorted(bool enable);
     /// Set whether billboards have fixed size on screen (measured in pixels) regardless of distance to camera.
+    /// @property
     void SetFixedScreenSize(bool enable);
     /// Set animation LOD bias.
+    /// @property
     void SetAnimationLodBias(float lodBias);
     /// Set emitter type.
+    /// @property
     void SetEmitterType(EmitterType type);
     /// Set emitter size.
+    /// @property
     void SetEmitterSize(const Vector3& size);
     /// Set negative direction limit.
+    /// @property
     void SetMinDirection(const Vector3& direction);
     /// Set positive direction limit.
+    /// @property
     void SetMaxDirection(const Vector3& direction);
     /// Set constant force acting on particles.
+    /// @property
     void SetConstantForce(const Vector3& force);
     /// Set particle velocity damping force.
+    /// @property
     void SetDampingForce(float force);
-    /// Set emission active period length (0 = infinite.)
+    /// Set emission active period length (0 = infinite).
+    /// @property
     void SetActiveTime(float time);
-    /// Set emission inactive period length (0 = infinite.)
+    /// Set emission inactive period length (0 = infinite).
+    /// @property
     void SetInactiveTime(float time);
     /// Set minimum emission rate.
+    /// @property
     void SetMinEmissionRate(float rate);
     /// Set maximum emission rate.
+    /// @property
     void SetMaxEmissionRate(float rate);
     /// Set particle minimum size.
+    /// @property
     void SetMinParticleSize(const Vector2& size);
     /// Set particle maximum size.
+    /// @property
     void SetMaxParticleSize(const Vector2& size);
     /// Set particle minimum time to live.
+    /// @property
     void SetMinTimeToLive(float time);
     /// Set particle maximum time to live.
+    /// @property
     void SetMaxTimeToLive(float time);
     /// Set particle minimum velocity.
+    /// @property
     void SetMinVelocity(float velocity);
     /// Set particle maximum velocity.
+    /// @property
     void SetMaxVelocity(float velocity);
     /// Set particle minimum rotation.
+    /// @property
     void SetMinRotation(float rotation);
     /// Set particle maximum rotation.
+    /// @property
     void SetMaxRotation(float rotation);
     /// Set particle minimum rotation speed.
+    /// @property
     void SetMinRotationSpeed(float speed);
     /// Set particle maximum rotation speed.
+    /// @property
     void SetMaxRotationSpeed(float speed);
     /// Set particle size additive modifier.
+    /// @property
     void SetSizeAdd(float sizeAdd);
     /// Set particle size multiplicative modifier.
+    /// @property
     void SetSizeMul(float sizeMul);
-    /// Set how the particles should rotate in relation to the camera. Default is to follow camera rotation on all axes (FC_ROTATE_XYZ.)
+    /// Set how the particles should rotate in relation to the camera. Default is to follow camera rotation on all axes (FC_ROTATE_XYZ).
+    /// @property
     void SetFaceCameraMode(FaceCameraMode mode);
 
     /// Add a color frame sorted in the correct position based on time.
     void AddColorTime(const Color& color, float time);
     /// Add a color frame sorted in the correct position based on time.
     void AddColorFrame(const ColorFrame& colorFrame);
-    /// Remove color frame at index
+    /// Remove color frame at index.
     void RemoveColorFrame(unsigned index);
     /// Set color animation of particles.
+    /// @nobindtemp
     void SetColorFrames(const Vector<ColorFrame>& colorFrames);
     /// Set color animation frame at index. If index is greater than number of color frames, new color frames are added.
     void SetColorFrame(unsigned index, const ColorFrame& colorFrame);
     /// Set number of color frames.
+    /// @property
     void SetNumColorFrames(unsigned number);
     /// Sort the list of color frames based on time.
     void SortColorFrames();
@@ -210,13 +229,15 @@ public:
     void AddTextureTime(const Rect& uv, float time);
     /// Add a texture frame sorted in the correct position based on time.
     void AddTextureFrame(const TextureFrame& textureFrame);
-    /// Remove texture frame at index
+    /// Remove texture frame at index.
     void RemoveTextureFrame(unsigned index);
     /// Set particle texture animation.
+    /// @nobindtemp
     void SetTextureFrames(const Vector<TextureFrame>& textureFrames);
     /// Set number of texture animation frames.
     void SetTextureFrame(unsigned index, const TextureFrame& textureFrame);
     /// Set number of texture frames.
+    /// @property
     void SetNumTextureFrames(unsigned number);
     /// Sort the list of texture frames based on time.
     void SortTextureFrames();
@@ -224,114 +245,149 @@ public:
     SharedPtr<ParticleEffect> Clone(const String& cloneName = String::EMPTY) const;
 
     /// Return material.
+    /// @property
     Material* GetMaterial() const { return material_; }
 
     /// Return maximum number of particles.
+    /// @property
     unsigned GetNumParticles() const { return numParticles_; }
 
     /// Return whether to update when particles are not visible.
+    /// @property
     bool GetUpdateInvisible() const { return updateInvisible_; }
 
     /// Return whether billboards are relative to the scene node.
+    /// @property
     bool IsRelative() const { return relative_; }
 
     /// Return whether scene node scale affects billboards' size.
+    /// @property
     bool IsScaled() const { return scaled_; }
 
     /// Return whether billboards are sorted.
+    /// @property
     bool IsSorted() const { return sorted_; }
 
     /// Return whether billboards are fixed screen size.
+    /// @property
     bool IsFixedScreenSize() const { return fixedScreenSize_; }
 
     /// Return animation Lod bias.
+    /// @property
     float GetAnimationLodBias() const { return animationLodBias_; }
 
     /// Return emitter type.
+    /// @property
     EmitterType GetEmitterType() const { return emitterType_; }
 
     /// Return emitter size.
+    /// @property
     const Vector3& GetEmitterSize() const { return emitterSize_; }
 
     /// Return negative direction limit.
+    /// @property
     const Vector3& GetMinDirection() const { return directionMin_; }
 
     /// Return positive direction limit.
+    /// @property
     const Vector3& GetMaxDirection() const { return directionMax_; }
 
     /// Return constant force acting on particles.
+    /// @property
     const Vector3& GetConstantForce() const { return constantForce_; }
 
     /// Return particle velocity damping force.
+    /// @property
     float GetDampingForce() const { return dampingForce_; }
 
-    /// Return emission active period length (0 = infinite.)
+    /// Return emission active period length (0 = infinite).
+    /// @property
     float GetActiveTime() const { return activeTime_; }
 
-    /// Return emission inactive period length (0 = infinite.)
+    /// Return emission inactive period length (0 = infinite).
+    /// @property
     float GetInactiveTime() const { return inactiveTime_; }
 
     /// Return minimum emission rate.
+    /// @property
     float GetMinEmissionRate() const { return emissionRateMin_; }
 
     /// Return maximum emission rate.
+    /// @property
     float GetMaxEmissionRate() const { return emissionRateMax_; }
 
     /// Return particle minimum size.
+    /// @property
     const Vector2& GetMinParticleSize() const { return sizeMin_; }
 
     /// Return particle maximum size.
+    /// @property
     const Vector2& GetMaxParticleSize() const { return sizeMax_; }
 
     /// Return particle minimum time to live.
+    /// @property
     float GetMinTimeToLive() const { return timeToLiveMin_; }
 
     /// Return particle maximum time to live.
+    /// @property
     float GetMaxTimeToLive() const { return timeToLiveMax_; }
 
     /// Return particle minimum velocity.
+    /// @property
     float GetMinVelocity() const { return velocityMin_; }
 
     /// Return particle maximum velocity.
+    /// @property
     float GetMaxVelocity() const { return velocityMax_; }
 
     /// Return particle minimum rotation.
+    /// @property
     float GetMinRotation() const { return rotationMin_; }
 
     /// Return particle maximum rotation.
+    /// @property
     float GetMaxRotation() const { return rotationMax_; }
 
     /// Return particle minimum rotation speed.
+    /// @property
     float GetMinRotationSpeed() const { return rotationSpeedMin_; }
 
     /// Return particle maximum rotation speed.
+    /// @property
     float GetMaxRotationSpeed() const { return rotationSpeedMax_; }
 
     /// Return particle size additive modifier.
+    /// @property
     float GetSizeAdd() const { return sizeAdd_; }
 
     /// Return particle size multiplicative modifier.
+    /// @property
     float GetSizeMul() const { return sizeMul_; }
 
     /// Return all color animation frames.
+    /// @nobindtemp
     const Vector<ColorFrame>& GetColorFrames() const { return colorFrames_; }
 
     /// Return number of color animation frames.
+    /// @property
     unsigned GetNumColorFrames() const { return colorFrames_.Size(); }
 
     /// Return a color animation frame, or null if outside range.
     const ColorFrame* GetColorFrame(unsigned index) const;
 
     /// Return all texture animation frames.
+    /// @nobindtemp
     const Vector<TextureFrame>& GetTextureFrames() const { return textureFrames_; }
 
     /// Return number of texture animation frames.
+    /// @property
     unsigned GetNumTextureFrames() const { return textureFrames_.Size(); }
 
     /// Return a texture animation frame, or null if outside range.
     const TextureFrame* GetTextureFrame(unsigned index) const;
 
     /// Return how the particles rotate in relation to the camera.
+    /// @property
     FaceCameraMode GetFaceCameraMode() const { return faceCameraMode_; }
 
     /// Return random direction.

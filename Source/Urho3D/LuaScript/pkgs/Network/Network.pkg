@@ -3,46 +3,46 @@ $#include "Network/Network.h"
 class Network
 {
     bool Connect(const String address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
-    
+
     void Disconnect(int waitMSec = 0);
-    bool StartServer(unsigned short port);
+    bool StartServer(unsigned short port, unsigned int maxConnections = 128);
     void StopServer();
-    
+
     void BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0);
 
     void BroadcastRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     void BroadcastRemoteEvent(const String eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
-    
+
     void BroadcastRemoteEvent(Scene* scene, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     void BroadcastRemoteEvent(Scene* scene, const String eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
-    
+
     void BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     void BroadcastRemoteEvent(Node* node, const String eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
-    
+
     void SetUpdateFps(int fps);
     void SetSimulatedLatency(int ms);
     void SetSimulatedPacketLoss(float loss);
-    
+
     void RegisterRemoteEvent(StringHash eventType);
     void RegisterRemoteEvent(const String eventType);
-    
+
     void UnregisterRemoteEvent(StringHash eventType);
     void UnregisterRemoteEvent(const String eventType);
-    
+
     void UnregisterAllRemoteEvents();
     void SetPackageCacheDir(const String path);
     void SendPackageToClients(Scene* scene, PackageFile* package);
 
     // SharedPtr<HttpRequest> MakeHttpRequest(const String url, const String verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String postData = String::EMPTY);
     tolua_outside HttpRequest* NetworkMakeHttpRequest @ MakeHttpRequest(const String url, const String verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String postData = String::EMPTY);
-    
+
     int GetUpdateFps() const;
     int GetSimulatedLatency() const;
     float GetSimulatedPacketLoss() const;
     Connection* GetServerConnection() const;
-    
+
     bool IsServerRunning() const;
-    
+
     bool CheckRemoteEvent(StringHash eventType) const;
     const String GetPackageCacheDir() const;
 
@@ -53,7 +53,7 @@ class Network
     void SetDiscoveryBeacon(const VariantMap& data);
     void SetNATServerInfo(const String& address, unsigned short port);
     void AttemptNATPunchtrough(const String& guid, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
-    
+
     tolua_property__get_set int updateFps;
     tolua_property__get_set int simulatedLatency;
     tolua_property__get_set float simulatedPacketLoss;

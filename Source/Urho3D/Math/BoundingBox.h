@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -40,6 +21,7 @@ class Matrix3x4;
 class Sphere;
 
 /// Three-dimensional axis-aligned bounding box.
+/// @allfloats
 class URHO3D_API BoundingBox
 {
 public:
@@ -71,7 +53,7 @@ public:
     {
     }
 
-    /// Construct from minimum and maximum floats (all dimensions same.)
+    /// Construct from minimum and maximum floats (all dimensions same).
     BoundingBox(float min, float max) noexcept :
         min_(Vector3(min, min, min)),
         max_(Vector3(max, max, max))
@@ -79,6 +61,7 @@ public:
     }
 
 #ifdef URHO3D_SSE
+    /// @nobind
     BoundingBox(__m128 min, __m128 max) noexcept
     {
         _mm_storeu_ps(&min_.x_, min);
@@ -159,7 +142,7 @@ public:
         max_ = max;
     }
 
-    /// Define from minimum and maximum floats (all dimensions same.)
+    /// Define from minimum and maximum floats (all dimensions same).
     void Define(float min, float max)
     {
         min_ = Vector3(min, min, min);
@@ -259,12 +242,15 @@ public:
     }
 
     /// Return center.
+    /// @property
     Vector3 Center() const { return (max_ + min_) * 0.5f; }
 
     /// Return size.
+    /// @property
     Vector3 Size() const { return max_ - min_; }
 
     /// Return half-size.
+    /// @property
     Vector3 HalfSize() const { return (max_ - min_) * 0.5f; }
 
     /// Return transformed by a 3x3 matrix.

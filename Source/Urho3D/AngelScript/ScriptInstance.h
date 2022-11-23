@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 /// \file
 
@@ -30,12 +11,15 @@
 class asIScriptFunction;
 class asIScriptObject;
 class asIScriptContext;
+class asITypeInfo;
 
 namespace Urho3D
 {
 
 class Script;
 class ScriptFile;
+enum { eAttrMapUserIdx = 0x1df4};
+void CleanupTypeInfoScriptInstance(asITypeInfo *type);
 
 /// Inbuilt scripted component methods.
 enum ScriptInstanceMethod
@@ -67,6 +51,7 @@ public:
     /// Destruct.
     ~ScriptInstance() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Handle attribute write access.
@@ -95,7 +80,7 @@ public:
     /// Remove all scripted event handlers.
     void RemoveEventHandlers() override;
     /// Remove all scripted event handlers, except those listed.
-    void RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions) override;
+    void RemoveEventHandlersExcept(const Vector<StringHash>& exceptions) override;
     /// Return whether has subscribed to an event.
     bool HasEventHandler(StringHash eventType) const override;
     /// Return whether has subscribed to a specific sender's event.
@@ -134,19 +119,19 @@ public:
     /// Set script file attribute.
     void SetScriptFileAttr(const ResourceRef& value);
     /// Set delayed method calls attribute.
-    void SetDelayedCallsAttr(const PODVector<unsigned char>& value);
+    void SetDelayedCallsAttr(const Vector<unsigned char>& value);
     /// Set script file serialization attribute by calling a script function.
-    void SetScriptDataAttr(const PODVector<unsigned char>& data);
+    void SetScriptDataAttr(const Vector<unsigned char>& data);
     /// Set script network serialization attribute by calling a script function.
-    void SetScriptNetworkDataAttr(const PODVector<unsigned char>& data);
+    void SetScriptNetworkDataAttr(const Vector<unsigned char>& data);
     /// Return script file attribute.
     ResourceRef GetScriptFileAttr() const;
     /// Return delayed method calls attribute.
-    PODVector<unsigned char> GetDelayedCallsAttr() const;
+    Vector<unsigned char> GetDelayedCallsAttr() const;
     /// Get script file serialization attribute by calling a script function.
-    PODVector<unsigned char> GetScriptDataAttr() const;
+    Vector<unsigned char> GetScriptDataAttr() const;
     /// Get script network serialization attribute by calling a script function.
-    PODVector<unsigned char> GetScriptNetworkDataAttr() const;
+    Vector<unsigned char> GetScriptNetworkDataAttr() const;
 
 protected:
     /// Handle scene being assigned.
@@ -190,6 +175,9 @@ private:
     /// Handle script file reload finished.
     void HandleScriptFileReloadFinished(StringHash eventType, VariantMap& eventData);
 
+    template<typename Op>
+    void executeScript(asIScriptFunction* method, Op func) const;
+
     /// Script file.
     WeakPtr<ScriptFile> scriptFile_;
     /// Script object.
@@ -202,7 +190,7 @@ private:
     Vector<DelayedCall> delayedCalls_;
     /// Attributes, including script object variables.
     Vector<AttributeInfo> attributeInfos_;
-    /// Storage for unapplied node and component ID attributes
+    /// Storage for unapplied node and component ID attributes.
     HashMap<AttributeInfo*, unsigned> idAttributes_;
     /// Storage for attributes while script object is being hot-reloaded.
     HashMap<String, Variant> storedAttributes_;

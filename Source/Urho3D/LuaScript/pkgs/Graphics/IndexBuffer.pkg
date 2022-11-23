@@ -15,7 +15,7 @@ class IndexBuffer : public Object
     bool IsDynamic() const;
     unsigned GetIndexCount() const;
     unsigned GetIndexSize() const;
-    
+
     tolua_property__is_set bool shadowed;
     tolua_readonly tolua_property__is_set bool dynamic;
     tolua_readonly tolua_property__get_set unsigned indexCount;

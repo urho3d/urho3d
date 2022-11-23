@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -717,10 +698,10 @@ Node* Scene::GetNode(unsigned id) const
     }
 }
 
-bool Scene::GetNodesWithTag(PODVector<Node*>& dest, const String& tag) const
+bool Scene::GetNodesWithTag(Vector<Node*>& dest, const String& tag) const
 {
     dest.Clear();
-    HashMap<StringHash, PODVector<Node*> >::ConstIterator it = taggedNodes_.Find(tag);
+    HashMap<StringHash, Vector<Node*>>::ConstIterator it = taggedNodes_.Find(tag);
     if (it != taggedNodes_.End())
     {
         dest = it->second_;
@@ -827,7 +808,7 @@ void Scene::EndThreadedUpdate()
     {
         URHO3D_PROFILE(EndThreadedUpdate);
 
-        for (PODVector<Component*>::ConstIterator i = delayedDirtyComponents_.Begin(); i != delayedDirtyComponents_.End(); ++i)
+        for (Vector<Component*>::ConstIterator i = delayedDirtyComponents_.Begin(); i != delayedDirtyComponents_.End(); ++i)
             (*i)->OnMarkedDirty((*i)->GetNode());
         delayedDirtyComponents_.Clear();
     }
@@ -958,11 +939,11 @@ void Scene::NodeAdded(Node* node)
     }
 
     // Add already created components and child nodes now
-    const Vector<SharedPtr<Component> >& components = node->GetComponents();
-    for (Vector<SharedPtr<Component> >::ConstIterator i = components.Begin(); i != components.End(); ++i)
+    const Vector<SharedPtr<Component>>& components = node->GetComponents();
+    for (Vector<SharedPtr<Component>>::ConstIterator i = components.Begin(); i != components.End(); ++i)
         ComponentAdded(*i);
-    const Vector<SharedPtr<Node> >& children = node->GetChildren();
-    for (Vector<SharedPtr<Node> >::ConstIterator i = children.Begin(); i != children.End(); ++i)
+    const Vector<SharedPtr<Node>>& children = node->GetChildren();
+    for (Vector<SharedPtr<Node>>::ConstIterator i = children.Begin(); i != children.End(); ++i)
         NodeAdded(*i);
 }
 
@@ -1001,11 +982,11 @@ void Scene::NodeRemoved(Node* node)
     }
 
     // Remove components and child nodes as well
-    const Vector<SharedPtr<Component> >& components = node->GetComponents();
-    for (Vector<SharedPtr<Component> >::ConstIterator i = components.Begin(); i != components.End(); ++i)
+    const Vector<SharedPtr<Component>>& components = node->GetComponents();
+    for (Vector<SharedPtr<Component>>::ConstIterator i = components.Begin(); i != components.End(); ++i)
         ComponentRemoved(*i);
-    const Vector<SharedPtr<Node> >& children = node->GetChildren();
-    for (Vector<SharedPtr<Node> >::ConstIterator i = children.Begin(); i != children.End(); ++i)
+    const Vector<SharedPtr<Node>>& children = node->GetChildren();
+    for (Vector<SharedPtr<Node>>::ConstIterator i = children.Begin(); i != children.End(); ++i)
         NodeRemoved(*i);
 }
 
@@ -1152,7 +1133,7 @@ void Scene::MarkReplicationDirty(Node* node)
     if (networkState_ && node->IsReplicated())
     {
         unsigned id = node->GetID();
-        for (PODVector<ReplicationState*>::Iterator i = networkState_->replicationStates_.Begin();
+        for (Vector<ReplicationState*>::Iterator i = networkState_->replicationStates_.Begin();
              i != networkState_->replicationStates_.End(); ++i)
         {
             auto* nodeState = static_cast<NodeReplicationState*>(*i);

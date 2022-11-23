@@ -4,9 +4,9 @@ class LineEdit : public BorderImage
 {
     LineEdit();
     virtual ~LineEdit();
-    
+
     void SetText(const String text);
-    
+
     void SetCursorPosition(unsigned position);
     void SetCursorBlinkRate(float rate);
     void SetMaxLength(unsigned length);

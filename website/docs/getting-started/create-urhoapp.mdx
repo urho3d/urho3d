@@ -1,0 +1,340 @@
+---
+sidebar_position: 30
+---
+
+import clsx from "clsx";
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import styles from './getting-started.module.scss';
+
+# Create New Project
+
+Create your first UrhoApp project
+
+You need an installed Urho3D library for the desired target platform to proceed. If you have been following along the previous section to install the library then you should be able to create a new project using the library in no time. The most commonly encountered issue by newbie in the past was figuring out how to tell the build script where to find the correct Urho3D library to use. The new rake tasks have been designed to address this issue by providing opinionated sane default for most of the use cases, but without sacrificing the possibility to override the default when necessary.
+
+## Project Scaffolding
+
+All you need is to execute the following command to create a new UrhoApp project.
+
+```bash
+rake new[UrhoApp,demo]
+```
+
+By default, this task creates a new project named **UrhoApp** in the `~/projects/` directory. You can override that by specifying explicitly the name of the new project as well as the parent directory where it should be created, as shown in the example above. Next, change directory to the project root of the newly created project and build it. You can build using CLI or IDE too.
+
+:::info
+
+The UrhoApp project is cross-platform out of the box!
+
+:::
+
+## Build UrhoApp project
+
+### Using CLI {#build-urhoapp-project-using-cli}
+
+Simply invoke `rake build` or just `rake` (as build is the default task). In order to target a specific platform, set the `PLATFORM` environment variable just before invoking the task. By default, the build task assumes to target native platform of the host machine.
+
+<Tabs
+  className={styles.cliUrhoApp}
+  groupId={'target-platform'}
+  defaultValue={'android'}
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'Apple', value: 'apple'},
+    {label: 'Arm', value: 'arm'},
+    {label: 'Linux', value: 'linux'},
+    {label: 'RPI', value: 'rpi'},
+    {label: 'Web', value: 'web'},
+    {label: 'Windows', value: 'win'},
+  ]
+  }>
+  <TabItem value={'android'}>
+
+```bash
+# When using Rake task
+PLATFORM=android rake
+
+# When using Gradle wrapper on Linux or Mac
+./gradlew build
+
+# When using Gradle wrapper on Windows
+gradlew.bat build
+```
+
+  </TabItem>
+  <TabItem value={'apple'}>
+
+```bash
+# When targeting macOS, "PLATFORM=macOS" is the default on Mac
+rake
+
+# When targeting iOS
+PLATFORM=iOS rake
+
+# When targeting tvOS
+PLATFORM=tvOS rake
+```
+
+  </TabItem>
+  <TabItem value={'arm'}>
+
+```bash
+# When compiling natively on the ARM board, "PLATFORM=arm" should be already set
+rake
+
+# When cross-compiling on Linux host machine, substitute '?' accordingly
+ARM_ABI_FLAGS=? ARM_PREFIX=? ARM_SYSROOT=? PLATFORM=arm rake
+```
+
+  </TabItem>
+  <TabItem value={'linux'}>
+
+```bash
+# When using GCC, "PLATFORM=linux" is the default on Linux
+rake
+
+# When using Clang, override the "CC" and "CXX" environment variables
+CC=clang CXX=clang++ rake
+```
+
+  </TabItem>
+  <TabItem value={'rpi'}>
+
+```bash
+# When compiling natively on the RPI board, "PLATFORM=rpi" should be already set
+RPI_ABI=RPI3 rake
+
+# When cross-compiling on Linux host machine, substitute '?' accordingly
+RPI_ABI=RPI3 RPI_PREFIX=? RPI_SYSROOT=? PLATFORM=rpi rake
+```
+
+  </TabItem>
+  <TabItem value={'web'}>
+
+```bash
+# When using Rake task on Linux or Mac
+PLATFORM=web rake
+
+# When using Rake task on Windows
+set "PLATFORM=web" && rake
+```
+
+  </TabItem>
+  <TabItem value={'win'}>
+
+```bash
+# When compiling natively using VS, "PLATFORM=win" is the default on Windows
+rake
+
+# When compiling natively using MinGW-w64
+set "GENERATOR=mingw" && rake
+
+# When cross-compiling on Linux host machine, substitute '?' accordingly
+MINGW_PREFIX=? PLATFORM=mingw rake
+```
+
+  </TabItem>
+</Tabs>
+
+Except for Android platform, the task generates the initial build tree under <code>build/<em>&lt;platform&gt;</em>/</code> relative to the project root. Assuming it was built successfully for Linux platform, you could then run the UrhoApp executable like so:
+
+```bash
+build/linux/bin/UrhoApp
+```
+
+For Android platform, you would have to use other gradle task (e.g., `installDebug`) to deploy the UrhoApp to an Android Emulator or actual device.
+
+![UrhoApp screenshot on Android platform](/img/docs/urhoapp-android-screenshot.png)
+
+### Using IDE {#build-urhoapp-project-using-ide}
+
+Similar to Urho3D project, the UrhoApp project can be opened directly in the IDE that supports CMake or Gradle build system or by opening the generated project file in the build tree.
+
+<Tabs
+  className={styles.ideUrhoApp}
+  groupId={'ide'}
+  defaultValue={'android-studio'}
+  values={[
+    {label: 'Android Studio', value: 'android-studio'},
+    {label: 'CLion', value: 'clion'},
+    {label: 'Code::Blocks', value: 'code-blocks'},
+    {label: 'CodeLite', value: 'codelite'},
+    {label: 'IntelliJ IDEA', value: 'intellij'},
+    {label: 'Visual Studio', value: 'visual-studio'},
+    {label: 'Xcode', value: 'xcode'},
+  ]
+  }>
+  <TabItem value={'android-studio'}>
+
+<div className={clsx('textBlock', styles.fixedHeight)}>
+
+:::caution
+
+Do not update the Android Gradle Plugin when being prompted, unless you know what you are doing.
+
+:::
+
+- Choose "Open an Existing Project" to open the new project.
+- After Gradle sync is completed, select "UrhoApp" from the "Edit Run/Debug Configurations" drop down list, and press "Ctrl+F9" to build the UrhoApp.
+- To run the UrhoApp, press "Shift+F10".
+
+</div>
+
+  </TabItem>
+  <TabItem value={'clion'}>
+
+<div className={clsx('textBlock', styles.fixedHeight)}>
+
+:::caution
+
+Disable the Gradle plugin and Gradle Native plugin as they may interfere and prevent proper project setup.
+
+:::
+
+- Choose "Open" to open the new project.
+- In the "Open Project Wizard" or in the "CMake Settings", set the `URHO3D_HOME` accordingly in the "CMake options" field, e.g.:
+  - `~/.urho3d/install/linux` when targeting Linux platform with GCC
+  - `%USERPROFILE%\.urho3d\install\win` when targeting Windows platform with MSVC
+- Select "UrhoApp" from the "Select Run/Debug Configuration" drop down list and press "Ctrl+F9" to build the UrhoApp.
+- To run the UrhoApp, press "Shift+F10".
+
+</div>
+
+  </TabItem>
+  <TabItem value={'code-blocks'}>
+
+<div className={clsx('textBlock', styles.fixedHeight)}>
+
+- Generate a build tree using CMake's Code::Blocks generator. One way to do it is by using rake task, like so: `GENERATOR=codeblocks rake cmake`
+- Open the "UrhoApp.cbp" Code::Blocks project file in the build tree. In the above case, the project file can be found in `build/linux-codeblocks/` directory.
+- **// FIXME: Please submit PR to complete the steps.**
+
+</div>
+
+  </TabItem>
+  <TabItem value={'codelite'}>
+
+<div className={clsx('textBlock', styles.fixedHeight)}>
+
+- Generate a build tree using CMake's CodeLite generator. One way to do it is by using rake task, like so: `GENERATOR=codelite rake cmake`
+- Open the "UrhoApp.workspace" CodeLite workspace file in the build tree. In the above case, the workspace file can be found in `build/linux-codelite/` directory.
+- **// FIXME: Please submit PR to complete the steps.**
+
+</div>
+
+  </TabItem>
+  <TabItem value={'intellij'}>
+
+<div className={clsx('textBlock', styles.fixedHeight)}>
+
+:::caution
+
+Do not update the Android Gradle Plugin when being prompted, unless you know what you are doing.
+
+:::
+
+- Choose "Open" to open the new project.
+- After Gradle sync is completed, select "UrhoApp" from the "Select Run/Debug Configuration" drop down list, and press "Ctrl+F9" to build the UrhoApp.
+- To run the UrhoApp, press "Shift+F10".
+
+</div>
+
+  </TabItem>
+  <TabItem value={'visual-studio'}>
+
+<div className={clsx('textBlock', styles.fixedHeight)}>
+
+- Choose "Open a project or solution" to open the new project.
+- After CMake initial build tree is generated, open the "CMake Settings for UrhoApp" under the "Project" menu, then in the "CMake variables and cache" section:
+  - Disable the `URHO3D_PCH` build option
+  - Set the `URHO3D_HOME` to `%USERPROFILE%\.urho3d\install\win`
+- Save the above changes to allow CMake to reconfigure the build tree.
+- Double click the "Folder View" in the "Solution Explorer", then select the "UrhoApp.exe" from the "Select Startup Item" drop down list and press "Ctrl+B" to build the UrhoApp.
+- To run the UrhoApp, press "Ctrl+F5".
+
+</div>
+
+  </TabItem>
+  <TabItem value={'xcode'}>
+
+<div className={clsx('textBlock', styles.fixedHeight)}>
+
+- Generate a build tree using CMake's Xcode generator. One way to do it is by using rake task, like so:
+  - `rake cmake` for targeting macOS
+  - `PLATFORM=iOS rake cmake` for targeting iOS
+  - `PLATFORM=tvOS rake cmake` for targeting tvOS
+- Open the "UrhoApp.xcodeproj" Xcode project file in the build tree. In the above case, the project file can be found in "build/macos", "build/ios", and "build/tvos", respectively.
+- Select "UrhoApp" from the list of targets and press "⌘+B" to build the UrhoApp.
+- To run the UrhoApp, press "⌘+R".
+
+</div>
+
+  </TabItem>
+</Tabs>
+
+## Project Structure
+
+In order to reuse the same build system for Urho3D project to successfully build your own UrhoApp project, the UrhoApp project must be structured similarly to Urho3D project. Assuming you chose to use the `rake new` to create the UrhoApp project, you will have the following project structure under a new app directory:
+
+```
+UrhoApp
+├─ app
+│  ├─ build.gradle.kts
+│  ├─ CMakeLists.txt
+│  ├─ proguard-rules.pro
+│  └─ src
+│     ├─ cpp
+│     │  ├─ UrhoApp.cpp
+│     │  └─ UrhoApp.h
+│     ├─ java
+│     │  └─ io/urho3d/urhoapp
+│     │     └─ MainActivity.kt
+│     ├─ res
+│     |  └─ (truncated)
+│     └─ AndroidManifest.xml
+├─ bin
+│  ├─ CoreData
+│  │  └─ (as in Urho3D)
+│  └─ Data
+│     ├─ Materials
+│     │  └─ Mushroom.xml
+│     ├─ Models
+│     │  └─ Mushroom.mdl
+│     ├─ Music
+│     │  └─ Ninja Gods.ogg
+│     └─ Textures
+│        ├─ Mushroom.dds
+│        ├─ UrhoIcon.icns
+│        └─ UrhoIcon.png
+├─ build.gradle.kts
+├─ cmake
+│  └─ (as in Urho3D)
+├─ CMakeLists.txt
+├─ gradle/wrapper
+│  ├─ gradle-wrapper.jar
+│  └─ gradle-wrapper.properties
+├─ gradle.properties
+├─ gradlew
+├─ gradlew.bat
+├─ rakefile
+├─ scripts
+│  └─ (as in Urho3D)
+├─ settings.gradle.kts
+├─ .clang-format
+├─ .clang-tidy
+├─ .gitattributes
+└─ .gitignore
+```
+
+At the root of the project there are a few build scripts which can be grouped as follows:
+- **CMake** - consist of `CMakeLists.txt` and all the CMake modules and toolchains in the `cmake/` directory.
+- **Gradle** - consist of `build.gradle.kts`, `settings.gradle.kts`, `gradle.properties`, and the Gradle wrapper scripts.
+- **Shell** - consist of convenience *nix bash shell script and Windows batch files in the `script/` directory.
+- **Rake** - one `rakefile` that defines all the common tasks with opinionated default options.
+
+If you are very familiar with CMake then you can directly invoke `cmake`, `ccmake`, or `cmake-gui` to generate a build tree for all the supported platforms, except for Android platform. For the latter case you need to use `gradle`, or via its wrapper script if you don't have Gradle installed globally. For the most cases though, you will probably find it useful to use the convenience shell scripts or to use them as reference for your own convenience scripts. Finally, the `rake` command can be used to execute rake tasks for building the project and more.
+
+All the above are for the build system, the actual meat of the UrhoApp project are only residing in the following two directories:
+- `app/` - mainly contains the C++ source code in `src/cpp/` and Kotlin/Java source code in `src/java/`.
+- `bin/` - contains the assets used by the Urho3D game engine, at the very least it should have `CoreData/` and `Data/`.

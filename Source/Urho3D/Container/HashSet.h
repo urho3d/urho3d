@@ -1,29 +1,11 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
 #include "../Container/HashBase.h"
 #include "../Container/Sort.h"
+#include "../Math/MathDefs.h"
 
 #include <cassert>
 #include <initializer_list>
@@ -175,7 +157,7 @@ public:
     HashSet()
     {
         // Reserve the tail node
-        allocator_ = AllocatorInitialize((unsigned)sizeof(Node));
+        allocator_ = AllocatorInitialize((i32)sizeof(Node));
         head_ = tail_ = ReserveNode();
     }
 
@@ -183,13 +165,13 @@ public:
     HashSet(const HashSet<T>& set)
     {
         // Reserve the tail node + initial capacity according to the set's size
-        allocator_ = AllocatorInitialize((unsigned)sizeof(Node), set.Size() + 1);
+        allocator_ = AllocatorInitialize((i32)sizeof(Node), set.Size() + 1);
         head_ = tail_ = ReserveNode();
         *this = set;
     }
 
     /// Move-construct from another hash set.
-    HashSet(HashSet<T> && set) noexcept
+    HashSet(HashSet<T>&& set) noexcept
     {
         Swap(set);
     }
@@ -228,9 +210,8 @@ public:
     }
 
     /// Move-assign a hash set.
-    HashSet& operator =(HashSet<T> && rhs) noexcept
+    HashSet& operator =(HashSet<T>&& rhs) noexcept
     {
-        assert(&rhs != this);
         Swap(rhs);
         return *this;
     }
@@ -316,7 +297,7 @@ public:
     /// Insert a key. Return an iterator and set exists flag according to whether the key already existed.
     Iterator Insert(const T& key, bool& exists)
     {
-        unsigned oldSize = Size();
+        i32 oldSize = Size();
         Iterator ret = Insert(key);
         exists = (Size() == oldSize);
         return ret;
@@ -411,14 +392,14 @@ public:
     /// Sort keys. After sorting the set can be iterated in order until new elements are inserted.
     void Sort()
     {
-        unsigned numKeys = Size();
+        i32 numKeys = Size();
         if (!numKeys)
             return;
 
         auto** ptrs = new Node* [numKeys];
         Node* ptr = Head();
 
-        for (unsigned i = 0; i < numKeys; ++i)
+        for (i32 i = 0; i < numKeys; ++i)
         {
             ptrs[i] = ptr;
             ptr = ptr->Next();
@@ -428,7 +409,7 @@ public:
 
         head_ = ptrs[0];
         ptrs[0]->prev_ = 0;
-        for (unsigned i = 1; i < numKeys; ++i)
+        for (i32 i = 1; i < numKeys; ++i)
         {
             ptrs[i - 1]->next_ = ptrs[i];
             ptrs[i]->prev_ = ptrs[i - 1];
@@ -440,18 +421,17 @@ public:
     }
 
     /// Rehash to a specific bucket count, which must be a power of two. Return true if successful.
-    bool Rehash(unsigned numBuckets)
+    bool Rehash(i32 numBuckets)
     {
+        assert(numBuckets > 0);
+
         if (numBuckets == NumBuckets())
             return true;
+
         if (!numBuckets || numBuckets < Size() / MAX_LOAD_FACTOR)
             return false;
 
-        // Check for being power of two
-        unsigned check = numBuckets;
-        while (!(check & 1u))
-            check >>= 1;
-        if (check != 1)
+        if (!IsPowerOfTwo(numBuckets))
             return false;
 
         AllocateBuckets(Size(), numBuckets);
@@ -637,7 +617,7 @@ private:
     /// Compare two nodes.
     static bool CompareNodes(Node*& lhs, Node*& rhs) { return lhs->key_ < rhs->key_; }
 
-    /// Compute a hash based on the key and the bucket size
+    /// Compute a hash based on the key and the bucket size.
     unsigned Hash(const T& key) const { return MakeHash(key) & (NumBuckets() - 1); }
 };
 

@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -49,7 +30,7 @@ public:
     }
 
     /// Construct from a list of faces.
-    explicit Polyhedron(const Vector<PODVector<Vector3> >& faces) :
+    explicit Polyhedron(const Vector<Vector<Vector3>>& faces) :
         faces_(faces)
     {
     }
@@ -82,7 +63,7 @@ public:
     /// Add a quadrilateral face.
     void AddFace(const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3);
     /// Add an arbitrary face.
-    void AddFace(const PODVector<Vector3>& face);
+    void AddFace(const Vector<Vector3>& face);
     /// Clip with a plane.
     void Clip(const Plane& plane);
     /// Clip with a bounding box.
@@ -105,17 +86,17 @@ public:
     bool Empty() const { return faces_.Empty(); }
 
     /// Polygon faces.
-    Vector<PODVector<Vector3> > faces_;
+    Vector<Vector<Vector3>> faces_;
 
 private:
     /// Set a triangle face by index.
-    void SetFace(unsigned index, const Vector3& v0, const Vector3& v1, const Vector3& v2);
+    void SetFace(i32 index, const Vector3& v0, const Vector3& v1, const Vector3& v2);
     /// Set a quadrilateral face by index.
-    void SetFace(unsigned index, const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3);
+    void SetFace(i32 index, const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3);
     /// Internal vector for clipped vertices.
-    PODVector<Vector3> clippedVertices_;
+    Vector<Vector3> clippedVertices_;
     /// Internal vector for the new face being constructed.
-    PODVector<Vector3> outFace_;
+    Vector<Vector3> outFace_;
 };
 
 }

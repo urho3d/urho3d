@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -45,6 +26,7 @@ public:
     /// Destruct.
     ~AnimatedModel() override;
     /// Register object factory. Drawable must be registered first.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Load from binary data. Return true if successful.
@@ -56,12 +38,12 @@ public:
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     void ApplyAttributes() override;
     /// Process octree raycast. May be called from a worker thread.
-    void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
+    void ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results) override;
     /// Update before octree reinsertion. Is called from a worker thread.
     void Update(const FrameInfo& frame) override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     void UpdateBatches(const FrameInfo& frame) override;
-    /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
+    /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update).
     void UpdateGeometry(const FrameInfo& frame) override;
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     UpdateGeometryType GetUpdateGeometryType() override;
@@ -85,12 +67,15 @@ public:
     /// Remove all animations.
     void RemoveAllAnimationStates();
     /// Set animation LOD bias.
+    /// @property
     void SetAnimationLodBias(float bias);
     /// Set whether to update animation and the bounding box when not visible. Recommended to enable for physically controlled models like ragdolls.
+    /// @property
     void SetUpdateInvisible(bool enable);
     /// Set vertex morph weight by index.
     void SetMorphWeight(unsigned index, float weight);
     /// Set vertex morph weight by name.
+    /// @property{set_morphWeights}
     void SetMorphWeight(const String& name, float weight);
     /// Set vertex morph weight by name hash.
     void SetMorphWeight(StringHash nameHash, float weight);
@@ -100,17 +85,20 @@ public:
     void ApplyAnimation();
 
     /// Return skeleton.
+    /// @property
     Skeleton& GetSkeleton() { return skeleton_; }
 
     /// Return all animation states.
-    const Vector<SharedPtr<AnimationState> >& GetAnimationStates() const { return animationStates_; }
+    const Vector<SharedPtr<AnimationState>>& GetAnimationStates() const { return animationStates_; }
 
     /// Return number of animation states.
+    /// @property
     unsigned GetNumAnimationStates() const { return animationStates_.Size(); }
 
     /// Return animation state by animation pointer.
     AnimationState* GetAnimationState(Animation* animation) const;
     /// Return animation state by animation name.
+    /// @property{get_animationStates}
     AnimationState* GetAnimationState(const String& animationName) const;
     /// Return animation state by animation name hash.
     AnimationState* GetAnimationState(StringHash animationNameHash) const;
@@ -118,23 +106,27 @@ public:
     AnimationState* GetAnimationState(unsigned index) const;
 
     /// Return animation LOD bias.
+    /// @property
     float GetAnimationLodBias() const { return animationLodBias_; }
 
     /// Return whether to update animation when not visible.
+    /// @property
     bool GetUpdateInvisible() const { return updateInvisible_; }
 
     /// Return all vertex morphs.
     const Vector<ModelMorph>& GetMorphs() const { return morphs_; }
 
     /// Return all morph vertex buffers.
-    const Vector<SharedPtr<VertexBuffer> >& GetMorphVertexBuffers() const { return morphVertexBuffers_; }
+    const Vector<SharedPtr<VertexBuffer>>& GetMorphVertexBuffers() const { return morphVertexBuffers_; }
 
     /// Return number of vertex morphs.
+    /// @property
     unsigned GetNumMorphs() const { return morphs_.Size(); }
 
     /// Return vertex morph weight by index.
     float GetMorphWeight(unsigned index) const;
     /// Return vertex morph weight by name.
+    /// @property{get_morphWeights}
     float GetMorphWeight(const String& name) const;
     /// Return vertex morph weight by name hash.
     float GetMorphWeight(StringHash nameHash) const;
@@ -149,7 +141,7 @@ public:
     /// Set animation states attribute.
     void SetAnimationStatesAttr(const VariantVector& value);
     /// Set morphs attribute.
-    void SetMorphsAttr(const PODVector<unsigned char>& value);
+    void SetMorphsAttr(const Vector<unsigned char>& value);
     /// Return model attribute.
     ResourceRef GetModelAttr() const;
     /// Return bones' animation enabled attribute.
@@ -157,13 +149,13 @@ public:
     /// Return animation states attribute.
     VariantVector GetAnimationStatesAttr() const;
     /// Return morphs attribute.
-    const PODVector<unsigned char>& GetMorphsAttr() const;
+    const Vector<unsigned char>& GetMorphsAttr() const;
 
     /// Return per-geometry bone mappings.
-    const Vector<PODVector<unsigned> >& GetGeometryBoneMappings() const { return geometryBoneMappings_; }
+    const Vector<Vector<unsigned>>& GetGeometryBoneMappings() const { return geometryBoneMappings_; }
 
-    /// Return per-geometry skin matrices. If empty, uses global skinning
-    const Vector<PODVector<Matrix3x4> >& GetGeometrySkinMatrices() const { return geometrySkinMatrices_; }
+    /// Return per-geometry skin matrices. If empty, uses global skinning.
+    const Vector<Vector<Matrix3x4>>& GetGeometrySkinMatrices() const { return geometrySkinMatrices_; }
 
     /// Recalculate the bone bounding box. Normally called internally, but can also be manually called if up-to-date information before rendering is necessary.
     void UpdateBoneBoundingBox();
@@ -185,7 +177,7 @@ private:
     void RemoveRootBone();
     /// Mark animation and skinning to require an update.
     void MarkAnimationDirty();
-    /// Mark animation and skinning to require a forced update (blending order changed.)
+    /// Mark animation and skinning to require a forced update (blending order changed).
     void MarkAnimationOrderDirty();
     /// Mark morphs to require an update.
     void MarkMorphsDirty();
@@ -212,25 +204,25 @@ private:
     /// Skeleton.
     Skeleton skeleton_;
     /// Morph vertex buffers.
-    Vector<SharedPtr<VertexBuffer> > morphVertexBuffers_;
+    Vector<SharedPtr<VertexBuffer>> morphVertexBuffers_;
     /// Vertex morphs.
     Vector<ModelMorph> morphs_;
     /// Animation states.
-    Vector<SharedPtr<AnimationState> > animationStates_;
+    Vector<SharedPtr<AnimationState>> animationStates_;
     /// Skinning matrices.
-    PODVector<Matrix3x4> skinMatrices_;
+    Vector<Matrix3x4> skinMatrices_;
     /// Mapping of subgeometry bone indices, used if more bones than skinning shader can manage.
-    Vector<PODVector<unsigned> > geometryBoneMappings_;
+    Vector<Vector<unsigned>> geometryBoneMappings_;
     /// Subgeometry skinning matrices, used if more bones than skinning shader can manage.
-    Vector<PODVector<Matrix3x4> > geometrySkinMatrices_;
+    Vector<Vector<Matrix3x4>> geometrySkinMatrices_;
     /// Subgeometry skinning matrix pointers, if more bones than skinning shader can manage.
-    Vector<PODVector<Matrix3x4*> > geometrySkinMatrixPtrs_;
+    Vector<Vector<Matrix3x4*>> geometrySkinMatrixPtrs_;
     /// Bounding box calculated from bones.
     BoundingBox boneBoundingBox_;
     /// Attribute buffer.
     mutable VectorBuffer attrBuffer_;
     /// The frame number animation LOD distance was last calculated on.
-    unsigned animationLodFrameNumber_;
+    i32 animationLodFrameNumber_;
     /// Morph vertex element mask.
     VertexMaskFlags morphElementMask_;
     /// Animation LOD bias.

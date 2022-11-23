@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -43,9 +24,10 @@ class URHO3D_API SoundSource : public Component
 public:
     /// Construct.
     explicit SoundSource(Context* context);
-    /// Destruct. Remove self from the audio subsystem
+    /// Destruct. Remove self from the audio subsystem.
     ~SoundSource() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Seek to time.
@@ -63,48 +45,62 @@ public:
     /// Stop playback.
     void Stop();
     /// Set sound type, determines the master gain group.
+    /// @property
     void SetSoundType(const String& type);
     /// Set frequency.
+    /// @property
     void SetFrequency(float frequency);
     /// Set gain. 0.0 is silence, 1.0 is full volume.
+    /// @property
     void SetGain(float gain);
     /// Set attenuation. 1.0 is unaltered. Used for distance attenuated playback.
     void SetAttenuation(float attenuation);
     /// Set stereo panning. -1.0 is full left and 1.0 is full right.
+    /// @property
     void SetPanning(float panning);
     /// Set to remove either the sound source component or its owner node from the scene automatically on sound playback completion. Disabled by default.
+    /// @property
     void SetAutoRemoveMode(AutoRemoveMode mode);
     /// Set new playback position.
     void SetPlayPosition(signed char* pos);
 
     /// Return sound.
+    /// @property
     Sound* GetSound() const { return sound_; }
 
     /// Return playback position.
     volatile signed char* GetPlayPosition() const { return position_; }
 
     /// Return sound type, determines the master gain group.
+    /// @property
     String GetSoundType() const { return soundType_; }
 
     /// Return playback time position.
+    /// @property
     float GetTimePosition() const { return timePosition_; }
 
     /// Return frequency.
+    /// @property
     float GetFrequency() const { return frequency_; }
 
     /// Return gain.
+    /// @property
     float GetGain() const { return gain_; }
 
     /// Return attenuation.
+    /// @property
     float GetAttenuation() const { return attenuation_; }
 
     /// Return stereo panning.
+    /// @property
     float GetPanning() const { return panning_; }
 
     /// Return automatic removal mode on sound playback completion.
+    /// @property
     AutoRemoveMode GetAutoRemoveMode() const { return autoRemove_; }
 
     /// Return whether is playing.
+    /// @property
     bool IsPlaying() const;
 
     /// Update the sound source. Perform subclass specific operations. Called by Audio.
@@ -120,7 +116,7 @@ public:
     void SetPositionAttr(int value);
     /// Return sound attribute.
     ResourceRef GetSoundAttr() const;
-    /// Set sound playing attribute
+    /// Set sound playing attribute.
     void SetPlayingAttr(bool value);
     /// Return sound position attribute.
     int GetPositionAttr() const;

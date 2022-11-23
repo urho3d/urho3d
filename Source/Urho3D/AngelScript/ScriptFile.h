@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -53,6 +34,7 @@ public:
     /// Destruct.
     ~ScriptFile() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
@@ -73,7 +55,7 @@ public:
     /// Remove all scripted event handlers.
     void RemoveEventHandlers() override;
     /// Remove all scripted event handlers, except those listed.
-    void RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions) override;
+    void RemoveEventHandlersExcept(const Vector<StringHash>& exceptions) override;
     /// Return whether has subscribed to an event.
     bool HasEventHandler(StringHash eventType) const override;
     /// Return whether has subscribed to a specific sender's event.
@@ -113,8 +95,11 @@ public:
     /// Return whether script compiled successfully.
     bool IsCompiled() const { return compiled_; }
 
-    /// Clean up an event invoker object when its associated script object no longer exists
+    /// Clean up an event invoker object when its associated script object no longer exists.
     void CleanupEventInvoker(asIScriptObject* object);
+
+    void SetOnlyCompile() { onlyCompile_ = true; }
+    Script* GetScript() const { return script_; }
 
 private:
     /// Add an event handler and create the necessary proxy object.
@@ -143,13 +128,14 @@ private:
     /// Search cache for functions.
     HashMap<String, asIScriptFunction*> functions_;
     /// Search cache for methods.
-    HashMap<asITypeInfo*, HashMap<String, asIScriptFunction*> > methods_;
+    HashMap<asITypeInfo*, HashMap<String, asIScriptFunction*>> methods_;
     /// Delayed function calls.
     Vector<DelayedCall> delayedCalls_;
-    /// Event helper objects for handling procedural or non-ScriptInstance script events
-    HashMap<asIScriptObject*, SharedPtr<ScriptEventInvoker> > eventInvokers_;
+    /// Event helper objects for handling procedural or non-ScriptInstance script events.
+    HashMap<asIScriptObject*, SharedPtr<ScriptEventInvoker>> eventInvokers_;
     /// Byte code for asynchronous loading.
     SharedArrayPtr<unsigned char> loadByteCode_;
+    bool onlyCompile_{false};
     /// Byte code size for asynchronous loading.
     unsigned loadByteCodeSize_{};
 };

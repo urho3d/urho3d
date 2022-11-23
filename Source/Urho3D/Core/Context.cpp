@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -67,7 +48,7 @@ void EventReceiverGroup::EndSendEvent()
     if (inSend_ == 0 && dirty_)
     {
         /// \todo Could be optimized by erase-swap, but this keeps the receiver order
-        for (unsigned i = receivers_.Size() - 1; i < receivers_.Size(); --i)
+        for (i32 i = receivers_.Size() - 1; i >= 0; --i)
         {
             if (!receivers_[i])
                 receivers_.Erase(i);
@@ -87,7 +68,7 @@ void EventReceiverGroup::Remove(Object* object)
 {
     if (inSend_ > 0)
     {
-        PODVector<Object*>::Iterator i = receivers_.Find(object);
+        Vector<Object*>::Iterator i = receivers_.Find(object);
         if (i != receivers_.End())
         {
             (*i) = nullptr;
@@ -98,9 +79,9 @@ void EventReceiverGroup::Remove(Object* object)
         receivers_.Remove(object);
 }
 
-void RemoveNamedAttribute(HashMap<StringHash, Vector<AttributeInfo> >& attributes, StringHash objectType, const char* name)
+void RemoveNamedAttribute(HashMap<StringHash, Vector<AttributeInfo>>& attributes, StringHash objectType, const char* name)
 {
-    HashMap<StringHash, Vector<AttributeInfo> >::Iterator i = attributes.Find(objectType);
+    HashMap<StringHash, Vector<AttributeInfo>>::Iterator i = attributes.Find(objectType);
     if (i == attributes.End())
         return;
 
@@ -146,14 +127,14 @@ Context::~Context()
     factories_.Clear();
 
     // Delete allocated event data maps
-    for (PODVector<VariantMap*>::Iterator i = eventDataMaps_.Begin(); i != eventDataMaps_.End(); ++i)
+    for (Vector<VariantMap*>::Iterator i = eventDataMaps_.Begin(); i != eventDataMaps_.End(); ++i)
         delete *i;
     eventDataMaps_.Clear();
 }
 
 SharedPtr<Object> Context::CreateObject(StringHash objectType)
 {
-    HashMap<StringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(objectType);
+    HashMap<StringHash, SharedPtr<ObjectFactory>>::ConstIterator i = factories_.Find(objectType);
     if (i != factories_.End())
         return i->second_->CreateObject();
     else
@@ -188,7 +169,7 @@ void Context::RegisterSubsystem(Object* object)
 
 void Context::RemoveSubsystem(StringHash objectType)
 {
-    HashMap<StringHash, SharedPtr<Object> >::Iterator i = subsystems_.Find(objectType);
+    HashMap<StringHash, SharedPtr<Object>>::Iterator i = subsystems_.Find(objectType);
     if (i != subsystems_.End())
         subsystems_.Erase(i);
 }
@@ -353,7 +334,7 @@ void Context::CopyBaseAttributes(StringHash baseType, StringHash derivedType)
 
 Object* Context::GetSubsystem(StringHash type) const
 {
-    HashMap<StringHash, SharedPtr<Object> >::ConstIterator i = subsystems_.Find(type);
+    HashMap<StringHash, SharedPtr<Object>>::ConstIterator i = subsystems_.Find(type);
     if (i != subsystems_.End())
         return i->second_;
     else
@@ -382,13 +363,13 @@ Object* Context::GetEventSender() const
 const String& Context::GetTypeName(StringHash objectType) const
 {
     // Search factories to find the hash-to-name mapping
-    HashMap<StringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(objectType);
+    HashMap<StringHash, SharedPtr<ObjectFactory>>::ConstIterator i = factories_.Find(objectType);
     return i != factories_.End() ? i->second_->GetTypeName() : String::EMPTY;
 }
 
 AttributeInfo* Context::GetAttribute(StringHash objectType, const char* name)
 {
-    HashMap<StringHash, Vector<AttributeInfo> >::Iterator i = attributes_.Find(objectType);
+    HashMap<StringHash, Vector<AttributeInfo>>::Iterator i = attributes_.Find(objectType);
     if (i == attributes_.End())
         return nullptr;
 
@@ -421,12 +402,12 @@ void Context::AddEventReceiver(Object* receiver, Object* sender, StringHash even
 
 void Context::RemoveEventSender(Object* sender)
 {
-    HashMap<Object*, HashMap<StringHash, SharedPtr<EventReceiverGroup> > >::Iterator i = specificEventReceivers_.Find(sender);
+    HashMap<Object*, HashMap<StringHash, SharedPtr<EventReceiverGroup>>>::Iterator i = specificEventReceivers_.Find(sender);
     if (i != specificEventReceivers_.End())
     {
-        for (HashMap<StringHash, SharedPtr<EventReceiverGroup> >::Iterator j = i->second_.Begin(); j != i->second_.End(); ++j)
+        for (HashMap<StringHash, SharedPtr<EventReceiverGroup>>::Iterator j = i->second_.Begin(); j != i->second_.End(); ++j)
         {
-            for (PODVector<Object*>::Iterator k = j->second_->receivers_.Begin(); k != j->second_->receivers_.End(); ++k)
+            for (Vector<Object*>::Iterator k = j->second_->receivers_.Begin(); k != j->second_->receivers_.End(); ++k)
             {
                 Object* receiver = *k;
                 if (receiver)

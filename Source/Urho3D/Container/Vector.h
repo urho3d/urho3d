@@ -1,43 +1,26 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
 #include "../Container/VectorBase.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cstring>
-#include <algorithm>
 #include <initializer_list>
 #include <new>
+#include <type_traits>
 #include <utility>
-
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:6293)
-#endif
 
 namespace Urho3D
 {
+
+/// No index.
+inline constexpr i32 NINDEX = -1;
+
+/// End position.
+inline constexpr i32 ENDPOS = -1;
 
 /// %Vector template class.
 template <class T> class Vector : public VectorBase
@@ -54,39 +37,54 @@ public:
     Vector() noexcept = default;
 
     /// Construct with initial size.
-    explicit Vector(unsigned size)
+    explicit Vector(i32 size)
     {
+        assert(size >= 0);
         Resize(size);
     }
 
     /// Construct with initial size and default value.
-    Vector(unsigned size, const T& value)
+    Vector(i32 size, const T& value)
     {
+        assert(size >= 0);
         Resize(size);
-        for (unsigned i = 0; i < size; ++i)
+        for (i32 i = 0; i < size; ++i)
             At(i) = value;
     }
 
     /// Construct with initial data.
-    Vector(const T* data, unsigned size)
+    Vector(const T* data, i32 size)
     {
-        DoInsertElements(0, data, data + size, CopyTag{});
+        assert((size >= 0 && data) || (!size && !data));
+
+        if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
+        {
+            Resize(size);
+            CopyElements(Buffer(), data, size);
+        }
+        else
+        {
+            DoInsertElements(0, data, data + size, CopyTag{});
+        }
     }
 
     /// Copy-construct from another vector.
     Vector(const Vector<T>& vector)
     {
-        DoInsertElements(0, vector.Begin(), vector.End(), CopyTag{});
+        if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
+            *this = vector;
+        else
+            DoInsertElements(0, vector.Begin(), vector.End(), CopyTag{});
     }
 
-    /// Copy-construct from another vector (iterator version)
+    /// Copy-construct from another vector (iterator version).
     Vector(ConstIterator start, ConstIterator end)
     {
         DoInsertElements(0, start, end, CopyTag{});
     }
 
     /// Move-construct from another vector.
-    Vector(Vector<T> && vector)
+    Vector(Vector<T>&& vector)
     {
         Swap(vector);
     }
@@ -103,7 +101,9 @@ public:
     /// Destruct.
     ~Vector()
     {
-        DestructElements(Buffer(), size_);
+        if constexpr (!std::is_trivial<T>::value)
+            DestructElements(Buffer(), size_);
+
         delete[] buffer_;
     }
 
@@ -113,16 +113,24 @@ public:
         // In case of self-assignment do nothing
         if (&rhs != this)
         {
-            Vector<T> copy(rhs);
-            Swap(copy);
+            if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
+            {
+                Resize(rhs.size_);
+                CopyElements(Buffer(), rhs.Buffer(), rhs.size_);
+            }
+            else
+            {
+                Vector<T> copy(rhs);
+                Swap(copy);
+            }
         }
+
         return *this;
     }
 
     /// Move-assign from another vector.
-    Vector<T>& operator =(Vector<T> && rhs)
+    Vector<T>& operator =(Vector<T>&& rhs)
     {
-        assert(&rhs != this);
         Swap(rhs);
         return *this;
     }
@@ -165,7 +173,7 @@ public:
 
         T* buffer = Buffer();
         T* rhsBuffer = rhs.Buffer();
-        for (unsigned i = 0; i < size_; ++i)
+        for (i32 i = 0; i < size_; ++i)
         {
             if (buffer[i] != rhsBuffer[i])
                 return false;
@@ -182,7 +190,7 @@ public:
 
         T* buffer = Buffer();
         T* rhsBuffer = rhs.Buffer();
-        for (unsigned i = 0; i < size_; ++i)
+        for (i32 i = 0; i < size_; ++i)
         {
             if (buffer[i] != rhsBuffer[i])
                 return true;
@@ -192,30 +200,30 @@ public:
     }
 
     /// Return element at index.
-    T& operator [](unsigned index)
+    T& operator [](i32 index)
     {
-        assert(index < size_);
+        assert(index >= 0 && index < size_);
         return Buffer()[index];
     }
 
     /// Return const element at index.
-    const T& operator [](unsigned index) const
+    const T& operator [](i32 index) const
     {
-        assert(index < size_);
+        assert(index >= 0 && index < size_);
         return Buffer()[index];
     }
 
     /// Return element at index.
-    T& At(unsigned index)
+    T& At(i32 index)
     {
-        assert(index < size_);
+        assert(index >= 0 && index < size_);
         return Buffer()[index];
     }
 
     /// Return const element at index.
-    const T& At(unsigned index) const
+    const T& At(i32 index) const
     {
-        assert(index < size_);
+        assert(index >= 0 && index < size_);
         return Buffer()[index];
     }
 
@@ -240,18 +248,32 @@ public:
 #ifndef COVERITY_SCAN_MODEL
     void Push(const T& value)
     {
-        if (size_ < capacity_)
+        if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
         {
-            // Optimize common case
-            ++size_;
-            new (&Back()) T(value);
+            if (size_ < capacity_)
+                ++size_;
+            else
+                Resize(size_ + 1);
+
+            Back() = value;
         }
         else
-            DoInsertElements(size_, &value, &value + 1, CopyTag{});
+        {
+            if (size_ < capacity_)
+            {
+                // Optimize common case
+                ++size_;
+                new (&Back()) T(value);
+            }
+            else
+            {
+                DoInsertElements(size_, &value, &value + 1, CopyTag{});
+            }
+        }
     }
 
     /// Move-add an element at the end.
-    void Push(T && value)
+    void Push(T&& value)
     {
         if (size_ < capacity_)
         {
@@ -273,7 +295,21 @@ public:
 #endif
 
     /// Add another vector at the end.
-    void Push(const Vector<T>& vector) { DoInsertElements(size_, vector.Begin(), vector.End(), CopyTag{}); }
+    void Push(const Vector<T>& vector)
+    {
+        if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
+        {
+            // Obtain the size before resizing, in case the other vector is another reference to this vector
+            i32 thisSize = size_;
+            i32 vectorSize = vector.size_;
+            Resize(thisSize + vectorSize);
+            CopyElements(Buffer() + thisSize, vector.Buffer(), vectorSize);
+        }
+        else
+        {
+            DoInsertElements(size_, vector.Begin(), vector.End(), CopyTag{});
+        }
+    }
 
     /// Remove the last element.
     void Pop()
@@ -282,99 +318,216 @@ public:
             Resize(size_ - 1);
     }
 
-    /// Insert an element at position.
-    void Insert(unsigned pos, const T& value)
+    /// Insert an element at position. If pos is ENDPOS, append the new value at the end.
+    void Insert(i32 pos, const T& value)
     {
+        assert((pos >= 0 && pos <= size_) || pos == ENDPOS);
         DoInsertElements(pos, &value, &value + 1, CopyTag{});
     }
 
-    /// Insert an element at position.
-    void Insert(unsigned pos, T && value)
+    /// Insert an element at position. If pos is ENDPOS, append the new value at the end.
+    void Insert(i32 pos, T&& value)
     {
-        DoInsertElements(pos, &value, &value + 1, MoveTag{});
+        assert((pos >= 0 && pos <= size_) || pos == ENDPOS);
+
+        if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
+        {
+            if (pos == ENDPOS)
+                pos = size_;
+
+            i32 oldSize = size_;
+            Resize(size_ + 1);
+            MoveRange(pos + 1, pos, oldSize - pos);
+            Buffer()[pos] = value;
+        }
+        else
+        {
+            DoInsertElements(pos, &value, &value + 1, MoveTag{});
+        }
     }
 
-    /// Insert another vector at position.
-    void Insert(unsigned pos, const Vector<T>& vector)
+    /// Insert another vector at position. If pos is ENDPOS, append the new elements at the end.
+    void Insert(i32 pos, const Vector<T>& vector)
     {
-        DoInsertElements(pos, vector.Begin(), vector.End(), CopyTag{});
+        assert((pos >= 0 && pos <= size_) || pos == ENDPOS);
+
+        if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
+        {
+            if (pos == ENDPOS)
+                pos = size_;
+
+            i32 oldSize = size_;
+            Resize(size_ + vector.size_);
+            MoveRange(pos + vector.size_, pos, oldSize - pos);
+            CopyElements(Buffer() + pos, vector.Buffer(), vector.size_);
+        }
+        else
+        {
+            DoInsertElements(pos, vector.Begin(), vector.End(), CopyTag{});
+        }
     }
 
     /// Insert an element by iterator.
     Iterator Insert(const Iterator& dest, const T& value)
     {
-        auto pos = (unsigned)(dest - Begin());
-        return DoInsertElements(pos, &value, &value + 1, CopyTag{});
+        if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
+        {
+            i32 pos = (i32)(dest - Begin());
+            assert(pos >= 0 && pos <= size_);
+            Insert(pos, value);
+
+            return Begin() + pos;
+        }
+        else
+        {
+            i32 pos = (i32)(dest - Begin());
+            assert(pos >= 0 && pos <= size_);
+            return DoInsertElements(pos, &value, &value + 1, CopyTag{});
+        }
     }
 
     /// Move-insert an element by iterator.
-    Iterator Insert(const Iterator& dest, T && value)
+    Iterator Insert(const Iterator& dest, T&& value)
     {
-        auto pos = (unsigned)(dest - Begin());
+        i32 pos = (i32)(dest - Begin());
+        assert(pos >= 0 && pos <= size_);
         return DoInsertElements(pos, &value, &value + 1, MoveTag{});
     }
 
     /// Insert a vector by iterator.
     Iterator Insert(const Iterator& dest, const Vector<T>& vector)
     {
-        auto pos = (unsigned)(dest - Begin());
-        return DoInsertElements(pos, vector.Begin(), vector.End(), CopyTag{});
+        if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
+        {
+            i32 pos = (i32)(dest - Begin());
+            assert(pos >= 0 && pos <= size_);
+            Insert(pos, vector);
+
+            return Begin() + pos;
+        }
+        else
+        {
+            i32 pos = (i32)(dest - Begin());
+            assert(pos >= 0 && pos <= size_);
+            return DoInsertElements(pos, vector.Begin(), vector.End(), CopyTag{});
+        }
     }
 
     /// Insert a vector partially by iterators.
     Iterator Insert(const Iterator& dest, const ConstIterator& start, const ConstIterator& end)
     {
-        auto pos = (unsigned)(dest - Begin());
-        return DoInsertElements(pos, start, end, CopyTag{});
+        if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
+        {
+            i32 pos = (i32)(dest - Begin());
+            assert(pos >= 0 && pos <= size_);
+            i32 length = (i32)(end - start);
+            Resize(size_ + length);
+            MoveRange(pos + length, pos, size_ - pos - length);
+            CopyElements(Buffer() + pos, &(*start), length);
+
+            return Begin() + pos;
+        }
+        else
+        {
+            i32 pos = (i32)(dest - Begin());
+            assert(pos >= 0 && pos <= size_);
+            return DoInsertElements(pos, start, end, CopyTag{});
+        }
     }
 
     /// Insert elements.
     Iterator Insert(const Iterator& dest, const T* start, const T* end)
     {
-        auto pos = (unsigned)(dest - Begin());
-        return DoInsertElements(pos, start, end, CopyTag{});
-    }
-
-    /// Erase a range of elements.
-    void Erase(unsigned pos, unsigned length = 1)
-    {
-        // Return if the range is illegal
-        if (pos + length > size_ || !length)
-            return;
-
-        DoEraseElements(pos, length);
-    }
-
-    /// Erase a range of elements by swapping elements from the end of the array.
-    void EraseSwap(unsigned pos, unsigned length = 1)
-    {
-        unsigned shiftStartIndex = pos + length;
-        // Return if the range is illegal
-        if (shiftStartIndex > size_ || !length)
-            return;
-
-        unsigned newSize = size_ - length;
-        unsigned trailingCount = size_ - shiftStartIndex;
-        if (trailingCount <= length)
+        if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
         {
-            // We're removing more elements from the array than exist past the end of the range being removed, so perform a normal shift and destroy
-            DoEraseElements(pos, length);
+            i32 pos = (i32)(dest - Begin());
+            assert(pos >= 0 && pos <= size_);
+            i32 length = (i32)(end - start);
+            Resize(size_ + length);
+            MoveRange(pos + length, pos, size_ - pos - length);
+
+            T* destPtr = Buffer() + pos;
+            for (const T* i = start; i != end; ++i)
+                *destPtr++ = *i;
+
+            return Begin() + pos;
         }
         else
         {
-            // Swap elements from the end of the array into the empty space
-            T* buffer = Buffer();
-            std::move(buffer + newSize, buffer + size_, buffer + pos);
+            i32 pos = (i32)(dest - Begin());
+            assert(pos >= 0 && pos <= size_);
+            return DoInsertElements(pos, start, end, CopyTag{});
+        }
+    }
+
+    /// Erase a range of elements.
+    void Erase(i32 pos, i32 length = 1)
+    {
+        assert(pos >= 0 && length >= 0 && pos + length <= size_);
+
+        if (!length)
+            return;
+
+        if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
+        {
+            MoveRange(pos, pos + length, size_ - pos - length);
+            Resize(size_ - length);
+        }
+        else
+        {
+            DoEraseElements(pos, length);
+        }
+    }
+
+    /// Erase a range of elements by swapping elements from the end of the array.
+    void EraseSwap(i32 pos, i32 length = 1)
+    {
+        assert(pos >= 0 && length >= 1 && pos + length <= size_);
+
+        i32 shiftStartIndex = pos + length;
+        i32 newSize = size_ - length;
+        i32 trailingCount = size_ - shiftStartIndex;
+
+        if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
+        {
+            if (trailingCount <= length)
+            {
+                // We're removing more elements from the array than exist past the end of the range being removed, so perform a normal shift and destroy
+                MoveRange(pos, shiftStartIndex, trailingCount);
+            }
+            else
+            {
+                // Swap elements from the end of the array into the empty space
+                CopyElements(Buffer() + pos, Buffer() + newSize, length);
+            }
             Resize(newSize);
+        }
+        else
+        {
+            if (trailingCount <= length)
+            {
+                // We're removing more elements from the array than exist past the end of the range being removed, so perform a normal shift and destroy
+                DoEraseElements(pos, length);
+            }
+            else
+            {
+                // Swap elements from the end of the array into the empty space
+                T* buffer = Buffer();
+                std::move(buffer + newSize, buffer + size_, buffer + pos);
+                Resize(newSize);
+            }
         }
     }
 
     /// Erase an element by iterator. Return iterator to the next element.
     Iterator Erase(const Iterator& it)
     {
-        auto pos = (unsigned)(it - Begin());
-        if (pos >= size_)
+        i32 pos = (i32)(it - Begin());
+        assert(pos >= 0 && pos <= size_);
+
+        if (pos == size_)
             return End();
+
         Erase(pos);
 
         return Begin() + pos;
@@ -383,10 +536,13 @@ public:
     /// Erase a range by iterators. Return iterator to the next element.
     Iterator Erase(const Iterator& start, const Iterator& end)
     {
-        auto pos = (unsigned)(start - Begin());
-        if (pos >= size_)
+        i32 pos = (i32)(start - Begin());
+        assert(pos >= 0 && pos <= size_);
+
+        if (pos == size_)
             return End();
-        auto length = (unsigned)(end - start);
+
+        i32 length = (i32)(end - start);
         Erase(pos, length);
 
         return Begin() + pos;
@@ -402,7 +558,9 @@ public:
             return true;
         }
         else
+        {
             return false;
+        }
     }
 
     /// Erase an element by value by swapping with the last element. Return true if was found and erased.
@@ -415,46 +573,105 @@ public:
             return true;
         }
         else
+        {
             return false;
+        }
     }
 
     /// Clear the vector.
     void Clear() { Resize(0); }
 
     /// Resize the vector.
-    void Resize(unsigned newSize) { DoResize(newSize); }
+    void Resize(i32 newSize)
+    {
+        assert(newSize >= 0);
+
+        if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
+        {
+            if (newSize > capacity_)
+            {
+                if (!capacity_)
+                    capacity_ = newSize;
+                else
+                {
+                    while (capacity_ < newSize)
+                        capacity_ += (capacity_ + 1) >> 1;
+                }
+
+                u8* newBuffer = AllocateBuffer((i32)(capacity_ * sizeof(T)));
+                // Move the data into the new buffer and delete the old
+                if (buffer_)
+                {
+                    CopyElements(reinterpret_cast<T*>(newBuffer), Buffer(), size_);
+                    delete[] buffer_;
+                }
+                buffer_ = newBuffer;
+            }
+
+            size_ = newSize;
+        }
+        else
+        {
+            DoResize(newSize);
+        }
+    }
 
     /// Resize the vector and fill new elements with default value.
-    void Resize(unsigned newSize, const T& value)
+    void Resize(i32 newSize, const T& value)
     {
-        unsigned oldSize = Size();
-        DoResize(newSize);
-        for (unsigned i = oldSize; i < newSize; ++i)
+        assert(newSize >= 0);
+        i32 oldSize = Size();
+        Resize(newSize);
+        for (i32 i = oldSize; i < newSize; ++i)
             At(i) = value;
     }
 
     /// Set new capacity.
-    void Reserve(unsigned newCapacity)
+    void Reserve(i32 newCapacity)
     {
+        assert(newCapacity >= 0);
+
         if (newCapacity < size_)
             newCapacity = size_;
 
-        if (newCapacity != capacity_)
+        if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
         {
-            T* newBuffer = nullptr;
-            capacity_ = newCapacity;
-
-            if (capacity_)
+            if (newCapacity != capacity_)
             {
-                newBuffer = reinterpret_cast<T*>(AllocateBuffer((unsigned)(capacity_ * sizeof(T))));
-                // Move the data into the new buffer
-                ConstructElements(newBuffer, Begin(), End(), MoveTag{});
-            }
+                u8* newBuffer = nullptr;
+                capacity_ = newCapacity;
 
-            // Delete the old buffer
-            DestructElements(Buffer(), size_);
-            delete[] buffer_;
-            buffer_ = reinterpret_cast<unsigned char*>(newBuffer);
+                if (capacity_)
+                {
+                    newBuffer = AllocateBuffer((i32)(capacity_ * sizeof(T)));
+                    // Move the data into the new buffer
+                    CopyElements(reinterpret_cast<T*>(newBuffer), Buffer(), size_);
+                }
+
+                // Delete the old buffer
+                delete[] buffer_;
+                buffer_ = newBuffer;
+            }
+        }
+        else
+        {
+            if (newCapacity != capacity_)
+            {
+                T* newBuffer = nullptr;
+                capacity_ = newCapacity;
+
+                if (capacity_)
+                {
+                    newBuffer = reinterpret_cast<T*>(AllocateBuffer((i32)(capacity_ * sizeof(T))));
+                    // Move the data into the new buffer
+                    ConstructElements(newBuffer, Begin(), End(), MoveTag{});
+                }
+
+                // Delete the old buffer
+                DestructElements(Buffer(), size_);
+                delete[] buffer_;
+                buffer_ = reinterpret_cast<u8*>(newBuffer);
+            }
         }
     }
 
@@ -480,7 +697,7 @@ public:
     }
 
     /// Return index of value in vector, or size if not found.
-    unsigned IndexOf(const T& value) const
+    i32 IndexOf(const T& value) const
     {
         return Find(value) - Begin();
     }
@@ -528,11 +745,11 @@ public:
         return Buffer()[size_ - 1];
     }
 
-    /// Return size of vector.
-    unsigned Size() const { return size_; }
+    /// Return number of elements.
+    i32 Size() const { return size_; }
 
     /// Return capacity of vector.
-    unsigned Capacity() const { return capacity_; }
+    i32 Capacity() const { return capacity_; }
 
     /// Return whether vector is empty.
     bool Empty() const { return size_ == 0; }
@@ -542,9 +759,10 @@ public:
 
 private:
     /// Construct elements using default ctor.
-    static void ConstructElements(T* dest, unsigned count)
+    static void ConstructElements(T* dest, i32 count)
     {
-        for (unsigned i = 0; i < count; ++i)
+        assert(count >= 0);
+        for (i32 i = 0; i < count; ++i)
             new(dest + i) T();
     }
 
@@ -552,8 +770,9 @@ private:
     template <class RandomIteratorT>
     static void ConstructElements(T* dest, RandomIteratorT start, RandomIteratorT end, CopyTag)
     {
-        const unsigned count = end - start;
-        for (unsigned i = 0; i < count; ++i)
+        const i32 count = (i32)(end - start);
+        assert(count > 0);
+        for (i32 i = 0; i < count; ++i)
             new(dest + i) T(*(start + i));
     }
 
@@ -561,30 +780,39 @@ private:
     template <class RandomIteratorT>
     static void ConstructElements(T* dest, RandomIteratorT start, RandomIteratorT end, MoveTag)
     {
-        const unsigned count = end - start;
-        for (unsigned i = 0; i < count; ++i)
+        const i32 count = (i32)(end - start);
+        assert(count >= 0);
+        for (i32 i = 0; i < count; ++i)
             new(dest + i) T(std::move(*(start + i)));
     }
 
     /// Calculate new vector capacity.
-    static unsigned CalculateCapacity(unsigned size, unsigned capacity)
+    static i32 CalculateCapacity(i32 size, i32 capacity)
     {
+        assert(size > 0 && capacity >= 0);
+
         if (!capacity)
+        {
             return size;
+        }
         else
         {
             while (capacity < size)
-                capacity += (capacity + 1) >> 1;
+                capacity += (capacity + 1) >> 1; // += (capacity * 0.5 and round up)
             return capacity;
         }
     }
 
     /// Resize the vector and create/remove new elements as necessary.
-    void DoResize(unsigned newSize)
+    void DoResize(i32 newSize)
     {
+        assert(newSize >= 0);
+
         // If size shrinks, destruct the removed elements
         if (newSize < size_)
+        {
             DestructElements(Buffer() + newSize, size_ - newSize);
+        }
         else
         {
             // Allocate new buffer if necessary and copy the current elements
@@ -612,13 +840,16 @@ private:
     }
 
     /// Insert elements into the vector using copy or move constructor.
+    /// If pos is ENDPOS, append the new elements at the end.
     template <class Tag, class RandomIteratorT>
-    Iterator DoInsertElements(unsigned pos, RandomIteratorT start, RandomIteratorT end, Tag)
+    Iterator DoInsertElements(i32 pos, RandomIteratorT start, RandomIteratorT end, Tag)
     {
-        if (pos > size_)
+        assert((pos >= 0 && pos <= size_) || pos == ENDPOS);
+
+        if (pos == ENDPOS)
             pos = size_;
 
-        const unsigned numElements = end - start;
+        const i32 numElements = (i32)(end - start);
         if (size_ + numElements > capacity_)
         {
             T* src = Buffer();
@@ -661,10 +892,9 @@ private:
     }
 
     /// Erase elements from the vector.
-    Iterator DoEraseElements(unsigned pos, unsigned count)
+    Iterator DoEraseElements(i32 pos, i32 count)
     {
-        assert(count > 0);
-        assert(pos + count <= size_);
+        assert(pos >= 0 && count > 0 && pos + count <= size_);
         T* buffer = Buffer();
         std::move(buffer + pos + count, buffer + size_, buffer + pos);
         Resize(size_ - count);
@@ -672,496 +902,47 @@ private:
     }
 
     /// Call the elements' destructors.
-    static void DestructElements(T* dest, unsigned count)
+    static void DestructElements(T* dest, i32 count)
     {
+        assert(count >= 0);
+
         while (count--)
         {
             dest->~T();
             ++dest;
         }
     }
-};
 
-/// %Vector template class for POD types. Does not call constructors or destructors and uses block move. Is intentionally (for performance reasons) unsafe for self-insertion.
-template <class T> class PODVector : public VectorBase
-{
-public:
-    using ValueType = T;
-    using Iterator = RandomAccessIterator<T>;
-    using ConstIterator = RandomAccessConstIterator<T>;
-
-    /// Construct empty.
-    PODVector() noexcept = default;
-
-    /// Construct with initial size.
-    explicit PODVector(unsigned size)
+    /// Move a range of elements within the vector. Only for POD Vector.
+    void MoveRange(i32 dest, i32 src, i32 count)
     {
-        Resize(size);
-    }
+        assert(dest >= 0 && src >= 0 && count >= 0);
 
-    /// Construct with initial size and default value.
-    PODVector(unsigned size, const T& value)
-    {
-        Resize(size);
-        for (unsigned i = 0; i < size; ++i)
-            At(i) = value;
-    }
-
-    /// Construct with initial data.
-    PODVector(const T* data, unsigned size)
-    {
-        Resize(size);
-        CopyElements(Buffer(), data, size);
-    }
-
-    /// Construct from another vector.
-    PODVector(const PODVector<T>& vector)
-    {
-        *this = vector;
-    }
-    /// Aggregate initialization constructor.
-    PODVector(const std::initializer_list<T>& list) : PODVector()
-    {
-        for (auto it = list.begin(); it != list.end(); it++)
+        if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
         {
-            Push(*it);
-        }
-    }
-    /// Destruct.
-    ~PODVector()
-    {
-        delete[] buffer_;
-    }
-
-    /// Assign from another vector.
-    PODVector<T>& operator =(const PODVector<T>& rhs)
-    {
-        // In case of self-assignment do nothing
-        if (&rhs != this)
-        {
-            Resize(rhs.size_);
-            CopyElements(Buffer(), rhs.Buffer(), rhs.size_);
-        }
-        return *this;
-    }
-
-    /// Add-assign an element.
-    PODVector<T>& operator +=(const T& rhs)
-    {
-        Push(rhs);
-        return *this;
-    }
-
-    /// Add-assign another vector.
-    PODVector<T>& operator +=(const PODVector<T>& rhs)
-    {
-        Push(rhs);
-        return *this;
-    }
-
-    /// Add an element.
-    PODVector<T> operator +(const T& rhs) const
-    {
-        PODVector<T> ret(*this);
-        ret.Push(rhs);
-        return ret;
-    }
-
-    /// Add another vector.
-    PODVector<T> operator +(const PODVector<T>& rhs) const
-    {
-        PODVector<T> ret(*this);
-        ret.Push(rhs);
-        return ret;
-    }
-
-    /// Test for equality with another vector.
-    bool operator ==(const PODVector<T>& rhs) const
-    {
-        if (rhs.size_ != size_)
-            return false;
-
-        T* buffer = Buffer();
-        T* rhsBuffer = rhs.Buffer();
-        for (unsigned i = 0; i < size_; ++i)
-        {
-            if (buffer[i] != rhsBuffer[i])
-                return false;
-        }
-
-        return true;
-    }
-
-    /// Test for inequality with another vector.
-    bool operator !=(const PODVector<T>& rhs) const
-    {
-        if (rhs.size_ != size_)
-            return true;
-
-        T* buffer = Buffer();
-        T* rhsBuffer = rhs.Buffer();
-        for (unsigned i = 0; i < size_; ++i)
-        {
-            if (buffer[i] != rhsBuffer[i])
-                return true;
-        }
-
-        return false;
-    }
-
-    /// Return element at index.
-    T& operator [](unsigned index)
-    {
-        assert(index < size_);
-        return Buffer()[index];
-    }
-
-    /// Return const element at index.
-    const T& operator [](unsigned index) const
-    {
-        assert(index < size_);
-        return Buffer()[index];
-    }
-
-    /// Return element at index.
-    T& At(unsigned index)
-    {
-        assert(index < size_);
-        return Buffer()[index];
-    }
-
-    /// Return const element at index.
-    const T& At(unsigned index) const
-    {
-        assert(index < size_);
-        return Buffer()[index];
-    }
-
-    /// Add an element at the end.
-    void Push(const T& value)
-    {
-        if (size_ < capacity_)
-            ++size_;
-        else
-            Resize(size_ + 1);
-        Back() = value;
-    }
-
-    /// Add another vector at the end.
-    void Push(const PODVector<T>& vector)
-    {
-        unsigned oldSize = size_;
-        Resize(size_ + vector.size_);
-        CopyElements(Buffer() + oldSize, vector.Buffer(), vector.size_);
-    }
-
-    /// Remove the last element.
-    void Pop()
-    {
-        if (size_)
-            Resize(size_ - 1);
-    }
-
-    /// Insert an element at position.
-    void Insert(unsigned pos, const T& value)
-    {
-        if (pos > size_)
-            pos = size_;
-
-        unsigned oldSize = size_;
-        Resize(size_ + 1);
-        MoveRange(pos + 1, pos, oldSize - pos);
-        Buffer()[pos] = value;
-    }
-
-    /// Insert another vector at position.
-    void Insert(unsigned pos, const PODVector<T>& vector)
-    {
-        if (pos > size_)
-            pos = size_;
-
-        unsigned oldSize = size_;
-        Resize(size_ + vector.size_);
-        MoveRange(pos + vector.size_, pos, oldSize - pos);
-        CopyElements(Buffer() + pos, vector.Buffer(), vector.size_);
-    }
-
-    /// Insert an element by iterator.
-    Iterator Insert(const Iterator& dest, const T& value)
-    {
-        auto pos = (unsigned)(dest - Begin());
-        if (pos > size_)
-            pos = size_;
-        Insert(pos, value);
-
-        return Begin() + pos;
-    }
-
-    /// Insert a vector by iterator.
-    Iterator Insert(const Iterator& dest, const PODVector<T>& vector)
-    {
-        auto pos = (unsigned)(dest - Begin());
-        if (pos > size_)
-            pos = size_;
-        Insert(pos, vector);
-
-        return Begin() + pos;
-    }
-
-    /// Insert a vector partially by iterators.
-    Iterator Insert(const Iterator& dest, const ConstIterator& start, const ConstIterator& end)
-    {
-        auto pos = (unsigned)(dest - Begin());
-        if (pos > size_)
-            pos = size_;
-        auto length = (unsigned)(end - start);
-        Resize(size_ + length);
-        MoveRange(pos + length, pos, size_ - pos - length);
-        CopyElements(Buffer() + pos, &(*start), length);
-
-        return Begin() + pos;
-    }
-
-    /// Insert elements.
-    Iterator Insert(const Iterator& dest, const T* start, const T* end)
-    {
-        auto pos = (unsigned)(dest - Begin());
-        if (pos > size_)
-            pos = size_;
-        auto length = (unsigned)(end - start);
-        Resize(size_ + length);
-        MoveRange(pos + length, pos, size_ - pos - length);
-
-        T* destPtr = Buffer() + pos;
-        for (const T* i = start; i != end; ++i)
-            *destPtr++ = *i;
-
-        return Begin() + pos;
-    }
-
-    /// Erase a range of elements.
-    void Erase(unsigned pos, unsigned length = 1)
-    {
-        // Return if the range is illegal
-        if (!length || pos + length > size_)
-            return;
-
-        MoveRange(pos, pos + length, size_ - pos - length);
-        Resize(size_ - length);
-    }
-
-    /// Erase an element by iterator. Return iterator to the next element.
-    Iterator Erase(const Iterator& it)
-    {
-        auto pos = (unsigned)(it - Begin());
-        if (pos >= size_)
-            return End();
-        Erase(pos);
-
-        return Begin() + pos;
-    }
-
-    /// Erase a range by iterators. Return iterator to the next element.
-    Iterator Erase(const Iterator& start, const Iterator& end)
-    {
-        auto pos = (unsigned)(start - Begin());
-        if (pos >= size_)
-            return End();
-        auto length = (unsigned)(end - start);
-        Erase(pos, length);
-
-        return Begin() + pos;
-    }
-
-    /// Erase a range of elements by swapping elements from the end of the array.
-    void EraseSwap(unsigned pos, unsigned length = 1)
-    {
-        unsigned shiftStartIndex = pos + length;
-        // Return if the range is illegal
-        if (shiftStartIndex > size_ || !length)
-            return;
-
-        unsigned newSize = size_ - length;
-        unsigned trailingCount = size_ - shiftStartIndex;
-        if (trailingCount <= length)
-        {
-            // We're removing more elements from the array than exist past the end of the range being removed, so perform a normal shift and destroy
-            MoveRange(pos, shiftStartIndex, trailingCount);
+            if (count)
+                memmove(Buffer() + dest, Buffer() + src, count * sizeof(T));
         }
         else
         {
-            // Swap elements from the end of the array into the empty space
-            CopyElements(Buffer() + pos, Buffer() + newSize, length);
+            static_assert(true);
         }
-        Resize(newSize);
     }
 
-    /// Erase an element by value. Return true if was found and erased.
-    bool Remove(const T& value)
+    /// Copy elements from one buffer to another. Only for POD Vector.
+    static void CopyElements(T* dest, const T* src, i32 count)
     {
-        Iterator i = Find(value);
-        if (i != End())
+        assert(count >= 0);
+
+        if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
         {
-            Erase(i);
-            return true;
+            if (count)
+                memcpy(dest, src, count * sizeof(T));
         }
         else
-            return false;
-    }
-
-    /// Erase an element by value by swapping with the last element. Return true if was found and erased.
-    bool RemoveSwap(const T& value)
-    {
-        Iterator i = Find(value);
-        if (i != End())
         {
-            EraseSwap(i - Begin());
-            return true;
+            static_assert(true);
         }
-        else
-            return false;
-    }
-
-    /// Clear the vector.
-    void Clear() { Resize(0); }
-
-    /// Resize the vector.
-    void Resize(unsigned newSize)
-    {
-        if (newSize > capacity_)
-        {
-            if (!capacity_)
-                capacity_ = newSize;
-            else
-            {
-                while (capacity_ < newSize)
-                    capacity_ += (capacity_ + 1) >> 1;
-            }
-
-            unsigned char* newBuffer = AllocateBuffer((unsigned)(capacity_ * sizeof(T)));
-            // Move the data into the new buffer and delete the old
-            if (buffer_)
-            {
-                CopyElements(reinterpret_cast<T*>(newBuffer), Buffer(), size_);
-                delete[] buffer_;
-            }
-            buffer_ = newBuffer;
-        }
-
-        size_ = newSize;
-    }
-
-    /// Set new capacity.
-    void Reserve(unsigned newCapacity)
-    {
-        if (newCapacity < size_)
-            newCapacity = size_;
-
-        if (newCapacity != capacity_)
-        {
-            unsigned char* newBuffer = nullptr;
-            capacity_ = newCapacity;
-
-            if (capacity_)
-            {
-                newBuffer = AllocateBuffer((unsigned)(capacity_ * sizeof(T)));
-                // Move the data into the new buffer
-                CopyElements(reinterpret_cast<T*>(newBuffer), Buffer(), size_);
-            }
-
-            // Delete the old buffer
-            delete[] buffer_;
-            buffer_ = newBuffer;
-        }
-    }
-
-    /// Reallocate so that no extra memory is used.
-    void Compact() { Reserve(size_); }
-
-    /// Return iterator to value, or to the end if not found.
-    Iterator Find(const T& value)
-    {
-        Iterator it = Begin();
-        while (it != End() && *it != value)
-            ++it;
-        return it;
-    }
-
-    /// Return const iterator to value, or to the end if not found.
-    ConstIterator Find(const T& value) const
-    {
-        ConstIterator it = Begin();
-        while (it != End() && *it != value)
-            ++it;
-        return it;
-    }
-
-    /// Return index of value in vector, or size if not found.
-    unsigned IndexOf(const T& value) const
-    {
-        return Find(value) - Begin();
-    }
-
-    /// Return whether contains a specific value.
-    bool Contains(const T& value) const { return Find(value) != End(); }
-
-    /// Return iterator to the beginning.
-    Iterator Begin() { return Iterator(Buffer()); }
-
-    /// Return const iterator to the beginning.
-    ConstIterator Begin() const { return ConstIterator(Buffer()); }
-
-    /// Return iterator to the end.
-    Iterator End() { return Iterator(Buffer() + size_); }
-
-    /// Return const iterator to the end.
-    ConstIterator End() const { return ConstIterator(Buffer() + size_); }
-
-    /// Return first element.
-    T& Front() { return Buffer()[0]; }
-
-    /// Return const first element.
-    const T& Front() const { return Buffer()[0]; }
-
-    /// Return last element.
-    T& Back()
-    {
-        assert(size_);
-        return Buffer()[size_ - 1];
-    }
-
-    /// Return const last element.
-    const T& Back() const
-    {
-        assert(size_);
-        return Buffer()[size_ - 1];
-    }
-
-    /// Return number of elements.
-    unsigned Size() const { return size_; }
-
-    /// Return capacity of vector.
-    unsigned Capacity() const { return capacity_; }
-
-    /// Return whether vector is empty.
-    bool Empty() const { return size_ == 0; }
-
-    /// Return the buffer with right type.
-    T* Buffer() const { return reinterpret_cast<T*>(buffer_); }
-
-private:
-    /// Move a range of elements within the vector.
-    void MoveRange(unsigned dest, unsigned src, unsigned count)
-    {
-        if (count)
-            memmove(Buffer() + dest, Buffer() + src, count * sizeof(T));
-    }
-
-    /// Copy elements from one buffer to another.
-    static void CopyElements(T* dest, const T* src, unsigned count)
-    {
-        if (count)
-            memcpy(dest, src, count * sizeof(T));
     }
 };
 
@@ -1173,16 +954,4 @@ template <class T> typename Urho3D::Vector<T>::Iterator begin(Urho3D::Vector<T>&
 
 template <class T> typename Urho3D::Vector<T>::Iterator end(Urho3D::Vector<T>& v) { return v.End(); }
 
-template <class T> typename Urho3D::PODVector<T>::ConstIterator begin(const Urho3D::PODVector<T>& v) { return v.Begin(); }
-
-template <class T> typename Urho3D::PODVector<T>::ConstIterator end(const Urho3D::PODVector<T>& v) { return v.End(); }
-
-template <class T> typename Urho3D::PODVector<T>::Iterator begin(Urho3D::PODVector<T>& v) { return v.Begin(); }
-
-template <class T> typename Urho3D::PODVector<T>::Iterator end(Urho3D::PODVector<T>& v) { return v.End(); }
-
 }
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif

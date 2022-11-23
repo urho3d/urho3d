@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -37,6 +18,8 @@
 #ifdef URHO3D_SPINE
 #include <spine/spine.h>
 #endif
+
+using namespace std;
 
 namespace Urho3D
 {
@@ -119,8 +102,8 @@ void AnimatedSprite2D::SetAnimationSet(AnimationSet2D* animationSet)
 
         // Create skeleton
         skeleton_ = spSkeleton_create(skeletonData);
-        skeleton_->flipX = flipX_;
-        skeleton_->flipY = flipY_;
+        skeleton_->scaleX = flipX_ ? -1 : 1;
+        skeleton_->scaleY = flipY_ ? -1 : 1;
 
         if (skeleton_->data->skinsCount > 0)
         {
@@ -135,7 +118,7 @@ void AnimatedSprite2D::SetAnimationSet(AnimationSet2D* animationSet)
 #endif
     if (animationSet_->GetSpriterData())
     {
-        spriterInstance_ = new Spriter::SpriterInstance(this, animationSet_->GetSpriterData());
+        spriterInstance_ = make_unique<Spriter::SpriterInstance>(this, animationSet_->GetSpriterData());
 
         if (!animationSet_->GetSpriterData()->entities_.Empty())
         {
@@ -294,8 +277,8 @@ void AnimatedSprite2D::UpdateSpineAnimation(float timeStep)
 {
     timeStep *= speed_;
 
-    skeleton_->flipX = flipX_;
-    skeleton_->flipY = flipY_;
+    skeleton_->scaleX = flipX_ ? -1 : 1;
+    skeleton_->scaleY = flipY_ ? -1 : 1;
 
     spSkeleton_update(skeleton_, timeStep);
     spAnimationState_update(animationState_, timeStep);
@@ -305,6 +288,12 @@ void AnimatedSprite2D::UpdateSpineAnimation(float timeStep)
     sourceBatchesDirty_ = true;
     worldBoundingBoxDirty_ = true;
 }
+
+// This enum used to be defined in spine/RegionAttachment.h but it got moved inside RegionAttachment.c so it's no longer accessible.
+// It's required because AnimatedSprite2D::UpdateSourceBatchesSpine() references its values (SP_VERTEX_*)
+typedef enum {
+    SP_VERTEX_X1 = 0, SP_VERTEX_Y1, SP_VERTEX_X2, SP_VERTEX_Y2, SP_VERTEX_X3, SP_VERTEX_Y3, SP_VERTEX_X4, SP_VERTEX_Y4
+} spVertexIndex;
 
 void AnimatedSprite2D::UpdateSourceBatchesSpine()
 {
@@ -323,15 +312,15 @@ void AnimatedSprite2D::UpdateSourceBatchesSpine()
         if (!attachment)
             continue;
 
-        unsigned color = Color(color_.r_ * slot->r,
-            color_.g_ * slot->g,
-            color_.b_ * slot->b,
-            color_.a_ * slot->a).ToUInt();
+        unsigned color = Color(color_.r_ * slot->color.r,
+            color_.g_ * slot->color.g,
+            color_.b_ * slot->color.b,
+            color_.a_ * slot->color.a).ToUInt();
 
         if (attachment->type == SP_ATTACHMENT_REGION)
         {
             spRegionAttachment* region = (spRegionAttachment*)attachment;
-            spRegionAttachment_computeWorldVertices(region, slot->bone, slotVertices);
+            spRegionAttachment_computeWorldVertices(region, slot->bone, slotVertices, 0, 2);
 
             Vertex2D vertices[4];
             vertices[0].position_ = worldTransform * Vector3(slotVertices[SP_VERTEX_X1], slotVertices[SP_VERTEX_Y1]);
@@ -354,13 +343,13 @@ void AnimatedSprite2D::UpdateSourceBatchesSpine()
             sourceBatches_[0].vertices_.Push(vertices[2]);
             sourceBatches_[0].vertices_.Push(vertices[3]);
         }
-        else if (attachment->type == SP_ATTACHMENT_MESH)
+        else if (attachment->type == SP_ATTACHMENT_MESH || attachment->type == SP_ATTACHMENT_LINKED_MESH)
         {
             spMeshAttachment* mesh = (spMeshAttachment*)attachment;
-            if (mesh->verticesCount > SLOT_VERTEX_COUNT_MAX)
+            if (mesh->super.verticesCount > SLOT_VERTEX_COUNT_MAX)
                 continue;
 
-            spMeshAttachment_computeWorldVertices(mesh, slot, slotVertices);
+            spVertexAttachment_computeWorldVertices(&mesh->super, slot, 0, mesh->super.verticesCount, slotVertices, 0, 2);
 
             Vertex2D vertex;
             vertex.color_ = color;
@@ -376,28 +365,6 @@ void AnimatedSprite2D::UpdateSourceBatchesSpine()
                     sourceBatches_[0].vertices_.Push(vertex);
             }
         }
-        else if (attachment->type == SP_ATTACHMENT_SKINNED_MESH)
-        {
-            spSkinnedMeshAttachment* skinnedMesh = (spSkinnedMeshAttachment*)attachment;
-            if (skinnedMesh->uvsCount > SLOT_VERTEX_COUNT_MAX)
-                continue;
-
-            spSkinnedMeshAttachment_computeWorldVertices(skinnedMesh, slot, slotVertices);
-
-            Vertex2D vertex;
-            vertex.color_ = color;
-            for (int j = 0; j < skinnedMesh->trianglesCount; ++j)
-            {
-                int index = skinnedMesh->triangles[j] << 1;
-                vertex.position_ = worldTransform * Vector3(slotVertices[index], slotVertices[index + 1]);
-                vertex.uv_ = Vector2(skinnedMesh->uvs[index], skinnedMesh->uvs[index + 1]);
-
-                sourceBatches_[0].vertices_.Push(vertex);
-                // Add padding vertex
-                if (j % 3 == 2)
-                    sourceBatches_[0].vertices_.Push(vertex);
-            }
-        }
     }
 }
 #endif
@@ -405,7 +372,7 @@ void AnimatedSprite2D::UpdateSourceBatchesSpine()
 void AnimatedSprite2D::SetSpriterAnimation()
 {
     if (!spriterInstance_)
-        spriterInstance_ = new Spriter::SpriterInstance(this, animationSet_->GetSpriterData());
+        spriterInstance_ = make_unique<Spriter::SpriterInstance>(this, animationSet_->GetSpriterData());
 
     // Use entity is empty first entity
     if (entity_.Empty())
@@ -450,8 +417,8 @@ void AnimatedSprite2D::UpdateSourceBatchesSpriter()
     Vertex2D vertex2;
     Vertex2D vertex3;
 
-    const PODVector<Spriter::SpatialTimelineKey*>& timelineKeys = spriterInstance_->GetTimelineKeys();
-    for (unsigned i = 0; i < timelineKeys.Size(); ++i)
+    const Vector<Spriter::SpatialTimelineKey*>& timelineKeys = spriterInstance_->GetTimelineKeys();
+    for (i32 i = 0; i < timelineKeys.Size(); ++i)
     {
         if (timelineKeys[i]->GetObjectType() != Spriter::SPRITE)
             continue;
@@ -496,7 +463,11 @@ void AnimatedSprite2D::UpdateSourceBatchesSpriter()
         vertex2.uv_ = textureRect.max_;
         vertex3.uv_ = Vector2(textureRect.max_.x_, textureRect.min_.y_);
 
-        vertex0.color_ = vertex1.color_ = vertex2.color_ = vertex3.color_ = color;
+        Color finalColor;
+        finalColor.FromUInt(color);
+        finalColor.a_ = info.alpha_;
+
+        vertex0.color_ = vertex1.color_ = vertex2.color_ = vertex3.color_ = finalColor.ToUInt();
 
         vertices.Push(vertex0);
         vertices.Push(vertex1);
@@ -526,7 +497,7 @@ void AnimatedSprite2D::Dispose()
         skeleton_ = 0;
     }
 #endif
-    spriterInstance_.Reset();
+    spriterInstance_.reset();
 }
 
 }

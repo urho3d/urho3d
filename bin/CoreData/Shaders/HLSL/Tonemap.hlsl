@@ -47,7 +47,7 @@ void PS(float2 iScreenPos : TEXCOORD0,
     #endif
 
     #ifdef UNCHARTED2
-    float3 color = Uncharted2Tonemap(max(Sample2D(DiffMap, iScreenPos).rgb * cTonemapExposureBias, 0.0)) / 
+    float3 color = Uncharted2Tonemap(max(Sample2D(DiffMap, iScreenPos).rgb * cTonemapExposureBias, 0.0)) /
         Uncharted2Tonemap(float3(cTonemapMaxWhite, cTonemapMaxWhite, cTonemapMaxWhite));
     oColor = float4(color, 1.0);
     #endif

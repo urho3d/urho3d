@@ -6,7 +6,7 @@ class Sprite : public UIElement
 {
     Sprite();
     virtual ~Sprite();
-    
+
     void SetPosition(const Vector2& position);
     void SetPosition(float x, float y);
     void SetHotSpot(const IntVector2& hotSpot);
@@ -19,7 +19,7 @@ class Sprite : public UIElement
     void SetImageRect(const IntRect& rect);
     void SetFullImageRect();
     void SetBlendMode(BlendMode mode);
-    
+
     const Vector2& GetPosition() const;
     const IntVector2& GetHotSpot() const;
     const Vector2& GetScale() const;
@@ -28,7 +28,7 @@ class Sprite : public UIElement
     const IntRect& GetImageRect() const;
     BlendMode GetBlendMode() const;
     const Matrix3x4& GetTransform() const;
-    
+
     tolua_property__get_set Vector2& position;
     tolua_property__get_set IntVector2& hotSpot;
     tolua_property__get_set Vector2& scale;

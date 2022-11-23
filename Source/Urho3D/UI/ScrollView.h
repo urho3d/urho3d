@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -41,6 +22,7 @@ public:
     /// Destruct.
     ~ScrollView() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Perform UI element update.
@@ -58,76 +40,101 @@ public:
     bool IsWheelHandler() const override { return true; }
 
     /// Set content element.
+    /// @property
     void SetContentElement(UIElement* element);
     /// Set view offset from the top-left corner.
+    /// @property
     void SetViewPosition(const IntVector2& position);
     /// Set view offset from the top-left corner.
     void SetViewPosition(int x, int y);
     /// Set scrollbars' visibility manually. Disables scrollbar autoshow/hide.
     void SetScrollBarsVisible(bool horizontal, bool vertical);
     /// Set horizontal scrollbar visibility manually. Disables scrollbar autoshow/hide.
+    /// @property
     void SetHorizontalScrollBarVisible(bool visible);
     /// Set vertical scrollbar visibility manually. Disables scrollbar autoshow/hide.
+    /// @property
     void SetVerticalScrollBarVisible(bool visible);
     /// Set whether to automatically show/hide scrollbars. Default true.
+    /// @property
     void SetScrollBarsAutoVisible(bool enable);
     /// Set arrow key scroll step. Also sets it on the scrollbars.
+    /// @property
     void SetScrollStep(float step);
     /// Set arrow key page step.
+    /// @property
     void SetPageStep(float step);
 
     /// Set scroll deceleration.
+    /// @property
     void SetScrollDeceleration(float deceleration) { scrollDeceleration_ = deceleration; }
 
-    /// Set scroll snap epsilon
+    /// Set scroll snap epsilon.
+    /// @property
     void SetScrollSnapEpsilon(float snap) { scrollSnapEpsilon_ = snap; }
 
     /// Set whether child elements should be disabled while touch scrolling.
+    /// @property
     void SetAutoDisableChildren(bool disable) { autoDisableChildren_ = disable; };
 
     /// Set how much touch movement is needed to trigger child element disabling.
+    /// @property
     void SetAutoDisableThreshold(float amount) { autoDisableThreshold_ = amount; };
 
     /// Return view offset from the top-left corner.
+    /// @property
     const IntVector2& GetViewPosition() const { return viewPosition_; }
 
     /// Return content element.
+    /// @property
     UIElement* GetContentElement() const { return contentElement_; }
 
     /// Return horizontal scroll bar.
+    /// @property
     ScrollBar* GetHorizontalScrollBar() const { return horizontalScrollBar_; }
 
     /// Return vertical scroll bar.
+    /// @property
     ScrollBar* GetVerticalScrollBar() const { return verticalScrollBar_; }
 
     /// Return scroll panel.
+    /// @property
     BorderImage* GetScrollPanel() const { return scrollPanel_; }
 
     /// Return whether scrollbars are automatically shown/hidden.
+    /// @property
     bool GetScrollBarsAutoVisible() const { return scrollBarsAutoVisible_; }
 
     /// Return whether the horizontal scrollbar is visible.
+    /// @property
     bool GetHorizontalScrollBarVisible() const;
 
     /// Return whether the vertical scrollbar is visible.
+    /// @property
     bool GetVerticalScrollBarVisible() const;
 
     /// Return arrow key scroll step.
+    /// @property
     float GetScrollStep() const;
 
     /// Return arrow key page step.
+    /// @property
     float GetPageStep() const { return pageStep_; }
 
     /// Return scroll deceleration.
+    /// @property
     float GetScrollDeceleration() const { return scrollDeceleration_; }
 
-    /// Return scroll snap epsilon
+    /// Return scroll snap epsilon.
+    /// @property
     float GetScrollSnapEpsilon() const { return scrollSnapEpsilon_; }
 
     /// Return whether child element will be disabled while touch scrolling.
+    /// @property
     bool GetAutoDisableChildren() const { return autoDisableChildren_; }
 
     /// Return how much touch movement is needed to trigger child element disabling.
+    /// @property
     float GetAutoDisableThreshold() const { return autoDisableThreshold_; }
 
     /// Set view position attribute.
@@ -173,21 +180,21 @@ protected:
     bool ignoreEvents_;
     /// Resize content widget width to match panel. Internal flag, used by the ListView class.
     bool resizeContentWidth_;
-    /// Scroll deceleration
+    /// Scroll deceleration.
     float scrollDeceleration_;
-    /// Scroll snap epsilon
+    /// Scroll snap epsilon.
     float scrollSnapEpsilon_;
-    /// Used to trigger scroll smoothing when false;
+    /// Used to trigger scroll smoothing when false.
     bool scrollTouchDown_;
-    /// Used to prevent touch scroll - scroll bar conflict
+    /// Used to prevent touch scroll - scroll bar conflict.
     bool barScrolling_;
     /// Used to determine if child elements should be disabled while touch scrolling, to prevent their trigger.
     bool autoDisableChildren_;
     /// Used to determine if children have been disabled.
     bool scrollChildrenDisable_;
-    /// Distance moved with touch scrolling
+    /// Distance moved with touch scrolling.
     float touchDistanceSum_;
-    /// Threshold to trigger auto disable children
+    /// Threshold to trigger auto disable children.
     float autoDisableThreshold_;
 
 private:

@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include <Urho3D/Core/Context.h>
 #include <Urho3D/Core/ProcessUtils.h>
@@ -29,12 +10,12 @@
 #include <Urho3D/Graphics/DebugRenderer.h>
 #include <Urho3D/Graphics/Geometry.h>
 #include <Urho3D/Graphics/Graphics.h>
-#include <Urho3D/Graphics/IndexBuffer.h>
 #include <Urho3D/Graphics/Light.h>
 #include <Urho3D/Graphics/Material.h>
 #include <Urho3D/Graphics/Octree.h>
-#include <Urho3D/Graphics/VertexBuffer.h>
 #include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/GraphicsAPI/IndexBuffer.h>
+#include <Urho3D/GraphicsAPI/VertexBuffer.h>
 #include <Urho3D/IO/File.h>
 #include <Urho3D/IO/FileSystem.h>
 #ifdef URHO3D_PHYSICS
@@ -63,13 +44,13 @@ struct OutModel
     String outName_;
     aiNode* rootNode_{};
     HashSet<unsigned> meshIndices_;
-    PODVector<aiMesh*> meshes_;
-    PODVector<aiNode*> meshNodes_;
-    PODVector<aiNode*> bones_;
-    PODVector<aiNode*> pivotlessBones_;
-    PODVector<aiAnimation*> animations_;
-    PODVector<float> boneRadii_;
-    PODVector<BoundingBox> boneHitboxes_;
+    Vector<aiMesh*> meshes_;
+    Vector<aiNode*> meshNodes_;
+    Vector<aiNode*> bones_;
+    Vector<aiNode*> pivotlessBones_;
+    Vector<aiAnimation*> animations_;
+    Vector<float> boneRadii_;
+    Vector<BoundingBox> boneHitboxes_;
     aiNode* rootBone_{};
     unsigned totalVertices_{};
     unsigned totalIndices_{};
@@ -80,8 +61,8 @@ struct OutScene
     String outName_;
     aiNode* rootNode_{};
     Vector<OutModel> models_;
-    PODVector<aiNode*> nodes_;
-    PODVector<unsigned> nodeModelIndices_;
+    Vector<aiNode*> nodes_;
+    Vector<unsigned> nodeModelIndices_;
 };
 
 // FBX transform chain
@@ -168,7 +149,7 @@ Vector<String> nonSkinningBoneIncludes_;
 Vector<String> nonSkinningBoneExcludes_;
 
 HashSet<aiAnimation*> allAnimations_;
-PODVector<aiAnimation*> sceneAnimations_;
+Vector<aiAnimation*> sceneAnimations_;
 
 float defaultTicksPerSecond_ = 4800.0f;
 // For subset animation import usage
@@ -184,7 +165,7 @@ void ExportModel(const String& outName, bool animationOnly);
 void ExportAnimation(const String& outName, bool animationOnly);
 void CollectMeshes(OutModel& model, aiNode* node);
 void CollectBones(OutModel& model, bool animationOnly = false);
-void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessary, aiNode* node);
+void CollectBonesFinal(Vector<aiNode*>& dest, const HashSet<aiNode*>& necessary, aiNode* node);
 void MoveToBindPose(OutModel& model, aiNode* current);
 void CollectAnimations(OutModel* model = nullptr);
 void BuildBoneCollisionInfo(OutModel& model);
@@ -201,15 +182,15 @@ void ExportMaterials(HashSet<String>& usedTextures);
 void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures);
 void CopyTextures(const HashSet<String>& usedTextures, const String& sourcePath);
 
-void CombineLods(const PODVector<float>& lodDistances, const Vector<String>& modelNames, const String& outName);
+void CombineLods(const Vector<float>& lodDistances, const Vector<String>& modelNames, const String& outName);
 
-void GetMeshesUnderNode(Vector<Pair<aiNode*, aiMesh*> >& dest, aiNode* node);
+void GetMeshesUnderNode(Vector<Pair<aiNode*, aiMesh*>>& dest, aiNode* node);
 unsigned GetMeshIndex(aiMesh* mesh);
 unsigned GetBoneIndex(OutModel& model, const String& boneName);
 aiBone* GetMeshBone(OutModel& model, const String& boneName);
 Matrix3x4 GetOffsetMatrix(OutModel& model, const String& boneName);
-void GetBlendData(OutModel& model, aiMesh* mesh, aiNode* meshNode, PODVector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
-    blendIndices, Vector<PODVector<float> >& blendWeights);
+void GetBlendData(OutModel& model, aiMesh* mesh, aiNode* meshNode, Vector<unsigned>& boneMappings, Vector<Vector<unsigned char>>&
+    blendIndices, Vector<Vector<float>>& blendWeights);
 String GetMeshMaterialName(aiMesh* mesh);
 String GetMaterialTextureName(const String& nameIn);
 String GenerateMaterialName(aiMaterial* material);
@@ -219,9 +200,9 @@ unsigned GetNumValidFaces(aiMesh* mesh);
 void WriteShortIndices(unsigned short*& dest, aiMesh* mesh, unsigned index, unsigned offset);
 void WriteLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned offset);
 void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, bool isSkinned, BoundingBox& box,
-    const Matrix3x4& vertexTransform, const Matrix3& normalTransform, Vector<PODVector<unsigned char> >& blendIndices,
-    Vector<PODVector<float> >& blendWeights);
-PODVector<VertexElement> GetVertexElements(aiMesh* mesh, bool isSkinned);
+    const Matrix3x4& vertexTransform, const Matrix3& normalTransform, Vector<Vector<unsigned char>>& blendIndices,
+    Vector<Vector<float>>& blendWeights);
+Vector<VertexElement> GetVertexElements(aiMesh* mesh, bool isSkinned);
 
 aiNode* GetNode(const String& name, aiNode* rootNode, bool caseSensitive = true);
 aiMatrix4x4 GetDerivedTransform(aiNode* node, aiNode* rootNode, bool rootInclusive = true);
@@ -575,7 +556,7 @@ void Run(const Vector<String>& arguments)
     }
     else if (command == "lod")
     {
-        PODVector<float> lodDistances;
+        Vector<float> lodDistances;
         Vector<String> modelNames;
         String outFile;
 
@@ -873,7 +854,7 @@ void MoveToBindPose(OutModel& model, aiNode* current)
         MoveToBindPose(model, current->mChildren[i]);
 }
 
-void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessary, aiNode* node)
+void CollectBonesFinal(Vector<aiNode*>& dest, const HashSet<aiNode*>& necessary, aiNode* node)
 {
     bool includeBone = necessary.Find(node) != necessary.End();
     String boneName = FromAIString(node->mName);
@@ -1000,14 +981,14 @@ void BuildAndSaveModel(OutModel& model)
     PrintLine("Writing model " + rootNodeName);
 
     SharedPtr<Model> outModel(new Model(context_));
-    Vector<PODVector<unsigned> > allBoneMappings;
+    Vector<Vector<unsigned>> allBoneMappings;
     BoundingBox box;
 
     unsigned numValidGeometries = 0;
 
     bool combineBuffers = true;
     // Check if buffers can be combined (same vertex elements, under 65535 vertices)
-    PODVector<VertexElement> elements = GetVertexElements(model.meshes_[0], model.bones_.Size() > 0);
+    Vector<VertexElement> elements = GetVertexElements(model.meshes_[0], model.bones_.Size() > 0);
     for (unsigned i = 0; i < model.meshes_.Size(); ++i)
     {
         if (GetNumValidFaces(model.meshes_[i]))
@@ -1036,8 +1017,8 @@ void BuildAndSaveModel(OutModel& model)
 
     SharedPtr<IndexBuffer> ib;
     SharedPtr<VertexBuffer> vb;
-    Vector<SharedPtr<VertexBuffer> > vbVector;
-    Vector<SharedPtr<IndexBuffer> > ibVector;
+    Vector<SharedPtr<VertexBuffer>> vbVector;
+    Vector<SharedPtr<IndexBuffer>> ibVector;
     unsigned startVertexOffset = 0;
     unsigned startIndexOffset = 0;
     unsigned destGeomIndex = 0;
@@ -1048,7 +1029,7 @@ void BuildAndSaveModel(OutModel& model)
     for (unsigned i = 0; i < model.meshes_.Size(); ++i)
     {
         aiMesh* mesh = model.meshes_[i];
-        PODVector<VertexElement> elements = GetVertexElements(mesh, isSkinned);
+        Vector<VertexElement> elements = GetVertexElements(mesh, isSkinned);
         unsigned validFaces = GetNumValidFaces(mesh);
         if (!validFaces)
             continue;
@@ -1118,9 +1099,9 @@ void BuildAndSaveModel(OutModel& model)
 
         // Build the vertex data
         // If there are bones, get blend data
-        Vector<PODVector<unsigned char> > blendIndices;
-        Vector<PODVector<float> > blendWeights;
-        PODVector<unsigned> boneMappings;
+        Vector<Vector<unsigned char>> blendIndices;
+        Vector<Vector<float>> blendWeights;
+        Vector<unsigned> boneMappings;
         if (model.bones_.Size())
             GetBlendData(model, mesh, model.meshNodes_[i], boneMappings, blendIndices, blendWeights);
 
@@ -1161,7 +1142,7 @@ void BuildAndSaveModel(OutModel& model)
     }
 
     // Define the model buffers and bounding box
-    PODVector<unsigned> emptyMorphRange;
+    Vector<unsigned> emptyMorphRange;
     outModel->SetVertexBuffers(vbVector, emptyMorphRange, emptyMorphRange);
     outModel->SetIndexBuffers(ibVector);
     outModel->SetBoundingBox(box);
@@ -1244,7 +1225,7 @@ void BuildAndSaveAnimations(OutModel* model)
     ExtrapolatePivotlessAnimation(model);
 
     // build and save anim
-    const PODVector<aiAnimation*>& animations = model ? model->animations_ : sceneAnimations_;
+    const Vector<aiAnimation*>& animations = model ? model->animations_ : sceneAnimations_;
 
     for (unsigned i = 0; i < animations.Size(); ++i)
     {
@@ -1305,7 +1286,7 @@ void BuildAndSaveAnimations(OutModel* model)
             if (model)
             {
                 unsigned boneIndex;
-                unsigned pos = channelName.Find("_$AssimpFbx$");
+                i32 pos = channelName.Find("_$AssimpFbx$");
 
                 if (!suppressFbxPivotNodes_ || pos == String::NPOS)
                 {
@@ -1514,7 +1495,7 @@ void ExportScene(const String& outName, bool asPrefab)
 
 void CollectSceneModels(OutScene& scene, aiNode* node)
 {
-    Vector<Pair<aiNode*, aiMesh*> > meshes;
+    Vector<Pair<aiNode*, aiMesh*>> meshes;
     GetMeshesUnderNode(meshes, node);
 
     if (meshes.Size())
@@ -2048,10 +2029,10 @@ void CopyTextures(const HashSet<String>& usedTextures, const String& sourcePath)
     }
 }
 
-void CombineLods(const PODVector<float>& lodDistances, const Vector<String>& modelNames, const String& outName)
+void CombineLods(const Vector<float>& lodDistances, const Vector<String>& modelNames, const String& outName)
 {
     // Load models
-    Vector<SharedPtr<Model> > srcModels;
+    Vector<SharedPtr<Model>> srcModels;
     for (unsigned i = 0; i < modelNames.Size(); ++i)
     {
         PrintLine("Reading LOD level " + String(i) + ": model " + modelNames[i] + " distance " + String(lodDistances[i]));
@@ -2094,9 +2075,9 @@ void CombineLods(const PODVector<float>& lodDistances, const Vector<String>& mod
             ErrorExit(modelNames[i] + " has different per-geometry bone mappings than " + modelNames[0]);
     }
 
-    Vector<SharedPtr<VertexBuffer> > vbVector;
-    Vector<SharedPtr<IndexBuffer> > ibVector;
-    PODVector<unsigned> emptyMorphRange;
+    Vector<SharedPtr<VertexBuffer>> vbVector;
+    Vector<SharedPtr<IndexBuffer>> ibVector;
+    Vector<unsigned> emptyMorphRange;
 
     // Create the final model
     SharedPtr<Model> outModel(new Model(context_));
@@ -2138,7 +2119,7 @@ void CombineLods(const PODVector<float>& lodDistances, const Vector<String>& mod
     outModel->Save(outFile);
 }
 
-void GetMeshesUnderNode(Vector<Pair<aiNode*, aiMesh*> >& dest, aiNode* node)
+void GetMeshesUnderNode(Vector<Pair<aiNode*, aiMesh*>>& dest, aiNode* node)
 {
     for (unsigned i = 0; i < node->mNumMeshes; ++i)
         dest.Push(MakePair(node, scene_->mMeshes[node->mMeshes[i]]));
@@ -2215,8 +2196,8 @@ Matrix3x4 GetOffsetMatrix(OutModel& model, const String& boneName)
     return Matrix3x4::IDENTITY;
 }
 
-void GetBlendData(OutModel& model, aiMesh* mesh, aiNode* meshNode, PODVector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
-    blendIndices, Vector<PODVector<float> >& blendWeights)
+void GetBlendData(OutModel& model, aiMesh* mesh, aiNode* meshNode, Vector<unsigned>& boneMappings, Vector<Vector<unsigned char>>&
+    blendIndices, Vector<Vector<float>>& blendWeights)
 {
     blendIndices.Resize(mesh->mNumVertices);
     blendWeights.Resize(mesh->mNumVertices);
@@ -2423,8 +2404,8 @@ void WriteLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned o
 }
 
 void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, bool isSkinned, BoundingBox& box,
-    const Matrix3x4& vertexTransform, const Matrix3& normalTransform, Vector<PODVector<unsigned char> >& blendIndices,
-    Vector<PODVector<float> >& blendWeights)
+    const Matrix3x4& vertexTransform, const Matrix3& normalTransform, Vector<Vector<unsigned char>>& blendIndices,
+    Vector<Vector<float>>& blendWeights)
 {
     Vector3 vertex = vertexTransform * ToVector3(mesh->mVertices[index]);
     box.Merge(vertex);
@@ -2492,9 +2473,9 @@ void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, bool isSkinned, Bou
     }
 }
 
-PODVector<VertexElement> GetVertexElements(aiMesh* mesh, bool isSkinned)
+Vector<VertexElement> GetVertexElements(aiMesh* mesh, bool isSkinned)
 {
-    PODVector<VertexElement> ret;
+    Vector<VertexElement> ret;
 
     // Position must always be first and of type Vector3 for raycasts to work
     ret.Push(VertexElement(TYPE_VECTOR3, SEM_POSITION));
@@ -2791,7 +2772,7 @@ void ExtrapolatePivotlessAnimation(OutModel* model)
         CreatePivotlessFbxBoneStruct(*model);
 
         // Extrapolate anim
-        const PODVector<aiAnimation *> &animations = model->animations_;
+        const Vector<aiAnimation *> &animations = model->animations_;
         for (unsigned i = 0; i < animations.Size(); ++i)
         {
             aiAnimation* anim = animations[i];
@@ -2802,7 +2783,7 @@ void ExtrapolatePivotlessAnimation(OutModel* model)
             {
                 aiNodeAnim* channel = anim->mChannels[j];
                 String channelName = FromAIString(channel->mNodeName);
-                unsigned pos = channelName.Find("_$AssimpFbx$");
+                i32 pos = channelName.Find("_$AssimpFbx$");
 
                 if (pos != String::NPOS)
                 {

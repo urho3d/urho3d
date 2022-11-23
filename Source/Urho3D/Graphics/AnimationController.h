@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -34,6 +15,7 @@ class Animation;
 struct Bone;
 
 /// Control data for an animation.
+/// @nocount
 struct URHO3D_API AnimationControl
 {
     /// Construct with defaults.
@@ -91,6 +73,7 @@ public:
     /// Destruct.
     ~AnimationController() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Handle enabled/disabled state change.
@@ -125,7 +108,7 @@ public:
     bool SetLooped(const String& name, bool enable);
     /// Set animation speed. Return true on success.
     bool SetSpeed(const String& name, float speed);
-    /// Set animation autofade at end (non-looped animations only.) Zero time disables. Return true on success.
+    /// Set animation autofade at end (non-looped animations only). Zero time disables. Return true on success.
     bool SetAutoFade(const String& name, float fadeOutTime);
     /// Set whether an animation auto-removes on completion.
     bool SetRemoveOnCompletion(const String& name, bool removeOnCompletion);
@@ -173,18 +156,19 @@ public:
     /// Find an animation state by animation name hash.
     AnimationState* GetAnimationState(StringHash nameHash) const;
     /// Return the animation control structures for inspection.
+    /// @nobindtemp
     const Vector<AnimationControl>& GetAnimations() const { return animations_; }
 
     /// Set animation control structures attribute.
     void SetAnimationsAttr(const VariantVector& value);
     /// Set animations attribute for network replication.
-    void SetNetAnimationsAttr(const PODVector<unsigned char>& value);
+    void SetNetAnimationsAttr(const Vector<unsigned char>& value);
     /// Set node animation states attribute.
     void SetNodeAnimationStatesAttr(const VariantVector& value);
     /// Return animation control structures attribute.
     VariantVector GetAnimationsAttr() const;
     /// Return animations attribute for network replication.
-    const PODVector<unsigned char>& GetNetAnimationsAttr() const;
+    const Vector<unsigned char>& GetNetAnimationsAttr() const;
     /// Return node animation states attribute.
     VariantVector GetNodeAnimationStatesAttr() const;
 
@@ -198,14 +182,14 @@ private:
     /// Remove an animation state.
     void RemoveAnimationState(AnimationState* state);
     /// Find the internal index and animation state of an animation.
-    void FindAnimation(const String& name, unsigned& index, AnimationState*& state) const;
+    void FindAnimation(const String& name, i32& index, AnimationState*& state) const;
     /// Handle scene post-update event.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
 
     /// Animation control structures.
     Vector<AnimationControl> animations_;
     /// Node hierarchy mode animation states.
-    Vector<SharedPtr<AnimationState> > nodeAnimationStates_;
+    Vector<SharedPtr<AnimationState>> nodeAnimationStates_;
     /// Attribute buffer for network replication.
     mutable VectorBuffer attrBuffer_;
 };

@@ -1,31 +1,12 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
+#include "../Graphics/Material.h"
+#include "../GraphicsAPI/GraphicsDefs.h"
 #include "../Math/Color.h"
 #include "../Math/Rect.h"
-#include "../Graphics/GraphicsDefs.h"
-#include "../Graphics/Material.h"
 
 namespace Urho3D
 {
@@ -36,7 +17,7 @@ class Matrix3x4;
 class Texture;
 class UIElement;
 
-static const unsigned UI_VERTEX_SIZE = 6;
+inline constexpr i32 UI_VERTEX_SIZE = 6;
 
 /// %UI rendering draw call.
 class URHO3D_API UIBatch
@@ -45,7 +26,7 @@ public:
     /// Construct with defaults.
     UIBatch();
     /// Construct.
-    UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData);
+    UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, Vector<float>* vertexData);
 
     /// Set new color for the batch. Overrides gradient.
     void SetColor(const Color& color, bool overrideAlpha = false);
@@ -71,7 +52,7 @@ public:
     unsigned GetInterpolatedColor(float x, float y);
 
     /// Add or merge a batch.
-    static void AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches);
+    static void AddOrMerge(const UIBatch& batch, Vector<UIBatch>& batches);
 
     /// Element this batch represents.
     UIElement* element_{};
@@ -84,7 +65,7 @@ public:
     /// Inverse texture size.
     Vector2 invTextureSize_{Vector2::ONE};
     /// Vertex data.
-    PODVector<float>* vertexData_{};
+    Vector<float>* vertexData_{};
     /// Vertex data start index.
     unsigned vertexStart_{};
     /// Vertex data end index.
@@ -93,8 +74,8 @@ public:
     unsigned color_{};
     /// Gradient flag.
     bool useGradient_{};
-    /// Custom material
-    Material* custom_material_{};
+    /// Custom material.
+    Material* customMaterial_{};
 
     /// Position adjustment vector for pixel-perfect rendering. Initialized by UI.
     static Vector3 posAdjust;

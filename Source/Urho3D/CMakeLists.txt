@@ -1,29 +1,13 @@
-#
-# Copyright (c) 2008-2019 the Urho3D project.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
+# Copyright (c) 2008-2022 the Urho3D project
+# License: MIT
 
 # Define target name
 set (TARGET_NAME Urho3D)
 
-setup_lint ()
+if (MSVC)
+    # Set warning level for Urho3D project
+    add_compile_options (/W3)
+endif ()
 
 # Prevent ICE from old MinGW versions, workaround from the GCC bugzilla https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61189
 if (MINGW AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9.1 AND NOT URHO3D_64BIT)
@@ -34,6 +18,21 @@ endif ()
 check_include_files (stdint.h HAVE_STDINT_H)
 if (HAVE_STDINT_H)
   add_definitions (-DHAVE_STDINT_H)
+endif ()
+
+# For AngelScript big files
+if (MSVC)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /bigobj")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+elseif (MINGW)
+    if (URHO3D_64BIT)
+        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wa,-mbig-obj")
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj")
+    elseif (CMAKE_BUILD_TYPE MATCHES Debug)
+        SET_SOURCE_FILES_PROPERTIES(AngelScript/Generated_Classes.cpp PROPERTIES COMPILE_FLAGS -Os)
+        SET_SOURCE_FILES_PROPERTIES(AngelScript/Generated_Classes.cpp PROPERTIES LINK_FLAGS -Os)
+        SET_SOURCE_FILES_PROPERTIES(AngelScript/Generated_Classes.cpp PROPERTIES STATIC_LIBRARY_FLAGS -Os)
+    endif ()
 endif ()
 
 # Generate JSON compilation database format specification
@@ -110,8 +109,15 @@ if (URHO3D_HASH_DEBUG)
     add_definitions (-DURHO3D_HASH_DEBUG)
 endif ()
 
+if (URHO3D_SSL)
+    add_definitions (-DURHO3D_SSL)
+    if (URHO3D_SSL_DYNAMIC)
+        add_definitions (-DURHO3D_SSL_DYNAMIC)
+    endif ()
+endif ()
+
 # Define source files
-foreach (DIR IK Navigation Network Physics Urho2D WebP)
+foreach (DIR IK Navigation Network Physics Physics2D Urho2D WebP)
     string (TOUPPER URHO3D_${DIR} OPT)
     if (NOT ${OPT})
         list (APPEND EXCLUDED_SOURCE_DIRS ${DIR})
@@ -132,26 +138,87 @@ if (URHO3D_DATABASE)
 else ()
     list (APPEND EXCLUDED_SOURCE_DIRS Database)
 endif ()
-if (URHO3D_OPENGL)
-    # Exclude the opposite source directory
-    list (APPEND EXCLUDED_SOURCE_DIRS Graphics/Direct3D9 Graphics/Direct3D11)
-else ()
-    list (APPEND EXCLUDED_SOURCE_DIRS Graphics/OpenGL)
-    if (URHO3D_D3D11)
-        list (APPEND EXCLUDED_SOURCE_DIRS Graphics/Direct3D9)
-    else ()
-        list (APPEND EXCLUDED_SOURCE_DIRS Graphics/Direct3D11)
-    endif ()
+
+if (NOT URHO3D_OPENGL)
+    list (APPEND EXCLUDED_SOURCE_DIRS GraphicsAPI/OpenGL)
 endif ()
+
+if (NOT URHO3D_D3D9)
+    list (APPEND EXCLUDED_SOURCE_DIRS GraphicsAPI/Direct3D9)
+endif ()
+
+if (NOT URHO3D_D3D11)
+    list (APPEND EXCLUDED_SOURCE_DIRS GraphicsAPI/Direct3D11)
+endif ()
+
 if (APPLE AND NOT ARM)
     set (GLOB_OBJC_PATTERN *.m)     # Should only pick up MacFileWatcher.m for macOS platform at the moment
 endif ()
 string (REPLACE ";" "/[^;]+;" EXCLUDE_PATTERNS "${EXCLUDED_SOURCE_DIRS};")
-define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} RECURSE GROUP PCH Precompiled.h)
+define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} RECURSE GROUP)
+
+if (URHO3D_GENERATEBINDINGS)
+
+    find_package (Doxygen 1.8.17 REQUIRED)
+    if (NOT DOXYGEN_FOUND)
+        message (FATAL_ERROR "Doxygen >= 1.8.17 required to generate bindings")
+    endif ()
+
+    # Generating Doxyfile
+    set (DOXYFILE_PATH "${CMAKE_BINARY_DIR}/Source/Tools/BindingGenerator/generated/Doxyfile")
+    configure_file ("${CMAKE_SOURCE_DIR}/Source/Tools/BindingGenerator/Doxyfile.in" "${DOXYFILE_PATH}")
+
+    set (XML_AST_DIR "${CMAKE_BINARY_DIR}/Source/Tools/BindingGenerator/generated/xml")
+    set (BINDING_GENERATOR_PATH "${CMAKE_BINARY_DIR}/bin/tool/BindingGenerator")
+
+    set (AS_GENERATED_FILES "AngelScript/Generated_Enums.cpp"
+                            "AngelScript/Generated_ObjectTypes.cpp"
+                            "AngelScript/Generated_DefaultConstructors.cpp"
+                            "AngelScript/Generated_Classes.cpp"
+                            "AngelScript/Generated_GlobalVariables.cpp"
+                            "AngelScript/Generated_GlobalFunctions.cpp"
+                            "AngelScript/Generated_Includes.h"
+                            "AngelScript/Generated_Members.h"
+                            "AngelScript/Generated_Templates.h")
+
+    set (AS_GENERATED_FILES_FULL_PATHS "${AS_GENERATED_FILES}")
+    # Add "${CMAKE_SOURCE_DIR}/Source/Urho3D/" to every item in list
+    list(TRANSFORM AS_GENERATED_FILES_FULL_PATHS PREPEND "${CMAKE_SOURCE_DIR}/Source/Urho3D/")
+
+    set (BINDED_HEADER_FILES "${SOURCE_FILES}")
+    # Header files only are used when generating bindings
+    list (FILTER BINDED_HEADER_FILES INCLUDE REGEX ".*\.h$")
+    # Exclude files from AngelScript directory to solve circular dependency
+    list (FILTER BINDED_HEADER_FILES EXCLUDE REGEX "^AngelScript/")
+
+    # Generate xmls and run BindingGenerator
+    add_custom_command (OUTPUT ${AS_GENERATED_FILES_FULL_PATHS}
+                               #${CMAKE_SOURCE_DIR}/Source/Urho3D/Lua/Generated.cpp
+                               #${CMAKE_SOURCE_DIR}/Source/Urho3D/JavaScript/Generated.cpp
+                               #${CMAKE_SOURCE_DIR}/Source/Urho3D/CSharp/Generated.cpp
+                               #fake_output_to_force_run_every_time
+                        COMMAND ${CMAKE_COMMAND} -E echo "Generating XMLs with AST to ${XML_AST_DIR}"
+                        COMMAND ${DOXYGEN_EXECUTABLE} "${DOXYFILE_PATH}"
+                        COMMAND ${CMAKE_COMMAND} -E echo "Running ${BINDING_GENERATOR_PATH} ${XML_AST_DIR} ${CMAKE_SOURCE_DIR}"
+                        COMMAND "${BINDING_GENERATOR_PATH}" "${XML_AST_DIR}" "${CMAKE_SOURCE_DIR}"
+                        DEPENDS BindingGenerator "${DOXYFILE_PATH}" "${BINDED_HEADER_FILES}"
+                        COMMENT "Generating bindings to script languages")
+
+    if (URHO3D_ANGELSCRIPT)
+        # If generated files already exists they will be in list SOURCE_FILES already.
+        # But they can also be removed.
+        # Make sure we have generated files in SOURCE_FILES in a single copy
+        list (REMOVE_ITEM SOURCE_FILES ${AS_GENERATED_FILES})
+        list (APPEND SOURCE_FILES ${AS_GENERATED_FILES})
+
+        source_group ("Source Files\\AngelScript" FILES ${AS_GENERATED_FILES})
+    endif()
+
+endif ()
 
 # Define generated source files
 if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/librevision.h)
-    execute_process (COMMAND ${CMAKE_COMMAND} -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h -P CMake/Modules/GetUrhoRevision.cmake
+    execute_process (COMMAND ${CMAKE_COMMAND} -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h -P cmake/Modules/GetUrhoRevision.cmake
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_QUIET ERROR_QUIET)
 endif ()
 set (URHO3D_DEPS ${STATIC_LIBRARY_TARGETS})
@@ -165,12 +232,13 @@ if (TARGET LuaJIT_universal)
 endif ()
 set_source_files_properties (${SYMBOLIC_SOURCES} PROPERTIES SYMBOLIC TRUE)
 add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/librevision.h
-    COMMAND ${CMAKE_COMMAND} -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h.new -P CMake/Modules/GetUrhoRevision.cmake
+    COMMAND ${CMAKE_COMMAND} -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h.new -P cmake/Modules/GetUrhoRevision.cmake
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/librevision.h.new ${CMAKE_CURRENT_BINARY_DIR}/librevision.h
     COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_CURRENT_BINARY_DIR}/librevision.h.new
-    DEPENDS ${URHO3D_DEPS} ${CMAKE_SOURCE_DIR}/CMake/Modules/GetUrhoRevision.cmake
+    DEPENDS ${URHO3D_DEPS} ${CMAKE_SOURCE_DIR}/cmake/Modules/GetUrhoRevision.cmake
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMENT "")     # Suppress the comment as the header file may or may not be re-generated
+source_group ("Source Files\\Generated" FILES ${CMAKE_CURRENT_BINARY_DIR}/librevision.h)
 
 # Use the AutoBinder tool to generate source files for binding script subsystems
 if (URHO3D_BINDINGS)
@@ -185,7 +253,7 @@ if (URHO3D_BINDINGS)
     endif ()
     ExternalProject_Add (AutoBinder
         SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/Clang-Tools
-        CMAKE_ARGS -DURHO3D_CLANG_TOOLS=AutoBinder -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool/clang -DDEST_INCLUDE_DIR=${DEST_INCLUDE_DIR} -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
+        CMAKE_ARGS -D URHO3D_CLANG_TOOLS=AutoBinder -D URHO3D_DEPLOYMENT_TARGET=generic -D DEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool/clang -D DEST_INCLUDE_DIR=${DEST_INCLUDE_DIR} -D BAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -D CMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
         ${ALTERNATE_COMMAND})
     add_make_clean_files (${CMAKE_BINARY_DIR}/bin/tool/clang/AutoBinder)
     file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/generated)
@@ -220,7 +288,7 @@ if (URHO3D_LUA)
         endif ()
         ExternalProject_Add (tolua++
             SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/ThirdParty/toluapp/src/bin
-            CMAKE_ARGS -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DURHO3D_UPDATE_SOURCE_TREE=${URHO3D_UPDATE_SOURCE_TREE} -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
+            CMAKE_ARGS -D URHO3D_DEPLOYMENT_TARGET=generic -D DEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -D BAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -D URHO3D_UPDATE_SOURCE_TREE=${URHO3D_UPDATE_SOURCE_TREE} -D CMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
             ${TRAVIS_ANDROID_FIX}
             ${ALTERNATE_COMMAND})
         add_make_clean_files (${CMAKE_BINARY_DIR}/bin/tool/tolua++)
@@ -231,7 +299,7 @@ if (URHO3D_LUA)
     # Use the host tool to generate source files for tolua++ API binding
     file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/LuaScript/generated)
     file (GLOB API_PKG_FILES LuaScript/pkgs/*.pkg)
-    foreach (DIR IK Navigation Network Database Physics Urho2D)
+    foreach (DIR IK Navigation Network Database Physics Physics2D Urho2D)
         string (TOUPPER URHO3D_${DIR} OPT)
         if (NOT ${OPT})
             list (REMOVE_ITEM API_PKG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/LuaScript/pkgs/${DIR}LuaAPI.pkg)
@@ -240,65 +308,23 @@ if (URHO3D_LUA)
     foreach (API_PKG_FILE ${API_PKG_FILES})
         get_filename_component (NAME ${API_PKG_FILE} NAME)
         string (REGEX REPLACE LuaAPI\\.pkg$ "" DIR ${NAME})
-        set (GEN_CPP_FILE LuaScript/generated/${DIR}LuaAPI.cpp)
-        list (APPEND GEN_CPP_FILES ${GEN_CPP_FILE})
+        set (GEN_CPP_FILE ${CMAKE_CURRENT_BINARY_DIR}/LuaScript/generated/${DIR}LuaAPI.cpp)
+        list (APPEND LUA_GEN_CPP_FILES ${GEN_CPP_FILE})
         file (GLOB PKG_FILES LuaScript/pkgs/${DIR}/*.pkg)
         add_custom_command (OUTPUT ${GEN_CPP_FILE}
-            COMMAND ${CMAKE_BINARY_DIR}/bin/tool/tolua++ -E ${CMAKE_PROJECT_NAME} -L ToCppHook.lua -o ${CMAKE_CURRENT_BINARY_DIR}/${GEN_CPP_FILE} ${NAME}
+            COMMAND ${CMAKE_BINARY_DIR}/bin/tool/tolua++ -E ${CMAKE_PROJECT_NAME} -L ToCppHook.lua -o ${GEN_CPP_FILE} ${NAME}
             DEPENDS tolua++ ${API_PKG_FILE} ${PKG_FILES} LuaScript/pkgs/ToCppHook.lua
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/LuaScript/pkgs
             COMMENT "Generating tolua++ API binding on the fly for ${DIR}")
     endforeach ()
-endif ()
-
-# Generate platform specific export header file
-if (MSVC)
-    set (PRE_EXPORT_HEADER "\n#pragma warning(disable: 4251)\n#pragma warning(disable: 4275)\n\n#if _MSC_VER < 1900\n#define strtoll _strtoi64\n#define strtoull _strtoui64\n#endif\n\n")
-endif ()
-if (URHO3D_CLANG_TOOLS)
-    set (ANNOTATE_NONSCRIPTABLE "__attribute__((annotate(\"nonscriptable\")))")
-endif ()
-generate_export_header (${TARGET_NAME} ${URHO3D_LIB_TYPE} EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Urho3D.h.new)
-execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h.new ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
-file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h.new)
-
-# Define generated object files
-# This is a hack as it relies on internal working of CMake
-if (MSVC AND URHO3D_LIB_TYPE STREQUAL SHARED)   # MSVC linker does not have force_load/whole_archive equivalent
-    foreach (TARGET ${STATIC_LIBRARY_TARGETS})
-        get_target_property (SOURCES ${TARGET} SOURCES)
-        get_target_property (INT_DIR ${TARGET} LOCATION)
-        if (INT_DIR)
-            get_filename_component (INT_DIR ${INT_DIR} PATH)
-            if (CMAKE_GENERATOR MATCHES 2008)
-                string (REPLACE /$(OutDir) /${TARGET}.dir/$(ConfigurationName) INT_DIR ${INT_DIR})
-            elseif (VS)
-                string (REPLACE /$(Configuration) /${TARGET}.dir/$(ConfigurationName) INT_DIR ${INT_DIR})
-            endif ()
-            foreach (SOURCE ${SOURCES})
-                get_filename_component (NAME ${SOURCE} NAME)
-                if (NAME MATCHES \\.c.*$|\\.mm?$|\\.S$|\\.s$)
-                    if (VS)
-                        string (REGEX REPLACE \\.c.*$|\\.mm?$|\\.S$|\\.s$ "" NAME "${NAME}")
-                        list (APPEND OBJ_FILES ${INT_DIR}/${NAME}.obj)
-                    else ()
-                        string (REGEX REPLACE ^.*/ThirdParty/${TARGET}/ "" SOURCE "${SOURCE}")
-                        list (APPEND OBJ_FILES ${INT_DIR}/CMakeFiles/${TARGET}.dir/${SOURCE}.obj)
-                    endif ()
-                elseif (NAME MATCHES \\.o.*$)
-                    list (APPEND OBJ_FILES ${SOURCE})
-                endif ()
-            endforeach ()
-            source_group ("Object Files\\${TARGET}" FILES ${OBJ_FILES})
-            list (APPEND ALL_OBJ_FILES ${OBJ_FILES})
-            unset (OBJ_FILES)
-        endif ()
-    endforeach ()
-    set_source_files_properties (${ALL_OBJ_FILES} PROPERTIES GENERATED TRUE)
+    source_group ("Source Files\\LuaScript\\Generated" FILES ${LUA_GEN_CPP_FILES})
+    if (URHO3D_LINT)
+        execute_process (COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/.clang-tidy ${CMAKE_CURRENT_BINARY_DIR}/LuaScript/generated)
+    endif ()
 endif ()
 
 # Aggregate all source files
-list (APPEND SOURCE_FILES ${GEN_CPP_FILES} ${ALL_OBJ_FILES} librevision.h Urho3D.h ${SYMBOLIC_SOURCES})
+list (APPEND SOURCE_FILES ${GEN_CPP_FILES} ${LUA_GEN_CPP_FILES} librevision.h Urho3D.h ${SYMBOLIC_SOURCES})
 
 # Define dependency libs
 # Add include directories to find the precompiled header, export header, and installed headers from third-party libs
@@ -323,17 +349,41 @@ if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.3.
 endif ()
 
 # Setup library output path
-if (ANDROID)
-    # Let SDK's android.toolchain.cmake controls where are the output directories
-else ()
-    set_output_directories (${CMAKE_BINARY_DIR}/lib ARCHIVE LIBRARY)
-endif ()
+set_output_directories (${CMAKE_BINARY_DIR}/lib ARCHIVE LIBRARY)
 
 # Setup target
 if (IOS OR TVOS)
     set (EXCLUDE_FROM_ALL EXCLUDE_FROM_ALL)
 endif ()
 setup_library (${URHO3D_LIB_TYPE} ${EXCLUDE_FROM_ALL})
+
+# Generate platform specific export header file (can only be called after the target has been added)
+if (MSVC)
+    set (APPENDIX "\n#pragma warning(disable: 4251)\n#pragma warning(disable: 4275)\n\n#if _MSC_VER < 1900\n#define strtoll _strtoi64\n#define strtoull _strtoui64\n#endif\n")
+endif ()
+if (URHO3D_CLANG_TOOLS)
+    set (ANNOTATE_NONSCRIPTABLE "__attribute__((annotate(\"nonscriptable\")))")
+endif ()
+set (APPENDIX "${APPENDIX}\n#define NONSCRIPTABLE ${ANNOTATE_NONSCRIPTABLE}\n\n")
+foreach (DEFINE URHO3D_STATIC_DEFINE URHO3D_OPENGL URHO3D_D3D9 URHO3D_D3D11 URHO3D_SSE URHO3D_DATABASE_ODBC URHO3D_DATABASE_SQLITE URHO3D_LUAJIT URHO3D_TESTING CLANG_PRE_STANDARD)
+    if (${DEFINE})
+        set (APPENDIX "${APPENDIX}#define ${DEFINE}\n")
+    endif ()
+endforeach()
+if (URHO3D_FORCE_AS_MAX_PORTABILITY)
+    set (APPENDIX "${APPENDIX}#define AS_MAX_PORTABILITY\n")
+endif ()
+generate_export_header (${TARGET_NAME} EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Urho3D.h.new CUSTOM_CONTENT_FROM_VARIABLE APPENDIX)
+set (COPYRIGHT "// Copyright (c) 2008-2022 the Urho3D project\n// License: MIT\n")
+file (READ ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h.new EXPORT_HEADER)
+file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h.new ${COPYRIGHT}${EXPORT_HEADER})
+execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h.new ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
+file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h.new)
+source_group ("Source Files\\Generated" FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
+
+# Precompile the header after the export header file has been generated
+enable_pch (Precompiled.h)
+
 if (NOT ANDROID AND NOT WEB)
     file (READ .soversion SOVERSION)
     string (STRIP ${SOVERSION} SOVERSION)
@@ -343,31 +393,28 @@ if (NOT ANDROID AND NOT WEB)
     else ()
         message (FATAL_ERROR "The .soversion file is corrupted. It should contain a version number with this format major(0xFFFF).minor(0xFF).patch-level(0xFF). e.g.: 0.1.2")
     endif ()
+else ()
+    set_target_properties (${TARGET_NAME} PROPERTIES NO_SONAME TRUE)
 endif ()
+# TODO: to use 'xcframework' as Apple discourages the use of 'lipo' to create universal binary combining libs/frameworks from different SDK
+# As of Xcode 12 the 'iphonesimulator' SDK produces binary for both 'x86_64' and 'arm64' archs
+# This has caused problem with 'lipo' to combine the already FAT lib from 'iphonesimulator' SDK with 'iphoneos' SDK containing 'arm64' arch
+# Temporary workaround by not generating the universal binary when the issue is detected
 if (IOS)
-    if (NOT IPHONEOS_DEPLOYMENT_TARGET STREQUAL "" AND IPHONEOS_DEPLOYMENT_TARGET VERSION_LESS 11.0)
-        # Add a custom target to build Mach-O universal binary consisting of both (32-bit & 64-bit) iPhoneOS and iPhoneSimulator archs
-        add_custom_target (${TARGET_NAME}_universal ALL
-            COMMAND if [ '$(CONFIGURATION)' != 'Debug' ]\; then if lipo -info $<TARGET_FILE:${TARGET_NAME}> 2>/dev/null |egrep -cq 'i386.*armv7|armv7.*i386|x86_64.*arm64|arm64.*x86_64'\; then echo $<TARGET_FILE:${TARGET_NAME}> is already a Mach-O universal binary consisting of both iphoneos and iphonesimulator archs\; else mv $<TARGET_FILE:${TARGET_NAME}>{,.ori} && if lipo -info $<TARGET_FILE:${TARGET_NAME}>.ori 2>/dev/null |egrep -cq 'i386|x86_64'\; then sdk=iphoneos\; else sdk=iphonesimulator\; fi && xcodebuild -target ${TARGET_NAME} -configuration $(CONFIGURATION) -sdk $$sdk 2>&1 && mv $<TARGET_FILE:${TARGET_NAME}>{,.new} && lipo -create -output $<TARGET_FILE:${TARGET_NAME}>{,.ori,.new} && rm $<TARGET_FILE:${TARGET_NAME}>{.ori,.new}\; fi\; fi
-            DEPENDS ${TARGET_NAME}
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            COMMENT "Creating Mach-O universal binary library consisting of both iPhoneOS and iPhoneSimulator archs")
-    else ()
-        # Since version 11.x iOS does not support 32-bit archs anymore
-        add_custom_target (${TARGET_NAME}_universal ALL
-            COMMAND if [ '$(CONFIGURATION)' != 'Debug' ]\; then if lipo -info $<TARGET_FILE:${TARGET_NAME}> 2>/dev/null |egrep -cq 'x86_64.*arm64|arm64.*x86_64'\; then echo $<TARGET_FILE:${TARGET_NAME}> is already a Mach-O universal binary consisting of both iphoneos and iphonesimulator archs\; else mv $<TARGET_FILE:${TARGET_NAME}>{,.ori} && if lipo -info $<TARGET_FILE:${TARGET_NAME}>.ori 2>/dev/null |egrep -cq x86_64\; then sdk=iphoneos\; else sdk=iphonesimulator\; fi && xcodebuild -target ${TARGET_NAME} -configuration $(CONFIGURATION) -sdk $$sdk 2>&1 && mv $<TARGET_FILE:${TARGET_NAME}>{,.new} && lipo -create -output $<TARGET_FILE:${TARGET_NAME}>{,.ori,.new} && rm $<TARGET_FILE:${TARGET_NAME}>{.ori,.new}\; fi\; fi
-            DEPENDS ${TARGET_NAME}
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            COMMENT "Creating Mach-O universal binary library consisting of both iPhoneOS and iPhoneSimulator archs")
-    endif ()
-    install (FILES $<TARGET_FILE:${TARGET_NAME}> DESTINATION ${DEST_LIBRARY_DIR})
-elseif (TVOS)
-    # Add a custom target to build Mach-O universal binary consisting of both AppleTVOS and AppleTVSimulator archs
+    # Add a custom target to build Mach-O universal binary consisting of both iPhoneOS and iPhoneSimulator SDKs
     add_custom_target (${TARGET_NAME}_universal ALL
-        COMMAND if [ '$(CONFIGURATION)' != 'Debug' ]\; then if lipo -info $<TARGET_FILE:${TARGET_NAME}> 2>/dev/null |egrep -cq 'x86_64.*arm64|arm64.*x86_64'\; then echo $<TARGET_FILE:${TARGET_NAME}> is already a Mach-O universal binary consisting of both AppleTVOS and AppleTVSimulator archs\; else mv $<TARGET_FILE:${TARGET_NAME}>{,.ori} && if lipo -info $<TARGET_FILE:${TARGET_NAME}>.ori 2>/dev/null |grep -cq x86_64\; then sdk=appletvos\; else sdk=appletvsimulator\; fi && xcodebuild -target ${TARGET_NAME} -configuration $(CONFIGURATION) -sdk $$sdk 2>&1 && mv $<TARGET_FILE:${TARGET_NAME}>{,.new} && lipo -create -output $<TARGET_FILE:${TARGET_NAME}>{,.ori,.new} && rm $<TARGET_FILE:${TARGET_NAME}>{.ori,.new}\; fi\; fi
+        COMMAND if [ '$(CONFIGURATION)' != 'Debug' ]\; then if lipo -info $<TARGET_FILE:${TARGET_NAME}> 2>/dev/null |egrep -cq 'x86_64.*arm64|arm64.*x86_64'\; then echo $<TARGET_FILE:${TARGET_NAME}> is already a Mach-O universal binary consisting of both iphoneos and iphonesimulator SDKs\; else mv $<TARGET_FILE:${TARGET_NAME}>{,.ori} && if lipo -info $<TARGET_FILE:${TARGET_NAME}>.ori 2>/dev/null |egrep -cq x86_64\; then sdk=iphoneos\; else sdk=iphonesimulator\; fi && xcodebuild -target ${TARGET_NAME} -configuration $(CONFIGURATION) -sdk $$sdk 2>&1 && mv $<TARGET_FILE:${TARGET_NAME}>{,.$$sdk} && if lipo -info $<TARGET_FILE:${TARGET_NAME}>.$$sdk 2>/dev/null |egrep -cq 'x86_64.*arm64|arm64.*x86_64'\; then echo 'Skip on Xcode 12 due to arch conflict' && mv $<TARGET_FILE:${TARGET_NAME}>{.ori,} && rm $<TARGET_FILE:${TARGET_NAME}>.$$sdk\; else lipo -create -output $<TARGET_FILE:${TARGET_NAME}>{,.ori,.$$sdk} && rm $<TARGET_FILE:${TARGET_NAME}>{.ori,.$$sdk}\; fi\; fi\; fi
         DEPENDS ${TARGET_NAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        COMMENT "Creating Mach-O universal binary library consisting of both AppleTVOS and AppleTVSimulator archs")
+        COMMENT "Creating Mach-O universal binary library consisting of both iPhoneOS and iPhoneSimulator SDks")
+    install (FILES $<TARGET_FILE:${TARGET_NAME}> DESTINATION ${DEST_LIBRARY_DIR})
+elseif (TVOS)
+    # Add a custom target to build Mach-O universal binary consisting of both AppleTVOS and AppleTVSimulator SDKs
+    add_custom_target (${TARGET_NAME}_universal ALL
+        COMMAND if [ '$(CONFIGURATION)' != 'Debug' ]\; then if lipo -info $<TARGET_FILE:${TARGET_NAME}> 2>/dev/null |egrep -cq 'x86_64.*arm64|arm64.*x86_64'\; then echo $<TARGET_FILE:${TARGET_NAME}> is already a Mach-O universal binary consisting of both AppleTVOS and AppleTVSimulator SDKs\; else mv $<TARGET_FILE:${TARGET_NAME}>{,.ori} && if lipo -info $<TARGET_FILE:${TARGET_NAME}>.ori 2>/dev/null |grep -cq x86_64\; then sdk=appletvos\; else sdk=appletvsimulator\; fi && xcodebuild -target ${TARGET_NAME} -configuration $(CONFIGURATION) -sdk $$sdk 2>&1 && mv $<TARGET_FILE:${TARGET_NAME}>{,.$$sdk} && if lipo -info $<TARGET_FILE:${TARGET_NAME}>.$$sdk 2>/dev/null |egrep -cq 'x86_64.*arm64|arm64.*x86_64'\; then echo 'Skip on Xcode 12 due to arch conflict' && mv $<TARGET_FILE:${TARGET_NAME}>{.ori,} && rm $<TARGET_FILE:${TARGET_NAME}>.$$sdk\; else lipo -create -output $<TARGET_FILE:${TARGET_NAME}>{,.ori,.$$sdk} && rm $<TARGET_FILE:${TARGET_NAME}>{.ori,.$$sdk}\; fi\; fi\; fi
+        DEPENDS ${TARGET_NAME}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMENT "Creating Mach-O universal binary library consisting of both AppleTVOS and AppleTVSimulator SDKs")
     install (FILES $<TARGET_FILE:${TARGET_NAME}> DESTINATION ${DEST_LIBRARY_DIR})
     # TODO: Temporary workaround as CMake does not recognize AppleTV platform yet
     add_dependencies (${TARGET_NAME} APPLETV_POST_CMAKE_FIX)
@@ -380,40 +427,46 @@ if (WIN32 AND URHO3D_LIB_TYPE STREQUAL SHARED)
     set (URHO3D_DLL_INSTALLED TRUE)
 endif ()
 
-# Setup dependency frameworks and libraries
+# TODO: This seems out of place
 if (MINGW)
     set (CMAKE_C_STANDARD_LIBRARIES "${CMAKE_C_STANDARD_LIBRARIES_INIT} -lwinmm")
     set (CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_C_STANDARD_LIBRARIES_INIT} -lwinmm")
-endif ()
-if (APPLE)
-    set (FORCE_LOAD -force_load)
-elseif (NOT MSVC)
-    set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES -Wl,--whole-archive)
-    if (WIN32 AND URHO3D_LIB_TYPE STREQUAL SHARED)
+    if (URHO3D_LIB_TYPE STREQUAL SHARED)
         set_target_properties (${TARGET_NAME} PROPERTIES PREFIX "")
     endif ()
 endif ()
-foreach (TARGET ${STATIC_LIBRARY_TARGETS})
-    get_target_property (ARCHIVE ${TARGET} LOCATION)
-    if (ARCHIVE)
-        if (NOT MSVC)
-            set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES ${FORCE_LOAD} ${ARCHIVE})    # Only works in Apple (Xcode and Makefile) and GCC while building shared library
+
+# Setup dependency libraries to be linked or archived as a whole inside Urho3D library for SHARED or STATIC lib type, respectively
+if (APPLE)
+    set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES -force_load)
+elseif (MSVC)
+    foreach (THIRD_PARTY_LIB ${STATIC_LIBRARY_TARGETS})
+        if (NOT ${THIRD_PARTY_LIB} MATCHES boost|rapidjson|STB)  # Exclude header-only "fake" static libs
+            # Must be specified for each library https://github.com/urho3d/Urho3D/issues/2760
+            set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_OPTIONS /WHOLEARCHIVE:${THIRD_PARTY_LIB})  # Require VS 2015 Update 2 onward
         endif ()
-        if (MSVC_VERSION VERSION_EQUAL 1500)
-            if (ARCHIVE MATCHES " ")
-                message (FATAL_ERROR "CMake/VS2008 generator does not support spaces in the source and/or build tree path")
+    endforeach ()
+    set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_OPTIONS /FORCE)
+else ()
+    set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES -Wl,--whole-archive)
+endif ()
+
+foreach (TARGET ${STATIC_LIBRARY_TARGETS})
+    set (ARCHIVE $<TARGET_FILE:${TARGET}>)
+    if (NOT ${TARGET} MATCHES boost|rapidjson|STB)  # Exclude header-only "fake" static lib targets
+        set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES ${ARCHIVE})      # Should work for all compiler toolchains while building shared library
+        if (URHO3D_LIB_TYPE STREQUAL STATIC)
+            if (XCODE OR MSVC)  # Only works in Xcode and MSVC while building static library
+                set_property (TARGET ${TARGET_NAME} APPEND PROPERTY STATIC_LIBRARY_OPTIONS ${ARCHIVE})
+            else ()
+                list (APPEND ARCHIVES ${ARCHIVE})   # Accumulate the target locations for archiving later
             endif ()
-            set_property (TARGET ${TARGET_NAME} APPEND_STRING PROPERTY STATIC_LIBRARY_FLAGS " ${ARCHIVE}")  # Fallback for VS2008
-        elseif (XCODE OR MSVC)
-            set_property (TARGET ${TARGET_NAME} APPEND_STRING PROPERTY STATIC_LIBRARY_FLAGS " \"${ARCHIVE}\"")  # Only works in Apple (Xcode only) and MSVC while building static library
-        else ()
-            list (APPEND ARCHIVES ${ARCHIVE})
         endif ()
     endif ()
 endforeach ()
 if (NOT XCODE AND NOT MSVC)
     if (NOT APPLE)
-        set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES -Wl,--no-whole-archive)
+        set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES -Wl,--no-whole-archive)  # GCC/Clang-specific to pair up with whole-archive linker option
     endif ()
     if (URHO3D_LIB_TYPE STREQUAL STATIC)
         if (APPLE)
@@ -484,22 +537,25 @@ install_header_files (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${DEST_
 # Generate the include-all-headers header file even though we do not encourage Urho3D library users to use it
 list (SORT URHO_HEADERS)
 list (REVERSE URHO_HEADERS)
-set (OPTIONAL_SUBS AngelScript Database IK Lua Navigation Network Physics Urho2D)
+set (OPTIONAL_SUBS AngelScript Database IK LuaScript Navigation Network Physics Physics2D Urho2D)
 foreach (SUB ${OPTIONAL_SUBS})
-    if (URHO_HEADERS MATCHES "(include/Urho3D/${SUB}[^;]+)")
+    if (URHO_HEADERS MATCHES "(include/Urho3D/${SUB}/[^;]+)")
         list (FIND URHO_HEADERS ${CMAKE_MATCH_1} FOUND_INDEX)
         list (INSERT URHO_HEADERS ${FOUND_INDEX} "#endif")
     endif ()
 endforeach ()
 list (REVERSE URHO_HEADERS)
 foreach (SUB ${OPTIONAL_SUBS})
-    if (URHO_HEADERS MATCHES "(include/Urho3D/${SUB}[^;]+)")
+    if (URHO_HEADERS MATCHES "(include/Urho3D/${SUB}/[^;]+)")
         string (TOUPPER ${SUB} SUB)
+        if("${SUB}" STREQUAL "LUASCRIPT")
+            set (SUB "LUA")
+        endif ()
         list (FIND URHO_HEADERS ${CMAKE_MATCH_1} FOUND_INDEX)
         list (INSERT URHO_HEADERS ${FOUND_INDEX} "#if URHO3D_${SUB}")
     endif ()
 endforeach ()
-string (REGEX REPLACE "include/[^;]+(DebugNew|Direct3D|GraphicsImpl|IKConverters|ODBC|OpenGL|Precompiled|SQLite|ToluaUtils|Urho3D|librevision)[^;]+;" "" URHO_HEADERS "${URHO_HEADERS};")
+string (REGEX REPLACE "include/[^;]+(DebugNew|Direct3D|GraphicsImpl|IKConverters|ODBC|OpenGL|Precompiled|SQLite|ToluaUtils|Urho3D|librevision|wrap\.h|aswrappedcall\.h)[^;]*;" "" URHO_HEADERS "${URHO_HEADERS};")
 string (REGEX REPLACE "include/([^;]+)" "#include <\\1>" URHO_HEADERS "${GENERATED_HEADERS};;${URHO_HEADERS}")
 string (REPLACE ";" \n URHO_HEADERS "${URHO_HEADERS}")
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3DAll.h.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3DAll.h)
@@ -550,7 +606,7 @@ string (REPLACE "${SYSROOT}" "\${pc_sysrootdir}" CLEANED_CMAKE_CXX_FLAGS "${CLEA
 string (REPLACE "${SYSROOT}" "\${pc_sysrootdir}" CLEANED_CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.pc.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc${PC_SUFFIX} @ONLY)
 if (MSVC)
-    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -DLIB_NAME=$<TARGET_LINKER_FILE_NAME:${TARGET_NAME}> -P ${CMAKE_SOURCE_DIR}/CMake/Modules/AdjustPkgConfigForMSVC.cmake)
+    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -DLIB_NAME=$<TARGET_LINKER_FILE_NAME:${TARGET_NAME}> -P ${CMAKE_SOURCE_DIR}/cmake/Modules/AdjustPkgConfigForMSVC.cmake)
 endif ()
 if (ANDROID)
     # After migration to Gradle build system we do not support Android cross-compiling build via pkgconfig anymore, however, this file is still being provided as reference only
@@ -559,23 +615,6 @@ endif ()
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc DESTINATION ${DEST_PKGCONFIG_DIR} ${RENAME})
 
 # Define post build steps
-if (ANDROID AND GRADLE_BUILD_DIR)
-    # Copy the library to URHO3D_HOME directory
-    set (ABI_LIB_DIR ${GRADLE_BUILD_DIR}/tree/${CMAKE_BUILD_TYPE}/${ANDROID_ABI}/lib)
-    file (MAKE_DIRECTORY ${ABI_LIB_DIR})
-    # Workaround execute_process does not support generator expression
-    if (URHO3D_LIB_TYPE STREQUAL STATIC)
-        set (LIB_EXT .a)
-    else ()
-        set (LIB_EXT .so)
-    endif ()
-    # Put a placeholder during Gradle configuration phase so that initial IDE "gradle sync" works cleanly
-    execute_process (COMMAND ${CMAKE_COMMAND} -E touch ${ABI_LIB_DIR}/lib${TARGET_NAME}${LIB_EXT})
-    # Replace the placeholder with the actual target file during Gradle execution phase
-    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${ABI_LIB_DIR}
-        COMMENT "Copying Urho3D library to URHO3D_HOME directory")
-    add_make_clean_files (${ABI_LIB_DIR}/$<TARGET_FILE_NAME:${TARGET_NAME}>)
-endif ()
 if (URHO3D_LIB_TYPE STREQUAL SHARED AND ARM)
     # Strip the output shared library for embedded ARM platforms (we don't do this for Android anymore, assuming Android plugin will take care of it)
     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
@@ -585,4 +624,8 @@ if (URHO3D_SCP_TO_TARGET)
     # Ensure SCP is the last command
     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${URHO3D_SCP_TO_TARGET} || exit 0
         COMMENT "Scp-ing Urho3D library to target system")
+endif ()
+
+if (URHO3D_FORCE_AS_MAX_PORTABILITY)
+    add_definitions (-DAS_MAX_PORTABILITY)
 endif ()

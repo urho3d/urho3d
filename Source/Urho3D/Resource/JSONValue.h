@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 /// \file
 
@@ -59,6 +40,7 @@ enum JSONNumberType
     JSONNT_FLOAT_DOUBLE
 };
 
+class Context;
 class JSONValue;
 
 /// JSON array type.
@@ -74,11 +56,22 @@ using ConstJSONObjectIterator = JSONObject::ConstIterator;
 class URHO3D_API JSONValue
 {
 public:
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:26495)
+#endif
+
     /// Construct null value.
     JSONValue() :
         type_(0)
     {
     }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
     /// Construct with a boolean.
     JSONValue(bool value) :         // NOLINT(google-explicit-constructor)
         type_(0)
@@ -167,25 +160,35 @@ public:
     JSONValue& operator =(const JSONValue& rhs);
 
     /// Return value type.
+    /// @property
     JSONValueType GetValueType() const;
     /// Return number type.
+    /// @property
     JSONNumberType GetNumberType() const;
     /// Return value type's name.
+    /// @property
     String GetValueTypeName() const;
     /// Return number type's name.
+    /// @property
     String GetNumberTypeName() const;
 
     /// Check is null.
+    /// @property{get_isNull}
     bool IsNull() const { return GetValueType() == JSON_NULL; }
     /// Check is boolean.
+    /// @property{get_isBool}
     bool IsBool() const { return GetValueType() == JSON_BOOL; }
     /// Check is number.
+    /// @property{get_isNumber}
     bool IsNumber() const { return GetValueType() == JSON_NUMBER; }
     /// Check is string.
+    /// @property{get_isString}
     bool IsString() const { return GetValueType() == JSON_STRING; }
     /// Check is array.
+    /// @property{get_isArray}
     bool IsArray() const { return GetValueType() == JSON_ARRAY; }
     /// Check is object.
+    /// @property{get_isObject}
     bool IsObject() const { return GetValueType() == JSON_OBJECT; }
 
     /// Return boolean value.
@@ -223,6 +226,7 @@ public:
     /// Resize array.
     void Resize(unsigned newSize);
     /// Return size of array or number of keys in object.
+    /// @property
     unsigned Size() const;
 
     // JSON object functions
@@ -293,17 +297,24 @@ public:
 private:
     /// type.
     unsigned type_;
+
+    // https://github.com/doxygen/doxygen/issues/7623
     union
     {
         /// Boolean value.
+        /// @nobind
         bool boolValue_;
         /// Number value.
+        /// @nobind
         double numberValue_;
         /// String value.
+        /// @nobind
         String* stringValue_;
         /// Array value.
+        /// @nobind
         JSONArray* arrayValue_;
         /// Object value.
+        /// @nobind
         JSONObject* objectValue_;
     };
 };

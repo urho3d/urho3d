@@ -1,4 +1,4 @@
-// Urho2D platformer example.
+// 2D platformer example.
 // This sample demonstrates:
 //    - Creating an orthogonal 2D scene from tile map file
 //    - Displaying the scene using the Renderer subsystem
@@ -55,7 +55,7 @@ void CreateScene()
     Node@ tileMapNode = scene_.CreateChild("TileMap");
     TileMap2D@ tileMap = tileMapNode.CreateComponent("TileMap2D");
     tileMap.tmxFile = cache.GetResource("TmxFile2D", "Urho2D/Tilesets/Ortho.tmx");
-    TileMapInfo2D@ info = tileMap.info;
+    const TileMapInfo2D@ info = tileMap.info;
 
     // Create Spriter Imp character (from sample 33_SpriterAnimation)
     CreateCharacter(info, true, 0.8f, Vector3(1.0f, 8.0f, 0.0f), 0.2f);

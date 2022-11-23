@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -30,8 +11,8 @@
 #include "../Graphics/DebugRenderer.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/Light.h"
-#include "../Graphics/ShaderVariation.h"
-#include "../Graphics/VertexBuffer.h"
+#include "../GraphicsAPI/ShaderVariation.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #include "../Math/Polyhedron.h"
 #include "../Resource/ResourceCache.h"
 
@@ -248,7 +229,7 @@ void DebugRenderer::AddPolyhedron(const Polyhedron& poly, const Color& color, bo
 
     for (unsigned i = 0; i < poly.faces_.Size(); ++i)
     {
-        const PODVector<Vector3>& face = poly.faces_[i];
+        const Vector<Vector3>& face = poly.faces_[i];
         if (face.Size() >= 3)
         {
             for (unsigned j = 0; j < face.Size(); ++j)

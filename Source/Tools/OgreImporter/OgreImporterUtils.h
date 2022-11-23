@@ -1,38 +1,22 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
 #include <Urho3D/Graphics/Animation.h>
-#include <Urho3D/Math/BoundingBox.h>
 #include <Urho3D/Graphics/Graphics.h>
-#include <Urho3D/Graphics/VertexBuffer.h>
+#include <Urho3D/GraphicsAPI/VertexBuffer.h>
 #include <Urho3D/IO/Serializer.h>
+#include <Urho3D/Math/BoundingBox.h>
 #include <Urho3D/Math/Matrix3x4.h>
 
 using namespace Urho3D;
 
 struct Triangle
 {
+    // Fields are not initialized.
+    Triangle() = default;
+
     Triangle(unsigned v0, unsigned v1, unsigned v2) :
         v0_{v0},
         v1_{v1},
@@ -127,7 +111,7 @@ struct ModelVertexBuffer
     {
         dest.WriteUInt(vertices_.Size());
 
-        PODVector<VertexElement> elements = VertexBuffer::GetElements(elementMask_);
+        Vector<VertexElement> elements = VertexBuffer::GetElements(elementMask_);
         dest.WriteUInt(elements.Size());
         for (unsigned j = 0; j < elements.Size(); ++j)
         {
@@ -170,7 +154,7 @@ struct ModelMorphBuffer
 {
     unsigned vertexBuffer_;
     unsigned elementMask_;
-    Vector<Pair<unsigned, ModelVertex> > vertices_;
+    Vector<Pair<unsigned, ModelVertex>> vertices_;
 };
 
 struct ModelMorph
@@ -189,7 +173,7 @@ struct ModelMorph
             dest.WriteUInt(buffers_[i].vertices_.Size());
             unsigned elementMask = buffers_[i].elementMask_;
 
-            for (Vector<Pair<unsigned, ModelVertex> >::Iterator j = buffers_[i].vertices_.Begin();
+            for (Vector<Pair<unsigned, ModelVertex>>::Iterator j = buffers_[i].vertices_.Begin();
                 j != buffers_[i].vertices_.End(); ++j)
             {
                 dest.WriteUInt(j->first_);
@@ -207,7 +191,7 @@ struct ModelMorph
 struct ModelIndexBuffer
 {
     unsigned indexSize_;
-    PODVector<unsigned> indices_;
+    Vector<unsigned> indices_;
 
     ModelIndexBuffer() :
         indexSize_(sizeof(unsigned short))
@@ -237,6 +221,6 @@ struct ModelSubGeometryLodLevel
     unsigned indexBuffer_{};
     unsigned indexStart_{};
     unsigned indexCount_{};
-    HashMap<unsigned, PODVector<BoneWeightAssignment> > boneWeights_;
-    PODVector<unsigned> boneMapping_;
+    HashMap<unsigned, Vector<BoneWeightAssignment>> boneWeights_;
+    Vector<unsigned> boneMapping_;
 };

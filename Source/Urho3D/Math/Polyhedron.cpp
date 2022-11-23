@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -26,10 +7,6 @@
 #include "../Math/Polyhedron.h"
 
 #include "../DebugNew.h"
-
-#ifdef _MSC_VER
-#pragma warning(disable:6293)
-#endif
 
 namespace Urho3D
 {
@@ -71,7 +48,7 @@ void Polyhedron::Define(const Frustum& frustum)
 void Polyhedron::AddFace(const Vector3& v0, const Vector3& v1, const Vector3& v2)
 {
     faces_.Resize(faces_.Size() + 1);
-    PODVector<Vector3>& face = faces_[faces_.Size() - 1];
+    Vector<Vector3>& face = faces_[faces_.Size() - 1];
     face.Resize(3);
     face[0] = v0;
     face[1] = v1;
@@ -81,7 +58,7 @@ void Polyhedron::AddFace(const Vector3& v0, const Vector3& v1, const Vector3& v2
 void Polyhedron::AddFace(const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3)
 {
     faces_.Resize(faces_.Size() + 1);
-    PODVector<Vector3>& face = faces_[faces_.Size() - 1];
+    Vector<Vector3>& face = faces_[faces_.Size() - 1];
     face.Resize(4);
     face[0] = v0;
     face[1] = v1;
@@ -89,7 +66,7 @@ void Polyhedron::AddFace(const Vector3& v0, const Vector3& v1, const Vector3& v2
     face[3] = v3;
 }
 
-void Polyhedron::AddFace(const PODVector<Vector3>& face)
+void Polyhedron::AddFace(const Vector<Vector3>& face)
 {
     faces_.Push(face);
 }
@@ -98,15 +75,14 @@ void Polyhedron::Clip(const Plane& plane)
 {
     clippedVertices_.Clear();
 
-    for (unsigned i = 0; i < faces_.Size(); ++i)
+    for (Vector<Vector3>& face : faces_)
     {
-        PODVector<Vector3>& face = faces_[i];
         Vector3 lastVertex;
         float lastDistance = 0.0f;
 
         outFace_.Clear();
 
-        for (unsigned j = 0; j < face.Size(); ++j)
+        for (i32 j = 0; j < face.Size(); ++j)
         {
             float distance = plane.Distance(face[j]);
             if (distance >= 0.0f)
@@ -154,16 +130,16 @@ void Polyhedron::Clip(const Plane& plane)
     }
 
     // Remove empty faces
-    for (unsigned i = faces_.Size() - 1; i < faces_.Size(); --i)
+    for (i32 i = faces_.Size() - 1; i >= 0; --i)
     {
         if (faces_[i].Empty())
             faces_.Erase(i);
     }
 
     // Create a new face from the clipped vertices. First remove duplicates
-    for (unsigned i = 0; i < clippedVertices_.Size(); ++i)
+    for (i32 i = 0; i < clippedVertices_.Size(); ++i)
     {
-        for (unsigned j = clippedVertices_.Size() - 1; j > i; --j)
+        for (i32 j = clippedVertices_.Size() - 1; j > i; --j)
         {
             if (clippedVertices_[j].Equals(clippedVertices_[i]))
                 clippedVertices_.Erase(j);
@@ -185,7 +161,7 @@ void Polyhedron::Clip(const Plane& plane)
             float bestDistance = M_INFINITY;
             unsigned bestIndex = 0;
 
-            for (unsigned i = 0; i < clippedVertices_.Size(); ++i)
+            for (i32 i = 0; i < clippedVertices_.Size(); ++i)
             {
                 float distance = (clippedVertices_[i] - lastAdded).LengthSquared();
                 if (distance < bestDistance)
@@ -236,21 +212,19 @@ void Polyhedron::Clear()
 
 void Polyhedron::Transform(const Matrix3& transform)
 {
-    for (unsigned i = 0; i < faces_.Size(); ++i)
+    for (Vector<Vector3>& face : faces_)
     {
-        PODVector<Vector3>& face = faces_[i];
-        for (unsigned j = 0; j < face.Size(); ++j)
-            face[j] = transform * face[j];
+        for (Vector3& vertex : face)
+            vertex = transform * vertex;
     }
 }
 
 void Polyhedron::Transform(const Matrix3x4& transform)
 {
-    for (unsigned i = 0; i < faces_.Size(); ++i)
+    for (Vector<Vector3>& face : faces_)
     {
-        PODVector<Vector3>& face = faces_[i];
-        for (unsigned j = 0; j < face.Size(); ++j)
-            face[j] = transform * face[j];
+        for (Vector3& vertex : face)
+            vertex = transform * vertex;
     }
 }
 
@@ -259,13 +233,13 @@ Polyhedron Polyhedron::Transformed(const Matrix3& transform) const
     Polyhedron ret;
     ret.faces_.Resize(faces_.Size());
 
-    for (unsigned i = 0; i < faces_.Size(); ++i)
+    for (i32 i = 0; i < faces_.Size(); ++i)
     {
-        const PODVector<Vector3>& face = faces_[i];
-        PODVector<Vector3>& newFace = ret.faces_[i];
+        const Vector<Vector3>& face = faces_[i];
+        Vector<Vector3>& newFace = ret.faces_[i];
         newFace.Resize(face.Size());
 
-        for (unsigned j = 0; j < face.Size(); ++j)
+        for (i32 j = 0; j < face.Size(); ++j)
             newFace[j] = transform * face[j];
     }
 
@@ -277,31 +251,33 @@ Polyhedron Polyhedron::Transformed(const Matrix3x4& transform) const
     Polyhedron ret;
     ret.faces_.Resize(faces_.Size());
 
-    for (unsigned i = 0; i < faces_.Size(); ++i)
+    for (i32 i = 0; i < faces_.Size(); ++i)
     {
-        const PODVector<Vector3>& face = faces_[i];
-        PODVector<Vector3>& newFace = ret.faces_[i];
+        const Vector<Vector3>& face = faces_[i];
+        Vector<Vector3>& newFace = ret.faces_[i];
         newFace.Resize(face.Size());
 
-        for (unsigned j = 0; j < face.Size(); ++j)
+        for (i32 j = 0; j < face.Size(); ++j)
             newFace[j] = transform * face[j];
     }
 
     return ret;
 }
 
-void Polyhedron::SetFace(unsigned index, const Vector3& v0, const Vector3& v1, const Vector3& v2)
+void Polyhedron::SetFace(i32 index, const Vector3& v0, const Vector3& v1, const Vector3& v2)
 {
-    PODVector<Vector3>& face = faces_[index];
+    assert(index >= 0);
+    Vector<Vector3>& face = faces_[index];
     face.Resize(3);
     face[0] = v0;
     face[1] = v1;
     face[2] = v2;
 }
 
-void Polyhedron::SetFace(unsigned index, const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3)
+void Polyhedron::SetFace(i32 index, const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3)
 {
-    PODVector<Vector3>& face = faces_[index];
+    assert(index >= 0);
+    Vector<Vector3>& face = faces_[index];
     face.Resize(4);
     face[0] = v0;
     face[1] = v1;

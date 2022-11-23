@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -65,12 +46,13 @@ public:
     /// Disconnect the connection to the server. If wait time is non-zero, will block while waiting for disconnect to finish.
     void Disconnect(int waitMSec = 0);
     /// Start a server on a port using UDP protocol. Return true if successful.
-    bool StartServer(unsigned short port);
+    bool StartServer(unsigned short port, unsigned int maxConnections = 128);
     /// Stop the server.
     void StopServer();
     /// Start NAT punchtrough client to allow remote connections.
     void StartNATClient();
     /// Get local server GUID.
+    /// @property{get_guid}
     const String& GetGUID() const { return guid_; }
     /// Attempt to connect to NAT server.
     void AttemptNATPunchtrough(const String& guid, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
@@ -85,10 +67,13 @@ public:
     /// Broadcast a remote event with the specified node as a sender. Is sent to all client connections in the node's scene.
     void BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     /// Set network update FPS.
+    /// @property
     void SetUpdateFps(int fps);
     /// Set simulated latency in milliseconds. This adds a fixed delay before sending each packet.
+    /// @property
     void SetSimulatedLatency(int ms);
     /// Set simulated packet loss probability between 0.0 - 1.0.
+    /// @property
     void SetSimulatedPacketLoss(float probability);
     /// Register a remote event as allowed to be received. There is also a fixed blacklist of events that can not be allowed in any case, such as ConsoleCommand.
     void RegisterRemoteEvent(StringHash eventType);
@@ -97,6 +82,7 @@ public:
     /// Unregister all remote events.
     void UnregisterAllRemoteEvents();
     /// Set the package download cache directory.
+    /// @property
     void SetPackageCacheDir(const String& path);
     /// Trigger all client connections in the specified scene to download a package file from the server. Can be used to download additional resource packages when clients are already joined in the scene. The package must have been added as a requirement to the scene, or else the eventual download will fail.
     void SendPackageToClients(Scene* scene, PackageFile* package);
@@ -105,26 +91,33 @@ public:
     /// Ban specific IP addresses.
     void BanAddress(const String& address);
     /// Return network update FPS.
+    /// @property
     int GetUpdateFps() const { return updateFps_; }
 
     /// Return simulated latency in milliseconds.
+    /// @property
     int GetSimulatedLatency() const { return simulatedLatency_; }
 
     /// Return simulated packet loss probability.
+    /// @property
     float GetSimulatedPacketLoss() const { return simulatedPacketLoss_; }
 
     /// Return a client or server connection by RakNet connection address, or null if none exist.
     Connection* GetConnection(const SLNet::AddressOrGUID& connection) const;
     /// Return the connection to the server. Null if not connected.
+    /// @property
     Connection* GetServerConnection() const;
     /// Return all client connections.
-    Vector<SharedPtr<Connection> > GetClientConnections() const;
+    /// @property
+    Vector<SharedPtr<Connection>> GetClientConnections() const;
     /// Return whether the server is running.
+    /// @property
     bool IsServerRunning() const;
     /// Return whether a remote event is allowed to be received.
     bool CheckRemoteEvent(StringHash eventType) const;
 
     /// Return the package download cache directory.
+    /// @property
     const String& GetPackageCacheDir() const { return packageCacheDir_; }
 
     /// Process incoming messages from connections. Called by HandleBeginFrame.
@@ -140,7 +133,7 @@ private:
     /// Handle server connection.
     void OnServerConnected(const SLNet::AddressOrGUID& address);
     /// Handle server disconnection.
-    void OnServerDisconnected();
+    void OnServerDisconnected(const SLNet::AddressOrGUID& address);
     /// Reconfigure network simulator parameters on all existing connections.
     void ConfigureNetworkSimulator();
     /// All incoming packages are handled here.
@@ -153,7 +146,7 @@ private:
     /// Client's server connection.
     SharedPtr<Connection> serverConnection_;
     /// Server's client connections.
-    HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> > clientConnections_;
+    HashMap<SLNet::AddressOrGUID, SharedPtr<Connection>> clientConnections_;
     /// Allowed remote events.
     HashSet<StringHash> allowedRemoteEvents_;
     /// Remote event fixed blacklist.
@@ -193,6 +186,7 @@ private:
 };
 
 /// Register Network library objects.
+/// @nobind
 void URHO3D_API RegisterNetworkLibrary(Context* context);
 
 }

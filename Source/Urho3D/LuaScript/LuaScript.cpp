@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -68,6 +49,9 @@ extern int tolua_IKLuaAPI_open(lua_State*);
 #endif
 #ifdef URHO3D_PHYSICS
 extern int tolua_PhysicsLuaAPI_open(lua_State*);
+#endif
+#ifdef URHO3D_PHYSICS2D
+extern int tolua_Physics2DLuaAPI_open(lua_State*);
 #endif
 extern int tolua_ResourceLuaAPI_open(lua_State*);
 extern int tolua_SceneLuaAPI_open(lua_State*);
@@ -123,6 +107,9 @@ LuaScript::LuaScript(Context* context) :
 #endif
 #ifdef URHO3D_PHYSICS
     tolua_PhysicsLuaAPI_open(luaState_);
+#endif
+#ifdef URHO3D_PHYSICS2D
+    tolua_Physics2DLuaAPI_open(luaState_);
 #endif
     tolua_UILuaAPI_open(luaState_);
 #ifdef URHO3D_URHO2D
@@ -217,7 +204,7 @@ void LuaScript::RemoveAllEventHandlers()
 
 void LuaScript::RemoveEventHandlersExcept(const Vector<String>& exceptionNames)
 {
-    PODVector<StringHash> exceptionTypes(exceptionNames.Size());
+    Vector<StringHash> exceptionTypes(exceptionNames.Size());
     for (unsigned i = 0; i < exceptionTypes.Size(); ++i)
         exceptionTypes[i] = StringHash(exceptionNames[i]);
 
@@ -431,7 +418,7 @@ LuaFunction* LuaScript::GetFunction(int index)
     if (!functionPointer)
         return nullptr;
 
-    HashMap<const void*, SharedPtr<LuaFunction> >::Iterator i = functionPointerToFunctionMap_.Find(functionPointer);
+    HashMap<const void*, SharedPtr<LuaFunction>>::Iterator i = functionPointerToFunctionMap_.Find(functionPointer);
     if (i != functionPointerToFunctionMap_.End())
         return i->second_;
 
@@ -446,7 +433,7 @@ LuaFunction* LuaScript::GetFunction(const String& functionName, bool silentIfNot
     if (!luaState_)
         return nullptr;
 
-    HashMap<String, SharedPtr<LuaFunction> >::Iterator i = functionNameToFunctionMap_.Find(functionName);
+    HashMap<String, SharedPtr<LuaFunction>>::Iterator i = functionNameToFunctionMap_.Find(functionName);
     if (i != functionNameToFunctionMap_.End())
         return i->second_;
 

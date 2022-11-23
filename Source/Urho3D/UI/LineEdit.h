@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -41,6 +22,7 @@ public:
     /// Destruct.
     ~LineEdit() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately.
@@ -49,16 +31,16 @@ public:
     void Update(float timeStep) override;
     /// React to mouse click begin.
     void OnClickBegin
-        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) override;
+        (const IntVector2& position, const IntVector2& screenPosition, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor) override;
     /// React to mouse doubleclick.
     void OnDoubleClick
-        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) override;
+        (const IntVector2& position, const IntVector2& screenPosition, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor) override;
     /// React to mouse drag begin.
     void
-        OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor) override;
+        OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor) override;
     /// React to mouse drag motion.
     void OnDragMove
-        (const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons, int qualifiers,
+        (const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, MouseButtonFlags buttons, QualifierFlags qualifiers,
             Cursor* cursor) override;
     /// React to drag and drop test. Return true to signal that the drop is acceptable.
     bool OnDragDropTest(UIElement* source) override;
@@ -70,50 +52,68 @@ public:
     void OnTextInput(const String& text) override;
 
     /// Set text.
+    /// @property
     void SetText(const String& text);
     /// Set cursor position.
-    void SetCursorPosition(unsigned position);
+    /// @property
+    void SetCursorPosition(i32 position);
     /// Set cursor blink rate. 0 disables blinking.
+    /// @property
     void SetCursorBlinkRate(float rate);
     /// Set maximum text length. 0 for unlimited.
-    void SetMaxLength(unsigned length);
+    /// @property
+    void SetMaxLength(i32 length);
     /// Set echo character for password entry and such. 0 (default) shows the actual text.
-    void SetEchoCharacter(unsigned c);
+    /// @property
+    void SetEchoCharacter(c32 c);
     /// Set whether can move cursor with arrows or mouse, default true.
+    /// @property
     void SetCursorMovable(bool enable);
     /// Set whether selections are allowed, default true.
+    /// @property
     void SetTextSelectable(bool enable);
     /// Set whether copy-paste operations are allowed, default true.
+    /// @property
     void SetTextCopyable(bool enable);
 
     /// Return text.
+    /// @property
     const String& GetText() const { return line_; }
 
     /// Return cursor position.
-    unsigned GetCursorPosition() const { return cursorPosition_; }
+    /// @property
+    i32 GetCursorPosition() const { return cursorPosition_; }
 
     /// Return cursor blink rate.
+    /// @property
     float GetCursorBlinkRate() const { return cursorBlinkRate_; }
 
     /// Return maximum text length.
-    unsigned GetMaxLength() const { return maxLength_; }
+    /// @property
+    i32 GetMaxLength() const { return maxLength_; }
 
     /// Return echo character.
-    unsigned GetEchoCharacter() const { return echoCharacter_; }
+    /// @property
+    c32 GetEchoCharacter() const { return echoCharacter_; }
 
     /// Return whether can move cursor with arrows or mouse.
+    /// @property
     bool IsCursorMovable() const { return cursorMovable_; }
 
     /// Return whether selections are allowed.
+    /// @property
     bool IsTextSelectable() const { return textSelectable_; }
 
     /// Return whether copy-paste operations are allowed.
+    /// @property
     bool IsTextCopyable() const { return textCopyable_; }
 
     /// Return text element.
+    /// @property
     Text* GetTextElement() const { return text_; }
 
     /// Return cursor element.
+    /// @property
     BorderImage* GetCursor() const { return cursor_; }
 
 protected:
@@ -123,8 +123,8 @@ protected:
     void UpdateText();
     /// Update cursor position and restart cursor blinking.
     void UpdateCursor();
-    /// Return char index corresponding to position within element, or M_MAX_UNSIGNED if not found.
-    unsigned GetCharIndex(const IntVector2& position);
+    /// Return char index corresponding to position within element, or NINDEX if not found.
+    i32 GetCharIndex(const IntVector2& position);
 
     /// Text element.
     SharedPtr<Text> text_;
@@ -137,17 +137,17 @@ protected:
     /// Last used text size.
     int lastFontSize_;
     /// Text edit cursor position.
-    unsigned cursorPosition_;
+    i32 cursorPosition_;
     /// Drag begin cursor position.
-    unsigned dragBeginCursor_;
+    i32 dragBeginCursor_;
     /// Cursor blink rate.
     float cursorBlinkRate_;
     /// Cursor blink timer.
     float cursorBlinkTimer_;
     /// Maximum text length.
-    unsigned maxLength_;
+    i32 maxLength_;
     /// Echo character.
-    unsigned echoCharacter_;
+    c32 echoCharacter_;
     /// Cursor movable flag.
     bool cursorMovable_;
     /// Text selectable flag.

@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -41,6 +22,7 @@ class CrowdAgent;
 class NavigationMesh;
 
 /// Parameter structure for obstacle avoidance params (copied from DetourObstacleAvoidance.h in order to hide Detour header from Urho3D library users).
+/// @pod
 struct CrowdObstacleAvoidanceParams
 {
     float velBias;
@@ -68,6 +50,7 @@ public:
     /// Destruct.
     ~CrowdManager() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     void ApplyAttributes() override;
@@ -84,10 +67,13 @@ public:
     /// Reset any crowd target for all crowd agents found in the specified node. Defaulted to scene node.
     void ResetCrowdTarget(Node* node = nullptr);
     /// Set the maximum number of agents.
+    /// @property
     void SetMaxAgents(unsigned maxAgents);
     /// Set the maximum radius of any agent.
+    /// @property
     void SetMaxAgentRadius(float maxAgentRadius);
     /// Assigns the navigation mesh for the crowd.
+    /// @property{set_navMesh}
     void SetNavigationMesh(NavigationMesh* navMesh);
     /// Set all the query filter types configured in the crowd based on the corresponding attribute.
     void SetQueryFilterTypesAttr(const VariantVector& value);
@@ -103,13 +89,13 @@ public:
     void SetObstacleAvoidanceParams(unsigned obstacleAvoidanceType, const CrowdObstacleAvoidanceParams& params);
 
     /// Get all the crowd agent components in the specified node hierarchy. If the node is not specified then use scene node. When inCrowdFilter is set to true then only get agents that are in the crowd.
-    PODVector<CrowdAgent*> GetAgents(Node* node = nullptr, bool inCrowdFilter = true) const;
+    Vector<CrowdAgent*> GetAgents(Node* node = nullptr, bool inCrowdFilter = true) const;
     /// Find the nearest point on the navigation mesh to a given point using the crowd initialized query extent (based on maxAgentRadius) and the specified query filter type.
     Vector3 FindNearestPoint(const Vector3& point, int queryFilterType, dtPolyRef* nearestRef = nullptr);
     /// Try to move along the surface from one point to another using the crowd initialized query extent (based on maxAgentRadius) and the specified query filter type.
     Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end, int queryFilterType, int maxVisited = 3);
     /// Find a path between world space points using the crowd initialized query extent (based on maxAgentRadius) and the specified query filter type. Return non-empty list of points if successful.
-    void FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, int queryFilterType);
+    void FindPath(Vector<Vector3>& dest, const Vector3& start, const Vector3& end, int queryFilterType);
     /// Return a random point on the navigation mesh using the crowd initialized query extent (based on maxAgentRadius) and the specified query filter type.
     Vector3 GetRandomPoint(int queryFilterType, dtPolyRef* randomRef = nullptr);
     /// Return a random point on the navigation mesh within a circle using the crowd initialized query extent (based on maxAgentRadius) and the specified query filter type. The circle radius is only a guideline and in practice the returned point may be further away.
@@ -120,18 +106,23 @@ public:
     Vector3 Raycast(const Vector3& start, const Vector3& end, int queryFilterType, Vector3* hitNormal = nullptr);
 
     /// Get the maximum number of agents.
+    /// @property
     unsigned GetMaxAgents() const { return maxAgents_; }
 
     /// Get the maximum radius of any agent.
+    /// @property
     float GetMaxAgentRadius() const { return maxAgentRadius_; }
 
     /// Get the Navigation mesh assigned to the crowd.
+    /// @property{get_navMesh}
     NavigationMesh* GetNavigationMesh() const { return navigationMesh_; }
 
     /// Get the number of configured query filter types.
+    /// @property
     unsigned GetNumQueryFilterTypes() const { return numQueryFilterTypes_; }
 
     /// Get the number of configured area in the specified query filter type.
+    /// @property
     unsigned GetNumAreas(unsigned queryFilterType) const;
     /// Return all the filter types configured in the crowd as attribute.
     VariantVector GetQueryFilterTypesAttr() const;
@@ -143,6 +134,7 @@ public:
     float GetAreaCost(unsigned queryFilterType, unsigned areaID) const;
 
     /// Get the number of configured obstacle avoidance types.
+    /// @property
     unsigned GetNumObstacleAvoidanceTypes() const { return numObstacleAvoidanceTypes_; }
 
     /// Return all the obstacle avoidance types configured in the crowd as attribute.
@@ -192,7 +184,7 @@ private:
     /// Number of query filter types configured in the crowd. Limit to DT_CROWD_MAX_QUERY_FILTER_TYPE.
     unsigned numQueryFilterTypes_{};
     /// Number of configured area in each filter type. Limit to DT_MAX_AREAS.
-    PODVector<unsigned> numAreas_;
+    Vector<unsigned> numAreas_;
     /// Number of obstacle avoidance types configured in the crowd. Limit to DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS.
     unsigned numObstacleAvoidanceTypes_{};
 };

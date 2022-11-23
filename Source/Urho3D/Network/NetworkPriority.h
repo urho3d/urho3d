@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -38,27 +19,36 @@ public:
     /// Destruct.
     ~NetworkPriority() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
-    /// Set base priority. Default 100 (send updates at full frequency.)
+    /// Set base priority. Default 100 (send updates at full frequency).
+    /// @property
     void SetBasePriority(float priority);
-    /// Set priority reduction distance factor. Default 0 (no effect.)
+    /// Set priority reduction distance factor. Default 0 (no effect).
+    /// @property
     void SetDistanceFactor(float factor);
-    /// Set minimum priority. Default 0 (no updates when far away enough.)
+    /// Set minimum priority. Default 0 (no updates when far away enough).
+    /// @property
     void SetMinPriority(float priority);
     /// Set whether updates to owner should be sent always at full rate. Default true.
+    /// @property
     void SetAlwaysUpdateOwner(bool enable);
 
     /// Return base priority.
+    /// @property
     float GetBasePriority() const { return basePriority_; }
 
     /// Return priority reduction distance factor.
+    /// @property
     float GetDistanceFactor() const { return distanceFactor_; }
 
     /// Return minimum priority.
+    /// @property
     float GetMinPriority() const { return minPriority_; }
 
     /// Return whether updates to owner should be sent always at full rate.
+    /// @property
     bool GetAlwaysUpdateOwner() const { return alwaysUpdateOwner_; }
 
     /// Increment and check priority accumulator. Return true if should update. Called by Connection.

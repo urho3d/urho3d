@@ -1,37 +1,18 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
 #include "../Core/Profiler.h"
 #include "../Graphics/Geometry.h"
-#include "../Graphics/IndexBuffer.h"
-#include "../Graphics/Model.h"
 #include "../Graphics/Graphics.h"
-#include "../Graphics/VertexBuffer.h"
-#include "../IO/Log.h"
+#include "../Graphics/Model.h"
+#include "../GraphicsAPI/IndexBuffer.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #include "../IO/File.h"
 #include "../IO/FileSystem.h"
+#include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
 
@@ -40,7 +21,7 @@
 namespace Urho3D
 {
 
-unsigned LookupVertexBuffer(VertexBuffer* buffer, const Vector<SharedPtr<VertexBuffer> >& buffers)
+unsigned LookupVertexBuffer(VertexBuffer* buffer, const Vector<SharedPtr<VertexBuffer>>& buffers)
 {
     for (unsigned i = 0; i < buffers.Size(); ++i)
     {
@@ -50,7 +31,7 @@ unsigned LookupVertexBuffer(VertexBuffer* buffer, const Vector<SharedPtr<VertexB
     return 0;
 }
 
-unsigned LookupIndexBuffer(IndexBuffer* buffer, const Vector<SharedPtr<IndexBuffer> >& buffers)
+unsigned LookupIndexBuffer(IndexBuffer* buffer, const Vector<SharedPtr<IndexBuffer>>& buffers)
 {
     for (unsigned i = 0; i < buffers.Size(); ++i)
     {
@@ -197,13 +178,13 @@ bool Model::BeginLoad(Deserializer& source)
     {
         // Read bone mappings
         unsigned boneMappingCount = source.ReadUInt();
-        PODVector<unsigned> boneMapping(boneMappingCount);
+        Vector<unsigned> boneMapping(boneMappingCount);
         for (unsigned j = 0; j < boneMappingCount; ++j)
             boneMapping[j] = source.ReadUInt();
         geometryBoneMappings_.Push(boneMapping);
 
         unsigned numLodLevels = source.ReadUInt();
-        Vector<SharedPtr<Geometry> > geometryLodLevels;
+        Vector<SharedPtr<Geometry>> geometryLodLevels;
         geometryLodLevels.Reserve(numLodLevels);
         loadGeometries_[i].Resize(numLodLevels);
 
@@ -377,7 +358,7 @@ bool Model::Save(Serializer& dest) const
     {
         VertexBuffer* buffer = vertexBuffers_[i];
         dest.WriteUInt(buffer->GetVertexCount());
-        const PODVector<VertexElement>& elements = buffer->GetElements();
+        const Vector<VertexElement>& elements = buffer->GetElements();
         dest.WriteUInt(elements.Size());
         for (unsigned j = 0; j < elements.Size(); ++j)
         {
@@ -488,8 +469,8 @@ void Model::SetBoundingBox(const BoundingBox& box)
     boundingBox_ = box;
 }
 
-bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& morphRangeStarts,
-    const PODVector<unsigned>& morphRangeCounts)
+bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const Vector<unsigned>& morphRangeStarts,
+    const Vector<unsigned>& morphRangeCounts)
 {
     for (unsigned i = 0; i < buffers.Size(); ++i)
     {
@@ -519,7 +500,7 @@ bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, co
     return true;
 }
 
-bool Model::SetIndexBuffers(const Vector<SharedPtr<IndexBuffer> >& buffers)
+bool Model::SetIndexBuffers(const Vector<SharedPtr<IndexBuffer>>& buffers)
 {
     for (unsigned i = 0; i < buffers.Size(); ++i)
     {
@@ -604,7 +585,7 @@ void Model::SetSkeleton(const Skeleton& skeleton)
     skeleton_ = skeleton;
 }
 
-void Model::SetGeometryBoneMappings(const Vector<PODVector<unsigned> >& geometryBoneMappings)
+void Model::SetGeometryBoneMappings(const Vector<Vector<unsigned>>& geometryBoneMappings)
 {
     geometryBoneMappings_ = geometryBoneMappings;
 }
@@ -629,7 +610,7 @@ SharedPtr<Model> Model::Clone(const String& cloneName) const
 
     // Deep copy vertex/index buffers
     HashMap<VertexBuffer*, VertexBuffer*> vbMapping;
-    for (Vector<SharedPtr<VertexBuffer> >::ConstIterator i = vertexBuffers_.Begin(); i != vertexBuffers_.End(); ++i)
+    for (Vector<SharedPtr<VertexBuffer>>::ConstIterator i = vertexBuffers_.Begin(); i != vertexBuffers_.End(); ++i)
     {
         VertexBuffer* origBuffer = *i;
         SharedPtr<VertexBuffer> cloneBuffer;
@@ -656,7 +637,7 @@ SharedPtr<Model> Model::Clone(const String& cloneName) const
     }
 
     HashMap<IndexBuffer*, IndexBuffer*> ibMapping;
-    for (Vector<SharedPtr<IndexBuffer> >::ConstIterator i = indexBuffers_.Begin(); i != indexBuffers_.End(); ++i)
+    for (Vector<SharedPtr<IndexBuffer>>::ConstIterator i = indexBuffers_.Begin(); i != indexBuffers_.End(); ++i)
     {
         IndexBuffer* origBuffer = *i;
         SharedPtr<IndexBuffer> cloneBuffer;

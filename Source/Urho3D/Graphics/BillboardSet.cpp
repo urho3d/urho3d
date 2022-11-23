@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -29,9 +10,9 @@
 #include "../Graphics/Camera.h"
 #include "../Graphics/Geometry.h"
 #include "../Graphics/Graphics.h"
-#include "../Graphics/IndexBuffer.h"
 #include "../Graphics/OctreeQuery.h"
-#include "../Graphics/VertexBuffer.h"
+#include "../GraphicsAPI/IndexBuffer.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #include "../IO/MemoryBuffer.h"
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Node.h"
@@ -128,11 +109,11 @@ void BillboardSet::RegisterObject(Context* context)
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE)
         .SetMetadata(AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, billboardsStructureElementNames);
-    URHO3D_ACCESSOR_ATTRIBUTE("Network Billboards", GetNetBillboardsAttr, SetNetBillboardsAttr, PODVector<unsigned char>,
+    URHO3D_ACCESSOR_ATTRIBUTE("Network Billboards", GetNetBillboardsAttr, SetNetBillboardsAttr, Vector<unsigned char>,
         Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
 
-void BillboardSet::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
+void BillboardSet::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results)
 {
     // If no billboard-level testing, use the Drawable test
     if (query.level_ < RAY_TRIANGLE)
@@ -149,7 +130,7 @@ void BillboardSet::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQue
     Matrix3x4 billboardTransform = relative_ ? worldTransform : Matrix3x4::IDENTITY;
     Vector3 billboardScale = scaled_ ? worldTransform.Scale() : Vector3::ONE;
 
-    for (unsigned i = 0; i < billboards_.Size(); ++i)
+    for (i32 i = 0; i < billboards_.Size(); ++i)
     {
         if (!billboards_[i].enabled_)
             continue;
@@ -374,7 +355,7 @@ void BillboardSet::SetBillboardsAttr(const VariantVector& value)
     // Dealing with old billboard format
     if (value.Size() == billboards_.Size() * 6 + 1)
     {
-        for (PODVector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End() && index < value.Size(); ++i)
+        for (Vector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End() && index < value.Size(); ++i)
         {
             i->position_ = value[index++].GetVector3();
             i->size_ = value[index++].GetVector2();
@@ -388,7 +369,7 @@ void BillboardSet::SetBillboardsAttr(const VariantVector& value)
     // New billboard format
     else
     {
-        for (PODVector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End() && index < value.Size(); ++i)
+        for (Vector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End() && index < value.Size(); ++i)
         {
             i->position_ = value[index++].GetVector3();
             i->size_ = value[index++].GetVector2();
@@ -404,13 +385,13 @@ void BillboardSet::SetBillboardsAttr(const VariantVector& value)
     Commit();
 }
 
-void BillboardSet::SetNetBillboardsAttr(const PODVector<unsigned char>& value)
+void BillboardSet::SetNetBillboardsAttr(const Vector<unsigned char>& value)
 {
     MemoryBuffer buf(value);
     unsigned numBillboards = buf.ReadVLE();
     SetNumBillboards(numBillboards);
 
-    for (PODVector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End(); ++i)
+    for (Vector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End(); ++i)
     {
         i->position_ = buf.ReadVector3();
         i->size_ = buf.ReadVector2();
@@ -435,7 +416,7 @@ VariantVector BillboardSet::GetBillboardsAttr() const
     ret.Reserve(billboards_.Size() * 7 + 1);
     ret.Push(billboards_.Size());
 
-    for (PODVector<Billboard>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
+    for (Vector<Billboard>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
     {
         ret.Push(i->position_);
         ret.Push(i->size_);
@@ -449,12 +430,12 @@ VariantVector BillboardSet::GetBillboardsAttr() const
     return ret;
 }
 
-const PODVector<unsigned char>& BillboardSet::GetNetBillboardsAttr() const
+const Vector<unsigned char>& BillboardSet::GetNetBillboardsAttr() const
 {
     attrBuffer_.Clear();
     attrBuffer_.WriteVLE(billboards_.Size());
 
-    for (PODVector<Billboard>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
+    for (Vector<Billboard>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
     {
         attrBuffer_.WriteVector3(i->position_);
         attrBuffer_.WriteVector2(i->size_);

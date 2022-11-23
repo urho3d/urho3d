@@ -1,4 +1,4 @@
--- Convenient functions for Urho2D samples:
+-- Convenient functions for Urho2D and Physics2D samples:
 --    - Generate collision shapes from a tmx file objects
 --    - Create Spriter Imp character
 --    - Load Mover script object class from file
@@ -445,6 +445,7 @@ function SpawnEffect(node)
     particleNode:SetScale(0.5 / node.scale.x)
     local particleEmitter = particleNode:CreateComponent("ParticleEmitter2D")
     particleEmitter.effect = cache:GetResource("ParticleEffect2D", "Urho2D/sun.pex")
+    particleEmitter.layer = 2
 end
 
 function PlaySound(soundName)

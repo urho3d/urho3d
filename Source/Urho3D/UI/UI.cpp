@@ -125,9 +125,6 @@ UI::UI(Context* context) :
     SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(UI, HandleKeyDown));
     SubscribeToEvent(E_TEXTINPUT, URHO3D_HANDLER(UI, HandleTextInput));
     SubscribeToEvent(E_DROPFILE, URHO3D_HANDLER(UI, HandleDropFile));
-    SubscribeToEvent(E_JOYSTICKBUTTONDOWN, URHO3D_HANDLER(UI, HandleJoystickButtonDown));
-    SubscribeToEvent(E_JOYSTICKAXISMOVE, URHO3D_HANDLER(UI, HandleJoystickAxisMove));
-    
 
     // Try to initialize right now, but skip if screen mode is not yet set
     Initialize();
@@ -1968,39 +1965,40 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     if (element)
     {
         // Switch focus between focusable elements in the same top level window
-        if (key == KEY_TAB || (element->GetType() == Button::GetTypeStatic() && (key == KEY_LEFT || key == KEY_RIGHT || key == KEY_DOWN || key == KEY_UP)))
-            SwitchFocusElement(key == KEY_TAB ? ((qualifiers_ & QUAL_SHIFT) ? -1 : 1) : key == KEY_DOWN || key == KEY_RIGHT ? 1 : -1);
+        if (key == KEY_TAB)
+        {
+            UIElement* topLevel = element->GetParent();
+            while (topLevel && topLevel->GetParent() != rootElement_ && topLevel->GetParent() != rootModalElement_)
+                topLevel = topLevel->GetParent();
+            if (topLevel)
+            {
+                topLevel->GetChildren(tempElements_, true);
+                for (Vector<UIElement*>::Iterator i = tempElements_.Begin(); i != tempElements_.End();)
+                {
+                    if ((*i)->GetFocusMode() < FM_FOCUSABLE)
+                        i = tempElements_.Erase(i);
+                    else
+                        ++i;
+                }
+                for (unsigned i = 0; i < tempElements_.Size(); ++i)
+                {
+                    if (tempElements_[i] == element)
+                    {
+                        int dir = (qualifiers_ & QUAL_SHIFT) ? -1 : 1;
+                        unsigned nextIndex = (tempElements_.Size() + i + dir) % tempElements_.Size();
+                        UIElement* next = tempElements_[nextIndex];
+                        SetFocusElement(next, true);
+                        return;
+                    }
+                }
+            }
+        }
         // Defocus the element
         else if (key == KEY_ESCAPE && element->GetFocusMode() == FM_FOCUSABLE_DEFOCUSABLE)
             element->SetFocus(false);
         // If none of the special keys, pass the key to the focused element
         else
             element->OnKey(key, mouseButtons_, qualifiers_);
-    }
-}
-
-void UI::HandleJoystickButtonDown(StringHash eventType, VariantMap& eventData) {
-    if (!focusElement_ || focusElement_->GetType() != Button::GetTypeStatic())
-        return;
-    int key = eventData[JoystickButtonDown::P_BUTTON].GetInt();
-    if (key == CONTROLLER_BUTTON_DPAD_DOWN || key == CONTROLLER_BUTTON_DPAD_RIGHT)
-        SwitchFocusElement(1);
-    else if (key == CONTROLLER_BUTTON_DPAD_UP || key == CONTROLLER_BUTTON_DPAD_LEFT)
-        SwitchFocusElement(-1);
-    else if (key == CONTROLLER_BUTTON_A)
-        focusElement_->OnKey(KEY_RETURN, MOUSEB_NONE, QUAL_NONE);
-}
-
-void UI::HandleJoystickAxisMove(StringHash eventType, VariantMap& eventData) {
-    if (!focusElement_ || focusElement_->GetType() != Button::GetTypeStatic())
-        return;
-    int key = eventData[JoystickAxisMove::P_AXIS].GetInt();
-    if (key == CONTROLLER_AXIS_LEFTX || key == CONTROLLER_AXIS_LEFTY) {
-        float pos = eventData[JoystickAxisMove::P_POSITION].GetFloat();
-        if (pos > 0.8)
-            SwitchFocusElement(1);
-        else if (pos < -0.8)
-            SwitchFocusElement(-1);
     }
 }
 
@@ -2158,29 +2156,6 @@ IntVector2 UI::GetEffectiveRootElementSize(bool applyScale) const
     }
 
     return size;
-}
-
-void UI::SwitchFocusElement(int dir) {
-    UIElement* topLevel = focusElement_ ->GetParent();
-    while (topLevel && topLevel->GetParent() != rootElement_ && topLevel->GetParent() != rootModalElement_)
-        topLevel = topLevel->GetParent();
-    if (topLevel) {
-        topLevel->GetChildren(tempElements_, true);
-        for (Vector<UIElement*>::Iterator i = tempElements_.Begin(); i != tempElements_.End();) {
-            if ((*i)->GetFocusMode() < FM_FOCUSABLE || !(*i)->IsVisible())
-                i = tempElements_.Erase(i);
-            else
-                ++i;
-        }
-        for (unsigned i = 0; i < tempElements_.Size(); ++i) {
-            if (tempElements_[i] == focusElement_) {
-                unsigned nextIndex = (tempElements_.Size() + i + dir) % tempElements_.Size();
-                UIElement* next = tempElements_[nextIndex];
-                SetFocusElement(next, true);
-                return;
-            }
-        }
-    }
 }
 
 void UI::SetElementRenderTexture(UIElement* element, Texture2D* texture)

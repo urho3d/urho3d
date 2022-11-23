@@ -1,30 +1,11 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
 #include "../Graphics/Graphics.h"
-#include "../Graphics/Texture2D.h"
+#include "../GraphicsAPI/Texture2D.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
@@ -111,10 +92,6 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     subpixel_ = (hintLevel <= FONT_HINT_LEVEL_LIGHT) && (pointSize <= subpixelThreshold);
     oversampling_ = subpixel_ ? ui->GetFontOversampling() : 1;
 
-    FT_Face face;
-    FT_Error error;
-    FT_Library library = freeType->GetLibrary();
-
     if (pointSize <= 0)
     {
         URHO3D_LOGERROR("Zero or negative point size");
@@ -127,7 +104,9 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
         return false;
     }
 
-    error = FT_New_Memory_Face(library, fontData, fontDataSize, 0, &face);
+    FT_Library library = freeType->GetLibrary();
+    FT_Face face;
+    FT_Error error = FT_New_Memory_Face(library, fontData, fontDataSize, 0, &face);
     if (error)
     {
         URHO3D_LOGERROR("Could not create font face");
@@ -143,24 +122,8 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
 
     face_ = face;
 
-    auto numGlyphs = (unsigned)face->num_glyphs;
+    unsigned numGlyphs = (unsigned)face->num_glyphs;
     URHO3D_LOGDEBUGF("Font face %s (%fpt) has %d glyphs", GetFileName(font_->GetName()).CString(), pointSize, numGlyphs);
-
-    PODVector<unsigned> charCodes(numGlyphs + 1, 0);
-
-    // Attempt to load space glyph first regardless if it's listed or not
-    // In some fonts (Consola) it is missing
-    charCodes[0] = 32;
-
-    FT_UInt glyphIndex;
-    FT_ULong charCode = FT_Get_First_Char(face, &glyphIndex);
-    while (glyphIndex != 0)
-    {
-        if (glyphIndex < numGlyphs)
-            charCodes[glyphIndex + 1] = (unsigned)charCode;
-
-        charCode = FT_Get_Next_Char(face, charCode, &glyphIndex);
-    }
 
     // Load each of the glyphs to see the sizes & store other information
     loadMode_ = FT_LOAD_DEFAULT;
@@ -204,17 +167,22 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     memset(imageData, 0, (size_t)image->GetWidth() * image->GetHeight());
     allocator_.Reset(FONT_TEXTURE_MIN_SIZE, FONT_TEXTURE_MIN_SIZE, textureWidth, textureHeight);
 
-    for (unsigned i = 0; i < charCodes.Size(); ++i)
-    {
-        unsigned charCode = charCodes[i];
-        if (charCode == 0)
-            continue;
+    HashMap<FT_UInt, FT_ULong> charCodes;
+    FT_UInt glyphIndex;
+    FT_ULong charCode = FT_Get_First_Char(face, &glyphIndex);
 
+    while (glyphIndex != 0)
+    {
         if (!LoadCharGlyph(charCode, image))
         {
             hasMutableGlyph_ = true;
             break;
         }
+
+        // TODO: FT_Get_Next_Char can return same glyphIndex for different charCode
+        charCodes[glyphIndex] = charCode;
+
+        charCode = FT_Get_Next_Char(face, charCode, &glyphIndex);
     }
 
     SharedPtr<Texture2D> texture = LoadFaceTexture(image);
@@ -276,13 +244,11 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
                         unsigned rightIndex = deserializer.ReadUShort();
                         float amount = deserializer.ReadShort() * xScale;
 
-                        unsigned leftCharCode = leftIndex < numGlyphs ? charCodes[leftIndex + 1] : 0;
-                        unsigned rightCharCode = rightIndex < numGlyphs ? charCodes[rightIndex + 1] : 0;
-                        if (leftCharCode != 0 && rightCharCode != 0)
-                        {
-                            unsigned value = (leftCharCode << 16u) + rightCharCode;
-                            kerningMapping_[value] = amount;
-                        }
+                        unsigned leftCharCode = charCodes[leftIndex];
+                        unsigned rightCharCode = charCodes[rightIndex];
+                        unsigned value = (leftCharCode << 16u) + rightCharCode;
+                        // TODO: need to store kerning for glyphs but not for charCodes
+                        kerningMapping_[value] = amount;
                     }
                 }
                 else
@@ -305,9 +271,9 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     return true;
 }
 
-const FontGlyph* FontFaceFreeType::GetGlyph(unsigned c)
+const FontGlyph* FontFaceFreeType::GetGlyph(c32 c)
 {
-    HashMap<unsigned, FontGlyph>::Iterator i = glyphMapping_.Find(c);
+    HashMap<c32, FontGlyph>::Iterator i = glyphMapping_.Find(c);
     if (i != glyphMapping_.End())
     {
         FontGlyph& glyph = i->second_;
@@ -317,7 +283,7 @@ const FontGlyph* FontFaceFreeType::GetGlyph(unsigned c)
 
     if (LoadCharGlyph(c))
     {
-        HashMap<unsigned, FontGlyph>::Iterator i = glyphMapping_.Find(c);
+        HashMap<c32, FontGlyph>::Iterator i = glyphMapping_.Find(c);
         if (i != glyphMapping_.End())
         {
             FontGlyph& glyph = i->second_;
@@ -407,7 +373,7 @@ void FontFaceFreeType::BoxFilter(unsigned char* dest, size_t destSize, const uns
     }
 }
 
-bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
+bool FontFaceFreeType::LoadCharGlyph(c32 charCode, Image* image)
 {
     if (!face_)
         return false;

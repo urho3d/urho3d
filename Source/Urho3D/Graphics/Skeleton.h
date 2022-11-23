@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 /// \file
 
@@ -43,6 +24,7 @@ class ResourceCache;
 class Serializer;
 
 /// %Bone in a skeleton.
+/// @nocount
 struct Bone
 {
     /// Construct with defaults.
@@ -61,7 +43,7 @@ struct Bone
     /// Bone name hash.
     StringHash nameHash_;
     /// Parent bone index.
-    unsigned parentIndex_;
+    i32 parentIndex_;
     /// Reset position.
     Vector3 initialPosition_;
     /// Reset rotation.
@@ -83,6 +65,7 @@ struct Bone
 };
 
 /// Hierarchical collection of bones.
+/// @nocount
 class URHO3D_API Skeleton
 {
 public:
@@ -98,33 +81,37 @@ public:
     /// Define from another skeleton.
     void Define(const Skeleton& src);
     /// Set root bone's index.
-    void SetRootBoneIndex(unsigned index);
+    void SetRootBoneIndex(i32 index);
     /// Clear bones.
     void ClearBones();
     /// Reset all animating bones to initial positions.
     void Reset();
 
     /// Return all bones.
+    /// @nobindtemp
     const Vector<Bone>& GetBones() const { return bones_; }
 
     /// Return modifiable bones.
     Vector<Bone>& GetModifiableBones() { return bones_; }
 
     /// Return number of bones.
-    unsigned GetNumBones() const { return bones_.Size(); }
+    /// @property
+    i32 GetNumBones() const { return bones_.Size(); }
 
     /// Return root bone.
+    /// @property
     Bone* GetRootBone();
-    /// Return index of the bone by name. Return M_MAX_UNSIGNED if not found.
-    unsigned GetBoneIndex(const String& boneName) const;
-    /// Return index of the bone by name hash. Return M_MAX_UNSIGNED if not found.
-    unsigned GetBoneIndex(const StringHash& boneNameHash) const;
-    /// Return index of the bone by the bone pointer. Return M_MAX_UNSIGNED if not found.
-    unsigned GetBoneIndex(const Bone* bone) const;
+    /// Return index of the bone by name. Return NINDEX if not found.
+    i32 GetBoneIndex(const String& boneName) const;
+    /// Return index of the bone by name hash. Return NINDEX if not found.
+    i32 GetBoneIndex(const StringHash& boneNameHash) const;
+    /// Return index of the bone by the bone pointer. Return NINDEX if not found.
+    i32 GetBoneIndex(const Bone* bone) const;
     /// Return parent of the given bone. Return null for root bones.
     Bone* GetBoneParent(const Bone* bone);
     /// Return bone by index.
-    Bone* GetBone(unsigned index);
+    /// @property{get_bones}
+    Bone* GetBone(i32 index);
     /// Return bone by name.
     Bone* GetBone(const String& name);
     /// Return bone by name.
@@ -139,7 +126,7 @@ private:
     /// Bones.
     Vector<Bone> bones_;
     /// Root bone index.
-    unsigned rootBoneIndex_;
+    i32 rootBoneIndex_;
 };
 
 }

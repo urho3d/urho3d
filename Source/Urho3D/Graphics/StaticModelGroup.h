@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -38,12 +19,13 @@ public:
     /// Destruct.
     ~StaticModelGroup() override;
     /// Register object factory. StaticModel must be registered first.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     void ApplyAttributes() override;
     /// Process octree raycast. May be called from a worker thread.
-    void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
+    void ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results) override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     void UpdateBatches(const FrameInfo& frame) override;
     /// Return number of occlusion geometry triangles.
@@ -59,9 +41,11 @@ public:
     void RemoveAllInstanceNodes();
 
     /// Return number of instance nodes.
+    /// @property
     unsigned GetNumInstanceNodes() const { return instanceNodes_.Size(); }
 
     /// Return instance node by index.
+    /// @property{get_instanceNodes}
     Node* GetInstanceNode(unsigned index) const;
 
     /// Set node IDs attribute.
@@ -83,9 +67,9 @@ private:
     void UpdateNodeIDs() const;
 
     /// Instance nodes.
-    Vector<WeakPtr<Node> > instanceNodes_;
+    Vector<WeakPtr<Node>> instanceNodes_;
     /// World transforms of valid (existing and visible) instances.
-    PODVector<Matrix3x4> worldTransforms_;
+    Vector<Matrix3x4> worldTransforms_;
     /// IDs of instance nodes for serialization.
     mutable VariantVector nodeIDsAttr_;
     /// Number of valid instance node transforms.

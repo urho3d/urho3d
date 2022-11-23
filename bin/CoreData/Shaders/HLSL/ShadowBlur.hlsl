@@ -32,7 +32,7 @@ void VS(float4 iPos : POSITION,
 
 void PS(float2 iScreenPos : TEXCOORD0,
     out float4 oColor : OUTCOLOR0)
-{  
+{
     float2 color = 0.0;
 
     color += 0.015625 * Sample2D(DiffMap, iScreenPos - 3.0 * cBlurOffsets).rg;

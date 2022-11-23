@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -26,13 +7,13 @@
 #include "../Graphics/Camera.h"
 #include "../Graphics/DebugRenderer.h"
 #include "../Graphics/Geometry.h"
-#include "../Graphics/IndexBuffer.h"
 #include "../Graphics/Material.h"
 #include "../Graphics/OcclusionBuffer.h"
 #include "../Graphics/OctreeQuery.h"
 #include "../Graphics/Terrain.h"
 #include "../Graphics/TerrainPatch.h"
-#include "../Graphics/VertexBuffer.h"
+#include "../GraphicsAPI/IndexBuffer.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #include "../IO/Log.h"
 #include "../Scene/Node.h"
 
@@ -70,7 +51,7 @@ void TerrainPatch::RegisterObject(Context* context)
     context->RegisterFactory<TerrainPatch>();
 }
 
-void TerrainPatch::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
+void TerrainPatch::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results)
 {
     RayQueryLevel level = query.level_;
 
@@ -103,7 +84,7 @@ void TerrainPatch::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQue
                 result.distance_ = distance;
                 result.drawable_ = this;
                 result.node_ = node_;
-                result.subObject_ = M_MAX_UNSIGNED;
+                result.subObject_ = NINDEX;
                 results.Push(result);
             }
         }
@@ -126,8 +107,8 @@ void TerrainPatch::UpdateBatches(const FrameInfo& frame)
     batches_[0].distance_ = distance_;
     batches_[0].worldTransform_ = &worldTransform;
 
-    unsigned newLodLevel = 0;
-    for (unsigned i = 0; i < lodErrors_.Size(); ++i)
+    i32 newLodLevel = 0;
+    for (i32 i = 0; i < lodErrors_.Size(); ++i)
     {
         if (lodErrors_[i] / lodDistance_ > LOD_CONSTANT)
             break;
@@ -194,7 +175,7 @@ bool TerrainPatch::DrawOcclusion(OcclusionBuffer* buffer)
     unsigned vertexSize;
     const unsigned char* indexData;
     unsigned indexSize;
-    const PODVector<VertexElement>* elements;
+    const Vector<VertexElement>* elements;
 
     occlusionGeometry_->GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
     // Check for valid geometry data
@@ -275,8 +256,10 @@ void TerrainPatch::OnWorldBoundingBoxUpdate()
     worldBoundingBox_ = boundingBox_.Transformed(node_->GetWorldTransform());
 }
 
-unsigned TerrainPatch::GetCorrectedLodLevel(unsigned lodLevel)
+i32 TerrainPatch::GetCorrectedLodLevel(i32 lodLevel)
 {
+    assert(lodLevel >= 0);
+
     if (north_)
         lodLevel = Min(lodLevel, north_->GetLodLevel() + 1);
     if (south_)

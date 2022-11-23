@@ -74,7 +74,7 @@ SamplerState sAlbedoBuffer : register(s0);
 SamplerState sNormalMap : register(s1);
 SamplerState sNormalBuffer : register(s1);
 SamplerState sSpecMap : register(s2);
-SamplerState sRoughMetalFresnel : register(s2); //R: Roughness, G: Metal 
+SamplerState sRoughMetalFresnel : register(s2); //R: Roughness, G: Metal
 SamplerState sEmissiveMap : register(s3);
 SamplerState sEnvMap : register(s4);
 SamplerState sVolumeMap : register(s5);

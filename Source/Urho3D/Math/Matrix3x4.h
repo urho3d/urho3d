@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -35,6 +16,12 @@ namespace Urho3D
 class URHO3D_API Matrix3x4
 {
 public:
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:26495)
+#endif
+
     /// Construct an identity matrix.
     Matrix3x4() noexcept
 #ifndef URHO3D_SSE
@@ -173,6 +160,10 @@ public:
         SetTranslation(translation);
 #endif
     }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
     /// Assign from another matrix.
     Matrix3x4& operator =(const Matrix3x4& rhs) noexcept = default;
@@ -664,6 +655,30 @@ public:
 
     /// Return matrix column.
     Vector3 Column(unsigned j) const { return Vector3(Element(0, j), Element(1, j), Element(2, j)); }
+
+    /// Return whether any element is NaN.
+    bool IsNaN() const
+    {
+        const float* data = Data();
+        for (unsigned i = 0; i < 12; ++i)
+        {
+            if (Urho3D::IsNaN(data[i]))
+                return true;
+        }
+        return false;
+    }
+
+    /// Return whether any element is Inf.
+    bool IsInf() const
+    {
+        const float* data = Data();
+        for (unsigned i = 0; i < 12; ++i)
+        {
+            if (Urho3D::IsInf(data[i]))
+                return true;
+        }
+        return false;
+    }
 
     /// Return as string.
     String ToString() const;

@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -33,10 +14,10 @@
 #include "../Graphics/DrawableEvents.h"
 #include "../Graphics/Geometry.h"
 #include "../Graphics/Graphics.h"
-#include "../Graphics/IndexBuffer.h"
 #include "../Graphics/Material.h"
 #include "../Graphics/Octree.h"
-#include "../Graphics/VertexBuffer.h"
+#include "../GraphicsAPI/IndexBuffer.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/ResourceEvents.h"
@@ -121,7 +102,7 @@ void AnimatedModel::RegisterObject(Context* context)
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr,
         VariantVector, Variant::emptyVariantVector, AM_FILE)
         .SetMetadata(AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, animationStatesStructureElementNames);
-    URHO3D_ACCESSOR_ATTRIBUTE("Morphs", GetMorphsAttr, SetMorphsAttr, PODVector<unsigned char>, Variant::emptyBuffer,
+    URHO3D_ACCESSOR_ATTRIBUTE("Morphs", GetMorphsAttr, SetMorphsAttr, Vector<unsigned char>, Variant::emptyBuffer,
         AM_DEFAULT | AM_NOEDIT);
 }
 
@@ -158,7 +139,7 @@ void AnimatedModel::ApplyAttributes()
         AssignBoneNodes();
 }
 
-void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
+void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results)
 {
     // If no bones or no bone-level testing, use the StaticModel test
     RayQueryLevel level = query.level_;
@@ -175,7 +156,7 @@ void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQu
     const Vector<Bone>& bones = skeleton_.GetBones();
     Sphere boneSphere;
 
-    for (unsigned i = 0; i < bones.Size(); ++i)
+    for (i32 i = 0; i < bones.Size(); ++i)
     {
         const Bone& bone = bones[i];
         if (!bone.node_)
@@ -229,7 +210,7 @@ void AnimatedModel::Update(const FrameInfo& frame)
 {
     // If node was invisible last frame, need to decide animation LOD distance here
     // If headless, retain the current animation distance (should be 0)
-    if (frame.camera_ && abs((int)frame.frameNumber_ - (int)viewFrameNumber_) > 1)
+    if (frame.camera_ && Abs(frame.frameNumber_ - viewFrameNumber_) > 1)
     {
         // First check for no update at all when invisible. In that case reset LOD timer to ensure update
         // next time the model is in view
@@ -265,10 +246,12 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
     // Note: per-geometry distances do not take skinning into account. Especially in case of a ragdoll they may be
     // much off base if the node's own transform is not updated
     if (batches_.Size() == 1)
+    {
         batches_[0].distance_ = distance_;
+    }
     else
     {
-        for (unsigned i = 0; i < batches_.Size(); ++i)
+        for (i32 i = 0; i < batches_.Size(); ++i)
             batches_[i].distance_ = frame.camera_->GetDistance(worldTransform * geometryData_[i].center_);
     }
 
@@ -352,8 +335,8 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
 
         // Copy the subgeometry & LOD level structure
         SetNumGeometries(model->GetNumGeometries());
-        const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
-        const PODVector<Vector3>& geometryCenters = model->GetGeometryCenters();
+        const Vector<Vector<SharedPtr<Geometry>>>& geometries = model->GetGeometries();
+        const Vector<Vector3>& geometryCenters = model->GetGeometryCenters();
         for (unsigned i = 0; i < geometries.Size(); ++i)
         {
             geometries_[i] = geometries[i];
@@ -361,7 +344,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
         }
 
         // Copy geometry bone mappings
-        const Vector<PODVector<unsigned> >& geometryBoneMappings = model->GetGeometryBoneMappings();
+        const Vector<Vector<unsigned>>& geometryBoneMappings = model->GetGeometryBoneMappings();
         geometryBoneMappings_.Clear();
         geometryBoneMappings_.Reserve(geometryBoneMappings.Size());
         for (unsigned i = 0; i < geometryBoneMappings.Size(); ++i)
@@ -468,7 +451,7 @@ void AnimatedModel::RemoveAnimationState(Animation* animation)
         RemoveAnimationState(animation->GetNameHash());
     else
     {
-        for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
+        for (Vector<SharedPtr<AnimationState>>::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
         {
             AnimationState* state = *i;
             if (!state->GetAnimation())
@@ -488,7 +471,7 @@ void AnimatedModel::RemoveAnimationState(const String& animationName)
 
 void AnimatedModel::RemoveAnimationState(StringHash animationNameHash)
 {
-    for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
+    for (Vector<SharedPtr<AnimationState>>::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
     {
         AnimationState* state = *i;
         Animation* animation = state->GetAnimation();
@@ -507,7 +490,7 @@ void AnimatedModel::RemoveAnimationState(StringHash animationNameHash)
 
 void AnimatedModel::RemoveAnimationState(AnimationState* state)
 {
-    for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
+    for (Vector<SharedPtr<AnimationState>>::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
     {
         if (*i == state)
         {
@@ -565,7 +548,7 @@ void AnimatedModel::SetMorphWeight(unsigned index, float weight)
         // For a master model, set the same morph weight on non-master models
         if (isMaster_)
         {
-            PODVector<AnimatedModel*> models;
+            Vector<AnimatedModel*> models;
             GetComponents<AnimatedModel>(models);
 
             // Indexing might not be the same, so use the name hash instead
@@ -613,7 +596,7 @@ void AnimatedModel::ResetMorphWeights()
     // For a master model, reset weights on non-master models
     if (isMaster_)
     {
-        PODVector<AnimatedModel*> models;
+        Vector<AnimatedModel*> models;
         GetComponents<AnimatedModel>(models);
 
         for (unsigned i = 1; i < models.Size(); ++i)
@@ -656,7 +639,7 @@ float AnimatedModel::GetMorphWeight(StringHash nameHash) const
 
 AnimationState* AnimatedModel::GetAnimationState(Animation* animation) const
 {
-    for (Vector<SharedPtr<AnimationState> >::ConstIterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
+    for (Vector<SharedPtr<AnimationState>>::ConstIterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
     {
         if ((*i)->GetAnimation() == animation)
             return *i;
@@ -672,7 +655,7 @@ AnimationState* AnimatedModel::GetAnimationState(const String& animationName) co
 
 AnimationState* AnimatedModel::GetAnimationState(StringHash animationNameHash) const
 {
-    for (Vector<SharedPtr<AnimationState> >::ConstIterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
+    for (Vector<SharedPtr<AnimationState>>::ConstIterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
     {
         Animation* animation = (*i)->GetAnimation();
         if (animation)
@@ -701,7 +684,7 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
 
     if (isMaster_)
     {
-        // Check if bone structure has stayed compatible (reloading the model.) In that case retain the old bones and animations
+        // Check if bone structure has stayed compatible (reloading the model). In that case retain the old bones and animations
         if (skeleton_.GetNumBones() == skeleton.GetNumBones())
         {
             Vector<Bone>& destBones = skeleton_.GetModifiableBones();
@@ -853,7 +836,7 @@ void AnimatedModel::SetAnimationStatesAttr(const VariantVector& value)
     }
 }
 
-void AnimatedModel::SetMorphsAttr(const PODVector<unsigned char>& value)
+void AnimatedModel::SetMorphsAttr(const Vector<unsigned char>& value)
 {
     for (unsigned index = 0; index < value.Size(); ++index)
         SetMorphWeight(index, (float)value[index] / 255.0f);
@@ -879,7 +862,7 @@ VariantVector AnimatedModel::GetAnimationStatesAttr() const
     VariantVector ret;
     ret.Reserve(animationStates_.Size() * 6 + 1);
     ret.Push(animationStates_.Size());
-    for (Vector<SharedPtr<AnimationState> >::ConstIterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
+    for (Vector<SharedPtr<AnimationState>>::ConstIterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
     {
         AnimationState* state = *i;
         Animation* animation = state->GetAnimation();
@@ -894,7 +877,7 @@ VariantVector AnimatedModel::GetAnimationStatesAttr() const
     return ret;
 }
 
-const PODVector<unsigned char>& AnimatedModel::GetMorphsAttr() const
+const Vector<unsigned char>& AnimatedModel::GetMorphsAttr() const
 {
     attrBuffer_.Clear();
     for (Vector<ModelMorph>::ConstIterator i = morphs_.Begin(); i != morphs_.End(); ++i)
@@ -1003,7 +986,7 @@ void AnimatedModel::AssignBoneNodes()
         SetSkeleton(model_->GetSkeleton(), true);
 
     // Re-assign the same start bone to animations to get the proper bone node this time
-    for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
+    for (Vector<SharedPtr<AnimationState>>::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
     {
         AnimationState* state = *i;
         state->SetStartBone(state->GetStartBone());
@@ -1013,7 +996,7 @@ void AnimatedModel::AssignBoneNodes()
 void AnimatedModel::FinalizeBoneBoundingBoxes()
 {
     Vector<Bone>& bones = skeleton_.GetModifiableBones();
-    PODVector<AnimatedModel*> models;
+    Vector<AnimatedModel*> models;
     GetComponents<AnimatedModel>(models);
 
     if (models.Size() > 1)
@@ -1032,7 +1015,7 @@ void AnimatedModel::FinalizeBoneBoundingBoxes()
 
         // Get matching bones from all non-master models and merge their bone bounding information
         // to prevent culling errors (master model may not have geometry in all bones, or the bounds are smaller)
-        for (PODVector<AnimatedModel*>::Iterator i = models.Begin(); i != models.End(); ++i)
+        for (Vector<AnimatedModel*>::Iterator i = models.Begin(); i != models.End(); ++i)
         {
             if ((*i) == this)
                 continue;
@@ -1104,8 +1087,8 @@ void AnimatedModel::MarkMorphsDirty()
 
 void AnimatedModel::CloneGeometries()
 {
-    const Vector<SharedPtr<VertexBuffer> >& originalVertexBuffers = model_->GetVertexBuffers();
-    HashMap<VertexBuffer*, SharedPtr<VertexBuffer> > clonedVertexBuffers;
+    const Vector<SharedPtr<VertexBuffer>>& originalVertexBuffers = model_->GetVertexBuffers();
+    HashMap<VertexBuffer*, SharedPtr<VertexBuffer>> clonedVertexBuffers;
     morphVertexBuffers_.Resize(originalVertexBuffers.Size());
 
     for (unsigned i = 0; i < originalVertexBuffers.Size(); ++i)
@@ -1139,7 +1122,7 @@ void AnimatedModel::CloneGeometries()
 
             // Add an additional vertex stream into the clone, which supplies only the morphable vertex data, while the static
             // data comes from the original vertex buffer(s)
-            const Vector<SharedPtr<VertexBuffer> >& originalBuffers = original->GetVertexBuffers();
+            const Vector<SharedPtr<VertexBuffer>>& originalBuffers = original->GetVertexBuffers();
             unsigned totalBuf = originalBuffers.Size();
             for (unsigned k = 0; k < originalBuffers.Size(); ++k)
             {
@@ -1287,7 +1270,7 @@ void AnimatedModel::ApplyAnimation()
     if (isMaster_)
     {
         skeleton_.ResetSilent();
-        for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
+        for (Vector<SharedPtr<AnimationState>>::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
             (*i)->Apply();
 
         // Skeleton reset and animations apply the node transforms "silently" to avoid repeated marking dirty. Mark dirty now

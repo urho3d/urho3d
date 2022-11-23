@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -32,15 +13,17 @@ class URHO3D_API Menu : public Button
 {
     URHO3D_OBJECT(Menu, Button);
 
-    using UIElement::LoadXML;
-
 public:
     /// Construct.
     explicit Menu(Context* context);
     /// Destruct.
     ~Menu() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
+
+    using UIElement::LoadXML;
+    using UIElement::SaveXML;
 
     /// Load from XML data with style. Return true if successful.
     bool LoadXML(const XMLElement& source, XMLFile* styleFile) override;
@@ -50,7 +33,7 @@ public:
     /// Perform UI element update.
     void Update(float timeStep) override;
     /// React to mouse hover.
-    void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor) override;
+    void OnHover(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor) override;
     /// React to the popup being shown.
     virtual void OnShowPopup();
 
@@ -58,29 +41,37 @@ public:
     virtual void OnHidePopup() { }
 
     /// Set popup element to show on selection.
+    /// @property
     void SetPopup(UIElement* popup);
     /// Set popup element offset.
+    /// @property
     void SetPopupOffset(const IntVector2& offset);
     /// Set popup element offset.
     void SetPopupOffset(int x, int y);
     /// Force the popup to show or hide.
+    /// @property
     void ShowPopup(bool enable);
-    /// Set accelerator key (set zero key code to disable.)
+    /// Set accelerator key (set zero key code to disable).
     void SetAccelerator(int key, int qualifiers);
 
     /// Return popup element.
+    /// @property
     UIElement* GetPopup() const { return popup_; }
 
     /// Return popup element offset.
+    /// @property
     const IntVector2& GetPopupOffset() const { return popupOffset_; }
 
     /// Return whether popup is open.
+    /// @property
     bool GetShowPopup() const { return showPopup_; }
 
     /// Return accelerator key code, 0 if disabled.
+    /// @property
     int GetAcceleratorKey() const { return acceleratorKey_; }
 
     /// Return accelerator qualifiers.
+    /// @property
     int GetAcceleratorQualifiers() const { return acceleratorQualifiers_; }
 
 protected:

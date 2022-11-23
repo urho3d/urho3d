@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -30,6 +11,7 @@ namespace Urho3D
 {
 
 /// Abstract stream for reading.
+/// @nocount
 class URHO3D_API Deserializer
 {
 public:
@@ -45,20 +27,25 @@ public:
     /// Set position from the beginning of the stream. Return actual new position.
     virtual unsigned Seek(unsigned position) = 0;
     /// Return name of the stream.
+    /// @property
     virtual const String& GetName() const;
     /// Return a checksum if applicable.
+    /// @property
     virtual unsigned GetChecksum();
     /// Return whether the end of stream has been reached.
+    /// @property
     virtual bool IsEof() const { return position_ >= size_; }
 
     /// Set position relative to current position. Return actual new position.
     unsigned SeekRelative(int delta);
     /// Return current position.
+    /// @property
     unsigned GetPosition() const { return position_; }
     /// Return current position.
     unsigned Tell() const { return position_; }
 
     /// Return size.
+    /// @property
     unsigned GetSize() const { return size_; }
 
     /// Read a 64-bit integer.
@@ -120,7 +107,7 @@ public:
     /// Read a 32-bit StringHash.
     StringHash ReadStringHash();
     /// Read a buffer with size encoded as VLE.
-    PODVector<unsigned char> ReadBuffer();
+    Vector<unsigned char> ReadBuffer();
     /// Read a resource reference.
     ResourceRef ReadResourceRef();
     /// Read a resource reference list.

@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -35,6 +16,7 @@ class Context;
 class EventHandler;
 
 /// Type info.
+/// @nobind
 class URHO3D_API TypeInfo
 {
 public:
@@ -75,9 +57,10 @@ private:
         virtual const Urho3D::TypeInfo* GetTypeInfo() const override { return GetTypeInfoStatic(); } \
         static Urho3D::StringHash GetTypeStatic() { return GetTypeInfoStatic()->GetType(); } \
         static const Urho3D::String& GetTypeNameStatic() { return GetTypeInfoStatic()->GetTypeName(); } \
-        static const Urho3D::TypeInfo* GetTypeInfoStatic() { static const Urho3D::TypeInfo typeInfoStatic(#typeName, BaseClassName::GetTypeInfoStatic()); return &typeInfoStatic; } \
+        static const Urho3D::TypeInfo* GetTypeInfoStatic() { static const Urho3D::TypeInfo typeInfoStatic(#typeName, BaseClassName::GetTypeInfoStatic()); return &typeInfoStatic; }
 
 /// Base class for objects with type identification, subsystem access and event sending/receiving capability.
+/// @templateversion
 class URHO3D_API Object : public RefCounted
 {
     friend class Context;
@@ -89,8 +72,10 @@ public:
     ~Object() override;
 
     /// Return type hash.
+    /// @property
     virtual StringHash GetType() const = 0;
     /// Return type name.
+    /// @property
     virtual const String& GetTypeName() const = 0;
     /// Return type info.
     virtual const TypeInfo* GetTypeInfo() const = 0;
@@ -126,8 +111,8 @@ public:
     void UnsubscribeFromEvents(Object* sender);
     /// Unsubscribe from all events.
     void UnsubscribeFromAllEvents();
-    /// Unsubscribe from all events except those listed, and optionally only those with userdata (script registered events.)
-    void UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData);
+    /// Unsubscribe from all events except those listed, and optionally only those with userdata (script registered events).
+    void UnsubscribeFromAllEventsExcept(const Vector<StringHash>& exceptions, bool onlyUserData);
     /// Send event to all subscribers.
     void SendEvent(StringHash eventType);
     /// Send event with parameters to all subscribers.
@@ -142,11 +127,14 @@ public:
 
     /// Return execution context.
     Context* GetContext() const { return context_; }
-    /// Return global variable based on key
+    /// Return global variable based on key.
+    /// @property
     const Variant& GetGlobalVar(StringHash key) const;
-    /// Return all global variables
+    /// Return all global variables.
+    /// @property
     const VariantMap& GetGlobalVars() const;
-    /// Set global variable with the respective key and value
+    /// Set global variable with the respective key and value.
+    /// @property
     void SetGlobalVar(StringHash key, const Variant& value);
     /// Return subsystem by type.
     Object* GetSubsystem(StringHash type) const;
@@ -165,6 +153,7 @@ public:
     /// Template version of returning a subsystem.
     template <class T> T* GetSubsystem() const;
     /// Return object category. Categories are (optionally) registered along with the object factory. Return an empty string if the object category is not registered.
+    /// @property
     const String& GetCategory() const;
 
     /// Block object from sending and receiving events.
@@ -293,7 +282,7 @@ protected:
     void* userData_;
 };
 
-/// Template implementation of the event handler invoke helper (stores a function pointer of specific class.)
+/// Template implementation of the event handler invoke helper (stores a function pointer of specific class).
 template <class T> class EventHandlerImpl : public EventHandler
 {
 public:
@@ -327,6 +316,7 @@ private:
 };
 
 /// Template implementation of the event handler invoke helper (std::function instance).
+/// @nobind
 class EventHandler11Impl : public EventHandler
 {
 public:

@@ -1,4 +1,4 @@
--- Urho2D platformer example.
+-- 2D platformer example.
 -- This sample demonstrates:
 --    - Creating an orthogonal 2D scene from tile map file
 --    - Displaying the scene using the Renderer subsystem

@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -144,7 +125,7 @@ bool File::Open(PackageFile* package, const String& fileName)
         return false;
     }
 
-    fileName_ = fileName;
+    name_ = fileName;
     offset_ = entry->offset_;
     checksum_ = entry->checksum_;
     size_ = entry->size_;
@@ -411,11 +392,6 @@ void File::Flush()
         fflush((FILE*)handle_);
 }
 
-void File::SetName(const String& name)
-{
-    fileName_ = name;
-}
-
 bool File::IsOpen() const
 {
 #ifdef __ANDROID__
@@ -463,7 +439,7 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
         }
         else
         {
-            fileName_ = fileName;
+            name_ = fileName;
             mode_ = mode;
             position_ = 0;
             if (!fromPackage)
@@ -502,7 +478,7 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
     if (!fromPackage)
     {
         fseek((FILE*)handle_, 0, SEEK_END);
-        long size = ftell((FILE*)handle_);
+        long size = ftell((FILE*)handle_); // 64 bit on Unix 64
         fseek((FILE*)handle_, 0, SEEK_SET);
         if (size > M_MAX_UNSIGNED)
         {
@@ -515,7 +491,7 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
         offset_ = 0;
     }
 
-    fileName_ = fileName;
+    name_ = fileName;
     mode_ = mode;
     position_ = 0;
     checksum_ = 0;

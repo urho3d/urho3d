@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -93,18 +74,22 @@ public:
     void SetTimerPeriod(unsigned mSec);
 
     /// Return frame number, starting from 1 once BeginFrame() is called for the first time.
-    unsigned GetFrameNumber() const { return frameNumber_; }
+    /// @property
+    i32 GetFrameNumber() const { return frameNumber_; }
 
     /// Return current frame timestep as seconds.
+    /// @property
     float GetTimeStep() const { return timeStep_; }
 
     /// Return current low-resolution timer period in milliseconds.
     unsigned GetTimerPeriod() const { return timerPeriod_; }
 
     /// Return elapsed time from program start as seconds.
+    /// @property
     float GetElapsedTime();
 
     /// Return current frames per second.
+    /// @property
     float GetFramesPerSecond() const;
 
     /// Get system time as milliseconds.
@@ -120,7 +105,7 @@ private:
     /// Elapsed time since program start.
     Timer elapsedTime_;
     /// Frame number.
-    unsigned frameNumber_;
+    i32 frameNumber_;
     /// Timestep in seconds.
     float timeStep_;
     /// Low-resolution timer period.

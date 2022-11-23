@@ -481,7 +481,7 @@ ADD_ASSIMP_IMPORTER( IFC
 if (ASSIMP_BUILD_IFC_IMPORTER)
   if (MSVC)
     set_source_files_properties(IFCReaderGen1.cpp IFCReaderGen2.cpp PROPERTIES COMPILE_FLAGS "/bigobj")
-  elseif(CMAKE_COMPILER_IS_MINGW)
+  elseif(MINGW)
     set_source_files_properties(IFCReaderGen1.cpp IFCReaderGen2.cpp PROPERTIES COMPILE_FLAGS "-O2")   # Urho3D: Remove -Wa,-mbig-obj flag as some older MinGW version may not support it yet
   endif()
 endif (ASSIMP_BUILD_IFC_IMPORTER)
@@ -851,7 +851,7 @@ SOURCE_GROUP( open3dgc FILES ${open3dgc_SRCS})
 # has implementation for different platforms: WIN32, __MACH__ and other ("else" block).
 # Urho3D: Only perform the dependency search on non-MSVC build
 IF (NOT MSVC)
-  FIND_PACKAGE(RT QUIET)
+  FIND_PACKAGE(rt QUIET)
 ENDIF ()
 IF (RT_FOUND OR MSVC)
   SET( ASSIMP_IMPORTER_GLTF_USE_OPEN3DGC 1 )
@@ -933,10 +933,6 @@ set (TARGET_NAME Assimp)
 
 # Define source files
 set (SOURCE_FILES ${assimp_src})
-
-# This target is added as dependency for AssetImporter target which may have clang-tidy setup at that scope
-# So, revert that here in order to exclude Assimp linter warnings/errors from ours
-reset_lint ()
 
 # Since we only build AssetImporter as a single-arch native tool, there is no point to build Assimp as universal binary library
 list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH YES)

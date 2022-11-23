@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -34,7 +15,7 @@ public:
     /// Construct an empty buffer.
     VectorBuffer();
     /// Construct from another buffer.
-    explicit VectorBuffer(const PODVector<unsigned char>& data);
+    explicit VectorBuffer(const Vector<unsigned char>& data);
     /// Construct from a memory area.
     VectorBuffer(const void* data, unsigned size);
     /// Construct from a stream.
@@ -48,7 +29,7 @@ public:
     unsigned Write(const void* data, unsigned size) override;
 
     /// Set data from another buffer.
-    void SetData(const PODVector<unsigned char>& data);
+    void SetData(const Vector<unsigned char>& data);
     /// Set data from a memory area.
     void SetData(const void* data, unsigned size);
     /// Set data from a stream.
@@ -65,11 +46,11 @@ public:
     unsigned char* GetModifiableData() { return size_ ? &buffer_[0] : nullptr; }
 
     /// Return the buffer.
-    const PODVector<unsigned char>& GetBuffer() const { return buffer_; }
+    const Vector<unsigned char>& GetBuffer() const { return buffer_; }
 
 private:
     /// Dynamic data buffer.
-    PODVector<unsigned char> buffer_;
+    Vector<unsigned char> buffer_;
 };
 
 }

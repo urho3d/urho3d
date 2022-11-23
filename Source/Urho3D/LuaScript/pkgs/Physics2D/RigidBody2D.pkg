@@ -1,0 +1,62 @@
+$#include "Physics2D/RigidBody2D.h"
+
+enum BodyType2D
+{
+    BT_STATIC = b2_staticBody,
+    BT_KINEMATIC = b2_kinematicBody,
+    BT_DYNAMIC = b2_dynamicBody
+};
+
+class RigidBody2D : Component
+{
+    void SetBodyType(BodyType2D bodyType);
+    void SetMass(float mass);
+    void SetInertia(float inertia);
+    void SetMassCenter(const Vector2& center);
+    void SetUseFixtureMass(bool useFixtureMass);
+    void SetLinearDamping(float linearDamping);
+    void SetAngularDamping(float angularDamping);
+    void SetAllowSleep(bool allowSleep);
+    void SetFixedRotation(bool fixedRotation);
+    void SetBullet(bool bullet);
+    void SetGravityScale(float gravityScale);
+    void SetAwake(bool awake);
+    void SetLinearVelocity(const Vector2& linearVelocity);
+    void SetAngularVelocity(float angularVelocity);
+    void ApplyForce(const Vector2& force, const Vector2& point,  bool wake);
+    void ApplyForceToCenter(const Vector2& force, bool wake);
+    void ApplyTorque(float torque, bool wake);
+    void ApplyLinearImpulse(const Vector2& impulse, const Vector2& point, bool wake);
+    void ApplyLinearImpulseToCenter(const Vector2& impulse, bool wake);
+    void ApplyAngularImpulse(float impulse, bool wake);
+
+    BodyType2D GetBodyType() const;
+    float GetMass() const;
+    float GetInertia() const;
+    Vector2 GetMassCenter() const;
+    bool GetUseFixtureMass() const;
+    float GetLinearDamping() const;
+    float GetAngularDamping() const;
+    bool IsAllowSleep() const;
+    bool IsFixedRotation() const;
+    bool IsBullet() const;
+    float GetGravityScale() const;
+    bool IsAwake() const;
+    Vector2 GetLinearVelocity() const;
+    float GetAngularVelocity() const;
+
+    tolua_property__get_set BodyType2D bodyType;
+    tolua_property__get_set float mass;
+    tolua_property__get_set float inertia;
+    tolua_property__get_set Vector2 massCenter;
+    tolua_property__get_set bool useFixtureMass;
+    tolua_property__get_set float linearDamping;
+    tolua_property__get_set float angularDamping;
+    tolua_property__is_set bool allowSleep;
+    tolua_property__is_set bool fixedRotation;
+    tolua_property__is_set bool bullet;
+    tolua_property__get_set float gravityScale;
+    tolua_property__is_set bool awake;
+    tolua_property__get_set Vector2 linearVelocity;
+    tolua_property__get_set float angularVelocity;
+};

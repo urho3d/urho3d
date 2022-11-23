@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include <Urho3D/Graphics/AnimatedModel.h>
 #include <Urho3D/IO/Log.h>
@@ -102,9 +83,9 @@ void CreateRagdoll::HandleNodeCollision(StringHash eventType, VariantMap& eventD
             Vector2(90.0f, 0.0f), Vector2::ZERO);
 
         // Disable keyframe animation from all bones so that they will not interfere with the ragdoll
-        auto* model = GetComponent<AnimatedModel>();
+        AnimatedModel* model = GetComponent<AnimatedModel>();
         Skeleton& skeleton = model->GetSkeleton();
-        for (unsigned i = 0; i < skeleton.GetNumBones(); ++i)
+        for (i32 i = 0; i < skeleton.GetNumBones(); ++i)
             skeleton.GetBone(i)->animated_ = false;
 
         // Finally remove self from the scene node. Note that this must be the last operation performed in the function

@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -30,7 +11,7 @@
 #include "../Graphics/Model.h"
 #include "../Graphics/StaticModel.h"
 #include "../Graphics/TerrainPatch.h"
-#include "../Graphics/VertexBuffer.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
 #include "../Navigation/CrowdAgent.h"
@@ -151,7 +132,7 @@ void NavigationMesh::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Detail Sample Max Error", GetDetailSampleMaxError, SetDetailSampleMaxError, float,
         DEFAULT_DETAIL_SAMPLE_MAX_ERROR, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Bounding Box Padding", GetPadding, SetPadding, Vector3, Vector3::ONE, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Navigation Data", GetNavigationDataAttr, SetNavigationDataAttr, PODVector<unsigned char>,
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Navigation Data", GetNavigationDataAttr, SetNavigationDataAttr, Vector<unsigned char>,
         Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Partition Type", GetPartitionType, SetPartitionType, NavmeshPartitionType, navmeshPartitionTypeNames,
         NAVMESH_PARTITION_WATERSHED, AM_DEFAULT);
@@ -196,11 +177,11 @@ void NavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         // Draw OffMeshConnection components
         if (drawOffMeshConnections_)
         {
-            PODVector<Node*> connections;
+            Vector<Node*> connections;
             scene->GetChildrenWithComponent<OffMeshConnection>(connections, true);
-            for (unsigned i = 0; i < connections.Size(); ++i)
+            for (const Node* node : connections)
             {
-                auto* connection = connections[i]->GetComponent<OffMeshConnection>();
+                OffMeshConnection* connection = node->GetComponent<OffMeshConnection>();
                 if (connection && connection->IsEnabledEffective())
                     connection->DrawDebugGeometry(debug, depthTest);
             }
@@ -209,9 +190,8 @@ void NavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         // Draw NavArea components
         if (drawNavAreas_)
         {
-            for (unsigned i = 0; i < areas_.Size(); ++i)
+            for (const WeakPtr<NavArea>& area : areas_)
             {
-                NavArea* area = areas_[i];
                 if (area && area->IsEnabledEffective())
                     area->DrawDebugGeometry(debug, depthTest);
             }
@@ -401,8 +381,8 @@ bool NavigationMesh::Build()
         return true; // Nothing to do
 
     // Build the combined bounding box
-    for (unsigned i = 0; i < geometryList.Size(); ++i)
-        boundingBox_.Merge(geometryList[i].boundingBox_);
+    for (const NavigationGeometryInfo& geom : geometryList)
+        boundingBox_.Merge(geom.boundingBox_);
 
     // Expand bounding box by padding
     boundingBox_.min_ -= padding_;
@@ -521,14 +501,14 @@ bool NavigationMesh::Build(const IntVector2& from, const IntVector2& to)
     return true;
 }
 
-PODVector<unsigned char> NavigationMesh::GetTileData(const IntVector2& tile) const
+Vector<unsigned char> NavigationMesh::GetTileData(const IntVector2& tile) const
 {
     VectorBuffer ret;
     WriteTile(ret, tile.x_, tile.y_);
     return ret.GetBuffer();
 }
 
-bool NavigationMesh::AddTile(const PODVector<unsigned char>& tileData)
+bool NavigationMesh::AddTile(const Vector<unsigned char>& tileData)
 {
     MemoryBuffer buffer(tileData);
     return ReadTile(buffer, false);
@@ -619,7 +599,7 @@ Vector3 NavigationMesh::FindNearestPoint(const Vector3& point, const Vector3& ex
     dtPolyRef pointRef;
     if (!nearestRef)
         nearestRef = &pointRef;
-    navMeshQuery_->findNearestPoly(&localPoint.x_, &extents.x_, filter ? filter : queryFilter_.Get(), nearestRef, &nearestPoint.x_);
+    navMeshQuery_->findNearestPoly(&localPoint.x_, &extents.x_, filter ? filter : queryFilter_.get(), nearestRef, &nearestPoint.x_);
     return *nearestRef ? transform * nearestPoint : point;
 }
 
@@ -635,7 +615,7 @@ Vector3 NavigationMesh::MoveAlongSurface(const Vector3& start, const Vector3& en
     Vector3 localStart = inverse * start;
     Vector3 localEnd = inverse * end;
 
-    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_.Get();
+    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_.get();
     dtPolyRef startRef;
     navMeshQuery_->findNearestPoly(&localStart.x_, &extents.x_, queryFilter, &startRef, nullptr);
     if (!startRef)
@@ -644,24 +624,24 @@ Vector3 NavigationMesh::MoveAlongSurface(const Vector3& start, const Vector3& en
     Vector3 resultPos;
     int visitedCount = 0;
     maxVisited = Max(maxVisited, 0);
-    PODVector<dtPolyRef> visited((unsigned)maxVisited);
+    Vector<dtPolyRef> visited((unsigned)maxVisited);
     navMeshQuery_->moveAlongSurface(startRef, &localStart.x_, &localEnd.x_, queryFilter, &resultPos.x_, maxVisited ?
         &visited[0] : nullptr, &visitedCount, maxVisited);
     return transform * resultPos;
 }
 
-void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents,
+void NavigationMesh::FindPath(Vector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents,
     const dtQueryFilter* filter)
 {
-    PODVector<NavigationPathPoint> navPathPoints;
+    Vector<NavigationPathPoint> navPathPoints;
     FindPath(navPathPoints, start, end, extents, filter);
 
     dest.Clear();
-    for (unsigned i = 0; i < navPathPoints.Size(); ++i)
-        dest.Push(navPathPoints[i].position_);
+    for (const NavigationPathPoint& navPathPoint : navPathPoints)
+        dest.Push(navPathPoint.position_);
 }
 
-void NavigationMesh::FindPath(PODVector<NavigationPathPoint>& dest, const Vector3& start, const Vector3& end,
+void NavigationMesh::FindPath(Vector<NavigationPathPoint>& dest, const Vector3& start, const Vector3& end,
     const Vector3& extents, const dtQueryFilter* filter)
 {
     URHO3D_PROFILE(FindPath);
@@ -677,7 +657,7 @@ void NavigationMesh::FindPath(PODVector<NavigationPathPoint>& dest, const Vector
     Vector3 localStart = inverse * start;
     Vector3 localEnd = inverse * end;
 
-    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_.Get();
+    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_.get();
     dtPolyRef startRef;
     dtPolyRef endRef;
     navMeshQuery_->findNearestPoly(&localStart.x_, &extents.x_, queryFilter, &startRef, nullptr);
@@ -713,9 +693,9 @@ void NavigationMesh::FindPath(PODVector<NavigationPathPoint>& dest, const Vector
         // Walk through all NavAreas and find nearest
         unsigned nearestNavAreaID = 0;       // 0 is the default nav area ID
         float nearestDistance = M_LARGE_VALUE;
-        for (unsigned j = 0; j < areas_.Size(); j++)
+
+        for (const WeakPtr<NavArea>& area : areas_)
         {
-            NavArea* area = areas_[j].Get();
             if (area && area->IsEnabledEffective())
             {
                 BoundingBox bb = area->GetWorldBoundingBox();
@@ -745,7 +725,7 @@ Vector3 NavigationMesh::GetRandomPoint(const dtQueryFilter* filter, dtPolyRef* r
     dtPolyRef polyRef;
     Vector3 point(Vector3::ZERO);
 
-    navMeshQuery_->findRandomPoint(filter ? filter : queryFilter_.Get(), Random, randomRef ? randomRef : &polyRef, &point.x_);
+    navMeshQuery_->findRandomPoint(filter ? filter : queryFilter_.get(), Random, randomRef ? randomRef : &polyRef, &point.x_);
 
     return node_->GetWorldTransform() * point;
 }
@@ -763,7 +743,7 @@ Vector3 NavigationMesh::GetRandomPointInCircle(const Vector3& center, float radi
     Matrix3x4 inverse = transform.Inverse();
     Vector3 localCenter = inverse * center;
 
-    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_.Get();
+    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_.get();
     dtPolyRef startRef;
     navMeshQuery_->findNearestPoly(&localCenter.x_, &extents.x_, queryFilter, &startRef, nullptr);
     if (!startRef)
@@ -794,7 +774,7 @@ float NavigationMesh::GetDistanceToWall(const Vector3& point, float radius, cons
     Matrix3x4 inverse = transform.Inverse();
     Vector3 localPoint = inverse * point;
 
-    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_.Get();
+    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_.get();
     dtPolyRef startRef;
     navMeshQuery_->findNearestPoly(&localPoint.x_, &extents.x_, queryFilter, &startRef, nullptr);
     if (!startRef)
@@ -827,7 +807,7 @@ Vector3 NavigationMesh::Raycast(const Vector3& start, const Vector3& end, const 
     Vector3 localStart = inverse * start;
     Vector3 localEnd = inverse * end;
 
-    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_.Get();
+    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_.get();
     dtPolyRef startRef;
     navMeshQuery_->findNearestPoly(&localStart.x_, &extents.x_, queryFilter, &startRef, nullptr);
     if (!startRef)
@@ -876,7 +856,7 @@ float NavigationMesh::GetAreaCost(unsigned areaID) const
     return 1.0f;
 }
 
-void NavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>& value)
+void NavigationMesh::SetNavigationDataAttr(const Vector<unsigned char>& value)
 {
     ReleaseNavigationMesh();
 
@@ -924,7 +904,7 @@ void NavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>& value
     // \todo Shall we send E_NAVIGATION_MESH_REBUILT here?
 }
 
-PODVector<unsigned char> NavigationMesh::GetNavigationDataAttr() const
+Vector<unsigned char> NavigationMesh::GetNavigationDataAttr() const
 {
     VectorBuffer ret;
 
@@ -956,24 +936,23 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
 
     // Get Navigable components from child nodes, not from whole scene. This makes it possible to partition
     // the scene into several navigation meshes
-    PODVector<Navigable*> navigables;
+    Vector<Navigable*> navigables;
     node_->GetComponents<Navigable>(navigables, true);
 
     HashSet<Node*> processedNodes;
-    for (unsigned i = 0; i < navigables.Size(); ++i)
+    for (const Navigable* navigable : navigables)
     {
-        if (navigables[i]->IsEnabledEffective())
-            CollectGeometries(geometryList, navigables[i]->GetNode(), processedNodes, navigables[i]->IsRecursive());
+        if (navigable->IsEnabledEffective())
+            CollectGeometries(geometryList, navigable->GetNode(), processedNodes, navigable->IsRecursive());
     }
 
     // Get offmesh connections
     Matrix3x4 inverse = node_->GetWorldTransform().Inverse();
-    PODVector<OffMeshConnection*> connections;
+    Vector<OffMeshConnection*> connections;
     node_->GetComponents<OffMeshConnection>(connections, true);
 
-    for (unsigned i = 0; i < connections.Size(); ++i)
+    for (OffMeshConnection* connection : connections)
     {
-        OffMeshConnection* connection = connections[i];
         if (connection->IsEnabledEffective() && connection->GetEndPoint())
         {
             const Matrix3x4& transform = connection->GetNode()->GetWorldTransform();
@@ -987,12 +966,11 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
     }
 
     // Get nav area volumes
-    PODVector<NavArea*> navAreas;
+    Vector<NavArea*> navAreas;
     node_->GetComponents<NavArea>(navAreas, true);
     areas_.Clear();
-    for (unsigned i = 0; i < navAreas.Size(); ++i)
+    for (NavArea* area : navAreas)
     {
-        NavArea* area = navAreas[i];
         if (area->IsEnabledEffective())
         {
             NavigationGeometryInfo info;
@@ -1020,13 +998,12 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
 #ifdef URHO3D_PHYSICS
     // Prefer compatible physics collision shapes (triangle mesh, convex hull, box) if found.
     // Then fallback to visible geometry
-    PODVector<CollisionShape*> collisionShapes;
+    Vector<CollisionShape*> collisionShapes;
     node->GetComponents<CollisionShape>(collisionShapes);
     bool collisionShapeFound = false;
 
-    for (unsigned i = 0; i < collisionShapes.Size(); ++i)
+    for (CollisionShape* shape : collisionShapes)
     {
-        CollisionShape* shape = collisionShapes[i];
         if (!shape->IsEnabledEffective())
             continue;
 
@@ -1047,10 +1024,10 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
     if (!collisionShapeFound)
 #endif
     {
-        PODVector<Drawable*> drawables;
+        Vector<Drawable*> drawables;
         node->GetDerivedComponents<Drawable>(drawables);
 
-        for (unsigned i = 0; i < drawables.Size(); ++i)
+        for (i32 i = 0; i < drawables.Size(); ++i)
         {
             /// \todo Evaluate whether should handle other types. Now StaticModel & TerrainPatch are supported, others skipped
             Drawable* drawable = drawables[i];
@@ -1076,9 +1053,9 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
 
     if (recursive)
     {
-        const Vector<SharedPtr<Node> >& children = node->GetChildren();
-        for (unsigned i = 0; i < children.Size(); ++i)
-            CollectGeometries(geometryList, children[i], processedNodes, recursive);
+        const Vector<SharedPtr<Node>>& children = node->GetChildren();
+        for (const SharedPtr<Node>& child : children)
+            CollectGeometries(geometryList, child, processedNodes, recursive);
     }
 }
 
@@ -1086,15 +1063,15 @@ void NavigationMesh::GetTileGeometry(NavBuildData* build, Vector<NavigationGeome
 {
     Matrix3x4 inverse = node_->GetWorldTransform().Inverse();
 
-    for (unsigned i = 0; i < geometryList.Size(); ++i)
+    for (const NavigationGeometryInfo& navGeometry : geometryList)
     {
-        if (box.IsInsideFast(geometryList[i].boundingBox_) != OUTSIDE)
+        if (box.IsInsideFast(navGeometry.boundingBox_) != OUTSIDE)
         {
-            const Matrix3x4& transform = geometryList[i].transform_;
+            const Matrix3x4& transform = navGeometry.transform_;
 
-            if (geometryList[i].component_->GetType() == OffMeshConnection::GetTypeStatic())
+            if (navGeometry.component_->GetType() == OffMeshConnection::GetTypeStatic())
             {
-                auto* connection = static_cast<OffMeshConnection*>(geometryList[i].component_);
+                auto* connection = static_cast<OffMeshConnection*>(navGeometry.component_);
                 Vector3 start = inverse * connection->GetNode()->GetWorldPosition();
                 Vector3 end = inverse * connection->GetEndPoint()->GetWorldPosition();
 
@@ -1106,9 +1083,9 @@ void NavigationMesh::GetTileGeometry(NavBuildData* build, Vector<NavigationGeome
                 build->offMeshDir_.Push((unsigned char)(connection->IsBidirectional() ? DT_OFFMESH_CON_BIDIR : 0));
                 continue;
             }
-            else if (geometryList[i].component_->GetType() == NavArea::GetTypeStatic())
+            else if (navGeometry.component_->GetType() == NavArea::GetTypeStatic())
             {
-                auto* area = static_cast<NavArea*>(geometryList[i].component_);
+                auto* area = static_cast<NavArea*>(navGeometry.component_);
                 NavAreaStub stub;
                 stub.areaID_ = (unsigned char)area->GetAreaID();
                 stub.bounds_ = area->GetWorldBoundingBox();
@@ -1117,7 +1094,7 @@ void NavigationMesh::GetTileGeometry(NavBuildData* build, Vector<NavigationGeome
             }
 
 #ifdef URHO3D_PHYSICS
-            auto* shape = dynamic_cast<CollisionShape*>(geometryList[i].component_);
+            auto* shape = dynamic_cast<CollisionShape*>(navGeometry.component_);
             if (shape)
             {
                 switch (shape->GetShapeType())
@@ -1128,7 +1105,7 @@ void NavigationMesh::GetTileGeometry(NavBuildData* build, Vector<NavigationGeome
                         if (!model)
                             continue;
 
-                        unsigned lodLevel = shape->GetLodLevel();
+                        i32 lodLevel = shape->GetLodLevel();
                         for (unsigned j = 0; j < model->GetNumGeometries(); ++j)
                             AddTriMeshGeometry(build, model->GetGeometry(j, lodLevel), transform);
                     }
@@ -1182,13 +1159,13 @@ void NavigationMesh::GetTileGeometry(NavBuildData* build, Vector<NavigationGeome
                 continue;
             }
 #endif
-            auto* drawable = dynamic_cast<Drawable*>(geometryList[i].component_);
+            auto* drawable = dynamic_cast<Drawable*>(navGeometry.component_);
             if (drawable)
             {
                 const Vector<SourceBatch>& batches = drawable->GetBatches();
 
-                for (unsigned j = 0; j < batches.Size(); ++j)
-                    AddTriMeshGeometry(build, drawable->GetLodGeometry(j, geometryList[i].lodLevel_), transform);
+                for (i32 j = 0; j < batches.Size(); ++j)
+                    AddTriMeshGeometry(build, drawable->GetLodGeometry(j, navGeometry.lodLevel_), transform);
             }
         }
     }
@@ -1203,7 +1180,7 @@ void NavigationMesh::AddTriMeshGeometry(NavBuildData* build, Geometry* geometry,
     const unsigned char* indexData;
     unsigned vertexSize;
     unsigned indexSize;
-    const PODVector<VertexElement>* elements;
+    const Vector<VertexElement>* elements;
 
     geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
     if (!vertexData || !indexData || !elements || VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR3, SEM_POSITION) != 0)
@@ -1389,9 +1366,9 @@ bool NavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int
     }
 
     // Mark area volumes
-    for (unsigned i = 0; i < build.navAreas_.Size(); ++i)
-        rcMarkBoxArea(build.ctx_, &build.navAreas_[i].bounds_.min_.x_, &build.navAreas_[i].bounds_.max_.x_,
-            build.navAreas_[i].areaID_, *build.compactHeightField_);
+    for (const NavAreaStub& navArea : build.navAreas_)
+        rcMarkBoxArea(build.ctx_, &navArea.bounds_.min_.x_, &navArea.bounds_.max_.x_,
+            navArea.areaID_, *build.compactHeightField_);
 
     if (this->partitionType_ == NAVMESH_PARTITION_WATERSHED)
     {

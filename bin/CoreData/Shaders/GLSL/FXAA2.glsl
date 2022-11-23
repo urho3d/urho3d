@@ -79,7 +79,7 @@ void PS()
             rgbOut = rgbA;
         else
             rgbOut = rgbB;
-    
+
         gl_FragColor = vec4(rgbOut, 1.0);
     }
     else

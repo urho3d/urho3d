@@ -1,42 +1,23 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
 #include "../Graphics/BillboardSet.h"
-#include "../Graphics/Graphics.h"
-#include "../Graphics/Octree.h"
-#include "../Graphics/Technique.h"
-#include "../Graphics/Material.h"
-#include "../Graphics/Texture2D.h"
-#include "../Graphics/StaticModel.h"
-#include "../Graphics/Renderer.h"
 #include "../Graphics/Camera.h"
-#include "../Graphics/VertexBuffer.h"
+#include "../Graphics/Graphics.h"
+#include "../Graphics/Material.h"
+#include "../Graphics/Octree.h"
+#include "../Graphics/Renderer.h"
+#include "../Graphics/StaticModel.h"
+#include "../Graphics/Technique.h"
+#include "../GraphicsAPI/Texture2D.h"
+#include "../GraphicsAPI/VertexBuffer.h"
+#include "../IO/Log.h"
+#include "../Resource/ResourceCache.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
-#include "../Resource/ResourceCache.h"
-#include "../IO/Log.h"
 #include "../UI/UI.h"
 #include "../UI/UIComponent.h"
 #include "../UI/UIEvents.h"
@@ -112,8 +93,14 @@ public:
             rect.bottom_ = graphics->GetHeight();
         }
 
-        Ray ray(camera->GetScreenRay((float)screenPos.x_ / rect.Width(), (float)screenPos.y_ / rect.Height()));
-        PODVector<RayQueryResult> queryResultVector;
+        auto* ui = GetSubsystem<UI>();
+
+        // Convert to system mouse position
+        IntVector2 pos;
+        pos = ui->ConvertUIToSystem(screenPos);
+
+        Ray ray(camera->GetScreenRay((float)pos.x_ / rect.Width(), (float)pos.y_ / rect.Height()));
+        Vector<RayQueryResult> queryResultVector;
         RayOctreeQuery query(queryResultVector, ray, RAY_TRIANGLE_UV, M_INFINITY, DRAWABLE_GEOMETRY, DEFAULT_VIEWMASK);
 
         octree->Raycast(query);
@@ -135,6 +122,10 @@ public:
             Vector2& uv = queryResult.textureUV_;
             result = IntVector2(static_cast<int>(uv.x_ * GetWidth()),
                 static_cast<int>(uv.y_ * GetHeight()));
+
+            // Convert back to scaled UI position
+            result = ui->ConvertSystemToUI(result);
+
             return result;
         }
         return result;

@@ -1,4 +1,4 @@
-// Convenient functions for Urho2D samples:
+// Convenient functions for Urho2D and Physics2D samples:
 //    - Generate collision shapes from a tmx file objects
 //    - Create Spriter Imp character
 //    - Load Mover script object class from file
@@ -26,7 +26,7 @@ String demoFilename = "";
 Node@ character2DNode;
 
 
-void CreateCollisionShapesFromTMXObjects(Node@ tileMapNode, TileMapLayer2D@ tileMapLayer, TileMapInfo2D@ info)
+void CreateCollisionShapesFromTMXObjects(Node@ tileMapNode, TileMapLayer2D@ tileMapLayer, const TileMapInfo2D@ info)
 {
     // Create rigid body to the root node
     RigidBody2D@ body = tileMapNode.CreateComponent("RigidBody2D");
@@ -58,7 +58,7 @@ void CreateCollisionShapesFromTMXObjects(Node@ tileMapNode, TileMapLayer2D@ tile
     }
 }
 
-CollisionBox2D@ CreateRectangleShape(Node@ node, TileMapObject2D@ object, Vector2 size, TileMapInfo2D@ info)
+CollisionBox2D@ CreateRectangleShape(Node@ node, TileMapObject2D@ object, Vector2 size, const TileMapInfo2D@ info)
 {
     CollisionBox2D@ shape = node.CreateComponent("CollisionBox2D");
     shape.size = size;
@@ -75,7 +75,7 @@ CollisionBox2D@ CreateRectangleShape(Node@ node, TileMapObject2D@ object, Vector
     return shape;
 }
 
-CollisionCircle2D@ CreateCircleShape(Node@ node, TileMapObject2D@ object, float radius, TileMapInfo2D@ info)
+CollisionCircle2D@ CreateCircleShape(Node@ node, TileMapObject2D@ object, float radius, const TileMapInfo2D@ info)
 {
     CollisionCircle2D@ shape = node.CreateComponent("CollisionCircle2D");
     Vector2 size = object.size;
@@ -92,7 +92,7 @@ CollisionCircle2D@ CreateCircleShape(Node@ node, TileMapObject2D@ object, float 
     return shape;
 }
 
-CollisionPolygon2D@ CreatePolygonShape(Node@ node, TileMapObject2D@ object)
+CollisionPolygon2D@ CreatePolygonShape(Node@ node, const TileMapObject2D@ object)
 {
     CollisionPolygon2D@ shape = node.CreateComponent("CollisionPolygon2D");
     uint numVertices = object.numPoints;
@@ -105,8 +105,9 @@ CollisionPolygon2D@ CreatePolygonShape(Node@ node, TileMapObject2D@ object)
     return shape;
 }
 
-CollisionChain2D@ CreatePolyLineShape(Node@ node, TileMapObject2D@ object)
+void CreatePolyLineShape(Node@ node, TileMapObject2D@ object)
 {
+/*
     CollisionChain2D@ shape = node.CreateComponent("CollisionChain2D");
     uint numVertices = object.numPoints;
     shape.vertexCount = numVertices;
@@ -116,9 +117,24 @@ CollisionChain2D@ CreatePolyLineShape(Node@ node, TileMapObject2D@ object)
     if (object.HasProperty("Friction"))
         shape.friction = object.GetProperty("Friction").ToFloat();
     return shape;
+*/
+
+    // Latest Box2D supports only one sided chains with ghost vertices, use two sided edges instead.
+    // But this can cause stuck at the edges ends https://box2d.org/posts/2020/06/ghost-collisions/
+
+    int numVertices = object.numPoints;
+
+    for (int i = 1; i < numVertices; ++i)
+    {
+        CollisionEdge2D@ shape = node.CreateComponent("CollisionEdge2D");
+        shape.SetVertices(object.GetPoint(i - 1), object.GetPoint(i));
+        shape.friction = 0.8f;
+        if (object.HasProperty("Friction"))
+            shape.friction = object.GetProperty("Friction").ToFloat();
+    }
 }
 
-void CreateCharacter(TileMapInfo2D@ info, bool createObject, float friction, Vector3 position, float scale)
+void CreateCharacter(const TileMapInfo2D@ info, bool createObject, float friction, Vector3 position, float scale)
 {
     character2DNode = scene_.CreateChild("Imp");
     character2DNode.position = position;
@@ -135,10 +151,13 @@ void CreateCharacter(TileMapInfo2D@ info, bool createObject, float friction, Vec
     RigidBody2D@ characterBody = character2DNode.CreateComponent("RigidBody2D");
     characterBody.bodyType = BT_DYNAMIC;
     characterBody.allowSleep = false;
+    characterBody.fixedRotation = true;
     CollisionCircle2D@ shape = character2DNode.CreateComponent("CollisionCircle2D");
     shape.radius = 1.1f; // Set shape size
     shape.friction = friction; // Set friction
     shape.restitution = 0.1f; // Bounce
+    shape.density = 6.6f;
+
     if (createObject)
         character2DNode.CreateScriptObject(scriptFile, "Character2D"); // Create a ScriptObject to handle character behavior
 
@@ -525,7 +544,7 @@ void PlaySound(String soundName)
     source.Play(cache.GetResource("Sound", "Sounds/" + soundName));
 }
 
-void CreateBackgroundSprite(TileMapInfo2D@ info, float scale, String texture, bool animate)
+void CreateBackgroundSprite(const TileMapInfo2D@ info, float scale, String texture, bool animate)
 {
     Node@ node = scene_.CreateChild("Background");
     node.position = Vector3(info.mapWidth, info.mapHeight, 0) / 2;

@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -42,13 +23,14 @@ public:
     /// Destruct.
     ~TerrainPatch() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Process octree raycast. May be called from a worker thread.
-    void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
+    void ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results) override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     void UpdateBatches(const FrameInfo& frame) override;
-    /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
+    /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update).
     void UpdateGeometry(const FrameInfo& frame) override;
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     UpdateGeometryType GetUpdateGeometryType() override;
@@ -98,13 +80,13 @@ public:
     TerrainPatch* GetEastPatch() const { return east_; }
 
     /// Return geometrical error array.
-    PODVector<float>& GetLodErrors() { return lodErrors_; }
+    Vector<float>& GetLodErrors() { return lodErrors_; }
 
     /// Return patch coordinates.
     const IntVector2& GetCoordinates() const { return coordinates_; }
 
     /// Return current LOD level.
-    unsigned GetLodLevel() const { return lodLevel_; }
+    i32 GetLodLevel() const { return lodLevel_; }
 
 protected:
     /// Recalculate the world-space bounding box.
@@ -112,7 +94,7 @@ protected:
 
 private:
     /// Return a corrected LOD level to ensure stitching can work correctly.
-    unsigned GetCorrectedLodLevel(unsigned lodLevel);
+    i32 GetCorrectedLodLevel(i32 lodLevel);
 
     /// Geometry.
     SharedPtr<Geometry> geometry_;
@@ -133,11 +115,11 @@ private:
     /// East neighbor patch.
     WeakPtr<TerrainPatch> east_;
     /// Geometrical error per LOD level.
-    PODVector<float> lodErrors_;
+    Vector<float> lodErrors_;
     /// Patch coordinates in the terrain. (0,0) is the northwest corner.
     IntVector2 coordinates_;
     /// Current LOD level.
-    unsigned lodLevel_;
+    i32 lodLevel_;
 };
 
 }

@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -50,6 +31,8 @@
 #endif
 
 #include "../DebugNew.h"
+
+using namespace std;
 
 extern "C" int SDL_AddTouch(SDL_TouchID touchID, SDL_TouchDeviceType type, const char* name);
 
@@ -326,7 +309,7 @@ int Win32_ResizingEventWatcher(void* data, SDL_Event* event)
 }
 #endif
 
-void JoystickState::Initialize(unsigned numButtons, unsigned numAxes, unsigned numHats)
+void JoystickState::Initialize(i32 numButtons, i32 numAxes, i32 numHats)
 {
     buttons_.Resize(numButtons);
     buttonPress_.Resize(numButtons);
@@ -338,14 +321,16 @@ void JoystickState::Initialize(unsigned numButtons, unsigned numAxes, unsigned n
 
 void JoystickState::Reset()
 {
-    for (unsigned i = 0; i < buttons_.Size(); ++i)
+    for (i32 i = 0; i < buttons_.Size(); ++i)
     {
         buttons_[i] = false;
         buttonPress_[i] = false;
     }
-    for (unsigned i = 0; i < axes_.Size(); ++i)
+
+    for (i32 i = 0; i < axes_.Size(); ++i)
         axes_[i] = 0.0f;
-    for (unsigned i = 0; i < hats_.Size(); ++i)
+
+    for (i32 i = 0; i < hats_.Size(); ++i)
         hats_[i] = HAT_CENTER;
 }
 
@@ -391,7 +376,7 @@ Input::Input(Context* context) :
     SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
     SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
 #elif defined(__EMSCRIPTEN__)
-    emscriptenInput_ = new EmscriptenInput(this);
+    emscriptenInput_ = make_unique<EmscriptenInput>(this);
 #endif
 
     // Try to initialize right now, but skip if screen mode is not yet set
@@ -1023,8 +1008,8 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
     unsigned numButtons = 0;
     unsigned numAxes = 0;
     unsigned numHats = 0;
-    const Vector<SharedPtr<UIElement> >& children = state.screenJoystick_->GetChildren();
-    for (Vector<SharedPtr<UIElement> >::ConstIterator iter = children.Begin(); iter != children.End(); ++iter)
+    const Vector<SharedPtr<UIElement>>& children = state.screenJoystick_->GetChildren();
+    for (Vector<SharedPtr<UIElement>>::ConstIterator iter = children.Begin(); iter != children.End(); ++iter)
     {
         UIElement* element = iter->Get();
         String name = element->GetName();
@@ -1129,9 +1114,9 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
     }
 
     // Make sure all the children are non-focusable so they do not mistakenly to be considered as active UI input controls by application
-    PODVector<UIElement*> allChildren;
+    Vector<UIElement*> allChildren;
     state.screenJoystick_->GetChildren(allChildren, true);
-    for (PODVector<UIElement*>::Iterator iter = allChildren.Begin(); iter != allChildren.End(); ++iter)
+    for (Vector<UIElement*>::Iterator iter = allChildren.Begin(); iter != allChildren.End(); ++iter)
         (*iter)->SetFocusMode(FM_NOTFOCUSABLE);
 
     state.Initialize(numButtons, numAxes, numHats);
@@ -1179,7 +1164,7 @@ void Input::SetScreenJoystickVisible(SDL_JoystickID id, bool enable)
 
 void Input::SetScreenKeyboardVisible(bool enable)
 {
-    if (enable != SDL_IsTextInputActive())
+    if (enable != (bool)SDL_IsTextInputActive())
     {
         if (enable)
             SDL_StartTextInput();
@@ -1646,9 +1631,9 @@ void Input::ResetState()
     ResetTouches();
 
     // Use SetMouseButton() to reset the state so that mouse events will be sent properly
-    SetMouseButton(MOUSEB_LEFT, false);
-    SetMouseButton(MOUSEB_RIGHT, false);
-    SetMouseButton(MOUSEB_MIDDLE, false);
+    SetMouseButton(MOUSEB_LEFT, false, 0);
+    SetMouseButton(MOUSEB_RIGHT, false, 0);
+    SetMouseButton(MOUSEB_MIDDLE, false, 0);
 
     mouseMove_ = IntVector2::ZERO;
     mouseMoveWheel_ = 0;
@@ -1744,7 +1729,7 @@ void Input::SendInputFocusEvent()
     SendEvent(E_INPUTFOCUS, eventData);
 }
 
-void Input::SetMouseButton(MouseButton button, bool newState)
+void Input::SetMouseButton(MouseButton button, bool newState, int clicks)
 {
     if (newState)
     {
@@ -1767,6 +1752,7 @@ void Input::SetMouseButton(MouseButton button, bool newState)
     eventData[P_BUTTON] = button;
     eventData[P_BUTTONS] = (unsigned)mouseButtonDown_;
     eventData[P_QUALIFIERS] = (unsigned)GetQualifiers();
+    eventData[P_CLICKS] = clicks;
     SendEvent(newState ? E_MOUSEBUTTONDOWN : E_MOUSEBUTTONUP, eventData);
 }
 
@@ -1934,7 +1920,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         if (!touchEmulation_)
         {
             const auto mouseButton = static_cast<MouseButton>(1u << (evt.button.button - 1u));  // NOLINT(misc-misplaced-widening-cast)
-            SetMouseButton(mouseButton, true);
+            SetMouseButton(mouseButton, true, evt.button.clicks);
         }
         else
         {
@@ -1960,7 +1946,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         if (!touchEmulation_)
         {
             const auto mouseButton = static_cast<MouseButton>(1u << (evt.button.button - 1u));  // NOLINT(misc-misplaced-widening-cast)
-            SetMouseButton(mouseButton, false);
+            SetMouseButton(mouseButton, false, evt.button.clicks);
         }
         else
         {
@@ -2355,7 +2341,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
 #if defined(IOS) || defined(TVOS) || defined (__ANDROID__)
                 // On iOS/tvOS we never lose the GL context, but may have done GPU object changes that could not be applied yet. Apply them now
                 // On Android the old GL context may be lost already, restore GPU objects to the new GL context
-                graphics_->Restore();
+                graphics_->Restore_OGL();
 #endif
                 minimized_ = false;
                 SendInputFocusEvent();

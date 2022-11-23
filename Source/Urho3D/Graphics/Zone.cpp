@@ -1,32 +1,13 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
 #include "../Graphics/DebugRenderer.h"
 #include "../Graphics/Octree.h"
-#include "../Graphics/TextureCube.h"
 #include "../Graphics/Zone.h"
+#include "../GraphicsAPI/TextureCube.h"
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Node.h"
 #include "../Scene/Scene.h"
@@ -264,16 +245,16 @@ void Zone::UpdateAmbientGradient()
         Vector3 minZPosition = worldTransform * Vector3(center.x_, center.y_, boundingBox_.min_.z_);
         Vector3 maxZPosition = worldTransform * Vector3(center.x_, center.y_, boundingBox_.max_.z_);
 
-        PODVector<Zone*> result;
+        Vector<Zone*> result;
         {
-            PointOctreeQuery query(reinterpret_cast<PODVector<Drawable*>&>(result), minZPosition, DRAWABLE_ZONE);
+            PointOctreeQuery query(reinterpret_cast<Vector<Drawable*>&>(result), minZPosition, DRAWABLE_ZONE);
             octant_->GetRoot()->GetDrawables(query);
         }
 
         // Gradient start position: get the highest priority zone that is not this zone
         int bestPriority = M_MIN_INT;
         Zone* bestZone = nullptr;
-        for (PODVector<Zone*>::ConstIterator i = result.Begin(); i != result.End(); ++i)
+        for (Vector<Zone*>::ConstIterator i = result.Begin(); i != result.End(); ++i)
         {
             Zone* zone = *i;
             int priority = zone->GetPriority();
@@ -292,13 +273,13 @@ void Zone::UpdateAmbientGradient()
 
         // Do the same for gradient end position
         {
-            PointOctreeQuery query(reinterpret_cast<PODVector<Drawable*>&>(result), maxZPosition, DRAWABLE_ZONE);
+            PointOctreeQuery query(reinterpret_cast<Vector<Drawable*>&>(result), maxZPosition, DRAWABLE_ZONE);
             octant_->GetRoot()->GetDrawables(query);
         }
         bestPriority = M_MIN_INT;
         bestZone = nullptr;
 
-        for (PODVector<Zone*>::ConstIterator i = result.Begin(); i != result.End(); ++i)
+        for (Vector<Zone*>::ConstIterator i = result.Begin(); i != result.End(); ++i)
         {
             Zone* zone = *i;
             int priority = zone->GetPriority();
@@ -326,11 +307,11 @@ void Zone::ClearDrawablesZone()
 {
     if (octant_ && lastWorldBoundingBox_.Defined())
     {
-        PODVector<Drawable*> result;
+        Vector<Drawable*> result;
         BoxOctreeQuery query(result, lastWorldBoundingBox_, DRAWABLE_GEOMETRY | DRAWABLE_ZONE);
         octant_->GetRoot()->GetDrawables(query);
 
-        for (PODVector<Drawable*>::Iterator i = result.Begin(); i != result.End(); ++i)
+        for (Vector<Drawable*>::Iterator i = result.Begin(); i != result.End(); ++i)
         {
             Drawable* drawable = *i;
             unsigned drawableFlags = drawable->GetDrawableFlags();

@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -296,8 +277,8 @@ const Vector<String>& ParseArguments(const String& cmdLine, bool skipFirstArgume
     }
 
     // Strip double quotes from the arguments
-    for (unsigned i = 0; i < arguments.Size(); ++i)
-        arguments[i].Replace("\"", "");
+    for (String& argument : arguments)
+        argument.Replace("\"", "");
 
     return arguments;
 }
@@ -360,7 +341,7 @@ String GetConsoleInput()
         ReadConsoleInputW(input, &record, 1, &readEvents);
         if (record.EventType == KEY_EVENT && record.Event.KeyEvent.bKeyDown)
         {
-            unsigned c = record.Event.KeyEvent.uChar.UnicodeChar;
+            c32 c = record.Event.KeyEvent.uChar.UnicodeChar;
             if (c)
             {
                 if (c == '\b')
@@ -433,14 +414,14 @@ unsigned GetNumPhysicalCPUs()
 #if defined(IOS)
     host_basic_info_data_t data;
     GetCPUData(&data);
-#if defined(TARGET_OS_SIMULATOR)
+#if TARGET_OS_SIMULATOR
     // Hardcoded to dual-core on simulator mode even if the host has more
     return Min(2, data.physical_cpu);
 #else
     return data.physical_cpu;
 #endif
 #elif defined(TVOS)
-#if defined(TARGET_OS_SIMULATOR)
+#if TARGET_OS_SIMULATOR
     return Min(2, SDL_TVOS_GetActiveProcessorCount());
 #else
     return SDL_TVOS_GetActiveProcessorCount();
@@ -467,13 +448,13 @@ unsigned GetNumLogicalCPUs()
 #if defined(IOS)
     host_basic_info_data_t data;
     GetCPUData(&data);
-#if defined(TARGET_OS_SIMULATOR)
+#if TARGET_OS_SIMULATOR
     return Min(2, data.logical_cpu);
 #else
     return data.logical_cpu;
 #endif
 #elif defined(TVOS)
-#if defined(TARGET_OS_SIMULATOR)
+#if TARGET_OS_SIMULATOR
     return Min(2, SDL_TVOS_GetActiveProcessorCount());
 #else
     return SDL_TVOS_GetActiveProcessorCount();

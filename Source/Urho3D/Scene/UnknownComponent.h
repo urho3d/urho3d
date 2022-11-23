@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -35,6 +16,7 @@ public:
     explicit UnknownComponent(Context* context);
 
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Return type of the stored component.
@@ -68,7 +50,7 @@ public:
     const Vector<String>& GetXMLAttributes() const { return xmlAttributes_; }
 
     /// Return the binary attributes. Empty when loaded with XML serialization.
-    const PODVector<unsigned char>& GetBinaryAttributes() const { return binaryAttributes_; }
+    const Vector<unsigned char>& GetBinaryAttributes() const { return binaryAttributes_; }
 
     /// Return whether was loaded using XML data.
     bool GetUseXML() const { return useXML_; }
@@ -93,10 +75,10 @@ private:
     String typeName_;
     /// XML format attribute infos.
     Vector<AttributeInfo> xmlAttributeInfos_;
-    /// XML format attribute data (as strings)
+    /// XML format attribute data (as strings).
     Vector<String> xmlAttributes_;
     /// Binary attributes.
-    PODVector<unsigned char> binaryAttributes_;
+    Vector<unsigned char> binaryAttributes_;
     /// Flag of whether was loaded using XML/JSON data.
     bool useXML_;
 

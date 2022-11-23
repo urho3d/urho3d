@@ -1,33 +1,14 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 /// \file
 
 #pragma once
 
-#include "../Math/Color.h"
 #include "../Graphics/Drawable.h"
+#include "../GraphicsAPI/Texture.h"
+#include "../Math/Color.h"
 #include "../Math/Frustum.h"
-#include "../Graphics/Texture.h"
 
 namespace Urho3D
 {
@@ -78,6 +59,7 @@ struct URHO3D_API BiasParameters
 };
 
 /// Cascaded shadow map parameters.
+/// @pod
 struct URHO3D_API CascadeParameters
 {
     /// Construct undefined.
@@ -109,13 +91,14 @@ struct URHO3D_API CascadeParameters
 
     /// Far clip values of the splits.
     Vector4 splits_;
-    /// The point relative to the total shadow range where shadow fade begins (0.0 - 1.0)
+    /// The point relative to the total shadow range where shadow fade begins (0.0 - 1.0).
     float fadeStart_{};
     /// Automatic depth bias adjustment strength.
     float biasAutoAdjust_{};
 };
 
 /// Shadow map focusing parameters.
+/// @pod
 struct URHO3D_API FocusParameters
 {
     /// Construct undefined.
@@ -157,149 +140,202 @@ public:
     /// Destruct.
     ~Light() override;
     /// Register object factory. Drawable must be registered first.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Process octree raycast. May be called from a worker thread.
-    void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
+    void ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results) override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     void UpdateBatches(const FrameInfo& frame) override;
     /// Visualize the component as debug geometry.
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set light type.
+    /// @property
     void SetLightType(LightType type);
     /// Set vertex lighting mode.
+    /// @property
     void SetPerVertex(bool enable);
     /// Set color.
+    /// @property
     void SetColor(const Color& color);
     /// Set temperature of the light in Kelvin. Modulates the light color when "use physical values" is enabled.
+    /// @property
     void SetTemperature(float temperature);
     /// Set area light radius. Greater than zero activates area light mode. Works only with PBR shaders.
+    /// @property
     void SetRadius(float radius);
     /// Set tube area light length. Works only with PBR shaders.
+    /// @property
     void SetLength(float length);
     /// Set use physical light values.
+    /// @property
     void SetUsePhysicalValues(bool enable);
     /// Set specular intensity. Zero disables specular calculations.
+    /// @property
     void SetSpecularIntensity(float intensity);
     /// Set light brightness multiplier. Both the color and specular intensity are multiplied with this. When "use physical values" is enabled, the value is specified in lumens.
+    /// @property
     void SetBrightness(float brightness);
     /// Set range.
+    /// @property
     void SetRange(float range);
     /// Set spotlight field of view.
+    /// @property
     void SetFov(float fov);
     /// Set spotlight aspect ratio.
+    /// @property
     void SetAspectRatio(float aspectRatio);
     /// Set fade out start distance.
+    /// @property
     void SetFadeDistance(float distance);
     /// Set shadow fade out start distance. Only has effect if shadow distance is also non-zero.
+    /// @property
     void SetShadowFadeDistance(float distance);
     /// Set shadow depth bias parameters.
+    /// @property
     void SetShadowBias(const BiasParameters& parameters);
     /// Set directional light cascaded shadow parameters.
+    /// @property
     void SetShadowCascade(const CascadeParameters& parameters);
     /// Set shadow map focusing parameters.
+    /// @property
     void SetShadowFocus(const FocusParameters& parameters);
     /// Set light intensity in shadow between 0.0 - 1.0. 0.0 (the default) gives fully dark shadows.
+    /// @property
     void SetShadowIntensity(float intensity);
     /// Set shadow resolution between 0.25 - 1.0. Determines the shadow map to use.
+    /// @property
     void SetShadowResolution(float resolution);
     /// Set shadow camera near/far clip distance ratio for spot and point lights. Does not affect directional lights, since they are orthographic and have near clip 0.
+    /// @property
     void SetShadowNearFarRatio(float nearFarRatio);
     /// Set maximum shadow extrusion for directional lights. The actual extrusion will be the smaller of this and camera far clip. Default 1000.
+    /// @property
     void SetShadowMaxExtrusion(float extrusion);
     /// Set range attenuation texture.
+    /// @property
     void SetRampTexture(Texture* texture);
     /// Set spotlight attenuation texture.
+    /// @property
     void SetShapeTexture(Texture* texture);
 
     /// Return light type.
+    /// @property
     LightType GetLightType() const { return lightType_; }
 
     /// Return vertex lighting mode.
+    /// @property
     bool GetPerVertex() const { return perVertex_; }
 
     /// Return color.
+    /// @property
     const Color& GetColor() const { return color_; }
 
     /// Return the temperature of the light in Kelvin.
+    /// @property
     float GetTemperature() const { return temperature_; }
 
     /// Return area light mode radius. Works only with PBR shaders.
+    /// @property
     float GetRadius() const { return lightRad_; }
 
     /// Return area tube light length. Works only with PBR shaders.
+    /// @property
     float GetLength() const { return lightLength_; }
 
     /// Return if light uses temperature and brightness in lumens.
+    /// @property
     bool GetUsePhysicalValues() const { return usePhysicalValues_; }
 
     /// Return the color value of the temperature in Kelvin.
+    /// @property
     Color GetColorFromTemperature() const;
 
     /// Return specular intensity.
+    /// @property
     float GetSpecularIntensity() const { return specularIntensity_; }
 
     /// Return brightness multiplier. Specified in lumens when "use physical values" is enabled.
+    /// @property
     float GetBrightness() const { return brightness_; }
 
     /// Return effective color, multiplied by brightness and affected by temperature when "use physical values" is enabled. Alpha is always 1 so that can compare against the default black color to detect a light with no effect.
+    /// @property
     Color GetEffectiveColor() const;
 
     /// Return effective specular intensity, multiplied by absolute value of brightness.
+    /// @property
     float GetEffectiveSpecularIntensity() const { return specularIntensity_ * Abs(brightness_); }
 
     /// Return range.
+    /// @property
     float GetRange() const { return range_; }
 
     /// Return spotlight field of view.
+    /// @property
     float GetFov() const { return fov_; }
 
     /// Return spotlight aspect ratio.
+    /// @property
     float GetAspectRatio() const { return aspectRatio_; }
 
     /// Return fade start distance.
+    /// @property
     float GetFadeDistance() const { return fadeDistance_; }
 
     /// Return shadow fade start distance.
+    /// @property
     float GetShadowFadeDistance() const { return shadowFadeDistance_; }
 
     /// Return shadow depth bias parameters.
+    /// @property
     const BiasParameters& GetShadowBias() const { return shadowBias_; }
 
     /// Return directional light cascaded shadow parameters.
+    /// @property
     const CascadeParameters& GetShadowCascade() const { return shadowCascade_; }
 
     /// Return shadow map focus parameters.
+    /// @property
     const FocusParameters& GetShadowFocus() const { return shadowFocus_; }
 
     /// Return light intensity in shadow.
+    /// @property
     float GetShadowIntensity() const { return shadowIntensity_; }
 
     /// Return shadow resolution.
+    /// @property
     float GetShadowResolution() const { return shadowResolution_; }
 
     /// Return shadow camera near/far clip distance ratio.
+    /// @property
     float GetShadowNearFarRatio() const { return shadowNearFarRatio_; }
 
     /// Return maximum shadow extrusion distance for directional lights.
+    /// @property
     float GetShadowMaxExtrusion() const { return shadowMaxExtrusion_; }
 
     /// Return range attenuation texture.
+    /// @property
     Texture* GetRampTexture() const { return rampTexture_; }
 
     /// Return spotlight attenuation texture.
+    /// @property
     Texture* GetShapeTexture() const { return shapeTexture_; }
 
     /// Return spotlight frustum.
+    /// @property
     Frustum GetFrustum() const;
     /// Return spotlight frustum in the specified view space.
     Frustum GetViewSpaceFrustum(const Matrix3x4& view) const;
 
     /// Return number of shadow map cascade splits for a directional light, considering also graphics API limitations.
+    /// @property
     int GetNumShadowSplits() const;
 
     /// Return whether light has negative (darkening) color.
+    /// @property
     bool IsNegative() const { return GetEffectiveColor().SumRGB() < 0.0f; }
 
     /// Set sort value based on intensity and view distance.

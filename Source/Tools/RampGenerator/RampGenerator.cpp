@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include <Urho3D/Container/ArrayPtr.h>
 #include <Urho3D/Core/Context.h>
@@ -53,8 +34,8 @@ static const float sigma3Kernel9x9[9 * 9] = {
 int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
 
-bool ReadIES(File* data, PODVector<float>& vertical, PODVector<float>& horizontal, PODVector<float>& luminance);
-void WriteIES(unsigned char* data, unsigned width, unsigned height, PODVector<float>& horizontal, PODVector<float>& vertical, PODVector<float>& luminance);
+bool ReadIES(File* data, Vector<float>& vertical, Vector<float>& horizontal, Vector<float>& luminance);
+void WriteIES(unsigned char* data, unsigned width, unsigned height, Vector<float>& horizontal, Vector<float>& vertical, Vector<float>& luminance);
 void Blur(unsigned char* data, unsigned width, unsigned height, const float* kernel, unsigned kernelWidth);
 
 int main(int argc, char** argv)
@@ -95,9 +76,9 @@ void Run(const Vector<String>& arguments)
         File file(&context);
         file.Open(inputFile);
 
-        PODVector<float> horizontal;
-        PODVector<float> vertical;
-        PODVector<float> luminance;
+        Vector<float> horizontal;
+        Vector<float> vertical;
+        Vector<float> luminance;
         ReadIES(&file, vertical, horizontal, luminance);
 
         SharedArrayPtr<unsigned char> data(new unsigned char[width * height]);
@@ -176,7 +157,7 @@ void Run(const Vector<String>& arguments)
     }
 }
 
-unsigned GetSample(float position, PODVector<float>& inputs)
+unsigned GetSample(float position, Vector<float>& inputs)
 {
     unsigned pos = 0;
     // Early outs
@@ -235,7 +216,7 @@ int PopFirstInt(Vector<String>& words)
     return -1; // < 0 ever valid?
 }
 
-bool ReadIES(File* data, PODVector<float>& vertical, PODVector<float>& horizontal, PODVector<float>& luminance)
+bool ReadIES(File* data, Vector<float>& vertical, Vector<float>& horizontal, Vector<float>& luminance)
 {
     String line = data->ReadLine();
     if (!line.Contains("IESNA:LM-63-1995") && !line.Contains("IESNA:LM-63-2002"))
@@ -258,8 +239,9 @@ bool ReadIES(File* data, PODVector<float>& vertical, PODVector<float>& horizonta
     while (!data->IsEof())
         lines.Push(data->ReadLine());
     Vector<String> words;
-    for (unsigned i = 0; i < lines.Size(); ++i)
-        words.Push(lines[i].Split(' '));
+    
+    for (const String& line : lines)
+        words.Push(line.Split(' '));
 
     // Prune any 'junk' collected
     for (unsigned i = 0; i < words.Size(); ++i)
@@ -306,7 +288,7 @@ bool ReadIES(File* data, PODVector<float>& vertical, PODVector<float>& horizonta
     return true;
 }
 
-void WriteIES(unsigned char* data, unsigned width, unsigned height, PODVector<float>& horizontal, PODVector<float>& vertical, PODVector<float>& luminance)
+void WriteIES(unsigned char* data, unsigned width, unsigned height, Vector<float>& horizontal, Vector<float>& vertical, Vector<float>& luminance)
 {
     // Find maximum luminance value
     float maximum = -1;

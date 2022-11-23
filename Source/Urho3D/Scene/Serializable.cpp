@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -33,6 +14,8 @@
 #include "../Scene/Serializable.h"
 
 #include "../DebugNew.h"
+
+using namespace std;
 
 namespace Urho3D
 {
@@ -126,7 +109,7 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
         break;
 
     case VAR_BUFFER:
-        *(reinterpret_cast<PODVector<unsigned char>*>(dest)) = src.GetBuffer();
+        *(reinterpret_cast<Vector<unsigned char>*>(dest)) = src.GetBuffer();
         break;
 
     case VAR_RESOURCEREF:
@@ -235,7 +218,7 @@ void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) cons
         break;
 
     case VAR_BUFFER:
-        dest = *(reinterpret_cast<const PODVector<unsigned char>*>(src));
+        dest = *(reinterpret_cast<const Vector<unsigned char>*>(src));
         break;
 
     case VAR_RESOURCEREF:
@@ -669,7 +652,7 @@ void Serializable::ResetToDefault()
 
 void Serializable::RemoveInstanceDefault()
 {
-    instanceDefaultValues_.Reset();
+    instanceDefaultValues_.reset();
 }
 
 void Serializable::SetTemporary(bool enable)
@@ -715,7 +698,7 @@ void Serializable::AllocateNetworkState()
         return;
 
     const Vector<AttributeInfo>* networkAttributes = GetNetworkAttributes();
-    networkState_ = new NetworkState();
+    networkState_ = make_unique<NetworkState>();
     networkState_->attributes_ = networkAttributes;
 
     if (!networkAttributes)
@@ -1020,7 +1003,7 @@ void Serializable::SetInstanceDefault(const String& name, const Variant& default
 {
     // Allocate the instance level default value
     if (!instanceDefaultValues_)
-        instanceDefaultValues_ = new VariantMap();
+        instanceDefaultValues_ = make_unique<VariantMap>();
     instanceDefaultValues_->operator [](name) = defaultValue;
 }
 

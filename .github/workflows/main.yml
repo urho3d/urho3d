@@ -1,0 +1,316 @@
+# Copyright (c) 2008-2022 the Urho3D project
+# License: MIT
+
+---
+
+name: CI/CD
+on:
+  push:
+  pull_request:
+  repository_dispatch: { types: [ 'Warm DBE build cache' ] }
+jobs:
+  init:
+    name: Init
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.whatchanged.outputs.skip }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: What changed
+        id: whatchanged
+        run: |
+          git fetch --deepen=1
+          git log --raw --no-merges -1 |grep '^:' >/tmp/whatchanged
+          echo ::set-output name=skip::$(grep -cqv 'website/' /tmp/whatchanged; echo $?)
+  linux:
+    name: 🐧
+    runs-on: ubuntu-latest
+    needs: init
+    if: needs.init.outputs.skip == '0'
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - linux-gcc
+          - linux-clang
+          - mingw
+          - rpi
+          - arm
+        lib-type:
+          - static
+          - shared
+        architecture:
+          - 64
+          - 32
+        build-type:
+          - rel
+          - dbg
+        include:
+          - { platform: web, lib-type: static, architecture: wasm, build-type: rel }
+          - { platform: web, lib-type: static, architecture: wasm, build-type: dbg }
+          - { platform: android, lib-type: static, architecture: all, build-type: both }
+          - { platform: android, lib-type: shared, architecture: all, build-type: both }
+    env:
+      HOST: ${{ github.job }}
+      PLATFORM: ${{ matrix.platform }}
+      BUILD_TYPE: ${{ matrix.build-type }}
+      LIB_TYPE: ${{ matrix.lib-type }}
+      ARCH: ${{ matrix.architecture }}
+      DBE_TAG: master
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with: { fetch-depth: 0 }
+      - name: Free up space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android
+          sudo apt-get clean
+          df -h
+        if: matrix.platform == 'android' || matrix.build-type == 'dbg'
+      - name: Source checksum
+        id: source_checksum
+        run: rake source_checksum
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            build/cache/.ccache
+            build/cache/.gradle/caches
+            build/cache/.gradle/wrapper
+          key: |
+            ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ matrix.build-type }}-${{ env.DBE_TAG }}-${{ steps.source_checksum.outputs.hexdigest }}
+          restore-keys: |
+            ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ matrix.build-type }}-${{ env.DBE_TAG }}
+            ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ matrix.build-type }}
+      - name: DBE
+        run: rake update_dot_files && script/dockerized.sh ${PLATFORM/-*} env
+      - name: CMake
+        run: script/dockerized.sh ${PLATFORM/-*} rake cmake
+        if: matrix.platform != 'android'
+      - name: Build
+        run: script/dockerized.sh ${PLATFORM/-*} rake build
+      - name: Test tools
+        if: startsWith(matrix.platform, 'linux')
+        shell: bash
+        run: script/dockerized.sh ${PLATFORM/-*} /home/runner/work/Urho3D/Urho3D/script/test_tools.sh /home/runner/work/Urho3D/Urho3D /home/runner/work/Urho3D/Urho3D/build/ci
+      - name: Test
+        run: script/dockerized.sh ${PLATFORM/-*} rake test
+        if: startsWith(matrix.platform, 'linux') || matrix.platform == 'android'
+      - name: Documentation
+        run: script/dockerized.sh ${PLATFORM/-*} rake doc
+      - name: Install
+        run: |
+          script/dockerized.sh ${PLATFORM/-*} rake install
+          if [[ $PLATFORM == android ]]; then touch build/cache/.gradle/mark; fi
+      - name: Scaffolding - new
+        run: script/dockerized.sh ${PLATFORM/-*} rake new
+      - name: Scaffolding - build
+        run: |
+          cd build/cache/projects/UrhoApp
+          script/dockerized.sh ${PLATFORM/-*}
+      - name: Scaffolding - test
+        run: |
+          cd build/cache/projects/UrhoApp
+          script/dockerized.sh ${PLATFORM/-*} rake test
+        if: matrix.platform == 'android' || startsWith(matrix.platform, 'linux')
+      - name: Scaffolding - cleanup
+        run: |
+          if [[ $PLATFORM == android ]]; then
+            rm -rf build/cache/.m2
+            find build/cache/.gradle -newer build/cache/.gradle/mark -type d |xargs rm -rf
+          else
+            rm -rf build/cache/{.urho3d,projects}
+          fi
+      - name: Package
+        run: script/dockerized.sh ${PLATFORM/-*} rake package
+        if: github.event_name == 'push' && matrix.platform != 'android'
+      - name: Upload
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ matrix.build-type }}
+          path: |
+            build/ci/*.tar.gz
+            android/urho3d-lib/build/distributions/*.aar
+            android/urho3d-lib/build/distributions/*.zip
+            android/urho3d-lib/build/libs/*.jar
+            build/*.out
+        if: github.event_name == 'push'
+        continue-on-error: ${{ !startsWith(github.ref, 'refs/tags/') }}
+      - name: Publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PUBLISHER_NAME: ${{ secrets.PUBLISHER_NAME }}
+          PUBLISHER_EMAIL: ${{ secrets.PUBLISHER_EMAIL }}
+          PUBLISHER_TOKEN: ${{ secrets.PUBLISHER_TOKEN }}
+          BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+          BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
+        run: script/dockerized.sh ${PLATFORM/-*} rake publish
+        if: |
+          github.event_name == 'push' &&
+          (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')) &&
+          (matrix.platform == 'android' || (matrix.platform == 'web' && matrix.build-type == 'rel'))
+        continue-on-error: ${{ !startsWith(github.ref, 'refs/tags/') }}
+  macOS:
+    name: 🍏
+    runs-on: macos-10.15
+    needs: init
+    if: needs.init.outputs.skip == '0' && github.event_name != 'repository_dispatch'
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - macOS
+        lib-type:
+          - static
+          - shared
+        include:
+          - { platform: iOS, lib-type: static }
+          - { platform: tvOS, lib-type: static }
+    env:
+      HOST: ${{ github.job }}
+      PLATFORM: ${{ matrix.platform }}
+      LIB_TYPE: ${{ matrix.lib-type }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with: { fetch-depth: 0 }
+      - name: Select xcode
+        run: sudo xcode-select -s '/Applications/Xcode_12.app'
+      - name: Install dependencies
+        run: while ! brew install doxygen graphviz; do sleep 1; done
+      - name: CMake
+        run: rake cmake
+      - name: Build
+        run: rake build
+      - name: Test tools
+        if: matrix.platform == 'macOS'
+        shell: bash
+        run: /Users/runner/work/Urho3D/Urho3D/script/test_tools.sh /Users/runner/work/Urho3D/Urho3D /Users/runner/work/Urho3D/Urho3D/build/ci
+      - name: Test
+        run: rake test
+        if: matrix.platform == 'macOS'
+      - name: Documentation
+        run: rake doc
+      - name: Install
+        run: rake install
+      - name: Scaffolding - new
+        run: rake new
+      - name: Scaffolding - build
+        run: |
+          cd ~/projects/UrhoApp
+          rake
+      - name: Scaffolding - test
+        run: |
+          cd ~/projects/UrhoApp
+          rake test
+        if: matrix.platform == 'macOS'
+      - name: Scaffolding - cleanup
+        run: rm -rf ~/{.urho3d,projects}
+      - name: Package
+        run: rake package
+        if: github.event_name == 'push'
+      - name: Upload
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.platform }}-${{ matrix.lib-type }}-all-rel
+          path: build/ci/*.tar.gz
+        if: github.event_name == 'push'
+  windows:
+    name: 🔲
+    runs-on: windows-2019
+    needs: init
+    if: needs.init.outputs.skip == '0' && github.event_name != 'repository_dispatch'
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - win-vs
+          - win-gcc
+        lib-type:
+          - static
+          - shared
+        graphics-api:
+          - DX11
+          - DX9
+          - OpenGL
+    env:
+      HOST: ${{ github.job }}
+      PLATFORM: ${{ matrix.platform }}
+      LIB_TYPE: ${{ matrix.lib-type }}
+      GRAPHICS_API: ${{ matrix.graphics-api }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with: { fetch-depth: 0 }
+      - name: Install dependencies
+        id: install_dependencies
+        shell: bash {0} # Allow catching errors
+        run: |
+          # Temporary use old version of Doxygen https://github.com/urho3d/Urho3D/issues/2757
+          # Server may reject connection, so try several times
+          for (( i = 0; i < 4; ++i ))
+          do
+            choco install --no-progress doxygen.install --version 1.8.20
+            if (( $? == 0 )) # Exit code of the previous command
+            then
+              break
+            else
+              echo "========== One more try =========="
+              sleep 20
+            fi
+          done
+          for (( i = 0; i < 4; ++i ))
+          do
+            choco install --no-progress graphviz.portable
+            if (( $? == 0 )) # Exit code of the previous command
+            then
+              break
+            else
+              echo "========== One more try =========="
+              sleep 20
+            fi
+          done
+          # Use MSYS2 instead obsolete MinGW
+          # https://github.com/urho3d/Urho3D/issues/2887
+          echo "c:\msys64\mingw32\bin" >> $GITHUB_PATH
+      - name: CMake
+        run: rake cmake
+      - name: Build
+        run: rake build
+      - name: Test tools
+        shell: bash
+        run: D:/a/Urho3D/Urho3D/script/test_tools.sh D:/a/Urho3D/Urho3D D:/a/Urho3D/Urho3D/build/ci
+      - name: Test
+        run: rake test
+        if: matrix.graphics-api != 'OpenGL'
+      - name: Documentation
+        run: rake doc
+      - name: Install
+        run: rake install
+      - name: Scaffolding - new
+        run: rake new
+      - name: Scaffolding - build
+        run: |
+          cd ~/projects/UrhoApp
+          rake
+      - name: Scaffolding - test
+        run: |
+          cd ~/projects/UrhoApp
+          rake test
+        if: matrix.graphics-api != 'OpenGL'
+      - name: Scaffolding - cleanup
+        run: rm -r -fo ~/.urho3d, ~/Projects
+      - name: Package
+        run: rake package
+        if: github.event_name == 'push'
+      - name: Upload
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.platform }}-${{ matrix.lib-type }}-64-${{ matrix.graphics-api }}-rel
+          path: build/ci/*.zip
+        if: github.event_name == 'push'
+
+...
+
+# vi: set ts=2 sw=2 expandtab:

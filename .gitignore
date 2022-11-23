@@ -15,6 +15,7 @@ generated/
 build/
 /captures/
 .cxx/
+/demo/
 
 # Output files
 /Source/**/*.a
@@ -77,6 +78,11 @@ build/
 # Android project settings
 /local.properties
 
+# Visual Studio project settings
+/.vs/
+/CMakeSettings.json
+/out/
+
 # CMake generated build files
 CMakeCache.txt
 CMakeFiles/
@@ -111,3 +117,7 @@ configure*
 *.bak
 Thumbs.db
 .directory
+
+# Doxygen mess from absence of 'dot' dependency
+CMakeDoxyFile.in
+CMakeDoxygenDefaults.cmake

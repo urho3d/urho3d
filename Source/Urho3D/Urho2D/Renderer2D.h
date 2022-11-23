@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -32,18 +13,20 @@ class Drawable2D;
 class IndexBuffer;
 class Material;
 class Technique;
+class Texture2D;
 class VertexBuffer;
 struct FrameInfo;
 struct SourceBatch2D;
 
 /// 2D view batch info.
+/// @nobind
 struct ViewBatchInfo2D
 {
     /// Construct.
     ViewBatchInfo2D();
 
     /// Vertex buffer update frame number.
-    unsigned vertexBufferUpdateFrameNumber_;
+    i32 vertexBufferUpdateFrameNumber_;
     /// Index count.
     unsigned indexCount_;
     /// Vertex count.
@@ -51,17 +34,17 @@ struct ViewBatchInfo2D
     /// Vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
     /// Batch updated frame number.
-    unsigned batchUpdatedFrameNumber_;
+    i32 batchUpdatedFrameNumber_;
     /// Source batches.
-    PODVector<const SourceBatch2D*> sourceBatches_;
-    /// Batch count;
+    Vector<const SourceBatch2D*> sourceBatches_;
+    /// Batch count.
     unsigned batchCount_;
     /// Distances.
-    PODVector<float> distances_;
+    Vector<float> distances_;
     /// Materials.
-    Vector<SharedPtr<Material> > materials_;
+    Vector<SharedPtr<Material>> materials_;
     /// Geometries.
-    Vector<SharedPtr<Geometry> > geometries_;
+    Vector<SharedPtr<Geometry>> geometries_;
 };
 
 /// 2D renderer component.
@@ -69,7 +52,7 @@ class URHO3D_API Renderer2D : public Drawable
 {
     URHO3D_OBJECT(Renderer2D, Drawable);
 
-    friend void CheckDrawableVisibilityWork(const WorkItem* item, unsigned threadIndex);
+    friend void CheckDrawableVisibilityWork(const WorkItem* item, i32 threadIndex);
 
 public:
     /// Construct.
@@ -77,13 +60,14 @@ public:
     /// Destruct.
     ~Renderer2D() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Process octree raycast. May be called from a worker thread.
-    void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
+    void ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results) override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     void UpdateBatches(const FrameInfo& frame) override;
-    /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
+    /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update).
     void UpdateGeometry(const FrameInfo& frame) override;
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     UpdateGeometryType GetUpdateGeometryType() override;
@@ -106,7 +90,7 @@ private:
     /// Handle view update begin event. Determine Drawable2D's and their batches here.
     void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData);
     /// Get all drawables in node.
-    void GetDrawables(PODVector<Drawable2D*>& drawables, Node* node);
+    void GetDrawables(Vector<Drawable2D*>& drawables, Node* node);
     /// Update view batch info.
     void UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* camera);
     /// Add view batch.
@@ -118,7 +102,7 @@ private:
     /// Material.
     SharedPtr<Material> material_;
     /// Drawables.
-    PODVector<Drawable2D*> drawables_;
+    Vector<Drawable2D*> drawables_;
     /// View frame info for current frame.
     FrameInfo frame_;
     /// View batch info.
@@ -128,9 +112,9 @@ private:
     /// View mask of current camera for visibility checking.
     unsigned viewMask_;
     /// Cached materials.
-    HashMap<Texture2D*, HashMap<int, SharedPtr<Material> > > cachedMaterials_;
+    HashMap<Texture2D*, HashMap<int, SharedPtr<Material>>> cachedMaterials_;
     /// Cached techniques per blend mode.
-    HashMap<int, SharedPtr<Technique> > cachedTechniques_;
+    HashMap<int, SharedPtr<Technique>> cachedTechniques_;
 };
 
 }

@@ -111,7 +111,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
     #else
         float fogFactor = GetFogFactor(iWorldPos.w);
     #endif
-    
+
     // Soft particle fade
     // In expand mode depth test should be off. In that case do manual alpha discard test first to reduce fill rate
     #ifdef SOFTPARTICLES

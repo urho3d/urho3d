@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 /// \file
 
@@ -55,6 +36,7 @@ public:
     /// Destruct.
     ~Font() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
@@ -62,23 +44,28 @@ public:
     /// Save resource as a new bitmap font type in XML format. Return true if successful.
     bool SaveXML(Serializer& dest, int pointSize, bool usedGlyphs = false, const String& indentation = "\t");
     /// Set absolute (in pixels) position adjustment for glyphs.
+    /// @property
     void SetAbsoluteGlyphOffset(const IntVector2& offset);
     /// Set point size scaled position adjustment for glyphs.
+    /// @property
     void SetScaledGlyphOffset(const Vector2& offset);
 
     /// Return font face. Pack and render to a texture if not rendered yet. Return null on error.
     FontFace* GetFace(float pointSize);
 
     /// Return font type.
+    /// @property
     FontType GetFontType() const { return fontType_; }
 
     /// Is signed distance field font.
     bool IsSDFFont() const { return sdfFont_; }
 
     /// Return absolute position adjustment for glyphs.
+    /// @property
     const IntVector2& GetAbsoluteGlyphOffset() const { return absoluteOffset_; }
 
     /// Return point size scaled position adjustment for glyphs.
+    /// @property
     const Vector2& GetScaledGlyphOffset() const { return scaledOffset_; }
 
     /// Return the total effective offset for a point size.
@@ -96,7 +83,7 @@ private:
     FontFace* GetFaceBitmap(float pointSize);
 
     /// Created faces.
-    HashMap<int, SharedPtr<FontFace> > faces_;
+    HashMap<int, SharedPtr<FontFace>> faces_;
     /// Font data.
     SharedArrayPtr<unsigned char> fontData_;
     /// Size of font data.

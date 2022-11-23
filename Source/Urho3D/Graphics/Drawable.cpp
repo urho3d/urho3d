@@ -1,46 +1,22 @@
-//
-
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
 #include "../Graphics/Camera.h"
 #include "../Graphics/DebugRenderer.h"
-#include "../IO/File.h"
 #include "../Graphics/Geometry.h"
 #include "../Graphics/Material.h"
 #include "../Graphics/Octree.h"
 #include "../Graphics/Renderer.h"
-#include "../Graphics/VertexBuffer.h"
 #include "../Graphics/Zone.h"
+#include "../GraphicsAPI/VertexBuffer.h"
+#include "../IO/File.h"
 #include "../IO/Log.h"
 #include "../Scene/Scene.h"
 
 #include "../DebugNew.h"
-
-#ifdef _MSC_VER
-#pragma warning(disable:6293)
-#endif
 
 namespace Urho3D
 {
@@ -115,7 +91,7 @@ void Drawable::OnSetEnabled()
         RemoveFromOctree();
 }
 
-void Drawable::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
+void Drawable::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results)
 {
     float distance = query.ray_.HitDistance(GetWorldBoundingBox());
     if (distance < query.maxDistance_)
@@ -126,7 +102,7 @@ void Drawable::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryRe
         result.distance_ = distance;
         result.drawable_ = this;
         result.node_ = GetNode();
-        result.subObject_ = M_MAX_UNSIGNED;
+        result.subObject_ = NINDEX;
         results.Push(result);
     }
 }
@@ -310,8 +286,10 @@ void Drawable::MarkInView(const FrameInfo& frame)
     vertexLights_.Clear();
 }
 
-void Drawable::MarkInView(unsigned frameNumber)
+void Drawable::MarkInView(i32 frameNumber)
 {
+    assert(frameNumber > 0);
+
     if (frameNumber != viewFrameNumber_)
     {
         viewFrameNumber_ = frameNumber;
@@ -339,7 +317,7 @@ void Drawable::LimitVertexLights(bool removeConvertedLights)
 {
     if (removeConvertedLights)
     {
-        for (unsigned i = vertexLights_.Size() - 1; i < vertexLights_.Size(); --i)
+        for (i32 i = vertexLights_.Size() - 1; i >= 0; --i)
         {
             if (!vertexLights_[i]->GetPerVertex())
                 vertexLights_.Erase(i);
@@ -419,7 +397,7 @@ void Drawable::RemoveFromOctree()
     }
 }
 
-bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV)
+bool WriteDrawablesToOBJ(const Vector<Drawable*>& drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV)
 {
     // Must track indices independently to deal with potential mismatching of drawables vertex attributes (ie. one with UV, another without, then another with)
     unsigned currentPositionIndex = 1;
@@ -462,7 +440,7 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
             const unsigned char* vertexData;
             const unsigned char* indexData;
             unsigned elementSize, indexSize;
-            const PODVector<VertexElement>* elements;
+            const Vector<VertexElement>* elements;
             geo->GetRawData(vertexData, elementSize, indexData, indexSize, elements);
             if (!vertexData || !elements)
                 continue;
@@ -583,7 +561,7 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
                     String output = "f ";
                     if (hasNormals)
                     {
-                        output.AppendWithFormat("%l/%l/%l %l/%l/%l %l/%l/%l",
+                        output.AppendWithFormat("%u/%u/%u %u/%u/%u %u/%u/%u",
                             currentPositionIndex + longIndices[0],
                             currentUVIndex + longIndices[0],
                             currentNormalIndex + longIndices[0],
@@ -597,7 +575,7 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
                     else if (hasNormals || hasUV)
                     {
                         unsigned secondTraitIndex = hasNormals ? currentNormalIndex : currentUVIndex;
-                        output.AppendWithFormat("%l%s%l %l%s%l %l%s%l",
+                        output.AppendWithFormat("%u%s%u %u%s%u %u%s%u",
                             currentPositionIndex + longIndices[0],
                             slashCharacter.CString(),
                             secondTraitIndex + longIndices[0],
@@ -610,7 +588,7 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
                     }
                     else
                     {
-                        output.AppendWithFormat("%l %l %l",
+                        output.AppendWithFormat("%u %u %u",
                             currentPositionIndex + longIndices[0],
                             currentPositionIndex + longIndices[1],
                             currentPositionIndex + longIndices[2]);

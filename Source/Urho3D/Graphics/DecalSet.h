@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -89,14 +70,14 @@ struct Decal
 
     /// Decal age timer.
     float timer_;
-    /// Maximum time to live in seconds (0 = infinite)
+    /// Maximum time to live in seconds (0 = infinite).
     float timeToLive_;
     /// Local-space bounding box.
     BoundingBox boundingBox_;
     /// Decal vertices.
-    PODVector<DecalVertex> vertices_;
+    Vector<DecalVertex> vertices_;
     /// Decal indices.
-    PODVector<unsigned short> indices_;
+    Vector<unsigned short> indices_;
 };
 
 /// %Decal renderer component.
@@ -110,6 +91,7 @@ public:
     /// Destruct.
     ~DecalSet() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
@@ -117,21 +99,25 @@ public:
     /// Handle enabled/disabled state change.
     void OnSetEnabled() override;
     /// Process octree raycast. May be called from a worker thread.
-    void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
+    void ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results) override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     void UpdateBatches(const FrameInfo& frame) override;
-    /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
+    /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update).
     void UpdateGeometry(const FrameInfo& frame) override;
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     UpdateGeometryType GetUpdateGeometryType() override;
 
     /// Set material. The material should use a small negative depth bias to avoid Z-fighting.
+    /// @property
     void SetMaterial(Material* material);
     /// Set maximum number of decal vertices.
+    /// @property
     void SetMaxVertices(unsigned num);
     /// Set maximum number of decal vertex indices.
+    /// @property
     void SetMaxIndices(unsigned num);
     /// Set whether to optimize GPU buffer sizes according to current amount of decals. Default false, which will size the buffers according to the maximum vertices/indices. When true, buffers will be reallocated whenever decals are added/removed, which can be worse for performance.
+    /// @property
     void SetOptimizeBufferSize(bool enable);
     /// Add a decal at world coordinates, using a target drawable's geometry for reference. If the decal needs to move with the target, the decal component should be created to the target's node. Return true if successful.
     bool AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size, float aspectRatio,
@@ -143,34 +129,41 @@ public:
     void RemoveAllDecals();
 
     /// Return material.
+    /// @property
     Material* GetMaterial() const;
 
     /// Return number of decals.
+    /// @property
     unsigned GetNumDecals() const { return decals_.Size(); }
 
     /// Retur number of vertices in the decals.
+    /// @property
     unsigned GetNumVertices() const { return numVertices_; }
 
     /// Retur number of vertex indices in the decals.
+    /// @property
     unsigned GetNumIndices() const { return numIndices_; }
 
     /// Return maximum number of decal vertices.
+    /// @property
     unsigned GetMaxVertices() const { return maxVertices_; }
 
     /// Return maximum number of decal vertex indices.
+    /// @property
     unsigned GetMaxIndices() const { return maxIndices_; }
 
     /// Return whether is optimizing GPU buffer sizes according to current amount of decals.
+    /// @property
     bool GetOptimizeBufferSize() const { return optimizeBufferSize_; }
 
     /// Set material attribute.
     void SetMaterialAttr(const ResourceRef& value);
     /// Set decals attribute.
-    void SetDecalsAttr(const PODVector<unsigned char>& value);
+    void SetDecalsAttr(const Vector<unsigned char>& value);
     /// Return material attribute.
     ResourceRef GetMaterialAttr() const;
     /// Return decals attribute.
-    PODVector<unsigned char> GetDecalsAttr() const;
+    Vector<unsigned char> GetDecalsAttr() const;
 
 protected:
     /// Recalculate the world-space bounding box.
@@ -180,11 +173,11 @@ protected:
 
 private:
     /// Get triangle faces from the target geometry.
-    void GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, const Frustum& frustum,
+    void GetFaces(Vector<Vector<DecalVertex>>& faces, Drawable* target, unsigned batchIndex, const Frustum& frustum,
         const Vector3& decalNormal, float normalCutoff);
     /// Get triangle face from the target geometry.
     void GetFace
-        (Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, unsigned i0, unsigned i1, unsigned i2,
+        (Vector<Vector<DecalVertex>>& faces, Drawable* target, unsigned batchIndex, unsigned i0, unsigned i1, unsigned i2,
             const unsigned char* positionData, const unsigned char* normalData, const unsigned char* skinningData,
             unsigned positionStride, unsigned normalStride, unsigned skinningStride, const Frustum& frustum,
             const Vector3& decalNormal, float normalCutoff);
@@ -206,7 +199,7 @@ private:
     void UpdateBuffers();
     /// Recalculate skinning.
     void UpdateSkinning();
-    /// Update the batch (geometry type, shader data.)
+    /// Update the batch (geometry type, shader data).
     void UpdateBatch();
     /// Find bones after loading.
     void AssignBoneNodes();
@@ -226,7 +219,7 @@ private:
     /// Bones used for skinned decals.
     Vector<Bone> bones_;
     /// Skinning matrices.
-    PODVector<Matrix3x4> skinMatrices_;
+    Vector<Matrix3x4> skinMatrices_;
     /// Vertices in the current decals.
     unsigned numVertices_;
     /// Indices in the current decals.

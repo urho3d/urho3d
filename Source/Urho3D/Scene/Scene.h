@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 /// \file
 
@@ -60,13 +41,13 @@ struct AsyncProgress
     SharedPtr<File> file_;
     /// XML file for XML mode.
     SharedPtr<XMLFile> xmlFile_;
-    /// JSON file for JSON mode
+    /// JSON file for JSON mode.
     SharedPtr<JSONFile> jsonFile_;
 
     /// Current XML element for XML mode.
     XMLElement xmlElement_;
 
-    /// Current JSON child array and for JSON mode
+    /// Current JSON child array and for JSON mode.
     unsigned jsonIndex_;
 
     /// Current load mode.
@@ -88,16 +69,20 @@ class URHO3D_API Scene : public Node
 {
     URHO3D_OBJECT(Scene, Node);
 
+public:
+    /// @manualbind
     using Node::GetComponent;
+    /// @manualbind
     using Node::SaveXML;
+    /// @manualbind
     using Node::SaveJSON;
 
-public:
     /// Construct.
     explicit Scene(Context* context);
     /// Destruct.
     ~Scene() override;
     /// Register object factory. Node must be registered first.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Load from binary data. Removes all existing child nodes and components first. Return true if successful.
@@ -145,22 +130,28 @@ public:
     /// Clear scene completely of either replicated, local or all nodes and components.
     void Clear(bool clearReplicated = true, bool clearLocal = true);
     /// Enable or disable scene update.
+    /// @property
     void SetUpdateEnabled(bool enable);
-    /// Set update time scale. 1.0 = real time (default.)
+    /// Set update time scale. 1.0 = real time (default).
+    /// @property
     void SetTimeScale(float scale);
     /// Set elapsed time in seconds. This can be used to prevent inaccuracy in the timer if the scene runs for a long time.
+    /// @property
     void SetElapsedTime(float time);
     /// Set network client motion smoothing constant.
+    /// @property
     void SetSmoothingConstant(float constant);
     /// Set network client motion smoothing snap threshold.
+    /// @property
     void SetSnapThreshold(float threshold);
     /// Set maximum milliseconds per frame to spend on async scene loading.
+    /// @property
     void SetAsyncLoadingMs(int ms);
     /// Add a required package file for networking. To be called on the server.
     void AddRequiredPackageFile(PackageFile* package);
     /// Clear required package files.
     void ClearRequiredPackageFiles();
-    /// Register a node user variable hash reverse mapping (for editing.)
+    /// Register a node user variable hash reverse mapping (for editing).
     void RegisterVar(const String& name);
     /// Unregister a node user variable hash reverse mapping.
     void UnregisterVar(const String& name);
@@ -172,43 +163,55 @@ public:
     /// Return component from the whole scene by ID, or null if not found.
     Component* GetComponent(unsigned id) const;
     /// Get nodes with specific tag from the whole scene, return false if empty.
-    bool GetNodesWithTag(PODVector<Node*>& dest, const String& tag)  const;
+    bool GetNodesWithTag(Vector<Node*>& dest, const String& tag)  const;
 
     /// Return whether updates are enabled.
+    /// @property
     bool IsUpdateEnabled() const { return updateEnabled_; }
 
     /// Return whether an asynchronous loading operation is in progress.
+    /// @property
     bool IsAsyncLoading() const { return asyncLoading_; }
 
     /// Return asynchronous loading progress between 0.0 and 1.0, or 1.0 if not in progress.
+    /// @property
     float GetAsyncProgress() const;
 
     /// Return the load mode of the current asynchronous loading operation.
+    /// @property
     LoadMode GetAsyncLoadMode() const { return asyncProgress_.mode_; }
 
     /// Return source file name.
+    /// @property
     const String& GetFileName() const { return fileName_; }
 
     /// Return source file checksum.
+    /// @property
     unsigned GetChecksum() const { return checksum_; }
 
     /// Return update time scale.
+    /// @property
     float GetTimeScale() const { return timeScale_; }
 
     /// Return elapsed time in seconds.
+    /// @property
     float GetElapsedTime() const { return elapsedTime_; }
 
     /// Return motion smoothing constant.
+    /// @property
     float GetSmoothingConstant() const { return smoothingConstant_; }
 
     /// Return motion smoothing snap threshold.
+    /// @property
     float GetSnapThreshold() const { return snapThreshold_; }
 
     /// Return maximum milliseconds per frame to spend on async loading.
+    /// @property
     int GetAsyncLoadingMs() const { return asyncLoadingMs_; }
 
     /// Return required package files.
-    const Vector<SharedPtr<PackageFile> >& GetRequiredPackageFiles() const { return requiredPackageFiles_; }
+    /// @property
+    const Vector<SharedPtr<PackageFile>>& GetRequiredPackageFiles() const { return requiredPackageFiles_; }
 
     /// Return a node user variable name, or empty if not registered.
     const String& GetVarName(StringHash hash) const;
@@ -252,6 +255,7 @@ public:
     /// Prepare network update by comparing attributes and marking replication states dirty as necessary.
     void PrepareNetworkUpdate();
     /// Clean up all references to a network connection that is about to be removed.
+    /// @manualbind
     void CleanupConnection(Connection* connection);
     /// Mark a node for attribute check on the next network update.
     void MarkNetworkUpdate(Node* node);
@@ -289,7 +293,7 @@ private:
     /// Local components by ID.
     HashMap<unsigned, Component*> localComponents_;
     /// Cached tagged nodes by tag.
-    HashMap<StringHash, PODVector<Node*> > taggedNodes_;
+    HashMap<StringHash, Vector<Node*>> taggedNodes_;
     /// Asynchronous loading progress.
     AsyncProgress asyncProgress_;
     /// Node and component ID resolver for asynchronous loading.
@@ -297,7 +301,7 @@ private:
     /// Source file name.
     mutable String fileName_;
     /// Required package files for networking.
-    Vector<SharedPtr<PackageFile> > requiredPackageFiles_;
+    Vector<SharedPtr<PackageFile>> requiredPackageFiles_;
     /// Registered node user variable reverse mappings.
     HashMap<StringHash, String> varNames_;
     /// Nodes to check for attribute changes on the next network update.
@@ -305,7 +309,7 @@ private:
     /// Components to check for attribute changes on the next network update.
     HashSet<unsigned> networkUpdateComponents_;
     /// Delayed dirty notification queue for components.
-    PODVector<Component*> delayedDirtyComponents_;
+    Vector<Component*> delayedDirtyComponents_;
     /// Mutex for the delayed dirty notification queue.
     Mutex sceneMutex_;
     /// Preallocated event data map for smoothing update events.
@@ -339,6 +343,7 @@ private:
 };
 
 /// Register Scene library objects.
+/// @nobind
 void URHO3D_API RegisterSceneLibrary(Context* context);
 
 }

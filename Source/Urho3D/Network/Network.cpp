@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
@@ -38,10 +19,10 @@
 #include "../Network/Protocol.h"
 #include "../Scene/Scene.h"
 
-#include <SLikeNet/MessageIdentifiers.h>
-#include <SLikeNet/NatPunchthroughClient.h>
-#include <SLikeNet/peerinterface.h>
-#include <SLikeNet/statistics.h>
+#include <slikenet/MessageIdentifiers.h>
+#include <slikenet/NatPunchthroughClient.h>
+#include <slikenet/peerinterface.h>
+#include <slikenet/statistics.h>
 
 #ifdef SendMessage
 #undef SendMessage
@@ -53,7 +34,7 @@ namespace Urho3D
 {
 
 static const char* RAKNET_MESSAGEID_STRINGS[] = {
-    "ID_CONNECTED_PING",  
+    "ID_CONNECTED_PING",
     "ID_UNCONNECTED_PING",
     "ID_UNCONNECTED_PING_OPEN_CONNECTIONS",
     "ID_CONNECTED_PONG",
@@ -300,15 +281,6 @@ void Network::HandleMessage(const SLNet::AddressOrGUID& source, int packetID, in
         MemoryBuffer msg(data, (unsigned)numBytes);
         if (connection->ProcessMessage((int)msgID, msg))
             return;
-
-        // If message was not handled internally, forward as an event
-        using namespace NetworkMessage;
-
-        VariantMap& eventData = GetEventDataMap();
-        eventData[P_CONNECTION] = connection;
-        eventData[P_MESSAGEID] = (int)msgID;
-        eventData[P_DATA].SetBuffer(msg.GetData(), msg.GetSize());
-        connection->SendEvent(E_NETWORKMESSAGE, eventData);
     }
     else
         URHO3D_LOGWARNING("Discarding message from unknown MessageConnection " + String(source.ToString()));
@@ -332,7 +304,7 @@ void Network::NewConnectionEstablished(const SLNet::AddressOrGUID& connection)
 void Network::ClientDisconnected(const SLNet::AddressOrGUID& connection)
 {
     // Remove the client connection that corresponds to this MessageConnection
-    HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Find(connection);
+    HashMap<SLNet::AddressOrGUID, SharedPtr<Connection>>::Iterator i = clientConnections_.Find(connection);
     if (i != clientConnections_.End())
     {
         Connection* connection = i->second_;
@@ -427,22 +399,22 @@ void Network::Disconnect(int waitMSec)
     serverConnection_->Disconnect(waitMSec);
 }
 
-bool Network::StartServer(unsigned short port)
+bool Network::StartServer(unsigned short port, unsigned int maxConnections)
 {
     if (IsServerRunning())
         return true;
 
     URHO3D_PROFILE(StartServer);
-    
+
     SLNet::SocketDescriptor socket;//(port, AF_INET);
     socket.port = port;
     socket.socketFamily = AF_INET;
     // Startup local connection with max 128 incoming connection(first param) and 1 socket description (third param)
-    SLNet::StartupResult startResult = rakPeer_->Startup(128, &socket, 1);
+    SLNet::StartupResult startResult = rakPeer_->Startup(maxConnections, &socket, 1);
     if (startResult == SLNet::RAKNET_STARTED)
     {
         URHO3D_LOGINFO("Started server on port " + String(port));
-        rakPeer_->SetMaximumIncomingConnections(128);
+        rakPeer_->SetMaximumIncomingConnections(maxConnections);
         isServer_ = true;
         rakPeer_->SetOccasionalPing(true);
         rakPeer_->SetUnreliableTimeout(1000);
@@ -527,18 +499,12 @@ void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const Vec
 void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes,
     unsigned contentID)
 {
-    if (!rakPeer_) 
+    if (!rakPeer_)
         return;
-    /* Make sure not to use SLikeNet(RakNet) internal message ID's
-     and since RakNet uses 1 byte message ID's, they cannot exceed 255 limit */
-    if (msgID < ID_USER_PACKET_ENUM || msgID >= 255)
-    {
-        URHO3D_LOGERROR("Can not send message with reserved ID");
-        return;
-    }
 
     VectorBuffer msgData;
-    msgData.WriteUByte((unsigned char)msgID);
+    msgData.WriteUByte((unsigned char)ID_USER_PACKET_ENUM);
+    msgData.WriteUInt((unsigned int)msgID);
     msgData.Write(data, numBytes);
 
     if (isServer_)
@@ -549,13 +515,13 @@ void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const uns
 
 void Network::BroadcastRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData)
 {
-    for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin(); i != clientConnections_.End(); ++i)
+    for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection>>::Iterator i = clientConnections_.Begin(); i != clientConnections_.End(); ++i)
         i->second_->SendRemoteEvent(eventType, inOrder, eventData);
 }
 
 void Network::BroadcastRemoteEvent(Scene* scene, StringHash eventType, bool inOrder, const VariantMap& eventData)
 {
-    for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
+    for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection>>::Iterator i = clientConnections_.Begin();
          i != clientConnections_.End(); ++i)
     {
         if (i->second_->GetScene() == scene)
@@ -577,7 +543,7 @@ void Network::BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrde
     }
 
     Scene* scene = node->GetScene();
-    for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
+    for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection>>::Iterator i = clientConnections_.Begin();
          i != clientConnections_.End(); ++i)
     {
         if (i->second_->GetScene() == scene)
@@ -643,7 +609,7 @@ void Network::SendPackageToClients(Scene* scene, PackageFile* package)
         return;
     }
 
-    for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
+    for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection>>::Iterator i = clientConnections_.Begin();
          i != clientConnections_.End(); ++i)
     {
         if (i->second_->GetScene() == scene)
@@ -672,7 +638,7 @@ Connection* Network::GetConnection(const SLNet::AddressOrGUID& connection) const
         return serverConnection_;
     else
     {
-        HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Find(connection);
+        HashMap<SLNet::AddressOrGUID, SharedPtr<Connection>>::ConstIterator i = clientConnections_.Find(connection);
         if (i != clientConnections_.End())
             return i->second_;
         else
@@ -685,10 +651,10 @@ Connection* Network::GetServerConnection() const
     return serverConnection_;
 }
 
-Vector<SharedPtr<Connection> > Network::GetClientConnections() const
+Vector<SharedPtr<Connection>> Network::GetClientConnections() const
 {
-    Vector<SharedPtr<Connection> > ret;
-    for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
+    Vector<SharedPtr<Connection>> ret;
+    for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection>>::ConstIterator i = clientConnections_.Begin();
          i != clientConnections_.End(); ++i)
         ret.Push(i->second_);
 
@@ -770,7 +736,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
         }
         else
         {
-            OnServerDisconnected();
+            OnServerDisconnected(packet->systemAddress);
         }
         packetHandled = true;
     }
@@ -782,7 +748,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
         }
         else
         {
-            OnServerDisconnected();
+            OnServerDisconnected(packet->systemAddress);
         }
         packetHandled = true;
     }
@@ -796,7 +762,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
 
             if (!isServer)
             {
-                OnServerDisconnected();
+                OnServerDisconnected(packet->systemAddress);
             }
         }
         packetHandled = true;
@@ -853,7 +819,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
         if (!isServer)
         {
             using namespace NetworkHostDiscovered;
-            
+
             dataStart += sizeof(SLNet::TimeMS);
             VariantMap& eventMap = context_->GetEventDataMap();
             if (packet->length > packet->length - dataStart) {
@@ -875,17 +841,20 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
     // Urho3D messages
     if (packetID >= ID_USER_PACKET_ENUM)
     {
+        unsigned int messageID = *(unsigned int*)(packet->data + dataStart);
+        dataStart += sizeof(unsigned int);
+
         if (isServer)
         {
-            HandleMessage(packet->systemAddress, 0, packetID, (const char*)(packet->data + dataStart), packet->length - dataStart);
+            HandleMessage(packet->systemAddress, 0, messageID, (const char*)(packet->data + dataStart), packet->length - dataStart);
         }
         else
         {
             MemoryBuffer buffer(packet->data + dataStart, packet->length - dataStart);
-            bool processed = serverConnection_->ProcessMessage(packetID, buffer);
+            bool processed = serverConnection_ && serverConnection_->ProcessMessage(messageID, buffer);
             if (!processed)
             {
-                HandleMessage(packet->systemAddress, 0, packetID, (const char*)(packet->data + dataStart), packet->length - dataStart);
+                HandleMessage(packet->systemAddress, 0, messageID, (const char*)(packet->data + dataStart), packet->length - dataStart);
             }
         }
         packetHandled = true;
@@ -943,7 +912,7 @@ void Network::PostUpdate(float timeStep)
                 URHO3D_PROFILE(PrepareServerUpdate);
 
                 networkScenes_.Clear();
-                for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
+                for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection>>::Iterator i = clientConnections_.Begin();
                      i != clientConnections_.End(); ++i)
                 {
                     Scene* scene = i->second_->GetScene();
@@ -959,12 +928,13 @@ void Network::PostUpdate(float timeStep)
                 URHO3D_PROFILE(SendServerUpdate);
 
                 // Then send server updates for each client connection
-                for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
+                for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection>>::Iterator i = clientConnections_.Begin();
                      i != clientConnections_.End(); ++i)
                 {
                     i->second_->SendServerUpdate();
                     i->second_->SendRemoteEvents();
                     i->second_->SendPackages();
+                    i->second_->SendAllBuffers();
                 }
             }
         }
@@ -974,6 +944,7 @@ void Network::PostUpdate(float timeStep)
             // Send the client update
             serverConnection_->SendClientUpdate();
             serverConnection_->SendRemoteEvents();
+            serverConnection_->SendAllBuffers();
         }
 
         // Notify that the update was sent
@@ -1009,8 +980,13 @@ void Network::OnServerConnected(const SLNet::AddressOrGUID& address)
     SendEvent(E_SERVERCONNECTED);
 }
 
-void Network::OnServerDisconnected()
+void Network::OnServerDisconnected(const SLNet::AddressOrGUID& address)
 {
+    if (natPunchServerAddress_ && *natPunchServerAddress_ == address.systemAddress) {
+        SendEvent(E_NATMASTERDISCONNECTED);
+        return;
+    }
+
     // Differentiate between failed connection, and disconnection
     bool failedConnect = serverConnection_ && serverConnection_->IsConnectPending();
     serverConnection_.Reset();
@@ -1032,7 +1008,7 @@ void Network::ConfigureNetworkSimulator()
     if (serverConnection_)
         serverConnection_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
 
-    for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
+    for (HashMap<SLNet::AddressOrGUID, SharedPtr<Connection>>::Iterator i = clientConnections_.Begin();
          i != clientConnections_.End(); ++i)
         i->second_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
 }

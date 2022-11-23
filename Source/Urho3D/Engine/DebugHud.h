@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #pragma once
 
@@ -55,14 +36,19 @@ public:
     /// Update. Called by HandlePostUpdate().
     void Update();
     /// Set UI elements' style from an XML file.
+    /// @property
     void SetDefaultStyle(XMLFile* style);
     /// Set elements to show.
+    /// @property
     void SetMode(unsigned mode);
     /// Set maximum profiler block depth, default unlimited.
+    /// @property
     void SetProfilerMaxDepth(unsigned depth);
     /// Set profiler accumulation interval in seconds.
+    /// @property
     void SetProfilerInterval(float interval);
     /// Set whether to show 3D geometry primitive/batch count only. Default false.
+    /// @property
     void SetUseRendererStats(bool enable);
     /// Toggle elements.
     void Toggle(unsigned mode);
@@ -70,30 +56,39 @@ public:
     void ToggleAll();
 
     /// Return the UI style file.
+    /// @property
     XMLFile* GetDefaultStyle() const;
 
     /// Return rendering stats text.
+    /// @property
     Text* GetStatsText() const { return statsText_; }
 
     /// Return rendering mode text.
+    /// @property
     Text* GetModeText() const { return modeText_; }
 
     /// Return profiler text.
+    /// @property
     Text* GetProfilerText() const { return profilerText_; }
 
     /// Return memory text.
+    /// @property
     Text* GetMemoryText() const { return memoryText_; }
 
     /// Return currently shown elements.
+    /// @property
     unsigned GetMode() const { return mode_; }
 
     /// Return maximum profiler block depth.
+    /// @property
     unsigned GetProfilerMaxDepth() const { return profilerMaxDepth_; }
 
-    /// Return profiler accumulation interval in seconds
+    /// Return profiler accumulation interval in seconds.
+    /// @property
     float GetProfilerInterval() const;
 
     /// Return whether showing 3D geometry primitive/batch count only.
+    /// @property
     bool GetUseRendererStats() const { return useRendererStats_; }
 
     /// Set application-specific stats.
