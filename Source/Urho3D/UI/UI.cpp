@@ -1,47 +1,28 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
+#include "../Container/Sort.h"
 #include "../Core/Context.h"
 #include "../Core/CoreEvents.h"
 #include "../Core/Profiler.h"
-#include "../Container/Sort.h"
+#include "../Graphics/Camera.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/GraphicsEvents.h"
-#include "../Graphics/Shader.h"
-#include "../Graphics/ShaderVariation.h"
-#include "../Graphics/Texture2D.h"
-#include "../Graphics/VertexBuffer.h"
 #include "../Graphics/Octree.h"
-#include "../Graphics/Viewport.h"
-#include "../Graphics/Camera.h"
 #include "../Graphics/Technique.h"
-#include "../Scene/Scene.h"
+#include "../Graphics/Viewport.h"
+#include "../GraphicsAPI/Shader.h"
+#include "../GraphicsAPI/ShaderVariation.h"
+#include "../GraphicsAPI/Texture2D.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #include "../Input/Input.h"
 #include "../Input/InputEvents.h"
 #include "../IO/Log.h"
 #include "../Math/Matrix3x4.h"
 #include "../Resource/ResourceCache.h"
+#include "../Scene/Scene.h"
 #include "../UI/CheckBox.h"
 #include "../UI/Cursor.h"
 #include "../UI/DropDownList.h"
@@ -58,10 +39,10 @@
 #include "../UI/Text3D.h"
 #include "../UI/ToolTip.h"
 #include "../UI/UI.h"
-#include "../UI/UIEvents.h"
-#include "../UI/Window.h"
-#include "../UI/View3D.h"
 #include "../UI/UIComponent.h"
+#include "../UI/UIEvents.h"
+#include "../UI/View3D.h"
+#include "../UI/Window.h"
 
 #include <cassert>
 #include <SDL/SDL.h>
@@ -144,6 +125,9 @@ UI::UI(Context* context) :
     SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(UI, HandleKeyDown));
     SubscribeToEvent(E_TEXTINPUT, URHO3D_HANDLER(UI, HandleTextInput));
     SubscribeToEvent(E_DROPFILE, URHO3D_HANDLER(UI, HandleDropFile));
+    SubscribeToEvent(E_JOYSTICKBUTTONDOWN, URHO3D_HANDLER(UI, HandleJoystickButtonDown));
+    SubscribeToEvent(E_JOYSTICKAXISMOVE, URHO3D_HANDLER(UI, HandleJoystickAxisMove));
+    
 
     // Try to initialize right now, but skip if screen mode is not yet set
     Initialize();
@@ -360,7 +344,7 @@ void UI::Update(float timeStep)
                     dragElement->OnDragBegin(dragElement->ScreenToElement(beginSendPos), beginSendPos, dragData->dragButtons,
                         qualifiers_, cursor_);
                 else
-                    dragElement->OnDragBegin(dragElement->ScreenToElement(beginSendPos), beginSendPos, dragData->dragButtons, 0, nullptr);
+                    dragElement->OnDragBegin(dragElement->ScreenToElement(beginSendPos), beginSendPos, dragData->dragButtons, QUAL_NONE, nullptr);
 
                 SendDragOrHoverEvent(E_DRAGBEGIN, dragElement, beginSendPos, IntVector2::ZERO, dragData);
             }
@@ -382,8 +366,7 @@ void UI::Update(float timeStep)
     {
         TouchState* touch = input->GetTouch(i);
         IntVector2 touchPos = touch->position_;
-        touchPos.x_ = (int)(touchPos.x_ / uiScale_);
-        touchPos.y_ = (int)(touchPos.y_ / uiScale_);
+        touchPos = ConvertSystemToUI(touchPos);
         ProcessHover(touchPos, MakeTouchIDMask(touch->touchID_), QUAL_NONE, nullptr);
     }
 
@@ -768,7 +751,10 @@ void UI::SetCustomSize(int width, int height)
 
 IntVector2 UI::GetCursorPosition() const
 {
-    return cursor_ ? cursor_->GetPosition() : GetSubsystem<Input>()->GetMousePosition();
+    if (cursor_)
+        return cursor_->GetPosition();
+
+    return ConvertSystemToUI(GetSubsystem<Input>()->GetMousePosition());
 }
 
 UIElement* UI::GetElementAt(const IntVector2& position, bool enabledOnly, IntVector2* elementScreenPosition)
@@ -846,23 +832,33 @@ UIElement* UI::GetElementAt(int x, int y, bool enabledOnly)
     return GetElementAt(IntVector2(x, y), enabledOnly);
 }
 
+IntVector2 UI::ConvertSystemToUI(const IntVector2& systemPos) const
+{
+    return VectorFloorToInt(static_cast<Vector2>(systemPos) / GetScale());
+}
+
+IntVector2 UI::ConvertUIToSystem(const IntVector2& uiPos) const
+{
+    return VectorFloorToInt(static_cast<Vector2>(uiPos) * GetScale());
+}
+
 UIElement* UI::GetFrontElement() const
 {
-    const Vector<SharedPtr<UIElement> >& rootChildren = rootElement_->GetChildren();
+    const Vector<SharedPtr<UIElement>>& rootChildren = rootElement_->GetChildren();
     int maxPriority = M_MIN_INT;
     UIElement* front = nullptr;
 
-    for (unsigned i = 0; i < rootChildren.Size(); ++i)
+    for (const SharedPtr<UIElement>& rootChild : rootChildren)
     {
         // Do not take into account input-disabled elements, hidden elements or those that are always in the front
-        if (!rootChildren[i]->IsEnabled() || !rootChildren[i]->IsVisible() || !rootChildren[i]->GetBringToBack())
+        if (!rootChild->IsEnabled() || !rootChild->IsVisible() || !rootChild->GetBringToBack())
             continue;
 
-        int priority = rootChildren[i]->GetPriority();
+        int priority = rootChild->GetPriority();
         if (priority > maxPriority)
         {
             maxPriority = priority;
-            front = rootChildren[i];
+            front = rootChild;
         }
     }
 
@@ -958,27 +954,27 @@ void UI::Update(float timeStep, UIElement* element)
     if (elementWeak.Expired())
         return;
 
-    const Vector<SharedPtr<UIElement> >& children = element->GetChildren();
+    const Vector<SharedPtr<UIElement>>& children = element->GetChildren();
     // Update of an element may modify its child vector. Use just index-based iteration to be safe
-    for (unsigned i = 0; i < children.Size(); ++i)
-        Update(timeStep, children[i]);
+    for (const SharedPtr<UIElement>& child : children)
+        Update(timeStep, child);
 }
 
-void UI::SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData)
+void UI::SetVertexData(VertexBuffer* dest, const Vector<float>& vertexData)
 {
     if (vertexData.Empty())
         return;
 
     // Update quad geometry into the vertex buffer
     // Resize the vertex buffer first if too small or much too large
-    unsigned numVertices = vertexData.Size() / UI_VERTEX_SIZE;
+    i32 numVertices = vertexData.Size() / UI_VERTEX_SIZE;
     if (dest->GetVertexCount() < numVertices || dest->GetVertexCount() > numVertices * 2)
         dest->SetSize(numVertices, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1, true);
 
     dest->SetData(&vertexData[0]);
 }
 
-void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd)
+void UI::Render(VertexBuffer* buffer, const Vector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd)
 {
     // Engine does not render when window is closed or device is lost
     assert(graphics_ && graphics_->IsInitialized() && !graphics_->IsDeviceLost());
@@ -993,14 +989,12 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
     Vector2 scale(2.0f * invScreenSize.x_, -2.0f * invScreenSize.y_);
     Vector2 offset(-1.0f, 1.0f);
 
-    if (surface)
+    if (Graphics::GetGAPI() == GAPI_OPENGL && surface)
     {
-#ifdef URHO3D_OPENGL
         // On OpenGL, flip the projection if rendering to a texture so that the texture can be addressed in the
         // same way as a render texture produced on Direct3D.
         offset.y_ = -offset.y_;
         scale.y_ = -scale.y_;
-#endif
     }
 
     Matrix4 projection(Matrix4::IDENTITY);
@@ -1014,13 +1008,13 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
 
     graphics_->ClearParameterSources();
     graphics_->SetColorWrite(true);
-#ifdef URHO3D_OPENGL
+
     // Reverse winding if rendering to texture on OpenGL
-    if (surface)
+    if (Graphics::GetGAPI() == GAPI_OPENGL && surface)
         graphics_->SetCullMode(CULL_CW);
     else
-#endif
         graphics_->SetCullMode(CULL_CCW);
+
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(false);
     graphics_->SetFillMode(FILL_SOLID);
@@ -1044,7 +1038,7 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
         ShaderVariation* ps;
         ShaderVariation* vs;
 
-        if (!batch.custom_material_)
+        if (!batch.customMaterial_)
         {
             if (!batch.texture_)
             {
@@ -1067,7 +1061,7 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
             vs = diffTextureVS;
             ps = diffTexturePS;
 
-            Technique* technique = batch.custom_material_->GetTechnique(0);
+            Technique* technique = batch.customMaterial_->GetTechnique(0);
             if (technique)
             {
                 Pass* pass = nullptr;
@@ -1076,8 +1070,8 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
                     pass = technique->GetPass(i);
                     if (pass)
                     {
-                        vs = graphics_->GetShader(VS, pass->GetVertexShader(), batch.custom_material_->GetVertexShaderDefines());
-                        ps = graphics_->GetShader(PS, pass->GetPixelShader(), batch.custom_material_->GetPixelShaderDefines());
+                        vs = graphics_->GetShader(VS, pass->GetVertexShader(), batch.customMaterial_->GetVertexShaderDefines());
+                        ps = graphics_->GetShader(PS, pass->GetPixelShader(), batch.customMaterial_->GetPixelShaderDefines());
                         break;
                     }
                 }
@@ -1103,34 +1097,32 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
         scissor.bottom_ = (int)(scissor.bottom_ * uiScale_);
 
         // Flip scissor vertically if using OpenGL texture rendering
-#ifdef URHO3D_OPENGL
-        if (surface)
+        if (Graphics::GetGAPI() == GAPI_OPENGL && surface)
         {
             int top = scissor.top_;
             int bottom = scissor.bottom_;
             scissor.top_ = viewSize.y_ - bottom;
             scissor.bottom_ = viewSize.y_ - top;
         }
-#endif
 
         graphics_->SetBlendMode(batch.blendMode_);
         graphics_->SetScissorTest(true, scissor);
-        if (!batch.custom_material_)
+        if (!batch.customMaterial_)
         {
             graphics_->SetTexture(0, batch.texture_);
         } else
         {
             // Update custom shader parameters if needed
-            if (graphics_->NeedParameterUpdate(SP_MATERIAL, reinterpret_cast<const void*>(batch.custom_material_->GetShaderParameterHash())))
+            if (graphics_->NeedParameterUpdate(SP_MATERIAL, reinterpret_cast<const void*>(batch.customMaterial_->GetShaderParameterHash())))
             {
-                auto shader_parameters = batch.custom_material_->GetShaderParameters();
+                auto shader_parameters = batch.customMaterial_->GetShaderParameters();
                 for (auto it = shader_parameters.Begin(); it != shader_parameters.End(); ++it)
                 {
                     graphics_->SetShaderParameter(it->second_.name_, it->second_.value_);
                 }
             }
             // Apply custom shader textures
-            auto textures = batch.custom_material_->GetTextures();
+            auto textures = batch.customMaterial_->GetTextures();
             for (auto it = textures.Begin(); it != textures.End(); ++it)
             {
                 graphics_->SetTexture(it->first_, it->second_);
@@ -1140,10 +1132,10 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
         graphics_->Draw(TRIANGLE_LIST, batch.vertexStart_ / UI_VERTEX_SIZE,
             (batch.vertexEnd_ - batch.vertexStart_) / UI_VERTEX_SIZE);
 
-        if (batch.custom_material_)
+        if (batch.customMaterial_)
         {
             // Reset textures used by the batch custom material
-            auto textures = batch.custom_material_->GetTextures();
+            auto textures = batch.customMaterial_->GetTextures();
             for (auto it = textures.Begin(); it != textures.End(); ++it)
             {
                 graphics_->SetTexture(it->first_, 0);
@@ -1152,7 +1144,7 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
     }
 }
 
-void UI::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, UIElement* element, IntRect currentScissor)
+void UI::GetBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, UIElement* element, IntRect currentScissor)
 {
     // Set clipping scissor for child elements. No need to draw if zero size
     element->AdjustScissor(currentScissor);
@@ -1160,16 +1152,16 @@ void UI::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, U
         return;
 
     element->SortChildren();
-    const Vector<SharedPtr<UIElement> >& children = element->GetChildren();
+    const Vector<SharedPtr<UIElement>>& children = element->GetChildren();
     if (children.Empty())
         return;
 
     // For non-root elements draw all children of same priority before recursing into their children: assumption is that they have
     // same renderstate
-    Vector<SharedPtr<UIElement> >::ConstIterator i = children.Begin();
+    Vector<SharedPtr<UIElement>>::ConstIterator i = children.Begin();
     if (element->GetTraversalMode() == TM_BREADTH_FIRST)
     {
-        Vector<SharedPtr<UIElement> >::ConstIterator j = i;
+        Vector<SharedPtr<UIElement>>::ConstIterator j = i;
         while (i != children.End())
         {
             int currentPriority = (*i)->GetPriority();
@@ -1211,7 +1203,7 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
         return;
 
     current->SortChildren();
-    const Vector<SharedPtr<UIElement> >& children = current->GetChildren();
+    const Vector<SharedPtr<UIElement>>& children = current->GetChildren();
     LayoutMode parentLayoutMode = current->GetLayoutMode();
 
     for (unsigned i = 0; i < children.Size(); ++i)
@@ -1302,15 +1294,18 @@ void UI::GetCursorPositionAndVisible(IntVector2& pos, bool& visible)
     else
     {
         auto* input = GetSubsystem<Input>();
-        pos = input->GetMousePosition();
         visible = input->IsMouseVisible();
 
         if (!visible && cursor_)
+        {
             pos = cursor_->GetPosition();
+        }
+        else
+        {
+            pos = input->GetMousePosition();
+            pos = ConvertSystemToUI(pos);
+        }
     }
-
-    pos.x_ = (int)(pos.x_ / uiScale_);
-    pos.y_ = (int)(pos.y_ / uiScale_);
 }
 
 void UI::SetCursorShape(CursorShape shape)
@@ -1323,11 +1318,11 @@ void UI::ReleaseFontFaces()
 {
     URHO3D_LOGDEBUG("Reloading font faces");
 
-    PODVector<Font*> fonts;
+    Vector<Font*> fonts;
     GetSubsystem<ResourceCache>()->GetResources<Font>(fonts);
 
-    for (unsigned i = 0; i < fonts.Size(); ++i)
-        fonts[i]->ReleaseFaces();
+    for (Font* font : fonts)
+        font->ReleaseFaces();
 }
 
 void UI::ProcessHover(const IntVector2& windowCursorPos, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor)
@@ -1472,7 +1467,7 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, MouseButton button
                 dragData->dragBeginSumPos = cursorPos;
                 dragData->dragBeginTimer.Reset();
                 dragData->dragButtons = button;
-                dragData->numDragButtons = CountSetBits((unsigned)dragData->dragButtons);
+                dragData->numDragButtons = CountSetBits((u32)dragData->dragButtons);
                 dragElementsCount_++;
 
                 dragElementsContain = dragElements_.Contains(element);
@@ -1483,7 +1478,7 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, MouseButton button
                 dragData->sumPos += cursorPos;
                 dragData->dragBeginSumPos += cursorPos;
                 dragData->dragButtons |= button;
-                dragData->numDragButtons = CountSetBits((unsigned)dragData->dragButtons);
+                dragData->numDragButtons = CountSetBits((u32)dragData->dragButtons);
             }
         }
         else
@@ -1790,20 +1785,20 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
     const IntVector2& rootSize = rootElement_->GetSize();
     const IntVector2& rootPos = rootElement_->GetPosition();
 
-    IntVector2 DeltaP = IntVector2(eventData[P_DX].GetInt(), eventData[P_DY].GetInt());
+    const IntVector2 mouseDeltaPos{ eventData[P_DX].GetInt(), eventData[P_DY].GetInt() };
+    const IntVector2 mousePos{ eventData[P_X].GetInt(), eventData[P_Y].GetInt() };
 
     if (cursor_)
     {
         if (!input->IsMouseVisible())
         {
             if (!input->IsMouseLocked())
-                cursor_->SetPosition(IntVector2(eventData[P_X].GetInt(), eventData[P_Y].GetInt()));
+                cursor_->SetPosition(ConvertSystemToUI(mousePos));
             else if (cursor_->IsVisible())
             {
                 // Relative mouse motion: move cursor only when visible
                 IntVector2 pos = cursor_->GetPosition();
-                pos.x_ += eventData[P_DX].GetInt();
-                pos.y_ += eventData[P_DY].GetInt();
+                pos += ConvertSystemToUI(mouseDeltaPos);
                 pos.x_ = Clamp(pos.x_, rootPos.x_, rootPos.x_ + rootSize.x_ - 1);
                 pos.y_ = Clamp(pos.y_, rootPos.y_, rootPos.y_ + rootSize.y_ - 1);
                 cursor_->SetPosition(pos);
@@ -1812,7 +1807,7 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
         else
         {
             // Absolute mouse motion: move always
-            cursor_->SetPosition(IntVector2(eventData[P_X].GetInt(), eventData[P_Y].GetInt()));
+            cursor_->SetPosition(ConvertSystemToUI(mousePos));
         }
     }
 
@@ -1820,7 +1815,7 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
 
-    ProcessMove(cursorPos, DeltaP, mouseButtons_, qualifiers_, cursor_, cursorVisible);
+    ProcessMove(cursorPos, mouseDeltaPos, mouseButtons_, qualifiers_, cursor_, cursorVisible);
 }
 
 void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
@@ -1876,8 +1871,7 @@ void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
     using namespace TouchBegin;
 
     IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
-    pos.x_ = int(pos.x_ / uiScale_);
-    pos.y_ = int(pos.y_ / uiScale_);
+    pos = ConvertSystemToUI(pos);
     usingTouchInput_ = true;
 
     const MouseButton touchId = MakeTouchIDMask(eventData[P_TOUCHID].GetInt());
@@ -1897,8 +1891,7 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
     using namespace TouchEnd;
 
     IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
-    pos.x_ = int(pos.x_ / uiScale_);
-    pos.y_ = int(pos.y_ / uiScale_);
+    pos = ConvertSystemToUI(pos);
 
     // Get the touch index
     const MouseButton touchId = MakeTouchIDMask(eventData[P_TOUCHID].GetInt());
@@ -1917,7 +1910,7 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
     }
 
     if (element && element->IsEnabled())
-        element->OnHover(element->ScreenToElement(pos), pos, 0, 0, nullptr);
+        element->OnHover(element->ScreenToElement(pos), pos, MOUSEB_NONE, QUAL_NONE, nullptr);
 
     ProcessClickEnd(pos, touchId, MOUSEB_NONE, QUAL_NONE, nullptr, true);
 }
@@ -1928,10 +1921,8 @@ void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
 
     IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
     IntVector2 deltaPos(eventData[P_DX].GetInt(), eventData[P_DY].GetInt());
-    pos.x_ = int(pos.x_ / uiScale_);
-    pos.y_ = int(pos.y_ / uiScale_);
-    deltaPos.x_ = int(deltaPos.x_ / uiScale_);
-    deltaPos.y_ = int(deltaPos.y_ / uiScale_);
+    pos = ConvertSystemToUI(pos);
+    deltaPos = ConvertSystemToUI(deltaPos);
     usingTouchInput_ = true;
 
     const MouseButton touchId = MakeTouchIDMask(eventData[P_TOUCHID].GetInt());
@@ -1977,40 +1968,39 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     if (element)
     {
         // Switch focus between focusable elements in the same top level window
-        if (key == KEY_TAB)
-        {
-            UIElement* topLevel = element->GetParent();
-            while (topLevel && topLevel->GetParent() != rootElement_ && topLevel->GetParent() != rootModalElement_)
-                topLevel = topLevel->GetParent();
-            if (topLevel)
-            {
-                topLevel->GetChildren(tempElements_, true);
-                for (PODVector<UIElement*>::Iterator i = tempElements_.Begin(); i != tempElements_.End();)
-                {
-                    if ((*i)->GetFocusMode() < FM_FOCUSABLE)
-                        i = tempElements_.Erase(i);
-                    else
-                        ++i;
-                }
-                for (unsigned i = 0; i < tempElements_.Size(); ++i)
-                {
-                    if (tempElements_[i] == element)
-                    {
-                        int dir = (qualifiers_ & QUAL_SHIFT) ? -1 : 1;
-                        unsigned nextIndex = (tempElements_.Size() + i + dir) % tempElements_.Size();
-                        UIElement* next = tempElements_[nextIndex];
-                        SetFocusElement(next, true);
-                        return;
-                    }
-                }
-            }
-        }
+        if (key == KEY_TAB || (element->GetType() == Button::GetTypeStatic() && (key == KEY_LEFT || key == KEY_RIGHT || key == KEY_DOWN || key == KEY_UP)))
+            SwitchFocusElement(key == KEY_TAB ? ((qualifiers_ & QUAL_SHIFT) ? -1 : 1) : key == KEY_DOWN || key == KEY_RIGHT ? 1 : -1);
         // Defocus the element
         else if (key == KEY_ESCAPE && element->GetFocusMode() == FM_FOCUSABLE_DEFOCUSABLE)
             element->SetFocus(false);
         // If none of the special keys, pass the key to the focused element
         else
             element->OnKey(key, mouseButtons_, qualifiers_);
+    }
+}
+
+void UI::HandleJoystickButtonDown(StringHash eventType, VariantMap& eventData) {
+    if (!focusElement_ || focusElement_->GetType() != Button::GetTypeStatic())
+        return;
+    int key = eventData[JoystickButtonDown::P_BUTTON].GetInt();
+    if (key == CONTROLLER_BUTTON_DPAD_DOWN || key == CONTROLLER_BUTTON_DPAD_RIGHT)
+        SwitchFocusElement(1);
+    else if (key == CONTROLLER_BUTTON_DPAD_UP || key == CONTROLLER_BUTTON_DPAD_LEFT)
+        SwitchFocusElement(-1);
+    else if (key == CONTROLLER_BUTTON_A)
+        focusElement_->OnKey(KEY_RETURN, MOUSEB_NONE, QUAL_NONE);
+}
+
+void UI::HandleJoystickAxisMove(StringHash eventType, VariantMap& eventData) {
+    if (!focusElement_ || focusElement_->GetType() != Button::GetTypeStatic())
+        return;
+    int key = eventData[JoystickAxisMove::P_AXIS].GetInt();
+    if (key == CONTROLLER_AXIS_LEFTX || key == CONTROLLER_AXIS_LEFTY) {
+        float pos = eventData[JoystickAxisMove::P_POSITION].GetFloat();
+        if (pos > 0.8)
+            SwitchFocusElement(1);
+        else if (pos < -0.8)
+            SwitchFocusElement(-1);
     }
 }
 
@@ -2051,8 +2041,7 @@ void UI::HandleDropFile(StringHash eventType, VariantMap& eventData)
     if (input->IsMouseVisible())
     {
         IntVector2 screenPos = input->GetMousePosition();
-        screenPos.x_ = int(screenPos.x_ / uiScale_);
-        screenPos.y_ = int(screenPos.y_ / uiScale_);
+        screenPos = ConvertSystemToUI(screenPos);
 
         UIElement* element = GetElementAt(screenPos);
 
@@ -2138,8 +2127,8 @@ IntVector2 UI::SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSe
                 if (!ts)
                     break;
                 IntVector2 pos = ts->position_;
-                dragData->sumPos.x_ += (int)(pos.x_ / uiScale_);
-                dragData->sumPos.y_ += (int)(pos.y_ / uiScale_);
+                pos = ConvertSystemToUI(pos);
+                dragData->sumPos += pos;
             }
         }
         sendPos.x_ = dragData->sumPos.x_ / dragData->numDragButtons;
@@ -2169,6 +2158,29 @@ IntVector2 UI::GetEffectiveRootElementSize(bool applyScale) const
     }
 
     return size;
+}
+
+void UI::SwitchFocusElement(int dir) {
+    UIElement* topLevel = focusElement_ ->GetParent();
+    while (topLevel && topLevel->GetParent() != rootElement_ && topLevel->GetParent() != rootModalElement_)
+        topLevel = topLevel->GetParent();
+    if (topLevel) {
+        topLevel->GetChildren(tempElements_, true);
+        for (Vector<UIElement*>::Iterator i = tempElements_.Begin(); i != tempElements_.End();) {
+            if ((*i)->GetFocusMode() < FM_FOCUSABLE || !(*i)->IsVisible())
+                i = tempElements_.Erase(i);
+            else
+                ++i;
+        }
+        for (unsigned i = 0; i < tempElements_.Size(); ++i) {
+            if (tempElements_[i] == focusElement_) {
+                unsigned nextIndex = (tempElements_.Size() + i + dir) % tempElements_.Size();
+                UIElement* next = tempElements_[nextIndex];
+                SetFocusElement(next, true);
+                return;
+            }
+        }
+    }
 }
 
 void UI::SetElementRenderTexture(UIElement* element, Texture2D* texture)

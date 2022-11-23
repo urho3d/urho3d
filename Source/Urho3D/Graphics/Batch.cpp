@@ -1,39 +1,20 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../Precompiled.h"
 
 #include "../Graphics/Camera.h"
 #include "../Graphics/Geometry.h"
 #include "../Graphics/Graphics.h"
-#include "../Graphics/GraphicsImpl.h"
-#include "../Graphics/GraphicsDefs.h"
+#include "../GraphicsAPI/GraphicsDefs.h"
 #include "../Graphics/Material.h"
 #include "../Graphics/Renderer.h"
-#include "../Graphics/ShaderVariation.h"
 #include "../Graphics/Technique.h"
-#include "../Graphics/Texture2D.h"
-#include "../Graphics/VertexBuffer.h"
 #include "../Graphics/View.h"
+#include "../GraphicsAPI/GraphicsImpl.h"
+#include "../GraphicsAPI/ShaderVariation.h"
+#include "../GraphicsAPI/Texture2D.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #include "../Scene/Scene.h"
 
 #include "../DebugNew.h"
@@ -114,13 +95,16 @@ void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split
     offset.x_ += scale.x_ + pixelUVOffset.x_ / width;
     offset.y_ += scale.y_ + pixelUVOffset.y_ / height;
 
-#ifdef URHO3D_OPENGL
-    offset.z_ = 0.5f;
-    scale.z_ = 0.5f;
-    offset.y_ = 1.0f - offset.y_;
-#else
-    scale.y_ = -scale.y_;
-#endif
+    if (Graphics::GetGAPI() == GAPI_OPENGL)
+    {
+        offset.z_ = 0.5f;
+        scale.z_ = 0.5f;
+        offset.y_ = 1.0f - offset.y_;
+    }
+    else
+    {
+        scale.y_ = -scale.y_;
+    }
 
     // If using 4 shadow samples, offset the position diagonally by half pixel
     if (renderer->GetShadowQuality() == SHADOWQUALITY_PCF_16BIT || renderer->GetShadowQuality() == SHADOWQUALITY_PCF_24BIT)
@@ -149,13 +133,16 @@ void CalculateSpotMatrix(Matrix4& dest, Light* light)
     spotProj.m22_ = 1.0f / Max(light->GetRange(), M_EPSILON);
     spotProj.m32_ = 1.0f;
 
-#ifdef URHO3D_OPENGL
-    texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.5f));
-    texAdjust.SetScale(Vector3(0.5f, -0.5f, 0.5f));
-#else
-    texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.0f));
-    texAdjust.SetScale(Vector3(0.5f, -0.5f, 1.0f));
-#endif
+    if (Graphics::GetGAPI() == GAPI_OPENGL)
+    {
+        texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.5f));
+        texAdjust.SetScale(Vector3(0.5f, -0.5f, 0.5f));
+    }
+    else
+    {
+        texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.0f));
+        texAdjust.SetScale(Vector3(0.5f, -0.5f, 1.0f));
+    }
 
     dest = texAdjust * spotProj * spotView;
 }
@@ -353,11 +340,10 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                         Matrix4 lightVecRot(lightNode->GetWorldRotation().RotationMatrix());
                         // HLSL compiler will pack the parameters as if the matrix is only 3x4, so must be careful to not overwrite
                         // the next parameter
-#ifdef URHO3D_OPENGL
-                        graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.Data(), 16);
-#else
-                        graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.Data(), 12);
-#endif
+                        if (Graphics::GetGAPI() == GAPI_OPENGL)
+                            graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.Data(), 16);
+                        else
+                            graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.Data(), 12);
                     }
                     break;
                 }
@@ -413,11 +399,10 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                         Matrix4 lightVecRot(lightNode->GetWorldRotation().RotationMatrix());
                         // HLSL compiler will pack the parameters as if the matrix is only 3x4, so must be careful to not overwrite
                         // the next parameter
-#ifdef URHO3D_OPENGL
-                        graphics->SetShaderParameter(PSP_LIGHTMATRICES, lightVecRot.Data(), 16);
-#else
-                        graphics->SetShaderParameter(PSP_LIGHTMATRICES, lightVecRot.Data(), 12);
-#endif
+                        if (Graphics::GetGAPI() == GAPI_OPENGL)
+                            graphics->SetShaderParameter(PSP_LIGHTMATRICES, lightVecRot.Data(), 16);
+                        else
+                            graphics->SetShaderParameter(PSP_LIGHTMATRICES, lightVecRot.Data(), 12);
                     }
                     break;
                 }
@@ -432,17 +417,23 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                     auto faceHeight = (unsigned)(shadowMap->GetHeight() / 3);
                     auto width = (float)shadowMap->GetWidth();
                     auto height = (float)shadowMap->GetHeight();
-#ifdef URHO3D_OPENGL
-                    float mulX = (float)(faceWidth - 3) / width;
-                    float mulY = (float)(faceHeight - 3) / height;
-                    float addX = 1.5f / width;
-                    float addY = 1.5f / height;
-#else
-                    float mulX = (float)(faceWidth - 4) / width;
-                    float mulY = (float)(faceHeight - 4) / height;
-                    float addX = 2.5f / width;
-                    float addY = 2.5f / height;
-#endif
+
+                    float mulX, mulY, addX, addY;
+                    if (Graphics::GetGAPI() == GAPI_OPENGL)
+                    {
+                        mulX = (float)(faceWidth - 3) / width;
+                        mulY = (float)(faceHeight - 3) / height;
+                        addX = 1.5f / width;
+                        addY = 1.5f / height;
+                    }
+                    else
+                    {
+                        mulX = (float)(faceWidth - 4) / width;
+                        mulY = (float)(faceHeight - 4) / height;
+                        addX = 2.5f / width;
+                        addY = 2.5f / height;
+                    }
+
                     // If using 4 shadow samples, offset the position diagonally by half pixel
                     if (renderer->GetShadowQuality() == SHADOWQUALITY_PCF_16BIT || renderer->GetShadowQuality() == SHADOWQUALITY_PCF_24BIT)
                     {
@@ -536,7 +527,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                  graphics->NeedParameterUpdate(SP_LIGHT, lightQueue_))
         {
             Vector4 vertexLights[MAX_VERTEX_LIGHTS * 3];
-            const PODVector<Light*>& lights = lightQueue_->vertexLights_;
+            const Vector<Light*>& lights = lightQueue_->vertexLights_;
 
             for (unsigned i = 0; i < lights.Size(); ++i)
             {
@@ -557,7 +548,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                 }
                 else
                 {
-                    cutoff = -1.0f;
+                    cutoff = -2.0f;
                     invCutoff = 1.0f;
                 }
 
@@ -604,8 +595,8 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                 graphics->SetShaderParameter(i->first_, i->second_.value_);
         }
 
-        const HashMap<TextureUnit, SharedPtr<Texture> >& textures = material_->GetTextures();
-        for (HashMap<TextureUnit, SharedPtr<Texture> >::ConstIterator i = textures.Begin(); i != textures.End(); ++i)
+        const HashMap<TextureUnit, SharedPtr<Texture>>& textures = material_->GetTextures();
+        for (HashMap<TextureUnit, SharedPtr<Texture>>::ConstIterator i = textures.Begin(); i != textures.End(); ++i)
         {
             if (graphics->HasTextureUnit(i->first_))
                 graphics->SetTexture(i->first_, i->second_.Get());
@@ -697,7 +688,7 @@ void BatchGroup::Draw(View* view, Camera* camera, bool allowDepthWrite) const
 
             // Get the geometry vertex buffers, then add the instancing stream buffer
             // Hack: use a const_cast to avoid dynamic allocation of new temp vectors
-            auto& vertexBuffers = const_cast<Vector<SharedPtr<VertexBuffer> >&>(
+            auto& vertexBuffers = const_cast<Vector<SharedPtr<VertexBuffer>>&>(
                 geometry_->GetVertexBuffers());
             vertexBuffers.Push(SharedPtr<VertexBuffer>(instanceBuffer));
 
@@ -765,7 +756,7 @@ void BatchQueue::SortFrontToBack()
         else
         {
             float minDistance = M_INFINITY;
-            for (PODVector<InstanceData>::ConstIterator j = i->second_.instances_.Begin(); j != i->second_.instances_.End(); ++j)
+            for (Vector<InstanceData>::ConstIterator j = i->second_.instances_.Begin(); j != i->second_.instances_.End(); ++j)
                 minDistance = Min(minDistance, j->distance_);
             i->second_.distance_ = minDistance;
         }
@@ -777,10 +768,10 @@ void BatchQueue::SortFrontToBack()
     for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
         sortedBatchGroups_[index++] = &i->second_;
 
-    SortFrontToBack2Pass(reinterpret_cast<PODVector<Batch*>& >(sortedBatchGroups_));
+    SortFrontToBack2Pass(reinterpret_cast<Vector<Batch*>& >(sortedBatchGroups_));
 }
 
-void BatchQueue::SortFrontToBack2Pass(PODVector<Batch*>& batches)
+void BatchQueue::SortFrontToBack2Pass(Vector<Batch*>& batches)
 {
     // Mobile devices likely use a tiled deferred approach, with which front-to-back sorting is irrelevant. The 2-pass
     // method is also time consuming, so just sort with state having priority
@@ -794,7 +785,7 @@ void BatchQueue::SortFrontToBack2Pass(PODVector<Batch*>& batches)
     unsigned short freeMaterialID = 0;
     unsigned short freeGeometryID = 0;
 
-    for (PODVector<Batch*>::Iterator i = batches.Begin(); i != batches.End(); ++i)
+    for (Vector<Batch*>::Iterator i = batches.Begin(); i != batches.End(); ++i)
     {
         Batch* batch = *i;
 
@@ -862,7 +853,7 @@ void BatchQueue::Draw(View* view, Camera* camera, bool markToStencil, bool using
     }
 
     // Instanced
-    for (PODVector<BatchGroup*>::ConstIterator i = sortedBatchGroups_.Begin(); i != sortedBatchGroups_.End(); ++i)
+    for (Vector<BatchGroup*>::ConstIterator i = sortedBatchGroups_.Begin(); i != sortedBatchGroups_.End(); ++i)
     {
         BatchGroup* group = *i;
         if (markToStencil)
@@ -871,7 +862,7 @@ void BatchQueue::Draw(View* view, Camera* camera, bool markToStencil, bool using
         group->Draw(view, camera, allowDepthWrite);
     }
     // Non-instanced
-    for (PODVector<Batch*>::ConstIterator i = sortedBatches_.Begin(); i != sortedBatches_.End(); ++i)
+    for (Vector<Batch*>::ConstIterator i = sortedBatches_.Begin(); i != sortedBatches_.End(); ++i)
     {
         Batch* batch = *i;
         if (markToStencil)

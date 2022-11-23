@@ -1,24 +1,5 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rightsR
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../../Precompiled.h"
 
@@ -26,11 +7,12 @@
 #include "../../Core/Profiler.h"
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/GraphicsEvents.h"
-#include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/Renderer.h"
-#include "../../Graphics/Texture2D.h"
+#include "../../GraphicsAPI/GraphicsImpl.h"
+#include "../../GraphicsAPI/Texture2D.h"
 #include "../../IO/FileSystem.h"
 #include "../../IO/Log.h"
+#include "../../IO/VectorBuffer.h"
 #include "../../Resource/ResourceCache.h"
 #include "../../Resource/XMLFile.h"
 
@@ -39,15 +21,18 @@
 namespace Urho3D
 {
 
-void Texture2D::OnDeviceLost()
+void Texture2D::OnDeviceLost_OGL()
 {
+    if (object_.name_ && !graphics_->IsDeviceLost())
+        glDeleteTextures(1, &object_.name_);
+
     GPUObject::OnDeviceLost();
 
     if (renderSurface_)
         renderSurface_->OnDeviceLost();
 }
 
-void Texture2D::OnDeviceReset()
+void Texture2D::OnDeviceReset_OGL()
 {
     if (!object_.name_ || dataPending_)
     {
@@ -58,7 +43,7 @@ void Texture2D::OnDeviceReset()
 
         if (!object_.name_)
         {
-            Create();
+            Create_OGL();
             dataLost_ = true;
         }
     }
@@ -66,7 +51,7 @@ void Texture2D::OnDeviceReset()
     dataPending_ = false;
 }
 
-void Texture2D::Release()
+void Texture2D::Release_OGL()
 {
     if (object_.name_)
     {
@@ -99,7 +84,7 @@ void Texture2D::Release()
     levelsDirty_ = false;
 }
 
-bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, const void* data)
+bool Texture2D::SetData_OGL(unsigned level, int x, int y, int width, int height, const void* data)
 {
     URHO3D_PROFILE(SetTextureData);
 
@@ -128,7 +113,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
         return true;
     }
 
-    if (IsCompressed())
+    if (IsCompressed_OGL())
     {
         x &= ~3u;
         y &= ~3u;
@@ -142,17 +127,17 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
         return false;
     }
 
-    graphics_->SetTextureForUpdate(this);
+    graphics_->SetTextureForUpdate_OGL(this);
 
     bool wholeLevel = x == 0 && y == 0 && width == levelWidth && height == levelHeight;
-    unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
+    unsigned format = GetSRGB() ? GetSRGBFormat_OGL(format_) : format_;
 
-    if (!IsCompressed())
+    if (!IsCompressed_OGL())
     {
         if (wholeLevel)
-            glTexImage2D(target_, level, format, width, height, 0, GetExternalFormat(format_), GetDataType(format_), data);
+            glTexImage2D(target_, level, format, width, height, 0, GetExternalFormat_OGL(format_), GetDataType_OGL(format_), data);
         else
-            glTexSubImage2D(target_, level, x, y, width, height, GetExternalFormat(format_), GetDataType(format_), data);
+            glTexSubImage2D(target_, level, x, y, width, height, GetExternalFormat_OGL(format_), GetDataType_OGL(format_), data);
     }
     else
     {
@@ -166,7 +151,12 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     return true;
 }
 
-bool Texture2D::SetData(Image* image, bool useAlpha)
+bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, const VectorBuffer& data)
+{
+    return SetData(level, x, y, width, height, data.GetBuffer().Buffer());
+}
+
+bool Texture2D::SetData_OGL(Image* image, bool useAlpha)
 {
     if (!image)
     {
@@ -232,7 +222,7 @@ bool Texture2D::SetData(Image* image, bool useAlpha)
         }
 
         // If image was previously compressed, reset number of requested levels to avoid error if level count is too high for new size
-        if (IsCompressed() && requestedLevels_ > 1)
+        if (IsCompressed_OGL() && requestedLevels_ > 1)
             requestedLevels_ = 0;
         SetSize(levelWidth, levelHeight, format);
         if (!object_.name_)
@@ -240,7 +230,7 @@ bool Texture2D::SetData(Image* image, bool useAlpha)
 
         for (unsigned i = 0; i < levels_; ++i)
         {
-            SetData(i, 0, 0, levelWidth, levelHeight, levelData);
+            SetData_OGL(i, 0, 0, levelWidth, levelHeight, levelData);
             memoryUse += levelWidth * levelHeight * components;
 
             if (i < levels_ - 1)
@@ -282,14 +272,14 @@ bool Texture2D::SetData(Image* image, bool useAlpha)
             CompressedLevel level = image->GetCompressedLevel(i + mipsToSkip);
             if (!needDecompress)
             {
-                SetData(i, 0, 0, level.width_, level.height_, level.data_);
+                SetData_OGL(i, 0, 0, level.width_, level.height_, level.data_);
                 memoryUse += level.rows_ * level.rowSize_;
             }
             else
             {
                 auto* rgbaData = new unsigned char[level.width_ * level.height_ * 4];
                 level.Decompress(rgbaData);
-                SetData(i, 0, 0, level.width_, level.height_, rgbaData);
+                SetData_OGL(i, 0, 0, level.width_, level.height_, rgbaData);
                 memoryUse += level.width_ * level.height_ * 4;
                 delete[] rgbaData;
             }
@@ -300,7 +290,7 @@ bool Texture2D::SetData(Image* image, bool useAlpha)
     return true;
 }
 
-bool Texture2D::GetData(unsigned level, void* dest) const
+bool Texture2D::GetData_OGL(unsigned level, void* dest) const
 {
     if (!object_.name_ || !graphics_)
     {
@@ -336,10 +326,10 @@ bool Texture2D::GetData(unsigned level, void* dest) const
     if (resolveDirty_)
         graphics_->ResolveToTexture(const_cast<Texture2D*>(this));
 
-    graphics_->SetTextureForUpdate(const_cast<Texture2D*>(this));
+    graphics_->SetTextureForUpdate_OGL(const_cast<Texture2D*>(this));
 
-    if (!IsCompressed())
-        glGetTexImage(target_, level, GetExternalFormat(format_), GetDataType(format_), dest);
+    if (!IsCompressed_OGL())
+        glGetTexImage(target_, level, GetExternalFormat_OGL(format_), GetDataType_OGL(format_), dest);
     else
         glGetCompressedTexImage(target_, level, dest);
 
@@ -352,7 +342,7 @@ bool Texture2D::GetData(unsigned level, void* dest) const
         graphics_->SetRenderTarget(0, const_cast<Texture2D*>(this));
         // Ensure the FBO is current; this viewport is actually never rendered to
         graphics_->SetViewport(IntRect(0, 0, width_, height_));
-        glReadPixels(0, 0, width_, height_, GetExternalFormat(format_), GetDataType(format_), dest);
+        glReadPixels(0, 0, width_, height_, GetExternalFormat_OGL(format_), GetDataType_OGL(format_), dest);
         return true;
     }
 
@@ -361,9 +351,9 @@ bool Texture2D::GetData(unsigned level, void* dest) const
 #endif
 }
 
-bool Texture2D::Create()
+bool Texture2D::Create_OGL()
 {
-    Release();
+    Release_OGL();
 
     if (!graphics_ || !width_ || !height_)
         return false;
@@ -383,9 +373,9 @@ bool Texture2D::Create()
     }
 #endif
 
-    unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
-    unsigned externalFormat = GetExternalFormat(format_);
-    unsigned dataType = GetDataType(format_);
+    unsigned format = GetSRGB() ? GetSRGBFormat_OGL(format_) : format_;
+    unsigned externalFormat = GetExternalFormat_OGL(format_);
+    unsigned dataType = GetDataType_OGL(format_);
 
     // Create a renderbuffer instead of a texture if depth texture is not properly supported, or if this will be a packed
     // depth stencil texture
@@ -434,12 +424,12 @@ bool Texture2D::Create()
     glGenTextures(1, &object_.name_);
 
     // Ensure that our texture is bound to OpenGL texture unit 0
-    graphics_->SetTextureForUpdate(this);
+    graphics_->SetTextureForUpdate_OGL(this);
 
     // If not compressed, create the initial level 0 texture with null data
     bool success = true;
 
-    if (!IsCompressed())
+    if (!IsCompressed_OGL())
     {
         glGetError();
 #ifndef GL_ES_VERSION_2_0
@@ -472,7 +462,7 @@ bool Texture2D::Create()
         if (requestedLevels_ != 1)
         {
             // Generate levels for the first time now
-            RegenerateLevels();
+            RegenerateLevels_OGL();
             // Determine max. levels automatically
             requestedLevels_ = 0;
         }

@@ -1,31 +1,12 @@
-//
-// Copyright (c) 2008-2019 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// Copyright (c) 2008-2022 the Urho3D project
+// License: MIT
 
 #include "../../Precompiled.h"
 
 #include "../../Graphics/Graphics.h"
-#include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/Material.h"
-#include "../../Graphics/RenderSurface.h"
+#include "../../GraphicsAPI/GraphicsImpl.h"
+#include "../../GraphicsAPI/RenderSurface.h"
 #include "../../IO/Log.h"
 #include "../../Resource/ResourceCache.h"
 #include "../../Resource/XMLFile.h"
@@ -70,7 +51,7 @@ static GLenum GetWrapMode(TextureAddressMode mode)
 #endif
 }
 
-void Texture::SetSRGB(bool enable)
+void Texture::SetSRGB_OGL(bool enable)
 {
     if (graphics_)
         enable &= graphics_->GetSRGBSupport();
@@ -84,11 +65,11 @@ void Texture::SetSRGB(bool enable)
 
         // If texture in use in the framebuffer, mark it dirty
         if (graphics_ && graphics_->GetRenderTarget(0) && graphics_->GetRenderTarget(0)->GetParentTexture() == this)
-            graphics_->MarkFBODirty();
+            graphics_->MarkFBODirty_OGL();
     }
 }
 
-void Texture::UpdateParameters()
+void Texture::UpdateParameters_OGL()
 {
     if (!object_.name_ || !graphics_)
         return;
@@ -105,7 +86,7 @@ void Texture::UpdateParameters()
     // Wrapping
     glTexParameteri(target_, GL_TEXTURE_WRAP_S, GetWrapMode(addressModes_[COORD_U]));
     glTexParameteri(target_, GL_TEXTURE_WRAP_T, GetWrapMode(addressModes_[COORD_V]));
-#ifndef URHO3D_GLES2
+#ifdef DESKTOP_GRAPHICS_OR_GLES3
     glTexParameteri(target_, GL_TEXTURE_WRAP_R, GetWrapMode(addressModes_[COORD_W]));
 #endif
 
@@ -178,12 +159,12 @@ void Texture::UpdateParameters()
     parametersDirty_ = false;
 }
 
-bool Texture::GetParametersDirty() const
+bool Texture::GetParametersDirty_OGL() const
 {
     return parametersDirty_;
 }
 
-bool Texture::IsCompressed() const
+bool Texture::IsCompressed_OGL() const
 {
     return format_ == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT || format_ == GL_COMPRESSED_RGBA_S3TC_DXT3_EXT ||
            format_ == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT || format_ == GL_ETC1_RGB8_OES ||
@@ -193,7 +174,7 @@ bool Texture::IsCompressed() const
            format_ == GL_ETC2_RGB8_OES || format_ == GL_ETC2_RGBA8_OES;
 }
 
-unsigned Texture::GetRowDataSize(int width) const
+unsigned Texture::GetRowDataSize_OGL(int width) const
 {
     switch (format_)
     {
@@ -279,7 +260,7 @@ unsigned Texture::GetRowDataSize(int width) const
 #define GL_SRGB_ALPHA_EXT GL_SRGB8_ALPHA8
 #endif
 
-unsigned Texture::GetExternalFormat(unsigned format)
+unsigned Texture::GetExternalFormat_OGL(unsigned format)
 {
 #ifndef GL_ES_VERSION_2_0
     if (format == GL_DEPTH_COMPONENT16 || format == GL_DEPTH_COMPONENT24 || format == GL_DEPTH_COMPONENT32)
@@ -321,7 +302,7 @@ unsigned Texture::GetExternalFormat(unsigned format)
 #endif
 }
 
-unsigned Texture::GetDataType(unsigned format)
+unsigned Texture::GetDataType_OGL(unsigned format)
 {
 #ifndef GL_ES_VERSION_2_0
     if (format == GL_DEPTH24_STENCIL8_EXT)
@@ -358,9 +339,9 @@ unsigned Texture::GetDataType(unsigned format)
 #endif
 }
 
-unsigned Texture::GetSRGBFormat(unsigned format)
+unsigned Texture::GetSRGBFormat_OGL(unsigned format)
 {
-#ifndef URHO3D_GLES2
+#ifdef DESKTOP_GRAPHICS_OR_GLES3
     if (!graphics_ || !graphics_->GetSRGBSupport())
         return format;
 
@@ -390,7 +371,7 @@ unsigned Texture::GetSRGBFormat(unsigned format)
 #endif
 }
 
-void Texture::RegenerateLevels()
+void Texture::RegenerateLevels_OGL()
 {
     if (!object_.name_)
         return;
