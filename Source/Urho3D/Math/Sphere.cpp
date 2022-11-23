@@ -11,8 +11,10 @@
 namespace Urho3D
 {
 
-void Sphere::Define(const Vector3* vertices, unsigned count)
+void Sphere::Define(const Vector3* vertices, i32 count)
 {
+    assert(count >= 0);
+
     if (!count)
         return;
 
@@ -47,8 +49,10 @@ void Sphere::Define(const Polyhedron& poly)
     Merge(poly);
 }
 
-void Sphere::Merge(const Vector3* vertices, unsigned count)
+void Sphere::Merge(const Vector3* vertices, i32 count)
 {
+    assert(count >= 0);
+
     while (count--)
         Merge(*vertices++);
 }
@@ -76,9 +80,8 @@ void Sphere::Merge(const Frustum& frustum)
 
 void Sphere::Merge(const Polyhedron& poly)
 {
-    for (unsigned i = 0; i < poly.faces_.Size(); ++i)
+    for (const Vector<Vector3>& face : poly.faces_)
     {
-        const Vector<Vector3>& face = poly.faces_[i];
         if (!face.Empty())
             Merge(&face[0], face.Size());
     }

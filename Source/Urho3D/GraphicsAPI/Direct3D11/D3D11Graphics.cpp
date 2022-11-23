@@ -177,7 +177,6 @@ void Graphics::Constructor_D3D11()
     orientations_ = "LandscapeLeft LandscapeRight";
     apiName_ = "D3D11";
 
-    Graphics::pixelUVOffset = Vector2(0.0f, 0.0f);
     Graphics::gl3Support = false;
 
     SetTextureUnitMappings_D3D11();
@@ -205,19 +204,19 @@ void Graphics::Destructor_D3D11()
     impl->vertexDeclarations_.Clear();
     impl->allConstantBuffers_.Clear();
 
-    for (HashMap<unsigned, ID3D11BlendState*>::Iterator i = impl->blendStates_.Begin(); i != impl->blendStates_.End(); ++i)
+    for (HashMap<hash32, ID3D11BlendState*>::Iterator i = impl->blendStates_.Begin(); i != impl->blendStates_.End(); ++i)
     {
         URHO3D_SAFE_RELEASE(i->second_);
     }
     impl->blendStates_.Clear();
 
-    for (HashMap<unsigned, ID3D11DepthStencilState*>::Iterator i = impl->depthStates_.Begin(); i != impl->depthStates_.End(); ++i)
+    for (HashMap<hash32, ID3D11DepthStencilState*>::Iterator i = impl->depthStates_.Begin(); i != impl->depthStates_.End(); ++i)
     {
         URHO3D_SAFE_RELEASE(i->second_);
     }
     impl->depthStates_.Clear();
 
-    for (HashMap<unsigned, ID3D11RasterizerState*>::Iterator i = impl->rasterizerStates_.Begin();
+    for (HashMap<hash32, ID3D11RasterizerState*>::Iterator i = impl->rasterizerStates_.Begin();
          i != impl->rasterizerStates_.End(); ++i)
     {
         URHO3D_SAFE_RELEASE(i->second_);
@@ -1825,7 +1824,7 @@ ConstantBuffer* Graphics::GetOrCreateConstantBuffer_D3D11(ShaderType type, unsig
     GraphicsImpl_D3D11* impl = GetImpl_D3D11();
 
     // Ensure that different shader types and index slots get unique buffers, even if the size is same
-    unsigned key = type | (index << 1) | (size << 4);
+    hash32 key = type | (index << 1) | (size << 4);
     ConstantBufferMap::Iterator i = impl->allConstantBuffers_.Find(key);
     if (i != impl->allConstantBuffers_.End())
         return i->second_.Get();
@@ -2367,9 +2366,9 @@ void Graphics::ResetCachedState_D3D11()
     impl->rasterizerStateDirty_ = true;
     impl->scissorRectDirty_ = true;
     impl->stencilRefDirty_ = true;
-    impl->blendStateHash_ = M_MAX_UNSIGNED;
-    impl->depthStateHash_ = M_MAX_UNSIGNED;
-    impl->rasterizerStateHash_ = M_MAX_UNSIGNED;
+    impl->blendStateHash_ = M_MAX_U32;
+    impl->depthStateHash_ = M_MAX_U32;
+    impl->rasterizerStateHash_ = M_MAX_U32;
     impl->firstDirtyTexture_ = impl->lastDirtyTexture_ = M_MAX_UNSIGNED;
     impl->firstDirtyVB_ = impl->lastDirtyVB_ = M_MAX_UNSIGNED;
     impl->dirtyConstantBuffers_.Clear();
@@ -2430,7 +2429,7 @@ void Graphics::PrepareDraw_D3D11()
             impl->firstDirtyVB_ = impl->lastDirtyVB_ = M_MAX_UNSIGNED;
         }
 
-        u64 newVertexDeclarationHash = 0;
+        hash64 newVertexDeclarationHash = 0;
         for (i32 i = 0; i < MAX_VERTEX_STREAMS; ++i)
         {
             if (vertexBuffers_[i])
@@ -2460,10 +2459,10 @@ void Graphics::PrepareDraw_D3D11()
 
     if (impl->blendStateDirty_)
     {
-        unsigned newBlendStateHash = (unsigned)((colorWrite_ ? 1 : 0) | (alphaToCoverage_ ? 2 : 0) | (blendMode_ << 2));
+        hash32 newBlendStateHash = (hash32)((colorWrite_ ? 1 : 0) | (alphaToCoverage_ ? 2 : 0) | (blendMode_ << 2));
         if (newBlendStateHash != impl->blendStateHash_)
         {
-            HashMap<unsigned, ID3D11BlendState*>::Iterator i = impl->blendStates_.Find(newBlendStateHash);
+            HashMap<hash32, ID3D11BlendState*>::Iterator i = impl->blendStates_.Find(newBlendStateHash);
             if (i == impl->blendStates_.End())
             {
                 URHO3D_PROFILE(CreateBlendState);
@@ -2501,13 +2500,13 @@ void Graphics::PrepareDraw_D3D11()
 
     if (impl->depthStateDirty_)
     {
-        unsigned newDepthStateHash =
+        hash32 newDepthStateHash =
             (depthWrite_ ? 1 : 0) | (stencilTest_ ? 2 : 0) | (depthTestMode_ << 2) | ((stencilCompareMask_ & 0xff) << 5) |
             ((stencilWriteMask_ & 0xff) << 13) | (stencilTestMode_ << 21) |
             ((stencilFail_ + stencilZFail_ * 5 + stencilPass_ * 25) << 24);
         if (newDepthStateHash != impl->depthStateHash_ || impl->stencilRefDirty_)
         {
-            HashMap<unsigned, ID3D11DepthStencilState*>::Iterator i = impl->depthStates_.Find(newDepthStateHash);
+            HashMap<hash32, ID3D11DepthStencilState*>::Iterator i = impl->depthStates_.Find(newDepthStateHash);
             if (i == impl->depthStates_.End())
             {
                 URHO3D_PROFILE(CreateDepthState);
@@ -2555,12 +2554,12 @@ void Graphics::PrepareDraw_D3D11()
             depthBits = 16;
         int scaledDepthBias = (int)(constantDepthBias_ * (1 << depthBits));
 
-        unsigned newRasterizerStateHash =
+        hash32 newRasterizerStateHash =
             (scissorTest_ ? 1 : 0) | (lineAntiAlias_ ? 2 : 0) | (fillMode_ << 2) | (cullMode_ << 4) |
             ((scaledDepthBias & 0x1fff) << 6) | (((int)(slopeScaledDepthBias_ * 100.0f) & 0x1fff) << 19);
         if (newRasterizerStateHash != impl->rasterizerStateHash_)
         {
-            HashMap<unsigned, ID3D11RasterizerState*>::Iterator i = impl->rasterizerStates_.Find(newRasterizerStateHash);
+            HashMap<hash32, ID3D11RasterizerState*>::Iterator i = impl->rasterizerStates_.Find(newRasterizerStateHash);
             if (i == impl->rasterizerStates_.End())
             {
                 URHO3D_PROFILE(CreateRasterizerState);

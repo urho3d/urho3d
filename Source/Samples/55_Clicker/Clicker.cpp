@@ -137,7 +137,7 @@ void Clicker::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 {
     using namespace MouseButtonDown;
 
-    MouseButton button = (MouseButton)eventData[P_BUTTON].GetUInt();
+    MouseButton button = (MouseButton)eventData[P_BUTTON].GetU32();
     
     if (button == MOUSEB_RIGHT)
     {

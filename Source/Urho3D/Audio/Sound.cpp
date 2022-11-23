@@ -119,7 +119,7 @@ bool Sound::LoadWav(Deserializer& source)
     // Try to open
     memset(&header, 0, sizeof header);
     source.Read(&header.riffText_, 4);
-    header.totalLength_ = source.ReadUInt();
+    header.totalLength_ = source.ReadU32();
     source.Read(&header.waveText_, 4);
 
     if (memcmp("RIFF", header.riffText_, 4) != 0 || memcmp("WAVE", header.waveText_, 4) != 0)
@@ -132,7 +132,7 @@ bool Sound::LoadWav(Deserializer& source)
     for (;;)
     {
         source.Read(&header.formatText_, 4);
-        header.formatLength_ = source.ReadUInt();
+        header.formatLength_ = source.ReadU32();
         if (!memcmp("fmt ", &header.formatText_, 4))
             break;
 
@@ -145,12 +145,12 @@ bool Sound::LoadWav(Deserializer& source)
     }
 
     // Read the FORMAT chunk
-    header.format_ = source.ReadUShort();
-    header.channels_ = source.ReadUShort();
-    header.frequency_ = source.ReadUInt();
-    header.avgBytes_ = source.ReadUInt();
-    header.blockAlign_ = source.ReadUShort();
-    header.bits_ = source.ReadUShort();
+    header.format_ = source.ReadU16();
+    header.channels_ = source.ReadU16();
+    header.frequency_ = source.ReadU32();
+    header.avgBytes_ = source.ReadU32();
+    header.blockAlign_ = source.ReadU16();
+    header.bits_ = source.ReadU16();
 
     // Skip data if the format chunk was bigger than what we use
     source.Seek(source.GetPosition() + header.formatLength_ - 16);
@@ -166,7 +166,7 @@ bool Sound::LoadWav(Deserializer& source)
     for (;;)
     {
         source.Read(&header.dataText_, 4);
-        header.dataLength_ = source.ReadUInt();
+        header.dataLength_ = source.ReadU32();
         if (!memcmp("data", &header.dataText_, 4))
             break;
 
@@ -338,7 +338,7 @@ void Sound::LoadParameters()
         if (name == "format" && !compressed_)
         {
             if (paramElem.HasAttribute("frequency"))
-                frequency_ = (unsigned)paramElem.GetInt("frequency");
+                frequency_ = (unsigned)paramElem.GetI32("frequency");
             if (paramElem.HasAttribute("sixteenbit"))
                 sixteenBit_ = paramElem.GetBool("sixteenbit");
             if (paramElem.HasAttribute("16bit"))
@@ -352,7 +352,7 @@ void Sound::LoadParameters()
             if (paramElem.HasAttribute("enable"))
                 SetLooped(paramElem.GetBool("enable"));
             if (paramElem.HasAttribute("start") && paramElem.HasAttribute("end"))
-                SetLoop((unsigned)paramElem.GetInt("start"), (unsigned)paramElem.GetInt("end"));
+                SetLoop((unsigned)paramElem.GetI32("start"), (unsigned)paramElem.GetI32("end"));
         }
     }
 }

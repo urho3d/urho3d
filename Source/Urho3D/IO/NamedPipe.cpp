@@ -8,7 +8,7 @@
 #include "../IO/Log.h"
 
 #ifdef _WIN32
-#include <windows.h>
+#include "../Engine/WinWrapped.h"
 #else
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -21,7 +21,7 @@
 namespace Urho3D
 {
 
-static const unsigned PIPE_BUFFER_SIZE = 65536;
+static constexpr i32 PIPE_BUFFER_SIZE = 65536;
 
 NamedPipe::NamedPipe(Context* context) :
     Object(context),
@@ -53,7 +53,7 @@ NamedPipe::~NamedPipe()
     Close();
 }
 
-unsigned NamedPipe::Seek(unsigned position)
+i64 NamedPipe::Seek(i64 position)
 {
     return 0;
 }
@@ -121,8 +121,10 @@ bool NamedPipe::Open(const String& name, bool isServer)
     }
 }
 
-unsigned NamedPipe::Read(void* dest, unsigned size)
+i32 NamedPipe::Read(void* dest, i32 size)
 {
+    assert(size >= 0);
+
     if (handle_ != INVALID_HANDLE_VALUE)
     {
         DWORD read = 0;
@@ -133,8 +135,10 @@ unsigned NamedPipe::Read(void* dest, unsigned size)
     return 0;
 }
 
-unsigned NamedPipe::Write(const void* data, unsigned size)
+i32 NamedPipe::Write(const void* data, i32 size)
 {
+    assert(size >= 0);
+
     if (handle_ != INVALID_HANDLE_VALUE)
     {
         DWORD written = 0;
@@ -252,8 +256,10 @@ bool NamedPipe::Open(const String& name, bool isServer)
 #endif
 }
 
-unsigned NamedPipe::Read(void* dest, unsigned size)
+i32 NamedPipe::Read(void* dest, i32 size)
 {
+    assert(size >= 0);
+
     // Attempt to open late if only the write handle is open yet
     if (readHandle_ == -1 && writeHandle_ != -1)
     {
@@ -272,8 +278,10 @@ unsigned NamedPipe::Read(void* dest, unsigned size)
         return 0;
 }
 
-unsigned NamedPipe::Write(const void* data, unsigned size)
+i32 NamedPipe::Write(const void* data, i32 size)
 {
+    assert(size >= 0);
+
     // Attempt to open late if only the read handle is open yet
     if (writeHandle_ == -1 && readHandle_ != -1)
     {
@@ -295,7 +303,7 @@ unsigned NamedPipe::Write(const void* data, unsigned size)
             written += writtenNow;
         }
 
-        return (unsigned)written;
+        return written;
     }
     else
         return 0;

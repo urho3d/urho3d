@@ -56,11 +56,11 @@ struct Batch
     void Draw(View* view, Camera* camera, bool allowDepthWrite) const;
 
     /// State sorting key.
-    unsigned long long sortKey_{};
+    hash64 sortKey_{};
     /// Distance from camera.
     float distance_{};
     /// 8-bit render order modifier from material.
-    unsigned char renderOrder_{};
+    i8 renderOrder_{};
     /// 8-bit light mask for stencil marking in deferred rendering.
     unsigned char lightMask_{};
     /// Base batch flag. This tells to draw the object fully without light optimizations.
@@ -72,7 +72,7 @@ struct Batch
     /// World transform(s). For a skinned model, these are the bone transforms.
     const Matrix3x4* worldTransform_{};
     /// Number of world transforms.
-    unsigned numWorldTransforms_{};
+    i32 numWorldTransforms_{};
     /// Per-instance data. If not null, must contain enough data to fill instancing buffer.
     void* instancingData_{};
     /// Zone.
@@ -116,14 +116,14 @@ struct BatchGroup : public Batch
 {
     /// Construct with defaults.
     BatchGroup() :
-        startIndex_(M_MAX_UNSIGNED)
+        startIndex_(NINDEX)
     {
     }
 
     /// Construct from a batch.
     explicit BatchGroup(const Batch& batch) :
         Batch(batch),
-        startIndex_(M_MAX_UNSIGNED)
+        startIndex_(NINDEX)
     {
     }
 
@@ -137,7 +137,7 @@ struct BatchGroup : public Batch
         newInstance.distance_ = batch.distance_;
         newInstance.instancingData_ = batch.instancingData_;
 
-        for (unsigned i = 0; i < batch.numWorldTransforms_; ++i)
+        for (i32 i = 0; i < batch.numWorldTransforms_; ++i)
         {
             newInstance.worldTransform_ = &batch.worldTransform_[i];
             instances_.Push(newInstance);
@@ -145,14 +145,14 @@ struct BatchGroup : public Batch
     }
 
     /// Pre-set the instance data. Buffer must be big enough to hold all data.
-    void SetInstancingData(void* lockedData, unsigned stride, unsigned& freeIndex);
+    void SetInstancingData(void* lockedData, i32 stride, i32& freeIndex);
     /// Prepare and draw.
     void Draw(View* view, Camera* camera, bool allowDepthWrite) const;
 
     /// Instance data.
     Vector<InstanceData> instances_;
-    /// Instance stream start index, or M_MAX_UNSIGNED if transforms not pre-set.
-    unsigned startIndex_;
+    /// Instance stream start index, or NINDEX if transforms not pre-set.
+    i32 startIndex_;
 };
 
 /// Instanced draw call grouping key.
@@ -183,7 +183,7 @@ struct BatchGroupKey
     /// Geometry.
     Geometry* geometry_;
     /// 8-bit render order modifier from material.
-    unsigned char renderOrder_;
+    i8 renderOrder_;
 
     /// Test for equality with another batch group key.
     bool operator ==(const BatchGroupKey& rhs) const
@@ -200,7 +200,7 @@ struct BatchGroupKey
     }
 
     /// Return hash value.
-    unsigned ToHash() const;
+    hash32 ToHash() const;
 };
 
 /// Queue that contains both instanced and non-instanced draw calls.
@@ -216,11 +216,11 @@ public:
     /// Sort batches front to back while also maintaining state sorting.
     void SortFrontToBack2Pass(Vector<Batch*>& batches);
     /// Pre-set instance data of all groups. The vertex buffer must be big enough to hold all data.
-    void SetInstancingData(void* lockedData, unsigned stride, unsigned& freeIndex);
+    void SetInstancingData(void* lockedData, i32 stride, i32& freeIndex);
     /// Draw.
     void Draw(View* view, Camera* camera, bool markToStencil, bool usingLightOptimization, bool allowDepthWrite) const;
     /// Return the combined amount of instances.
-    unsigned GetNumInstances() const;
+    i32 GetNumInstances() const;
 
     /// Return whether the batch group is empty.
     bool IsEmpty() const { return batches_.Empty() && batchGroups_.Empty(); }
@@ -228,11 +228,11 @@ public:
     /// Instanced draw calls.
     HashMap<BatchGroupKey, BatchGroup> batchGroups_;
     /// Shader remapping table for 2-pass state and distance sort.
-    HashMap<unsigned, unsigned> shaderRemapping_;
+    HashMap<hash32, hash32> shaderRemapping_;
     /// Material remapping table for 2-pass state and distance sort.
-    HashMap<unsigned short, unsigned short> materialRemapping_;
+    HashMap<hash16, hash16> materialRemapping_;
     /// Geometry remapping table for 2-pass state and distance sort.
-    HashMap<unsigned short, unsigned short> geometryRemapping_;
+    HashMap<hash16, hash16> geometryRemapping_;
 
     /// Unsorted non-instanced draw calls.
     Vector<Batch> batches_;
@@ -241,7 +241,7 @@ public:
     /// Sorted instanced draw calls.
     Vector<BatchGroup*> sortedBatchGroups_;
     /// Maximum sorted instances.
-    unsigned maxSortedInstances_;
+    i32 maxSortedInstances_;
     /// Whether the pass command contains extra shader defines.
     bool hasExtraDefines_;
     /// Vertex shader extra defines.

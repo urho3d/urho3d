@@ -171,7 +171,7 @@ void NATPunchtrough::ShowLogMessage(const String& row)
 void NATPunchtrough::HandleSaveNatSettings(StringHash eventType, VariantMap& eventData)
 {
     // Save NAT server configuration
-    GetSubsystem<Network>()->SetNATServerInfo(natServerAddress_->GetText(), ToInt(natServerPort_->GetText()));
+    GetSubsystem<Network>()->SetNATServerInfo(natServerAddress_->GetText(), ToI32(natServerPort_->GetText()));
     ShowLogMessage("Saving NAT settings: " + natServerAddress_->GetText() + ":" + natServerPort_->GetText());
 }
 

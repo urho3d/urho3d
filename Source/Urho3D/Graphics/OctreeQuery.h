@@ -22,9 +22,9 @@ class URHO3D_API OctreeQuery
 {
 public:
     /// Construct with query parameters.
-    OctreeQuery(Vector<Drawable*>& result, unsigned char drawableFlags, unsigned viewMask) :
+    OctreeQuery(Vector<Drawable*>& result, DrawableTypes drawableTypes, unsigned viewMask) :
         result_(result),
-        drawableFlags_(drawableFlags),
+        drawableTypes_(drawableTypes),
         viewMask_(viewMask)
     {
     }
@@ -45,7 +45,7 @@ public:
     /// Result vector reference.
     Vector<Drawable*>& result_;
     /// Drawable flags to include.
-    unsigned char drawableFlags_;
+    DrawableTypes drawableTypes_;
     /// Drawable layers to include.
     unsigned viewMask_;
 };
@@ -56,9 +56,9 @@ class URHO3D_API PointOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with point and query parameters.
-    PointOctreeQuery(Vector<Drawable*>& result, const Vector3& point, unsigned char drawableFlags = DRAWABLE_ANY,
+    PointOctreeQuery(Vector<Drawable*>& result, const Vector3& point, DrawableTypes drawableTypes = DrawableTypes::Any,
         unsigned viewMask = DEFAULT_VIEWMASK) :
-        OctreeQuery(result, drawableFlags, viewMask),
+        OctreeQuery(result, drawableTypes, viewMask),
         point_(point)
     {
     }
@@ -78,9 +78,9 @@ class URHO3D_API SphereOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with sphere and query parameters.
-    SphereOctreeQuery(Vector<Drawable*>& result, const Sphere& sphere, unsigned char drawableFlags = DRAWABLE_ANY,
+    SphereOctreeQuery(Vector<Drawable*>& result, const Sphere& sphere, DrawableTypes drawableTypes = DrawableTypes::Any,
         unsigned viewMask = DEFAULT_VIEWMASK) :
-        OctreeQuery(result, drawableFlags, viewMask),
+        OctreeQuery(result, drawableTypes, viewMask),
         sphere_(sphere)
     {
     }
@@ -100,9 +100,9 @@ class URHO3D_API BoxOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with bounding box and query parameters.
-    BoxOctreeQuery(Vector<Drawable*>& result, const BoundingBox& box, unsigned char drawableFlags = DRAWABLE_ANY,
+    BoxOctreeQuery(Vector<Drawable*>& result, const BoundingBox& box, DrawableTypes drawableTypes = DrawableTypes::Any,
         unsigned viewMask = DEFAULT_VIEWMASK) :
-        OctreeQuery(result, drawableFlags, viewMask),
+        OctreeQuery(result, drawableTypes, viewMask),
         box_(box)
     {
     }
@@ -122,9 +122,9 @@ class URHO3D_API FrustumOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with frustum and query parameters.
-    FrustumOctreeQuery(Vector<Drawable*>& result, const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY,
+    FrustumOctreeQuery(Vector<Drawable*>& result, const Frustum& frustum, DrawableTypes drawableTypes = DrawableTypes::Any,
         unsigned viewMask = DEFAULT_VIEWMASK) :
-        OctreeQuery(result, drawableFlags, viewMask),
+        OctreeQuery(result, drawableTypes, viewMask),
         frustum_(frustum)
     {
     }
@@ -211,10 +211,10 @@ class URHO3D_API RayOctreeQuery
 public:
     /// Construct with ray and query parameters.
     RayOctreeQuery(Vector<RayQueryResult>& result, const Ray& ray, RayQueryLevel level = RAY_TRIANGLE,
-        float maxDistance = M_INFINITY, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) :
+        float maxDistance = M_INFINITY, DrawableTypes drawableTypes = DrawableTypes::Any, unsigned viewMask = DEFAULT_VIEWMASK) :
         result_(result),
         ray_(ray),
-        drawableFlags_(drawableFlags),
+        drawableTypes_(drawableTypes),
         viewMask_(viewMask),
         maxDistance_(maxDistance),
         level_(level)
@@ -230,8 +230,8 @@ public:
     Vector<RayQueryResult>& result_;
     /// Ray.
     Ray ray_;
-    /// Drawable flags to include.
-    unsigned char drawableFlags_;
+    /// Drawable types to include.
+    DrawableTypes drawableTypes_;
     /// Drawable layers to include.
     unsigned viewMask_;
     /// Maximum ray distance.
@@ -245,8 +245,8 @@ class URHO3D_API AllContentOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct.
-    AllContentOctreeQuery(Vector<Drawable*>& result, unsigned char drawableFlags, unsigned viewMask) :
-        OctreeQuery(result, drawableFlags, viewMask)
+    AllContentOctreeQuery(Vector<Drawable*>& result, DrawableTypes drawableTypes, unsigned viewMask) :
+        OctreeQuery(result, drawableTypes, viewMask)
     {
     }
 

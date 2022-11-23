@@ -161,7 +161,7 @@ bool UnknownComponent::Save(Serializer& dest) const
     // Write type and ID
     if (!dest.WriteStringHash(GetType()))
         return false;
-    if (!dest.WriteUInt(id_))
+    if (!dest.WriteU32(id_))
         return false;
 
     if (!binaryAttributes_.Size())
@@ -184,7 +184,7 @@ bool UnknownComponent::SaveXML(XMLElement& dest) const
     // Write type and ID
     if (!dest.SetString("type", GetTypeName()))
         return false;
-    if (!dest.SetInt("id", id_))
+    if (!dest.SetI32("id", id_))
         return false;
 
     for (unsigned i = 0; i < xmlAttributeInfos_.Size(); ++i)

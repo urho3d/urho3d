@@ -29,7 +29,7 @@
 #ifndef _MSC_VER
 #define _WIN32_IE 0x501
 #endif
-#include <windows.h>
+#include "../Engine/WinWrapped.h"
 #include <shellapi.h>
 #include <direct.h>
 #include <shlobj.h>

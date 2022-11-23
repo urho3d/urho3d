@@ -22,13 +22,13 @@ class VertexBuffer;
 struct VertexBufferMorph
 {
     /// Vertex elements.
-    VertexMaskFlags elementMask_;
+    VertexElements elementMask_;
     /// Number of vertices.
-    unsigned vertexCount_;
+    i32 vertexCount_;
     /// Morphed vertices data size as bytes.
-    unsigned dataSize_;
+    i32 dataSize_;
     /// Morphed vertices. Stored packed as <index, data> pairs.
-    SharedArrayPtr<unsigned char> morphData_;
+    SharedArrayPtr<byte> morphData_;
 };
 
 /// Definition of a model's vertex morph.
@@ -41,33 +41,33 @@ struct ModelMorph
     /// Current morph weight.
     float weight_;
     /// Morph data per vertex buffer.
-    HashMap<unsigned, VertexBufferMorph> buffers_;
+    HashMap<i32, VertexBufferMorph> buffers_;
 };
 
 /// Description of vertex buffer data for asynchronous loading.
 struct VertexBufferDesc
 {
     /// Vertex count.
-    unsigned vertexCount_;
+    i32 vertexCount_;
     /// Vertex declaration.
     Vector<VertexElement> vertexElements_;
     /// Vertex data size.
-    unsigned dataSize_;
+    i32 dataSize_;
     /// Vertex data.
-    SharedArrayPtr<unsigned char> data_;
+    SharedArrayPtr<byte> data_;
 };
 
 /// Description of index buffer data for asynchronous loading.
 struct IndexBufferDesc
 {
     /// Index count.
-    unsigned indexCount_;
+    i32 indexCount_;
     /// Index size.
-    unsigned indexSize_;
+    i32 indexSize_;
     /// Index data size.
-    unsigned dataSize_;
+    i32 dataSize_;
     /// Index data.
-    SharedArrayPtr<unsigned char> data_;
+    SharedArrayPtr<byte> data_;
 };
 
 /// Description of a geometry for asynchronous loading.
@@ -76,13 +76,13 @@ struct GeometryDesc
     /// Primitive type.
     PrimitiveType type_;
     /// Vertex buffer ref.
-    unsigned vbRef_;
+    i32 vbRef_;
     /// Index buffer ref.
-    unsigned ibRef_;
+    i32 ibRef_;
     /// Index start.
-    unsigned indexStart_;
+    i32 indexStart_;
     /// Index count.
-    unsigned indexCount_;
+    i32 indexCount_;
 };
 
 /// 3D model resource.
@@ -110,25 +110,25 @@ public:
     /// @property
     void SetBoundingBox(const BoundingBox& box);
     /// Set vertex buffers and their morph ranges.
-    bool SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const Vector<unsigned>& morphRangeStarts,
-        const Vector<unsigned>& morphRangeCounts);
+    bool SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const Vector<i32>& morphRangeStarts,
+        const Vector<i32>& morphRangeCounts);
     /// Set index buffers.
     bool SetIndexBuffers(const Vector<SharedPtr<IndexBuffer>>& buffers);
     /// Set number of geometries.
     /// @property
-    void SetNumGeometries(unsigned num);
+    void SetNumGeometries(i32 num);
     /// Set number of LOD levels in a geometry.
     /// @property
-    bool SetNumGeometryLodLevels(unsigned index, unsigned num);
+    bool SetNumGeometryLodLevels(i32 index, i32 num);
     /// Set geometry.
-    bool SetGeometry(unsigned index, unsigned lodLevel, Geometry* geometry);
+    bool SetGeometry(i32 index, i32 lodLevel, Geometry* geometry);
     /// Set geometry center.
     /// @property{set_geometryCenters}
-    bool SetGeometryCenter(unsigned index, const Vector3& center);
+    bool SetGeometryCenter(i32 index, const Vector3& center);
     /// Set skeleton.
     void SetSkeleton(const Skeleton& skeleton);
     /// Set bone mappings when model has more bones than the skinning shader can handle.
-    void SetGeometryBoneMappings(const Vector<Vector<unsigned>>& geometryBoneMappings);
+    void SetGeometryBoneMappings(const Vector<Vector<i32>>& geometryBoneMappings);
     /// Set vertex morphs.
     void SetMorphs(const Vector<ModelMorph>& morphs);
     /// Clone the model. The geometry data is deep-copied and can be modified in the clone without affecting the original.
@@ -150,11 +150,11 @@ public:
 
     /// Return number of geometries.
     /// @property
-    unsigned GetNumGeometries() const { return geometries_.Size(); }
+    i32 GetNumGeometries() const { return geometries_.Size(); }
 
     /// Return number of LOD levels in geometry.
     /// @property
-    unsigned GetNumGeometryLodLevels(unsigned index) const;
+    i32 GetNumGeometryLodLevels(i32 index) const;
 
     /// Return geometry pointers.
     const Vector<Vector<SharedPtr<Geometry>>>& GetGeometries() const { return geometries_; }
@@ -163,7 +163,7 @@ public:
     const Vector<Vector3>& GetGeometryCenters() const { return geometryCenters_; }
 
     /// Return geometry by index and LOD level. The LOD level is clamped if out of range.
-    Geometry* GetGeometry(unsigned index, unsigned lodLevel) const;
+    Geometry* GetGeometry(i32 index, i32 lodLevel) const;
 
     /// Return geometry center by index.
     /// @property{get_geometryCenters}
@@ -174,25 +174,25 @@ public:
     }
 
     /// Return geometery bone mappings.
-    const Vector<Vector<unsigned>>& GetGeometryBoneMappings() const { return geometryBoneMappings_; }
+    const Vector<Vector<i32>>& GetGeometryBoneMappings() const { return geometryBoneMappings_; }
 
     /// Return vertex morphs.
     const Vector<ModelMorph>& GetMorphs() const { return morphs_; }
 
     /// Return number of vertex morphs.
     /// @property
-    unsigned GetNumMorphs() const { return morphs_.Size(); }
+    i32 GetNumMorphs() const { return morphs_.Size(); }
 
     /// Return vertex morph by index.
-    const ModelMorph* GetMorph(unsigned index) const;
+    const ModelMorph* GetMorph(i32 index) const;
     /// Return vertex morph by name.
     const ModelMorph* GetMorph(const String& name) const;
     /// Return vertex morph by name hash.
     const ModelMorph* GetMorph(StringHash nameHash) const;
     /// Return vertex buffer morph range start.
-    unsigned GetMorphRangeStart(unsigned bufferIndex) const;
+    i32 GetMorphRangeStart(i32 bufferIndex) const;
     /// Return vertex buffer morph range vertex count.
-    unsigned GetMorphRangeCount(unsigned bufferIndex) const;
+    i32 GetMorphRangeCount(i32 bufferIndex) const;
 
 private:
     /// Bounding box.
@@ -206,15 +206,15 @@ private:
     /// Geometries.
     Vector<Vector<SharedPtr<Geometry>>> geometries_;
     /// Geometry bone mappings.
-    Vector<Vector<unsigned>> geometryBoneMappings_;
+    Vector<Vector<i32>> geometryBoneMappings_;
     /// Geometry centers.
     Vector<Vector3> geometryCenters_;
     /// Vertex morphs.
     Vector<ModelMorph> morphs_;
     /// Vertex buffer morph range start.
-    Vector<unsigned> morphRangeStarts_;
+    Vector<i32> morphRangeStarts_;
     /// Vertex buffer morph range vertex count.
-    Vector<unsigned> morphRangeCounts_;
+    Vector<i32> morphRangeCounts_;
     /// Vertex buffer data for asynchronous loading.
     Vector<VertexBufferDesc> loadVBData_;
     /// Index buffer data for asynchronous loading.

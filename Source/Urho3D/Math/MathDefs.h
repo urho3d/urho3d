@@ -24,15 +24,37 @@ namespace Urho3D
 #undef M_PI
 inline constexpr float M_PI = 3.14159265358979323846264338327950288f;
 inline constexpr float M_HALF_PI = M_PI * 0.5f;
-inline constexpr i32 M_MIN_INT = 0x80000000;
-inline constexpr i32 M_MAX_INT = 0x7fffffff;
-inline constexpr u32 M_MIN_UNSIGNED = 0x00000000;
-inline constexpr u32 M_MAX_UNSIGNED = 0xffffffff;
 
+// TODO: remove this
+inline constexpr i32 M_MIN_INT = 0x80000000;
+inline constexpr i32 M_MAX_INT = 0x7FFFFFFF;
+inline constexpr u32 M_MIN_UNSIGNED = 0x00000000;
+inline constexpr u32 M_MAX_UNSIGNED = 0xFFFFFFFF;
+
+inline constexpr i8 M_MIN_I8 = (i8)0x80; // -128
+inline constexpr i8 M_MAX_I8 = 0x7F; // 127
+inline constexpr u8 M_MIN_U8 = 0x00;
+inline constexpr u8 M_MAX_U8 = 0xFF; // 255
+
+inline constexpr i16 M_MIN_I16 = (i16)0x8000; // -32768
+inline constexpr i16 M_MAX_I16 = 0x7FFF; // 32767
+inline constexpr u16 M_MIN_U16 = 0x0000;
+inline constexpr u16 M_MAX_U16 = 0xFFFF; // 65535
+
+inline constexpr i32 M_MIN_I32 = (i32)0x80000000; // -2147483648
+inline constexpr i32 M_MAX_I32 = 0x7FFFFFFF; // 2147483647
+inline constexpr u32 M_MIN_U32 = 0x00000000;
+inline constexpr u32 M_MAX_U32 = 0xFFFFFFFF; // 4294967295
+
+inline constexpr i64 M_MIN_I64 = (i64)0x8000000000000000; // -9223372036854775808
+inline constexpr i64 M_MAX_I64 = 0x7FFFFFFFFFFFFFFF; // 9223372036854775807
+inline constexpr u64 M_MIN_U64 = 0x0000000000000000;
+inline constexpr u64 M_MAX_U64 = 0xFFFFFFFFFFFFFFFF; // 18446744073709551615
+
+inline constexpr i16 M_I16_MASK_ALL_BITS = (i16)0xFFFF; // -1
 inline constexpr u16 M_U16_MASK_ALL_BITS = 0xFFFF;
-inline constexpr i16 M_I16_MASK_ALL_BITS = -1;
-inline constexpr u32 M_U32_MASK_ALL_BITS = M_MAX_UNSIGNED;
-inline constexpr i32 M_I32_MASK_ALL_BITS = -1;
+inline constexpr i32 M_I32_MASK_ALL_BITS = (i32)0xFFFFFFFF; // -1
+inline constexpr u32 M_U32_MASK_ALL_BITS = 0xFFFFFFFF;
 
 inline constexpr float M_EPSILON = 0.000001f;
 inline constexpr float M_LARGE_EPSILON = 0.00005f;
@@ -291,7 +313,11 @@ inline i32 CountSetBits(u32 value)
 }
 
 /// Update a hash with the given 8-bit value using the SDBM algorithm.
-inline constexpr unsigned SDBMHash(unsigned hash, unsigned char c) { return c + (hash << 6u) + (hash << 16u) - hash; }
+inline constexpr hash32 SDBMHash(hash32 hash, u8 c) { return c + (hash << 6u) + (hash << 16u) - hash; }
+
+/// Update a hash with the given byte value using the SDBM algorithm.
+/// @nobind
+inline constexpr hash32 SDBMHash(hash32 hash, byte b) { return SDBMHash(hash, (u8)b); }
 
 /// Return a random float between 0.0 (inclusive) and 1.0 (exclusive).
 inline float Random() { return Rand() / 32768.0f; }

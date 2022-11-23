@@ -24,8 +24,8 @@ namespace Urho3D
 
 extern const char* NAVIGATION_CATEGORY;
 
-static const unsigned DEFAULT_MAX_AGENTS = 512;
-static const float DEFAULT_MAX_AGENT_RADIUS = 0.f;
+static constexpr i32 DEFAULT_MAX_AGENTS = 512;
+static constexpr float DEFAULT_MAX_AGENT_RADIUS = 0.f;
 
 static const StringVector filterTypesStructureElementNames =
 {
@@ -76,21 +76,21 @@ void CrowdManager::RegisterObject(Context* context)
 {
     context->RegisterFactory<CrowdManager>(NAVIGATION_CATEGORY);
 
-    URHO3D_ATTRIBUTE("Max Agents", unsigned, maxAgents_, DEFAULT_MAX_AGENTS, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Max Agent Radius", float, maxAgentRadius_, DEFAULT_MAX_AGENT_RADIUS, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Navigation Mesh", unsigned, navigationMeshId_, 0, AM_DEFAULT | AM_COMPONENTID);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Filter Types", GetQueryFilterTypesAttr, SetQueryFilterTypesAttr,
-        VariantVector, Variant::emptyVariantVector, AM_DEFAULT)
+    URHO3D_ATTRIBUTE("Max Agents", maxAgents_, DEFAULT_MAX_AGENTS, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Max Agent Radius", maxAgentRadius_, DEFAULT_MAX_AGENT_RADIUS, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Navigation Mesh", navigationMeshId_, 0, AM_DEFAULT | AM_COMPONENTID);
+    URHO3D_ACCESSOR_ATTRIBUTE("Filter Types", GetQueryFilterTypesAttr, SetQueryFilterTypesAttr,
+        Variant::emptyVariantVector, AM_DEFAULT)
         .SetMetadata(AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, filterTypesStructureElementNames);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Obstacle Avoidance Types", GetObstacleAvoidanceTypesAttr, SetObstacleAvoidanceTypesAttr,
-        VariantVector, Variant::emptyVariantVector, AM_DEFAULT)
+    URHO3D_ACCESSOR_ATTRIBUTE("Obstacle Avoidance Types", GetObstacleAvoidanceTypesAttr, SetObstacleAvoidanceTypesAttr,
+        Variant::emptyVariantVector, AM_DEFAULT)
         .SetMetadata(AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, obstacleAvoidanceTypesStructureElementNames);
 }
 
 void CrowdManager::ApplyAttributes()
 {
     // Values from Editor, saved-file, or network must be checked before applying
-    maxAgents_ = Max(1U, maxAgents_);
+    maxAgents_ = Max(1, maxAgents_);
     maxAgentRadius_ = Max(0.f, maxAgentRadius_);
 
     bool navMeshChange = false;
@@ -214,7 +214,7 @@ void CrowdManager::ResetCrowdTarget(Node* node)
         agents[i]->ResetTarget();
 }
 
-void CrowdManager::SetMaxAgents(unsigned maxAgents)
+void CrowdManager::SetMaxAgents(i32 maxAgents)
 {
     if (maxAgents != maxAgents_ && maxAgents > 0)
     {
@@ -265,7 +265,7 @@ void CrowdManager::SetQueryFilterTypesAttr(const VariantVector& value)
 
     unsigned index = 0;
     unsigned queryFilterType = 0;
-    numQueryFilterTypes_ = index < value.Size() ? Min(value[index++].GetUInt(), (unsigned)DT_CROWD_MAX_QUERY_FILTER_TYPE) : 0;
+    numQueryFilterTypes_ = index < value.Size() ? Min(value[index++].GetU32(), (unsigned)DT_CROWD_MAX_QUERY_FILTER_TYPE) : 0;
 
     while (queryFilterType < numQueryFilterTypes_)
     {
@@ -273,10 +273,10 @@ void CrowdManager::SetQueryFilterTypesAttr(const VariantVector& value)
         {
             dtQueryFilter* filter = crowd_->getEditableFilter(queryFilterType);
             assert(filter);
-            filter->setIncludeFlags((unsigned short)value[index++].GetUInt());
-            filter->setExcludeFlags((unsigned short)value[index++].GetUInt());
+            filter->setIncludeFlags((unsigned short)value[index++].GetU32());
+            filter->setExcludeFlags((unsigned short)value[index++].GetU32());
             unsigned prevNumAreas = numAreas_[queryFilterType];
-            numAreas_[queryFilterType] = Min(value[index++].GetUInt(), (unsigned)DT_MAX_AREAS);
+            numAreas_[queryFilterType] = Min(value[index++].GetU32(), (unsigned)DT_MAX_AREAS);
 
             // Must loop through based on previous number of areas, the new area cost (if any) can only be set in the next attribute get/set iteration
             if (index + prevNumAreas <= value.Size())
@@ -334,7 +334,7 @@ void CrowdManager::SetObstacleAvoidanceTypesAttr(const VariantVector& value)
 
     unsigned index = 0;
     unsigned obstacleAvoidanceType = 0;
-    numObstacleAvoidanceTypes_ = index < value.Size() ? Min(value[index++].GetUInt(), (unsigned)DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS) : 0;
+    numObstacleAvoidanceTypes_ = index < value.Size() ? Min(value[index++].GetU32(), (unsigned)DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS) : 0;
 
     while (obstacleAvoidanceType < numObstacleAvoidanceTypes_)
     {
@@ -347,10 +347,10 @@ void CrowdManager::SetObstacleAvoidanceTypesAttr(const VariantVector& value)
             params.weightSide = value[index++].GetFloat();
             params.weightToi = value[index++].GetFloat();
             params.horizTime = value[index++].GetFloat();
-            params.gridSize = (unsigned char)value[index++].GetUInt();
-            params.adaptiveDivs = (unsigned char)value[index++].GetUInt();
-            params.adaptiveRings = (unsigned char)value[index++].GetUInt();
-            params.adaptiveDepth = (unsigned char)value[index++].GetUInt();
+            params.gridSize = (unsigned char)value[index++].GetU32();
+            params.adaptiveDivs = (unsigned char)value[index++].GetU32();
+            params.adaptiveRings = (unsigned char)value[index++].GetU32();
+            params.adaptiveDepth = (unsigned char)value[index++].GetU32();
             crowd_->setObstacleAvoidanceParams(obstacleAvoidanceType, &params);
         }
         ++obstacleAvoidanceType;

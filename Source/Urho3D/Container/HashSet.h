@@ -618,7 +618,7 @@ private:
     static bool CompareNodes(Node*& lhs, Node*& rhs) { return lhs->key_ < rhs->key_; }
 
     /// Compute a hash based on the key and the bucket size.
-    unsigned Hash(const T& key) const { return MakeHash(key) & (NumBuckets() - 1); }
+    hash32 Hash(const T& key) const { return MakeHash(key) & (NumBuckets() - 1); }
 };
 
 template <class T> typename Urho3D::HashSet<T>::ConstIterator begin(const Urho3D::HashSet<T>& v) { return v.Begin(); }

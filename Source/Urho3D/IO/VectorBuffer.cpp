@@ -10,30 +10,36 @@ namespace Urho3D
 
 VectorBuffer::VectorBuffer() = default;
 
-VectorBuffer::VectorBuffer(const Vector<unsigned char>& data)
+VectorBuffer::VectorBuffer(const Vector<byte>& data)
 {
     SetData(data);
 }
 
-VectorBuffer::VectorBuffer(const void* data, unsigned size)
+VectorBuffer::VectorBuffer(const void* data, i32 size)
 {
+    assert(size >= 0);
+
     SetData(data, size);
 }
 
-VectorBuffer::VectorBuffer(Deserializer& source, unsigned size)
+VectorBuffer::VectorBuffer(Deserializer& source, i32 size)
 {
+    assert(size >= 0);
+
     SetData(source, size);
 }
 
-unsigned VectorBuffer::Read(void* dest, unsigned size)
+i32 VectorBuffer::Read(void* dest, i32 size)
 {
+    assert(size >= 0);
+
     if (size + position_ > size_)
         size = size_ - position_;
     if (!size)
         return 0;
 
-    unsigned char* srcPtr = &buffer_[position_];
-    auto* destPtr = (unsigned char*)dest;
+    byte* srcPtr = &buffer_[position_];
+    byte* destPtr = (byte*)dest;
     position_ += size;
 
     memcpy(destPtr, srcPtr, size);
@@ -41,8 +47,10 @@ unsigned VectorBuffer::Read(void* dest, unsigned size)
     return size;
 }
 
-unsigned VectorBuffer::Seek(unsigned position)
+i64 VectorBuffer::Seek(i64 position)
 {
+    assert(position >= 0 && position <= M_MAX_INT);
+
     if (position > size_)
         position = size_;
 
@@ -50,8 +58,10 @@ unsigned VectorBuffer::Seek(unsigned position)
     return position_;
 }
 
-unsigned VectorBuffer::Write(const void* data, unsigned size)
+i32 VectorBuffer::Write(const void* data, i32 size)
 {
+    assert(size >= 0);
+
     if (!size)
         return 0;
 
@@ -61,8 +71,8 @@ unsigned VectorBuffer::Write(const void* data, unsigned size)
         buffer_.Resize(size_);
     }
 
-    auto* srcPtr = (unsigned char*)data;
-    unsigned char* destPtr = &buffer_[position_];
+    byte* srcPtr = (byte*)data;
+    byte* destPtr = &buffer_[position_];
     position_ += size;
 
     memcpy(destPtr, srcPtr, size);
@@ -70,15 +80,17 @@ unsigned VectorBuffer::Write(const void* data, unsigned size)
     return size;
 }
 
-void VectorBuffer::SetData(const Vector<unsigned char>& data)
+void VectorBuffer::SetData(const Vector<byte>& data)
 {
     buffer_ = data;
     position_ = 0;
     size_ = data.Size();
 }
 
-void VectorBuffer::SetData(const void* data, unsigned size)
+void VectorBuffer::SetData(const void* data, i32 size)
 {
+    assert(size >= 0);
+
     if (!data)
         size = 0;
 
@@ -90,10 +102,12 @@ void VectorBuffer::SetData(const void* data, unsigned size)
     size_ = size;
 }
 
-void VectorBuffer::SetData(Deserializer& source, unsigned size)
+void VectorBuffer::SetData(Deserializer& source, i32 size)
 {
+    assert(size >= 0);
+
     buffer_.Resize(size);
-    unsigned actualSize = source.Read(&buffer_[0], size);
+    i32 actualSize = (i32)source.Read(&buffer_[0], size);
     if (actualSize != size)
         buffer_.Resize(actualSize);
 
@@ -108,8 +122,10 @@ void VectorBuffer::Clear()
     size_ = 0;
 }
 
-void VectorBuffer::Resize(unsigned size)
+void VectorBuffer::Resize(i32 size)
 {
+    assert(size >= 0);
+
     buffer_.Resize(size);
     size_ = size;
     if (position_ > size_)

@@ -91,7 +91,7 @@ void CreateToolBar()
     viewportModeList.AddItem(CreateViewPortModeText("2 Left / 1 Right", VIEWPORT_TOP_LEFT|VIEWPORT_BOTTOM_LEFT|VIEWPORT_RIGHT));
     for (uint i = 0; i < viewportModeList.numItems; ++i)
     {
-        if (viewportModeList.items[i].vars[VIEW_MODE].GetUInt() == viewportMode)
+        if (viewportModeList.items[i].vars[VIEW_MODE].GetU32() == viewportMode)
         {
             viewportModeList.selection = i;
             break;
@@ -384,7 +384,7 @@ void ToolBarSetViewportMode(StringHash eventType, VariantMap& eventData)
     DropDownList@ dropDown = eventData["Element"].GetPtr();
     UIElement@ selected = dropDown.selectedItem;
     dropDown.focus = false;     // Lose the focus so the RMB dragging, immediately followed after changing viewport setup, behaves as expected
-    uint mode = selected.vars[VIEW_MODE].GetUInt();
+    uint mode = selected.vars[VIEW_MODE].GetU32();
     SetViewportMode(mode);
 }
 

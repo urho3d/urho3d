@@ -19,10 +19,16 @@
 # 3. This notice may not be removed or altered from any source distribution.
 #
 
-# Modified by Yao Wei Tjong for Urho3D, the modified portion is licensed under below license
+# Modified for Urho3D, the modified portion is licensed under below license
 
 # Copyright (c) 2008-2022 the Urho3D project
 # License: MIT
+
+# Urho3D: This hack allows build 32-bit version on Linux Mint x64
+# TODO: Why is it not being detected correctly?
+if (CMAKE_LIBRARY_ARCHITECTURE STREQUAL "x86_64-linux-gnu" AND NOT URHO3D_64BIT)
+    set (CMAKE_LIBRARY_ARCHITECTURE "i386-linux-gnu")
+endif ()
 
 # Urho3D - commented out in-source tree build prevention as Urho3D supports both out-of-source and in-source tree builds
 
@@ -322,7 +328,7 @@ endif ()
 dep_option(WASAPI              "Use the Windows WASAPI audio driver" ON WINDOWS OFF)
 # Urho3D
 if (WINDOWS)
-  if (URHO3D_D3D9 OR URHO3D_D3D11)
+  if (URHO3D_D3D11)
     set (RENDER_D3D TRUE)
   else ()
     set (RENDER_D3D FALSE)

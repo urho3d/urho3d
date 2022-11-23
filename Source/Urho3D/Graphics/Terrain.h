@@ -43,9 +43,9 @@ public:
     /// Set maximum number of LOD levels for terrain patches. This can be between 1-4.
     /// @property
     void SetMaxLodLevels(unsigned levels);
-    /// Set LOD level used for terrain patch occlusion. By default (M_MAX_UNSIGNED) the coarsest. Since the LOD level used needs to be fixed, using finer LOD levels may result in false positive occlusion in cases where the actual rendered geometry is coarser, so use with caution.
+    /// Set LOD level used for terrain patch occlusion. By default (NINDEX) the coarsest. Since the LOD level used needs to be fixed, using finer LOD levels may result in false positive occlusion in cases where the actual rendered geometry is coarser, so use with caution.
     /// @property
-    void SetOcclusionLodLevel(unsigned level);
+    void SetOcclusionLodLevel(i32 level);
     /// Set smoothing of heightmap.
     /// @property
     void SetSmoothing(bool enable);
@@ -127,7 +127,7 @@ public:
 
     /// Return LOD level used for occlusion.
     /// @property
-    unsigned GetOcclusionLodLevel() const { return occlusionLodLevel_; }
+    i32 GetOcclusionLodLevel() const { return occlusionLodLevel_; }
 
     /// Return whether smoothing is in use.
     /// @property
@@ -234,7 +234,7 @@ public:
     /// Set max LOD levels attribute.
     void SetMaxLodLevelsAttr(unsigned value);
     /// Set occlusion LOD level attribute.
-    void SetOcclusionLodLevelAttr(unsigned value);
+    void SetOcclusionLodLevelAttr(i32 value);
     /// Return heightmap attribute.
     ResourceRef GetHeightMapAttr() const;
     /// Return material attribute.
@@ -315,7 +315,7 @@ private:
     /// Maximum number of LOD levels.
     unsigned maxLodLevels_;
     /// LOD level used for occlusion.
-    unsigned occlusionLodLevel_;
+    i32 occlusionLodLevel_;
     /// Smoothing enable flag.
     bool smoothing_;
     /// Visible flag.

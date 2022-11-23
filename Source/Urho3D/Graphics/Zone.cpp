@@ -29,7 +29,7 @@ static const float DEFAULT_FOG_HEIGHT_SCALE = 0.5f;
 extern const char* SCENE_CATEGORY;
 
 Zone::Zone(Context* context) :
-    Drawable(context, DRAWABLE_ZONE),
+    Drawable(context, DrawableTypes::Zone),
     inverseWorldDirty_(true),
     heightFog_(false),
     override_(false),
@@ -51,24 +51,24 @@ void Zone::RegisterObject(Context* context)
 {
     context->RegisterFactory<Zone>(SCENE_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_ATTRIBUTE_EX("Bounding Box Min", Vector3, boundingBox_.min_, MarkNodeDirty, DEFAULT_BOUNDING_BOX_MIN, AM_DEFAULT);
-    URHO3D_ATTRIBUTE_EX("Bounding Box Max", Vector3, boundingBox_.max_, MarkNodeDirty, DEFAULT_BOUNDING_BOX_MAX, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Ambient Color", Color, ambientColor_, DEFAULT_AMBIENT_COLOR, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Fog Color", Color, fogColor_, DEFAULT_FOG_COLOR, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Fog Start", float, fogStart_, DEFAULT_FOG_START, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Fog End", float, fogEnd_, DEFAULT_FOG_END, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Fog Height", float, fogHeight_, DEFAULT_FOG_HEIGHT, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Fog Height Scale", float, fogHeightScale_, DEFAULT_FOG_HEIGHT_SCALE, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Height Fog Mode", bool, heightFog_, false, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Override Mode", bool, override_, false, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Ambient Gradient", bool, ambientGradient_, false, AM_DEFAULT);
-    URHO3D_ATTRIBUTE_EX("Priority", int, priority_, MarkNodeDirty, 0, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Zone Texture", GetZoneTextureAttr, SetZoneTextureAttr, ResourceRef,
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, true, AM_DEFAULT);
+    URHO3D_ATTRIBUTE_EX("Bounding Box Min", boundingBox_.min_, MarkNodeDirty, DEFAULT_BOUNDING_BOX_MIN, AM_DEFAULT);
+    URHO3D_ATTRIBUTE_EX("Bounding Box Max", boundingBox_.max_, MarkNodeDirty, DEFAULT_BOUNDING_BOX_MAX, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Ambient Color", ambientColor_, DEFAULT_AMBIENT_COLOR, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Fog Color", fogColor_, DEFAULT_FOG_COLOR, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Fog Start", fogStart_, DEFAULT_FOG_START, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Fog End", fogEnd_, DEFAULT_FOG_END, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Fog Height", fogHeight_, DEFAULT_FOG_HEIGHT, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Fog Height Scale", fogHeightScale_, DEFAULT_FOG_HEIGHT_SCALE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Height Fog Mode", heightFog_, false, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Override Mode", override_, false, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Ambient Gradient", ambientGradient_, false, AM_DEFAULT);
+    URHO3D_ATTRIBUTE_EX("Priority", priority_, MarkNodeDirty, 0, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Zone Texture", GetZoneTextureAttr, SetZoneTextureAttr,
         ResourceRef(TextureCube::GetTypeStatic()), AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Light Mask", int, lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Shadow Mask", int, shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Shadow Mask", shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, DEFAULT_ZONEMASK, AM_DEFAULT);
 }
 
 void Zone::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
@@ -247,7 +247,7 @@ void Zone::UpdateAmbientGradient()
 
         Vector<Zone*> result;
         {
-            PointOctreeQuery query(reinterpret_cast<Vector<Drawable*>&>(result), minZPosition, DRAWABLE_ZONE);
+            PointOctreeQuery query(reinterpret_cast<Vector<Drawable*>&>(result), minZPosition, DrawableTypes::Zone);
             octant_->GetRoot()->GetDrawables(query);
         }
 
@@ -273,7 +273,7 @@ void Zone::UpdateAmbientGradient()
 
         // Do the same for gradient end position
         {
-            PointOctreeQuery query(reinterpret_cast<Vector<Drawable*>&>(result), maxZPosition, DRAWABLE_ZONE);
+            PointOctreeQuery query(reinterpret_cast<Vector<Drawable*>&>(result), maxZPosition, DrawableTypes::Zone);
             octant_->GetRoot()->GetDrawables(query);
         }
         bestPriority = M_MIN_INT;
@@ -308,18 +308,18 @@ void Zone::ClearDrawablesZone()
     if (octant_ && lastWorldBoundingBox_.Defined())
     {
         Vector<Drawable*> result;
-        BoxOctreeQuery query(result, lastWorldBoundingBox_, DRAWABLE_GEOMETRY | DRAWABLE_ZONE);
+        BoxOctreeQuery query(result, lastWorldBoundingBox_, DrawableTypes::Geometry | DrawableTypes::Zone);
         octant_->GetRoot()->GetDrawables(query);
 
         for (Vector<Drawable*>::Iterator i = result.Begin(); i != result.End(); ++i)
         {
             Drawable* drawable = *i;
-            unsigned drawableFlags = drawable->GetDrawableFlags();
-            if (drawableFlags & DRAWABLE_GEOMETRY)
+            DrawableTypes drawableType = drawable->GetDrawableType();
+            if (drawableType == DrawableTypes::Geometry)
                 drawable->SetZone(nullptr);
-            else if (drawableFlags & DRAWABLE_ZONE)
+            else // drawableType == DrawableTypes::Zone
             {
-                auto* zone = static_cast<Zone*>(drawable);
+                Zone* zone = static_cast<Zone*>(drawable);
                 zone->lastAmbientStartZone_.Reset();
                 zone->lastAmbientEndZone_.Reset();
             }

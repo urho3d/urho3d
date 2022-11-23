@@ -57,18 +57,18 @@ void Node::RegisterObject(Context* context)
 {
     context->RegisterFactory<Node>();
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Name", GetName, SetName, String, String::EMPTY, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Tags", GetTags, SetTags, StringVector, Variant::emptyStringVector, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Scale", GetScale, SetScale, Vector3, Vector3::ONE, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Variables", VariantMap, vars_, Variant::emptyVariantMap, AM_FILE); // Network replication of vars uses custom data
-    URHO3D_ACCESSOR_ATTRIBUTE("Network Position", GetNetPositionAttr, SetNetPositionAttr, Vector3, Vector3::ZERO,
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Name", GetName, SetName, String::EMPTY, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Tags", GetTags, SetTags, Variant::emptyStringVector, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Position", GetPosition, SetPosition, Vector3::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Rotation", GetRotation, SetRotation, Quaternion::IDENTITY, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Scale", GetScale, SetScale, Vector3::ONE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Variables", vars_, Variant::emptyVariantMap, AM_FILE); // Network replication of vars uses custom data
+    URHO3D_ACCESSOR_ATTRIBUTE("Network Position", GetNetPositionAttr, SetNetPositionAttr, Vector3::ZERO,
         AM_NET | AM_LATESTDATA | AM_NOEDIT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Network Rotation", GetNetRotationAttr, SetNetRotationAttr, Vector<unsigned char>, Variant::emptyBuffer,
+    URHO3D_ACCESSOR_ATTRIBUTE("Network Rotation", GetNetRotationAttr, SetNetRotationAttr, Variant::emptyBuffer,
         AM_NET | AM_LATESTDATA | AM_NOEDIT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Network Parent Node", GetNetParentAttr, SetNetParentAttr, Vector<unsigned char>, Variant::emptyBuffer,
+    URHO3D_ACCESSOR_ATTRIBUTE("Network Parent Node", GetNetParentAttr, SetNetParentAttr, Variant::emptyBuffer,
         AM_NET | AM_NOEDIT);
 }
 
@@ -77,7 +77,7 @@ bool Node::Load(Deserializer& source)
     SceneResolver resolver;
 
     // Read own ID. Will not be applied, only stored for resolving possible references
-    unsigned nodeID = source.ReadUInt();
+    NodeId nodeID = source.ReadU32();
     resolver.AddNode(nodeID, this);
 
     // Read attributes, components and child nodes
@@ -94,7 +94,7 @@ bool Node::Load(Deserializer& source)
 bool Node::Save(Serializer& dest) const
 {
     // Write node ID
-    if (!dest.WriteUInt(id_))
+    if (!dest.WriteU32(id_))
         return false;
 
     // Write attributes
@@ -103,9 +103,8 @@ bool Node::Save(Serializer& dest) const
 
     // Write components
     dest.WriteVLE(GetNumPersistentComponents());
-    for (unsigned i = 0; i < components_.Size(); ++i)
+    for (const SharedPtr<Component>& component : components_)
     {
-        Component* component = components_[i];
         if (component->IsTemporary())
             continue;
 
@@ -119,9 +118,8 @@ bool Node::Save(Serializer& dest) const
 
     // Write child nodes
     dest.WriteVLE(GetNumPersistentChildren());
-    for (unsigned i = 0; i < children_.Size(); ++i)
+    for (const SharedPtr<Node>& node : children_)
     {
-        Node* node = children_[i];
         if (node->IsTemporary())
             continue;
 
@@ -137,7 +135,7 @@ bool Node::LoadXML(const XMLElement& source)
     SceneResolver resolver;
 
     // Read own ID. Will not be applied, only stored for resolving possible references
-    unsigned nodeID = source.GetUInt("id");
+    NodeId nodeID = source.GetU32("id");
     resolver.AddNode(nodeID, this);
 
     // Read attributes, components and child nodes
@@ -156,7 +154,7 @@ bool Node::LoadJSON(const JSONValue& source)
     SceneResolver resolver;
 
     // Read own ID. Will not be applied, only stored for resolving possible references
-    unsigned nodeID = source.Get("id").GetUInt();
+    NodeId nodeID = source.Get("id").GetU32();
     resolver.AddNode(nodeID, this);
 
     // Read attributes, components and child nodes
@@ -173,7 +171,7 @@ bool Node::LoadJSON(const JSONValue& source)
 bool Node::SaveXML(XMLElement& dest) const
 {
     // Write node ID
-    if (!dest.SetUInt("id", id_))
+    if (!dest.SetU32("id", id_))
         return false;
 
     // Write attributes
@@ -181,9 +179,8 @@ bool Node::SaveXML(XMLElement& dest) const
         return false;
 
     // Write components
-    for (unsigned i = 0; i < components_.Size(); ++i)
+    for (const SharedPtr<Component>& component : components_)
     {
-        Component* component = components_[i];
         if (component->IsTemporary())
             continue;
 
@@ -193,9 +190,8 @@ bool Node::SaveXML(XMLElement& dest) const
     }
 
     // Write child nodes
-    for (unsigned i = 0; i < children_.Size(); ++i)
+    for (const SharedPtr<Node>& node : children_)
     {
-        Node* node = children_[i];
         if (node->IsTemporary())
             continue;
 
@@ -219,9 +215,8 @@ bool Node::SaveJSON(JSONValue& dest) const
     // Write components
     JSONArray componentsArray;
     componentsArray.Reserve(components_.Size());
-    for (unsigned i = 0; i < components_.Size(); ++i)
+    for (const SharedPtr<Component>& component : components_)
     {
-        Component* component = components_[i];
         if (component->IsTemporary())
             continue;
 
@@ -235,9 +230,8 @@ bool Node::SaveJSON(JSONValue& dest) const
     // Write child nodes
     JSONArray childrenArray;
     childrenArray.Reserve(children_.Size());
-    for (unsigned i = 0; i < children_.Size(); ++i)
+    for (const SharedPtr<Node>& node : children_)
     {
-        Node* node = children_[i];
         if (node->IsTemporary())
             continue;
 
@@ -398,16 +392,16 @@ void Node::RemoveAllTags()
     // Clear old scene cache
     if (scene_)
     {
-        for (unsigned i = 0; i < impl_->tags_.Size(); ++i)
+        for (const String& tag : impl_->tags_)
         {
-            scene_->NodeTagRemoved(this, impl_->tags_[i]);
+            scene_->NodeTagRemoved(this, tag);
 
             // Send event
             using namespace NodeTagRemoved;
             VariantMap& eventData = GetEventDataMap();
             eventData[P_SCENE] = scene_;
             eventData[P_NODE] = this;
-            eventData[P_TAG] = impl_->tags_[i];
+            eventData[P_TAG] = tag;
             scene_->SendEvent(E_NODETAGREMOVED, eventData);
         }
     }
@@ -544,16 +538,16 @@ void Node::Translate(const Vector3& delta, TransformSpace space)
 {
     switch (space)
     {
-    case TS_LOCAL:
+    case TransformSpace::Local:
         // Note: local space translation disregards local scale for scale-independent movement speed
         position_ += rotation_ * delta;
         break;
 
-    case TS_PARENT:
+    case TransformSpace::Parent:
         position_ += delta;
         break;
 
-    case TS_WORLD:
+    case TransformSpace::World:
         position_ += (parent_ == scene_ || !parent_) ? delta : parent_->GetWorldTransform().Inverse() * Vector4(delta, 0.0f);
         break;
     }
@@ -567,15 +561,15 @@ void Node::Rotate(const Quaternion& delta, TransformSpace space)
 {
     switch (space)
     {
-    case TS_LOCAL:
+    case TransformSpace::Local:
         rotation_ = (rotation_ * delta).Normalized();
         break;
 
-    case TS_PARENT:
+    case TransformSpace::Parent:
         rotation_ = (delta * rotation_).Normalized();
         break;
 
-    case TS_WORLD:
+    case TransformSpace::World:
         if (parent_ == scene_ || !parent_)
             rotation_ = (delta * rotation_).Normalized();
         else
@@ -598,17 +592,17 @@ void Node::RotateAround(const Vector3& point, const Quaternion& delta, Transform
 
     switch (space)
     {
-    case TS_LOCAL:
+    case TransformSpace::Local:
         parentSpacePoint = GetTransform() * point;
         rotation_ = (rotation_ * delta).Normalized();
         break;
 
-    case TS_PARENT:
+    case TransformSpace::Parent:
         parentSpacePoint = point;
         rotation_ = (delta * rotation_).Normalized();
         break;
 
-    case TS_WORLD:
+    case TransformSpace::World:
         if (parent_ == scene_ || !parent_)
         {
             parentSpacePoint = point;
@@ -652,15 +646,15 @@ bool Node::LookAt(const Vector3& target, const Vector3& up, TransformSpace space
 
     switch (space)
     {
-    case TS_LOCAL:
+    case TransformSpace::Local:
         worldSpaceTarget = GetWorldTransform() * target;
         break;
 
-    case TS_PARENT:
+    case TransformSpace::Parent:
         worldSpaceTarget = (parent_ == scene_ || !parent_) ? target : parent_->GetWorldTransform() * target;
         break;
 
-    case TS_WORLD:
+    case TransformSpace::World:
         worldSpaceTarget = target;
         break;
     }
@@ -768,14 +762,14 @@ void Node::MarkDirty()
     }
 }
 
-Node* Node::CreateChild(const String& name, CreateMode mode, unsigned id, bool temporary)
+Node* Node::CreateChild(const String& name, CreateMode mode, NodeId id, bool temporary)
 {
     Node* newNode = CreateChild(id, mode, temporary);
     newNode->SetName(name);
     return newNode;
 }
 
-Node* Node::CreateTemporaryChild(const String& name, CreateMode mode, unsigned id)
+Node* Node::CreateTemporaryChild(const String& name, CreateMode mode, NodeId id)
 {
     return CreateChild(name, mode, id, true);
 }
@@ -866,7 +860,7 @@ void Node::RemoveAllChildren()
 
 void Node::RemoveChildren(bool removeReplicated, bool removeLocal, bool recursive)
 {
-    unsigned numRemoved = 0;
+    i32 numRemoved = 0;
 
     for (i32 i = children_.Size() - 1; i >= 0; --i)
     {
@@ -892,7 +886,7 @@ void Node::RemoveChildren(bool removeReplicated, bool removeLocal, bool recursiv
         MarkReplicationDirty();
 }
 
-Component* Node::CreateComponent(StringHash type, CreateMode mode, unsigned id)
+Component* Node::CreateComponent(StringHash type, CreateMode mode, ComponentId id)
 {
     // Do not attempt to create replicated components to local nodes, as that may lead to component ID overwrite
     // as replicated components are synced over
@@ -911,7 +905,7 @@ Component* Node::CreateComponent(StringHash type, CreateMode mode, unsigned id)
     return newComponent;
 }
 
-Component* Node::GetOrCreateComponent(StringHash type, CreateMode mode, unsigned id)
+Component* Node::GetOrCreateComponent(StringHash type, CreateMode mode, ComponentId id)
 {
     Component* oldComponent = GetComponent(type);
     if (oldComponent)
@@ -920,7 +914,7 @@ Component* Node::GetOrCreateComponent(StringHash type, CreateMode mode, unsigned
         return CreateComponent(type, mode, id);
 }
 
-Component* Node::CloneComponent(Component* component, unsigned id)
+Component* Node::CloneComponent(Component* component, ComponentId id)
 {
     if (!component)
     {
@@ -931,7 +925,7 @@ Component* Node::CloneComponent(Component* component, unsigned id)
     return CloneComponent(component, component->IsReplicated() ? REPLICATED : LOCAL, id);
 }
 
-Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned id)
+Component* Node::CloneComponent(Component* component, CreateMode mode, ComponentId id)
 {
     if (!component)
     {
@@ -951,7 +945,7 @@ Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned 
 
     if (compAttributes)
     {
-        for (unsigned i = 0; i < compAttributes->Size() && i < cloneAttributes->Size(); ++i)
+        for (i32 i = 0; i < compAttributes->Size() && i < cloneAttributes->Size(); ++i)
         {
             const AttributeInfo& attr = compAttributes->At(i);
             const AttributeInfo& cloneAttr = cloneAttributes->At(i);
@@ -1014,7 +1008,7 @@ void Node::RemoveComponent(StringHash type)
 
 void Node::RemoveComponents(bool removeReplicated, bool removeLocal)
 {
-    unsigned numRemoved = 0;
+    i32 numRemoved = 0;
 
     for (i32 i = components_.Size() - 1; i >= 0; --i)
     {
@@ -1040,7 +1034,7 @@ void Node::RemoveComponents(bool removeReplicated, bool removeLocal)
 
 void Node::RemoveComponents(StringHash type)
 {
-    unsigned numRemoved = 0;
+    i32 numRemoved = 0;
 
     for (i32 i = components_.Size() - 1; i >= 0; --i)
     {
@@ -1061,8 +1055,10 @@ void Node::RemoveAllComponents()
     RemoveComponents(true, true);
 }
 
-void Node::ReorderComponent(Component* component, unsigned index)
+void Node::ReorderComponent(Component* component, i32 index)
 {
+    assert((index >= 0 && index < components_.Size()) || index == ENDPOS);
+
     if (!component || component->GetNode() != this)
         return;
 
@@ -1200,18 +1196,17 @@ Vector2 Node::WorldToLocal2D(const Vector2& vector) const
     return Vector2(result.x_, result.y_);
 }
 
-unsigned Node::GetNumChildren(bool recursive) const
+i32 Node::GetNumChildren(bool recursive) const
 {
     if (!recursive)
         return children_.Size();
-    else
-    {
-        unsigned allChildren = children_.Size();
-        for (Vector<SharedPtr<Node>>::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
-            allChildren += (*i)->GetNumChildren(true);
 
-        return allChildren;
-    }
+    i32 allChildren = children_.Size();
+
+    for (const SharedPtr<Node>& child : children_)
+        allChildren += child->GetNumChildren(true);
+
+    return allChildren;
 }
 
 void Node::GetChildren(Vector<Node*>& dest, bool recursive) const
@@ -1280,9 +1275,17 @@ Vector<Node*> Node::GetChildrenWithTag(const String& tag, bool recursive) const
     return dest;
 }
 
-Node* Node::GetChild(unsigned index) const
+Node* Node::GetChild(i32 index) const
 {
-    return index < children_.Size() ? children_[index].Get() : nullptr;
+    assert(index >= 0);
+
+    if (index < 0 || index >= children_.Size())
+    {
+        URHO3D_LOGWARNING("Node* Node::GetChild(i32 index) const: index out of range");
+        return nullptr;
+    }
+
+    return children_[index].Get();
 }
 
 Node* Node::GetChild(const String& name, bool recursive) const
@@ -1313,12 +1316,13 @@ Node* Node::GetChild(StringHash nameHash, bool recursive) const
     return nullptr;
 }
 
-unsigned Node::GetNumNetworkComponents() const
+i32 Node::GetNumNetworkComponents() const
 {
-    unsigned num = 0;
-    for (Vector<SharedPtr<Component>>::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
+    i32 num = 0;
+
+    for (const SharedPtr<Component>& component : components_)
     {
-        if ((*i)->IsReplicated())
+        if (component->IsReplicated())
             ++num;
     }
 
@@ -1417,7 +1421,7 @@ Component* Node::GetParentComponent(StringHash type, bool fullTraversal) const
     return nullptr;
 }
 
-void Node::SetID(unsigned id)
+void Node::SetID(NodeId id)
 {
     id_ = id;
 }
@@ -1443,7 +1447,7 @@ void Node::SetNetPositionAttr(const Vector3& value)
         SetPosition(value);
 }
 
-void Node::SetNetRotationAttr(const Vector<unsigned char>& value)
+void Node::SetNetRotationAttr(const Vector<byte>& value)
 {
     MemoryBuffer buf(value);
     auto* transform = GetComponent<SmoothedTransform>();
@@ -1453,7 +1457,7 @@ void Node::SetNetRotationAttr(const Vector<unsigned char>& value)
         SetRotation(buf.ReadPackedQuaternion());
 }
 
-void Node::SetNetParentAttr(const Vector<unsigned char>& value)
+void Node::SetNetParentAttr(const Vector<byte>& value)
 {
     Scene* scene = GetScene();
     if (!scene)
@@ -1467,7 +1471,7 @@ void Node::SetNetParentAttr(const Vector<unsigned char>& value)
         return;
     }
 
-    unsigned baseNodeID = buf.ReadNetID();
+    NodeId baseNodeID = buf.ReadNetID();
     Node* baseNode = scene->GetNode(baseNodeID);
     if (!baseNode)
     {
@@ -1495,21 +1499,21 @@ const Vector3& Node::GetNetPositionAttr() const
     return position_;
 }
 
-const Vector<unsigned char>& Node::GetNetRotationAttr() const
+const Vector<byte>& Node::GetNetRotationAttr() const
 {
     impl_->attrBuffer_.Clear();
     impl_->attrBuffer_.WritePackedQuaternion(rotation_);
     return impl_->attrBuffer_.GetBuffer();
 }
 
-const Vector<unsigned char>& Node::GetNetParentAttr() const
+const Vector<byte>& Node::GetNetParentAttr() const
 {
     impl_->attrBuffer_.Clear();
     Scene* scene = GetScene();
     if (scene && parent_ && parent_ != scene)
     {
         // If parent is replicated, can write the ID directly
-        unsigned parentID = parent_->GetID();
+        NodeId parentID = parent_->GetID();
         if (Scene::IsReplicatedID(parentID))
             impl_->attrBuffer_.WriteNetID(parentID);
         else
@@ -1539,12 +1543,12 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool loadChildren
     if (!Animatable::Load(source))
         return false;
 
-    unsigned numComponents = source.ReadVLE();
-    for (unsigned i = 0; i < numComponents; ++i)
+    i32 numComponents = source.ReadVLE();
+    for (i32 i = 0; i < numComponents; ++i)
     {
         VectorBuffer compBuffer(source, source.ReadVLE());
         StringHash compType = compBuffer.ReadStringHash();
-        unsigned compID = compBuffer.ReadUInt();
+        ComponentId compID = compBuffer.ReadU32();
 
         Component* newComponent = SafeCreateComponent(String::EMPTY, compType,
             (mode == REPLICATED && Scene::IsReplicatedID(compID)) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
@@ -1559,10 +1563,10 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool loadChildren
     if (!loadChildren)
         return true;
 
-    unsigned numChildren = source.ReadVLE();
-    for (unsigned i = 0; i < numChildren; ++i)
+    i32 numChildren = source.ReadVLE();
+    for (i32 i = 0; i < numChildren; ++i)
     {
-        unsigned nodeID = source.ReadUInt();
+        NodeId nodeID = source.ReadU32();
         Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, (mode == REPLICATED && Scene::IsReplicatedID(nodeID)) ? REPLICATED :
             LOCAL);
         resolver.AddNode(nodeID, newNode);
@@ -1586,7 +1590,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadC
     while (compElem)
     {
         String typeName = compElem.GetAttribute("type");
-        unsigned compID = compElem.GetUInt("id");
+        ComponentId compID = compElem.GetU32("id");
         Component* newComponent = SafeCreateComponent(typeName, StringHash(typeName),
             (mode == REPLICATED && Scene::IsReplicatedID(compID)) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
         if (newComponent)
@@ -1605,7 +1609,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadC
     XMLElement childElem = source.GetChild("node");
     while (childElem)
     {
-        unsigned nodeID = childElem.GetUInt("id");
+        NodeId nodeID = childElem.GetU32("id");
         Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, (mode == REPLICATED && Scene::IsReplicatedID(nodeID)) ? REPLICATED :
             LOCAL);
         resolver.AddNode(nodeID, newNode);
@@ -1629,11 +1633,11 @@ bool Node::LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadC
 
     const JSONArray& componentsArray = source.Get("components").GetArray();
 
-    for (unsigned i = 0; i < componentsArray.Size(); i++)
+    for (i32 i = 0; i < componentsArray.Size(); i++)
     {
         const JSONValue& compVal = componentsArray.At(i);
         String typeName = compVal.Get("type").GetString();
-        unsigned compID = compVal.Get("id").GetUInt();
+        ComponentId compID = compVal.Get("id").GetU32();
         Component* newComponent = SafeCreateComponent(typeName, StringHash(typeName),
             (mode == REPLICATED && Scene::IsReplicatedID(compID)) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
         if (newComponent)
@@ -1648,11 +1652,11 @@ bool Node::LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadC
         return true;
 
     const JSONArray& childrenArray = source.Get("children").GetArray();
-    for (unsigned i = 0; i < childrenArray.Size(); i++)
+    for (i32 i = 0; i < childrenArray.Size(); i++)
     {
         const JSONValue& childVal = childrenArray.At(i);
 
-        unsigned nodeID = childVal.Get("id").GetUInt();
+        NodeId nodeID = childVal.Get("id").GetU32();
         Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, (mode == REPLICATED && Scene::IsReplicatedID(nodeID)) ? REPLICATED :
             LOCAL);
         resolver.AddNode(nodeID, newNode);
@@ -1691,10 +1695,10 @@ void Node::PrepareNetworkUpdate()
         AllocateNetworkState();
 
     const Vector<AttributeInfo>* attributes = networkState_->attributes_;
-    unsigned numAttributes = attributes->Size();
+    i32 numAttributes = attributes->Size();
 
     // Check for attribute changes
-    for (unsigned i = 0; i < numAttributes; ++i)
+    for (i32 i = 0; i < numAttributes; ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
 
@@ -1783,7 +1787,7 @@ void Node::MarkReplicationDirty()
     }
 }
 
-Node* Node::CreateChild(unsigned id, CreateMode mode, bool temporary)
+Node* Node::CreateChild(NodeId id, CreateMode mode, bool temporary)
 {
     SharedPtr<Node> newNode(new Node(context_));
     newNode->SetTemporary(temporary);
@@ -1802,7 +1806,7 @@ Node* Node::CreateChild(unsigned id, CreateMode mode, bool temporary)
     return newNode;
 }
 
-void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
+void Node::AddComponent(Component* component, ComponentId id, CreateMode mode)
 {
     if (!component)
         return;
@@ -1846,26 +1850,26 @@ void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
     }
 }
 
-unsigned Node::GetNumPersistentChildren() const
+i32 Node::GetNumPersistentChildren() const
 {
-    unsigned ret = 0;
+    i32 ret = 0;
 
-    for (Vector<SharedPtr<Node>>::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+    for (const SharedPtr<Node>& child : children_)
     {
-        if (!(*i)->IsTemporary())
+        if (!child->IsTemporary())
             ++ret;
     }
 
     return ret;
 }
 
-unsigned Node::GetNumPersistentComponents() const
+i32 Node::GetNumPersistentComponents() const
 {
-    unsigned ret = 0;
+    i32 ret = 0;
 
-    for (Vector<SharedPtr<Component>>::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
+    for (const SharedPtr<Component>& component : components_)
     {
-        if (!(*i)->IsTemporary())
+        if (!component->IsTemporary())
             ++ret;
     }
 
@@ -1904,7 +1908,7 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
     {
         // Name must in following format: "#0/#1/@component#0/attribute"
         Node* node = this;
-        unsigned i = 0;
+        i32 i = 0;
         for (; i < names.Size() - 1; ++i)
         {
             if (names[i].Front() != '#')
@@ -1914,7 +1918,7 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
             char s = name.Front();
             if (s >= '0' && s <= '9')
             {
-                unsigned index = ToUInt(name);
+                i32 index = ToI32(name);
                 node = node->GetChild(index);
             }
             else
@@ -1957,7 +1961,7 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
         }
         else
         {
-            unsigned index = ToUInt(componentNames[1]);
+            i32 index = ToI32(componentNames[1]);
             Vector<Component*> components;
             node->GetComponents(components, StringHash(componentNames.Front()));
             if (index >= components.Size())
@@ -2040,7 +2044,7 @@ void Node::SetEnabled(bool enable, bool recursive, bool storeSelf)
     }
 }
 
-Component* Node::SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, unsigned id)
+Component* Node::SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, ComponentId id)
 {
     // Do not attempt to create replicated components to local nodes, as that may lead to component ID overwrite
     // as replicated components are synced over
@@ -2167,7 +2171,7 @@ Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mod
 
     // Copy attributes
     const Vector<AttributeInfo>* attributes = GetAttributes();
-    for (unsigned j = 0; j < attributes->Size(); ++j)
+    for (i32 j = 0; j < attributes->Size(); ++j)
     {
         const AttributeInfo& attr = attributes->At(j);
         // Do not copy network-only attributes, as they may have unintended side effects

@@ -522,8 +522,8 @@ void PostEditAttribute(Serializable@ serializable, uint index)
     // try to get it from a StaticModel in the same node
     if (serializable.typeName == "CollisionShape" && serializable.attributeInfos[index].name == "Shape Type")
     {
-        int shapeType = serializable.GetAttribute("Shape Type").GetInt();
-        if ((shapeType == 6 || shapeType == 7) && serializable.GetAttribute("CustomGeometry ComponentID").GetInt() == 0 &&
+        int shapeType = serializable.GetAttribute("Shape Type").GetI32();
+        if ((shapeType == 6 || shapeType == 7) && serializable.GetAttribute("CustomGeometry ComponentID").GetI32() == 0 &&
             serializable.GetAttribute("Model").GetResourceRef().name.Trimmed().length == 0)
         {
             Node@ ownerNode = cast<Component>(serializable).node;
@@ -584,7 +584,7 @@ Array<Serializable@>@ GetAttributeEditorTargets(UIElement@ attrEdit)
         Array<Variant>@ ids = variant.GetVariantVector();
         for (uint i = 0; i < ids.length; ++i)
         {
-            Node@ node = editorScene.GetNode(ids[i].GetUInt());
+            Node@ node = editorScene.GetNode(ids[i].GetU32());
             if (node !is null)
                 ret.Push(node);
         }
@@ -597,7 +597,7 @@ Array<Serializable@>@ GetAttributeEditorTargets(UIElement@ attrEdit)
             Array<Variant>@ ids = variant.GetVariantVector();
             for (uint i = 0; i < ids.length; ++i)
             {
-                Component@ component = editorScene.GetComponent(ids[i].GetUInt());
+                Component@ component = editorScene.GetComponent(ids[i].GetU32());
                 if (component !is null)
                     ret.Push(component);
             }

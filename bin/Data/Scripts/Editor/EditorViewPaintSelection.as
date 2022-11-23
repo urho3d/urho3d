@@ -126,7 +126,7 @@ void SelectOriginsByPaintSelection(IntVector2 curPos, float brushRadius, bool is
 
         float distance = (v1 - v2).length;
         bool isThisOriginInCircle = distance < brushRadius ? true : false;
-        int nodeID = originsIcons[i].vars[ORIGIN_NODEID_VAR].GetInt();
+        int nodeID = originsIcons[i].vars[ORIGIN_NODEID_VAR].GetI32();
 
         if (isThisOriginInCircle)
         {
@@ -153,8 +153,8 @@ void HandlePaintSelectionMouseMove(StringHash eventType, VariantMap& eventData)
 {
     if (!EditorPaintSelectionShow || EditorPaintSelectionUIContainer is null) return;
 
-    int x = eventData["X"].GetInt();
-    int y = eventData["Y"].GetInt();
+    int x = eventData["X"].GetI32();
+    int y = eventData["Y"].GetI32();
     float r = (paintSelectionBrushCurrentSize.x * 0.5);
 
     IntVector2 mousePos(x,y);
@@ -175,7 +175,7 @@ void HandlePaintSelectionWheel(StringHash eventType, VariantMap& eventData)
 {
     if (!EditorPaintSelectionShow || EditorPaintSelectionUIContainer is null) return;
 
-    int wheelValue = eventData["Wheel"].GetInt();
+    int wheelValue = eventData["Wheel"].GetI32();
 
     if (wheelValue != 0)
     {

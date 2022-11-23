@@ -256,14 +256,14 @@ void ImportTundraScene(const String&in fileName)
             }
             if (compType == "EC_RigidBody" || compType == "RigidBody")
             {
-                shapeType = GetComponentAttribute(compElem, "Shape type").ToInt();
+                shapeType = GetComponentAttribute(compElem, "Shape type").ToI32();
                 mass = GetComponentAttribute(compElem, "Mass").ToFloat();
                 bodySize = GetComponentAttribute(compElem, "Size").ToVector3();
                 collisionMeshName = GetComponentAttribute(compElem, "Collision mesh ref");
                 trigger = GetComponentAttribute(compElem, "Phantom").ToBool();
                 kinematic = GetComponentAttribute(compElem, "Kinematic").ToBool();
-                collisionLayer = GetComponentAttribute(compElem, "Collision Layer").ToInt();
-                collisionMask = GetComponentAttribute(compElem, "Collision Mask").ToInt();
+                collisionLayer = GetComponentAttribute(compElem, "Collision Layer").ToI32();
+                collisionMask = GetComponentAttribute(compElem, "Collision Mask").ToI32();
                 ProcessRef(collisionMeshName);
             }
 

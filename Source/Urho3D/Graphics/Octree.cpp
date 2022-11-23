@@ -254,7 +254,7 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
         {
             Drawable* drawable = *start++;
 
-            if ((drawable->GetDrawableFlags() & query.drawableFlags_) && (drawable->GetViewMask() & query.viewMask_))
+            if (!!(drawable->GetDrawableType() & query.drawableTypes_) && (drawable->GetViewMask() & query.viewMask_))
                 drawable->ProcessRayQuery(query, query.result_);
         }
     }
@@ -281,7 +281,7 @@ void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, Vector<Drawable*>& 
         {
             Drawable* drawable = *start++;
 
-            if ((drawable->GetDrawableFlags() & query.drawableFlags_) && (drawable->GetViewMask() & query.viewMask_))
+            if (!!(drawable->GetDrawableType() & query.drawableTypes_) && (drawable->GetViewMask() & query.viewMask_))
                 drawables.Push(drawable);
         }
     }
@@ -318,9 +318,9 @@ void Octree::RegisterObject(Context* context)
     Vector3 defaultBoundsMin = -Vector3::ONE * DEFAULT_OCTREE_SIZE;
     Vector3 defaultBoundsMax = Vector3::ONE * DEFAULT_OCTREE_SIZE;
 
-    URHO3D_ATTRIBUTE_EX("Bounding Box Min", Vector3, worldBoundingBox_.min_, UpdateOctreeSize, defaultBoundsMin, AM_DEFAULT);
-    URHO3D_ATTRIBUTE_EX("Bounding Box Max", Vector3, worldBoundingBox_.max_, UpdateOctreeSize, defaultBoundsMax, AM_DEFAULT);
-    URHO3D_ATTRIBUTE_EX("Number of Levels", int, numLevels_, UpdateOctreeSize, DEFAULT_OCTREE_LEVELS, AM_DEFAULT);
+    URHO3D_ATTRIBUTE_EX("Bounding Box Min", worldBoundingBox_.min_, UpdateOctreeSize, defaultBoundsMin, AM_DEFAULT);
+    URHO3D_ATTRIBUTE_EX("Bounding Box Max", worldBoundingBox_.max_, UpdateOctreeSize, defaultBoundsMax, AM_DEFAULT);
+    URHO3D_ATTRIBUTE_EX("Number of Levels", numLevels_, UpdateOctreeSize, DEFAULT_OCTREE_LEVELS, AM_DEFAULT);
 }
 
 void Octree::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)

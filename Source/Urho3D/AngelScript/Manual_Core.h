@@ -26,7 +26,7 @@ template <class T> CScriptArray* AttributeInfo_GetEnumNames(T* ptr)
 // ========================================================================================
 
 // StringVector ResourceRefList::names_ | File: ../Core/Variant.h
-template <class T> void ResourceRefList_Resize(unsigned size, ResourceRefList* ptr)
+template <class T> void ResourceRefList_Resize(i32 size, ResourceRefList* ptr)
 {
     ptr->names_.Resize(size);
 }
@@ -44,9 +44,9 @@ template <class T> bool ResourceRefList_IsEmpty(ResourceRefList* ptr)
 }
 
 // StringVector ResourceRefList::names_ | File: ../Core/Variant.h
-template <class T> void ResourceRefList_SetName(unsigned index, const String& name, ResourceRefList* ptr)
+template <class T> void ResourceRefList_SetName(i32 index, const String& name, ResourceRefList* ptr)
 {
-    if (index >= ptr->names_.Size())
+    if (index < 0 || index >= ptr->names_.Size())
     {
         asGetActiveContext()->SetException("Index out of bounds");
         return;
@@ -56,9 +56,9 @@ template <class T> void ResourceRefList_SetName(unsigned index, const String& na
 }
 
 // StringVector ResourceRefList::names_ | File: ../Core/Variant.h
-template <class T> const String& ResourceRefList_GetName(unsigned index, ResourceRefList* ptr)
+template <class T> const String& ResourceRefList_GetName(i32 index, ResourceRefList* ptr)
 {
-    if (index >= ptr->names_.Size())
+    if (index < 0 || index >= ptr->names_.Size())
     {
         asGetActiveContext()->SetException("Index out of bounds");
         return String::EMPTY;
@@ -69,11 +69,11 @@ template <class T> const String& ResourceRefList_GetName(unsigned index, Resourc
 
 #define REGISTER_MEMBERS_MANUAL_PART_ResourceRefList() \
     /* StringVector ResourceRefList::names_ | File: ../Core/Variant.h */ \
-    engine->RegisterObjectMethod(className, "void Resize(uint)", AS_FUNCTION_OBJLAST(ResourceRefList_Resize<T>), AS_CALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "void Resize(int)", AS_FUNCTION_OBJLAST(ResourceRefList_Resize<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "uint get_length() const", AS_FUNCTION_OBJLAST(ResourceRefList_GetSize<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "bool get_empty() const", AS_FUNCTION_OBJLAST(ResourceRefList_IsEmpty<T>), AS_CALL_CDECL_OBJLAST); \
-    engine->RegisterObjectMethod(className, "void set_names(uint, const String&in) const", AS_FUNCTION_OBJLAST(ResourceRefList_SetName<T>), AS_CALL_CDECL_OBJLAST); \
-    engine->RegisterObjectMethod(className, "const String& get_names(uint) const", AS_FUNCTION_OBJLAST(ResourceRefList_GetName<T>), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "void set_names(int, const String&in) const", AS_FUNCTION_OBJLAST(ResourceRefList_SetName<T>), AS_CALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "const String& get_names(int) const", AS_FUNCTION_OBJLAST(ResourceRefList_GetName<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
 

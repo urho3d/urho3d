@@ -12,18 +12,23 @@
 namespace Urho3D
 {
 
-static const unsigned DRAWABLE_UNDEFINED = 0x0;
-static const unsigned DRAWABLE_GEOMETRY = 0x1;
-static const unsigned DRAWABLE_LIGHT = 0x2;
-static const unsigned DRAWABLE_ZONE = 0x4;
-static const unsigned DRAWABLE_GEOMETRY2D = 0x8;
-static const unsigned DRAWABLE_ANY = 0xff;
-static const unsigned DEFAULT_VIEWMASK = M_MAX_UNSIGNED;
-static const unsigned DEFAULT_LIGHTMASK = M_MAX_UNSIGNED;
-static const unsigned DEFAULT_SHADOWMASK = M_MAX_UNSIGNED;
-static const unsigned DEFAULT_ZONEMASK = M_MAX_UNSIGNED;
-static const int MAX_VERTEX_LIGHTS = 4;
-static const float ANIMATION_LOD_BASESCALE = 2500.0f;
+enum class DrawableTypes : u8
+{
+    Undefined  = 0,
+    Geometry   = 1 << 0,
+    Light      = 1 << 1,
+    Zone       = 1 << 2,
+    Geometry2D = 1 << 3,
+    Any        = 0xFF
+};
+URHO3D_FLAGS(DrawableTypes);
+
+inline constexpr mask32 DEFAULT_VIEWMASK = M_U32_MASK_ALL_BITS;
+inline constexpr mask32 DEFAULT_LIGHTMASK = M_U32_MASK_ALL_BITS;
+inline constexpr mask32 DEFAULT_SHADOWMASK = M_U32_MASK_ALL_BITS;
+inline constexpr mask32 DEFAULT_ZONEMASK = M_U32_MASK_ALL_BITS;
+inline constexpr i32 MAX_VERTEX_LIGHTS = 4;
+inline constexpr float ANIMATION_LOD_BASESCALE = 2500.0f;
 
 class Camera;
 class File;
@@ -80,7 +85,7 @@ struct URHO3D_API SourceBatch
     /// World transform(s). For a skinned model, these are the bone transforms.
     const Matrix3x4* worldTransform_{&Matrix3x4::IDENTITY};
     /// Number of world transforms.
-    unsigned numWorldTransforms_{1};
+    i32 numWorldTransforms_{1};
     /// Per-instance data. If not null, must contain enough data to fill instancing buffer.
     void* instancingData_{};
     /// %Geometry type.
@@ -98,7 +103,7 @@ class URHO3D_API Drawable : public Component
 
 public:
     /// Construct.
-    Drawable(Context* context, unsigned char drawableFlags);
+    Drawable(Context* context, DrawableTypes drawableType);
     /// Destruct.
     ~Drawable() override;
     /// Register object attributes. Drawable must be registered first.
@@ -120,10 +125,10 @@ public:
     virtual UpdateGeometryType GetUpdateGeometryType() { return UPDATE_NONE; }
 
     /// Return the geometry for a specific LOD level.
-    virtual Geometry* GetLodGeometry(unsigned batchIndex, unsigned level);
+    virtual Geometry* GetLodGeometry(i32 batchIndex, i32 level);
 
     /// Return number of occlusion geometry triangles.
-    virtual unsigned GetNumOccluderTriangles() { return 0; }
+    virtual i32 GetNumOccluderTriangles() { return 0; }
 
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
     virtual bool DrawOcclusion(OcclusionBuffer* buffer);
@@ -141,19 +146,19 @@ public:
     void SetLodBias(float bias);
     /// Set view mask. Is and'ed with camera's view mask to see if the object should be rendered.
     /// @property
-    void SetViewMask(unsigned mask);
+    void SetViewMask(mask32 mask);
     /// Set light mask. Is and'ed with light's and zone's light mask to see if the object should be lit.
     /// @property
-    void SetLightMask(unsigned mask);
+    void SetLightMask(mask32 mask);
     /// Set shadow mask. Is and'ed with light's light mask and zone's shadow mask to see if the object should be rendered to a shadow map.
     /// @property
-    void SetShadowMask(unsigned mask);
+    void SetShadowMask(mask32 mask);
     /// Set zone mask. Is and'ed with zone's zone mask to see if the object should belong to the zone.
     /// @property
-    void SetZoneMask(unsigned mask);
+    void SetZoneMask(mask32 mask);
     /// Set maximum number of per-pixel lights. Default 0 is unlimited.
     /// @property
-    void SetMaxLights(unsigned num);
+    void SetMaxLights(i32 num);
     /// Set shadowcaster flag.
     /// @property
     void SetCastShadows(bool enable);
@@ -174,8 +179,8 @@ public:
     /// @property
     const BoundingBox& GetWorldBoundingBox();
 
-    /// Return drawable flags.
-    unsigned char GetDrawableFlags() const { return drawableFlags_; }
+    /// Return drawable type.
+    DrawableTypes GetDrawableType() const { return drawableType_; }
 
     /// Return draw distance.
     /// @property
@@ -191,23 +196,23 @@ public:
 
     /// Return view mask.
     /// @property
-    unsigned GetViewMask() const { return viewMask_; }
+    mask32 GetViewMask() const { return viewMask_; }
 
     /// Return light mask.
     /// @property
-    unsigned GetLightMask() const { return lightMask_; }
+    mask32 GetLightMask() const { return lightMask_; }
 
     /// Return shadow mask.
     /// @property
-    unsigned GetShadowMask() const { return shadowMask_; }
+    mask32 GetShadowMask() const { return shadowMask_; }
 
     /// Return zone mask.
     /// @property
-    unsigned GetZoneMask() const { return zoneMask_; }
+    mask32 GetZoneMask() const { return zoneMask_; }
 
     /// Return maximum number of per-pixel lights.
     /// @property
-    unsigned GetMaxLights() const { return maxLights_; }
+    i32 GetMaxLights() const { return maxLights_; }
 
     /// Return shadowcaster flag.
     /// @property
@@ -252,7 +257,11 @@ public:
     void LimitVertexLights(bool removeConvertedLights);
 
     /// Set base pass flag for a batch.
-    void SetBasePass(unsigned batchIndex) { basePassFlags_ |= (1u << batchIndex); }
+    void SetBasePass(i32 batchIndex)
+    {
+        assert(batchIndex >= 0 && batchIndex < 32);
+        basePassFlags_ |= (1u << batchIndex);
+    }
 
     /// Return octree octant.
     Octant* GetOctant() const { return octant_; }
@@ -277,7 +286,11 @@ public:
     bool IsInView(const FrameInfo& frame, bool anyCamera = false) const;
 
     /// Return whether has a base pass.
-    bool HasBasePass(unsigned batchIndex) const { return (basePassFlags_ & (1u << batchIndex)) != 0; }
+    bool HasBasePass(i32 batchIndex) const
+    {
+        assert(batchIndex >= 0 && batchIndex < 32);
+        return (basePassFlags_ & (1u << batchIndex)) != 0;
+    }
 
     /// Return per-pixel lights.
     const Vector<Light*>& GetLights() const { return lights_; }
@@ -339,8 +352,8 @@ protected:
     BoundingBox boundingBox_;
     /// Draw call source data.
     Vector<SourceBatch> batches_;
-    /// Drawable flags.
-    unsigned char drawableFlags_;
+    /// Drawable type
+    DrawableTypes drawableType_;
     /// Bounding box dirty flag.
     bool worldBoundingBoxDirty_;
     /// Shadowcaster flag.
@@ -358,13 +371,13 @@ protected:
     /// Current zone.
     Zone* zone_;
     /// View mask.
-    unsigned viewMask_;
+    mask32 viewMask_;
     /// Light mask.
-    unsigned lightMask_;
+    mask32 lightMask_;
     /// Shadow mask.
-    unsigned shadowMask_;
+    mask32 shadowMask_;
     /// Zone mask.
-    unsigned zoneMask_;
+    mask32 zoneMask_;
     /// Last visible frame number.
     i32 viewFrameNumber_;
     /// Current distance to camera.
@@ -384,9 +397,9 @@ protected:
     /// LOD bias.
     float lodBias_;
     /// Base pass flags, bit per batch.
-    unsigned basePassFlags_;
+    flagset32 basePassFlags_;
     /// Maximum per-pixel lights.
-    unsigned maxLights_;
+    i32 maxLights_;
     /// List of cameras from which is seen on the current frame.
     Vector<Camera*> viewCameras_;
     /// First per-pixel light added this frame.

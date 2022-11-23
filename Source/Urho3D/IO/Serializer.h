@@ -30,24 +30,28 @@ public:
     virtual ~Serializer();
 
     /// Write bytes to the stream. Return number of bytes actually written.
-    virtual unsigned Write(const void* data, unsigned size) = 0;
+    virtual i32 Write(const void* data, i32 size) = 0;
 
     /// Write a 64-bit integer.
-    bool WriteInt64(long long value);
+    bool WriteI64(i64 value);
     /// Write a 32-bit integer.
-    bool WriteInt(int value);
+    bool WriteI32(i32 value);
     /// Write a 16-bit integer.
-    bool WriteShort(short value);
+    bool WriteI16(i16 value);
     /// Write an 8-bit integer.
-    bool WriteByte(signed char value);
+    bool WriteI8(i8 value);
     /// Write a 64-bit unsigned integer.
-    bool WriteUInt64(unsigned long long value);
+    bool WriteU64(u64 value);
     /// Write a 32-bit unsigned integer.
-    bool WriteUInt(unsigned value);
+    bool WriteU32(u32 value);
     /// Write a 16-bit unsigned integer.
-    bool WriteUShort(unsigned short value);
+    bool WriteU16(u16 value);
     /// Write an 8-bit unsigned integer.
-    bool WriteUByte(unsigned char value);
+    bool WriteU8(u8 value);
+
+    /// Write an byte
+    bool WriteByte(byte value);
+
     /// Write a bool.
     bool WriteBool(bool value);
     /// Write a float.
@@ -91,7 +95,7 @@ public:
     /// Write a 32-bit StringHash.
     bool WriteStringHash(const StringHash& value);
     /// Write a buffer, with size encoded as VLE.
-    bool WriteBuffer(const Vector<unsigned char>& value);
+    bool WriteBuffer(const Vector<byte>& value);
     /// Write a resource reference.
     bool WriteResourceRef(const ResourceRef& value);
     /// Write a resource reference list.
@@ -109,7 +113,7 @@ public:
     /// Write a variable-length encoded unsigned integer, which can use 29 bits maximum.
     bool WriteVLE(unsigned value);
     /// Write a 24-bit network object ID.
-    bool WriteNetID(unsigned value);
+    bool WriteNetID(id32 value);
     /// Write a text line. Char codes 13 & 10 will be automatically appended.
     bool WriteLine(const String& value);
 };

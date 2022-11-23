@@ -206,8 +206,8 @@ void LoadConfig()
         if (cameraElem.HasAttribute("fov")) viewFov = cameraElem.GetFloat("fov");
         if (cameraElem.HasAttribute("speed")) cameraBaseSpeed = cameraElem.GetFloat("speed");
         if (cameraElem.HasAttribute("limitrotation")) limitRotation = cameraElem.GetBool("limitrotation");
-        if (cameraElem.HasAttribute("viewportmode")) viewportMode = cameraElem.GetUInt("viewportmode");
-        if (cameraElem.HasAttribute("mouseorbitmode")) mouseOrbitMode = cameraElem.GetInt("mouseorbitmode");
+        if (cameraElem.HasAttribute("viewportmode")) viewportMode = cameraElem.GetU32("viewportmode");
+        if (cameraElem.HasAttribute("mouseorbitmode")) mouseOrbitMode = cameraElem.GetI32("mouseorbitmode");
         if (cameraElem.HasAttribute("mmbpan")) mmbPanMode = cameraElem.GetBool("mmbpan");
         if (cameraElem.HasAttribute("rotatearoundselect")) rotateAroundSelect = cameraElem.GetBool("rotatearoundselect");
         
@@ -217,8 +217,8 @@ void LoadConfig()
     if (!objectElem.isNull)
     {
         if (objectElem.HasAttribute("cameraflymode")) cameraFlyMode = objectElem.GetBool("cameraflymode");
-        if (objectElem.HasAttribute("hotkeymode")) hotKeyMode = objectElem.GetInt("hotkeymode");
-        if (objectElem.HasAttribute("newnodemode")) newNodeMode = objectElem.GetInt("newnodemode");
+        if (objectElem.HasAttribute("hotkeymode")) hotKeyMode = objectElem.GetI32("hotkeymode");
+        if (objectElem.HasAttribute("newnodemode")) newNodeMode = objectElem.GetI32("newnodemode");
         if (objectElem.HasAttribute("movestep")) moveStep = objectElem.GetFloat("movestep");
         if (objectElem.HasAttribute("rotatestep")) rotateStep = objectElem.GetFloat("rotatestep");
         if (objectElem.HasAttribute("scalestep")) scaleStep = objectElem.GetFloat("scalestep");
@@ -227,8 +227,8 @@ void LoadConfig()
         if (objectElem.HasAttribute("scalesnap")) scaleSnap = objectElem.GetBool("scalesnap");
         if (objectElem.HasAttribute("applymateriallist")) applyMaterialList = objectElem.GetBool("applymateriallist");
         if (objectElem.HasAttribute("importoptions")) importOptions = objectElem.GetAttribute("importoptions");
-        if (objectElem.HasAttribute("pickmode")) pickMode = objectElem.GetInt("pickmode");
-        if (objectElem.HasAttribute("axismode")) axisMode = AxisMode(objectElem.GetInt("axismode"));
+        if (objectElem.HasAttribute("pickmode")) pickMode = objectElem.GetI32("pickmode");
+        if (objectElem.HasAttribute("axismode")) axisMode = AxisMode(objectElem.GetI32("axismode"));
         if (objectElem.HasAttribute("revertonpause")) revertOnPause = objectElem.GetBool("revertonpause");
     }
 
@@ -256,11 +256,11 @@ void LoadConfig()
     if (!renderingElem.isNull)
     {
         if (renderingElem.HasAttribute("renderpath")) renderPathName = renderingElem.GetAttribute("renderpath");
-        if (renderingElem.HasAttribute("texturequality")) renderer.textureQuality = renderingElem.GetInt("texturequality");
-        if (renderingElem.HasAttribute("materialquality")) renderer.materialQuality = renderingElem.GetInt("materialquality");
-        if (renderingElem.HasAttribute("shadowresolution")) SetShadowResolution(renderingElem.GetInt("shadowresolution"));
-        if (renderingElem.HasAttribute("shadowquality")) renderer.shadowQuality = ShadowQuality(renderingElem.GetInt("shadowquality"));
-        if (renderingElem.HasAttribute("maxoccludertriangles")) renderer.maxOccluderTriangles = renderingElem.GetInt("maxoccludertriangles");
+        if (renderingElem.HasAttribute("texturequality")) renderer.textureQuality = renderingElem.GetI32("texturequality");
+        if (renderingElem.HasAttribute("materialquality")) renderer.materialQuality = renderingElem.GetI32("materialquality");
+        if (renderingElem.HasAttribute("shadowresolution")) SetShadowResolution(renderingElem.GetI32("shadowresolution"));
+        if (renderingElem.HasAttribute("shadowquality")) renderer.shadowQuality = ShadowQuality(renderingElem.GetI32("shadowquality"));
+        if (renderingElem.HasAttribute("maxoccludertriangles")) renderer.maxOccluderTriangles = renderingElem.GetI32("maxoccludertriangles");
         if (renderingElem.HasAttribute("specularlighting")) renderer.specularLighting = renderingElem.GetBool("specularlighting");
         if (renderingElem.HasAttribute("dynamicinstancing")) renderer.dynamicInstancing = renderingElem.GetBool("dynamicinstancing");
         if (renderingElem.HasAttribute("framelimiter")) engine.maxFps = renderingElem.GetBool("framelimiter") ? 200 : 0;
@@ -273,7 +273,7 @@ void LoadConfig()
     {
         if (uiElem.HasAttribute("minopacity")) uiMinOpacity = uiElem.GetFloat("minopacity");
         if (uiElem.HasAttribute("maxopacity")) uiMaxOpacity = uiElem.GetFloat("maxopacity");
-        if (uiElem.HasAttribute("languageindex")) localization.SetLanguage(uiElem.GetInt("languageindex"));
+        if (uiElem.HasAttribute("languageindex")) localization.SetLanguage(uiElem.GetI32("languageindex"));
     }
 
     if (!hierarchyElem.isNull)
@@ -296,12 +296,12 @@ void LoadConfig()
     {
         if (viewElem.HasAttribute("defaultzoneambientcolor")) renderer.defaultZone.ambientColor = viewElem.GetColor("defaultzoneambientcolor");
         if (viewElem.HasAttribute("defaultzonefogcolor")) renderer.defaultZone.fogColor = viewElem.GetColor("defaultzonefogcolor");
-        if (viewElem.HasAttribute("defaultzonefogstart")) renderer.defaultZone.fogStart = viewElem.GetInt("defaultzonefogstart");
-        if (viewElem.HasAttribute("defaultzonefogend")) renderer.defaultZone.fogEnd = viewElem.GetInt("defaultzonefogend");
+        if (viewElem.HasAttribute("defaultzonefogstart")) renderer.defaultZone.fogStart = viewElem.GetI32("defaultzonefogstart");
+        if (viewElem.HasAttribute("defaultzonefogend")) renderer.defaultZone.fogEnd = viewElem.GetI32("defaultzonefogend");
         if (viewElem.HasAttribute("showgrid")) showGrid = viewElem.GetBool("showgrid");
         if (viewElem.HasAttribute("grid2dmode")) grid2DMode = viewElem.GetBool("grid2dmode");
-        if (viewElem.HasAttribute("gridsize")) gridSize = viewElem.GetInt("gridsize");
-        if (viewElem.HasAttribute("gridsubdivisions")) gridSubdivisions = viewElem.GetInt("gridsubdivisions");
+        if (viewElem.HasAttribute("gridsize")) gridSize = viewElem.GetI32("gridsize");
+        if (viewElem.HasAttribute("gridsubdivisions")) gridSubdivisions = viewElem.GetI32("gridsubdivisions");
         if (viewElem.HasAttribute("gridscale")) gridScale = viewElem.GetFloat("gridscale");
         if (viewElem.HasAttribute("gridcolor")) gridColor = viewElem.GetColor("gridcolor");
         if (viewElem.HasAttribute("gridsubdivisioncolor")) gridSubdivisionColor = viewElem.GetColor("gridsubdivisioncolor");
@@ -323,7 +323,7 @@ void LoadConfig()
     {
         cubeMapGen_Name = cubeMapElem.HasAttribute("name") ? cubeMapElem.GetAttribute("name") : "";
         cubeMapGen_Path = cubeMapElem.HasAttribute("path") ? cubeMapElem.GetAttribute("path") : cubemapDefaultOutputPath;
-        cubeMapGen_Size = cubeMapElem.HasAttribute("size") ? cubeMapElem.GetInt("size") : 128;
+        cubeMapGen_Size = cubeMapElem.HasAttribute("size") ? cubeMapElem.GetI32("size") : 128;
     }
     else
     {
@@ -361,14 +361,14 @@ void SaveConfig()
     cameraElem.SetFloat("fov", viewFov);
     cameraElem.SetFloat("speed", cameraBaseSpeed);
     cameraElem.SetBool("limitrotation", limitRotation);
-    cameraElem.SetUInt("viewportmode", viewportMode);
-    cameraElem.SetInt("mouseorbitmode", mouseOrbitMode);
+    cameraElem.SetU32("viewportmode", viewportMode);
+    cameraElem.SetI32("mouseorbitmode", mouseOrbitMode);
     cameraElem.SetBool("mmbpan", mmbPanMode);
     cameraElem.SetBool("rotatearoundselect", rotateAroundSelect);
 
     objectElem.SetBool("cameraflymode", cameraFlyMode);
-    objectElem.SetInt("hotkeymode", hotKeyMode);
-    objectElem.SetInt("newnodemode", newNodeMode);
+    objectElem.SetI32("hotkeymode", hotKeyMode);
+    objectElem.SetI32("newnodemode", newNodeMode);
     objectElem.SetFloat("movestep", moveStep);
     objectElem.SetFloat("rotatestep", rotateStep);
     objectElem.SetFloat("scalestep", scaleStep);
@@ -377,8 +377,8 @@ void SaveConfig()
     objectElem.SetBool("scalesnap", scaleSnap);
     objectElem.SetBool("applymateriallist", applyMaterialList);
     objectElem.SetAttribute("importoptions", importOptions);
-    objectElem.SetInt("pickmode", pickMode);
-    objectElem.SetInt("axismode", axisMode);
+    objectElem.SetI32("pickmode", pickMode);
+    objectElem.SetI32("axismode", axisMode);
     objectElem.SetBool("revertonpause", revertOnPause);
 
     resourcesElem.SetBool("rememberresourcepath", rememberResourcePath);
@@ -389,12 +389,12 @@ void SaveConfig()
     if (renderer !is null && graphics !is null)
     {
         renderingElem.SetAttribute("renderpath", renderPathName);
-        renderingElem.SetInt("texturequality", renderer.textureQuality);
-        renderingElem.SetInt("materialquality", renderer.materialQuality);
-        renderingElem.SetInt("shadowresolution", GetShadowResolution());
-        renderingElem.SetInt("maxoccludertriangles", renderer.maxOccluderTriangles);
+        renderingElem.SetI32("texturequality", renderer.textureQuality);
+        renderingElem.SetI32("materialquality", renderer.materialQuality);
+        renderingElem.SetI32("shadowresolution", GetShadowResolution());
+        renderingElem.SetI32("maxoccludertriangles", renderer.maxOccluderTriangles);
         renderingElem.SetBool("specularlighting", renderer.specularLighting);
-        renderingElem.SetInt("shadowquality", int(renderer.shadowQuality));
+        renderingElem.SetI32("shadowquality", int(renderer.shadowQuality));
         renderingElem.SetBool("dynamicinstancing", renderer.dynamicInstancing);
     }
 
@@ -405,7 +405,7 @@ void SaveConfig()
 
     uiElem.SetFloat("minopacity", uiMinOpacity);
     uiElem.SetFloat("maxopacity", uiMaxOpacity);
-    uiElem.SetInt("languageindex", localization.languageIndex);
+    uiElem.SetI32("languageindex", localization.languageIndex);
 
     hierarchyElem.SetBool("showinternaluielement", showInternalUIElement);
     hierarchyElem.SetBool("showtemporaryobject", showTemporaryObject);
@@ -423,8 +423,8 @@ void SaveConfig()
     viewElem.SetColor("defaultzonefogcolor", renderer.defaultZone.fogColor);
     viewElem.SetFloat("defaultzonefogstart", renderer.defaultZone.fogStart);
     viewElem.SetFloat("defaultzonefogend", renderer.defaultZone.fogEnd);
-    viewElem.SetInt("gridsize", gridSize);
-    viewElem.SetInt("gridsubdivisions", gridSubdivisions);
+    viewElem.SetI32("gridsize", gridSize);
+    viewElem.SetI32("gridsubdivisions", gridSubdivisions);
     viewElem.SetFloat("gridscale", gridScale);
     viewElem.SetColor("gridcolor", gridColor);
     viewElem.SetColor("gridsubdivisioncolor", gridSubdivisionColor);

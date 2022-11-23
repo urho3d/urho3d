@@ -45,24 +45,24 @@ void ParticleEmitter::RegisterObject(Context* context)
 {
     context->RegisterFactory<ParticleEmitter>(GEOMETRY_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Effect", GetEffectAttr, SetEffectAttr, ResourceRef, ResourceRef(ParticleEffect::GetTypeStatic()),
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Effect", GetEffectAttr, SetEffectAttr, ResourceRef(ParticleEffect::GetTypeStatic()),
         AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Cast Shadows", bool, castShadows_, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Is Emitting", bool, emitting_, true, AM_FILE);
-    URHO3D_ATTRIBUTE("Period Timer", float, periodTimer_, 0.0f, AM_FILE | AM_NOEDIT);
-    URHO3D_ATTRIBUTE("Emission Timer", float, emissionTimer_, 0.0f, AM_FILE | AM_NOEDIT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, true, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Cast Shadows", castShadows_, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, 1.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Is Emitting", emitting_, true, AM_FILE);
+    URHO3D_ATTRIBUTE("Period Timer", periodTimer_, 0.0f, AM_FILE | AM_NOEDIT);
+    URHO3D_ATTRIBUTE("Emission Timer", emissionTimer_, 0.0f, AM_FILE | AM_NOEDIT);
     URHO3D_ENUM_ATTRIBUTE("Autoremove Mode", autoRemove_, autoRemoveModeNames, REMOVE_DISABLED, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Particles", GetParticlesAttr, SetParticlesAttr, VariantVector, Variant::emptyVariantVector,
+    URHO3D_ACCESSOR_ATTRIBUTE("Particles", GetParticlesAttr, SetParticlesAttr, Variant::emptyVariantVector,
         AM_FILE | AM_NOEDIT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Billboards", GetParticleBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector,
+    URHO3D_ACCESSOR_ATTRIBUTE("Billboards", GetParticleBillboardsAttr, SetBillboardsAttr, Variant::emptyVariantVector,
         AM_FILE | AM_NOEDIT);
-    URHO3D_ATTRIBUTE("Serialize Particles", bool, serializeParticles_, true, AM_FILE);
+    URHO3D_ATTRIBUTE("Serialize Particles", serializeParticles_, true, AM_FILE);
 }
 
 void ParticleEmitter::OnSetEnabled()
@@ -350,7 +350,7 @@ ResourceRef ParticleEmitter::GetEffectAttr() const
 void ParticleEmitter::SetParticlesAttr(const VariantVector& value)
 {
     i32 index = 0;
-    SetNumParticles(index < value.Size() ? value[index++].GetUInt() : 0);
+    SetNumParticles(index < value.Size() ? value[index++].GetU32() : 0);
 
     for (Vector<Particle>::Iterator i = particles_.Begin(); i != particles_.End() && index < value.Size(); ++i)
     {
@@ -360,8 +360,8 @@ void ParticleEmitter::SetParticlesAttr(const VariantVector& value)
         i->timeToLive_ = value[index++].GetFloat();
         i->scale_ = value[index++].GetFloat();
         i->rotationSpeed_ = value[index++].GetFloat();
-        i->colorIndex_ = value[index++].GetInt();
-        i->texIndex_ = value[index++].GetInt();
+        i->colorIndex_ = value[index++].GetI32();
+        i->texIndex_ = value[index++].GetI32();
     }
 }
 

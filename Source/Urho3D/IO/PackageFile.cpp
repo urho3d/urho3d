@@ -48,7 +48,7 @@ bool PackageFile::Open(const String& fileName, unsigned startOffset)
         {
             unsigned fileSize = file->GetSize();
             file->Seek((unsigned)(fileSize - sizeof(unsigned)));
-            unsigned newStartOffset = fileSize - file->ReadUInt();
+            unsigned newStartOffset = fileSize - file->ReadU32();
             if (newStartOffset < fileSize)
             {
                 startOffset = newStartOffset;
@@ -69,16 +69,16 @@ bool PackageFile::Open(const String& fileName, unsigned startOffset)
     totalSize_ = file->GetSize();
     compressed_ = id == "ULZ4";
 
-    unsigned numFiles = file->ReadUInt();
-    checksum_ = file->ReadUInt();
+    unsigned numFiles = file->ReadU32();
+    checksum_ = file->ReadU32();
 
     for (unsigned i = 0; i < numFiles; ++i)
     {
         String entryName = file->ReadString();
         PackageEntry newEntry{};
-        newEntry.offset_ = file->ReadUInt() + startOffset;
-        totalDataSize_ += (newEntry.size_ = file->ReadUInt());
-        newEntry.checksum_ = file->ReadUInt();
+        newEntry.offset_ = file->ReadU32() + startOffset;
+        totalDataSize_ += (newEntry.size_ = file->ReadU32());
+        newEntry.checksum_ = file->ReadU32();
         if (!compressed_ && newEntry.offset_ + newEntry.size_ > totalSize_)
         {
             URHO3D_LOGERROR("File entry " + entryName + " outside package file");

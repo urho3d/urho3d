@@ -94,7 +94,7 @@ void HandleNetworkHostDiscovered(StringHash eventType, VariantMap& eventData)
     log.Info("Server discovered!");
     String text = serverList.text;
     VariantMap data = eventData["Beacon"].GetVariantMap();
-    text += "\n" + data["Name"].GetString() + "(" + String(data["Players"].GetInt()) + ")" + eventData["Address"].GetString() + ":" + String(eventData["Port"].GetInt());
+    text += "\n" + data["Name"].GetString() + "(" + String(data["Players"].GetI32()) + ")" + eventData["Address"].GetString() + ":" + String(eventData["Port"].GetI32());
     serverList.text = text;
 }
 

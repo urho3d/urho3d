@@ -18,52 +18,56 @@ public:
     /// Construct with zero size.
     Deserializer();
     /// Construct with defined size.
-    explicit Deserializer(unsigned size);
+    explicit Deserializer(i64 size);
     /// Destruct.
     virtual ~Deserializer();
 
     /// Read bytes from the stream. Return number of bytes actually read.
-    virtual unsigned Read(void* dest, unsigned size) = 0;
+    virtual i32 Read(void* dest, i32 size) = 0;
     /// Set position from the beginning of the stream. Return actual new position.
-    virtual unsigned Seek(unsigned position) = 0;
+    virtual i64 Seek(i64 position) = 0;
     /// Return name of the stream.
     /// @property
     virtual const String& GetName() const;
     /// Return a checksum if applicable.
     /// @property
-    virtual unsigned GetChecksum();
+    virtual hash32 GetChecksum();
     /// Return whether the end of stream has been reached.
     /// @property
     virtual bool IsEof() const { return position_ >= size_; }
 
     /// Set position relative to current position. Return actual new position.
-    unsigned SeekRelative(int delta);
+    i64 SeekRelative(i64 delta);
     /// Return current position.
     /// @property
-    unsigned GetPosition() const { return position_; }
+    i64 GetPosition() const { return position_; }
     /// Return current position.
-    unsigned Tell() const { return position_; }
+    i64 Tell() const { return position_; }
 
     /// Return size.
     /// @property
-    unsigned GetSize() const { return size_; }
+    i64 GetSize() const { return size_; }
 
     /// Read a 64-bit integer.
-    long long ReadInt64();
+    i64 ReadI64();
     /// Read a 32-bit integer.
-    int ReadInt();
+    i32 ReadI32();
     /// Read a 16-bit integer.
-    short ReadShort();
+    i16 ReadI16();
     /// Read an 8-bit integer.
-    signed char ReadByte();
+    i8 ReadI8();
     /// Read a 64-bit unsigned integer.
-    unsigned long long ReadUInt64();
+    u64 ReadU64();
     /// Read a 32-bit unsigned integer.
-    unsigned ReadUInt();
+    u32 ReadU32();
     /// Read a 16-bit unsigned integer.
-    unsigned short ReadUShort();
+    u16 ReadU16();
     /// Read an 8-bit unsigned integer.
-    unsigned char ReadUByte();
+    u8 ReadU8();
+
+    /// Read an 8-bit unsigned integer
+    byte ReadByte();
+
     /// Read a bool.
     bool ReadBool();
     /// Read a float.
@@ -107,7 +111,7 @@ public:
     /// Read a 32-bit StringHash.
     StringHash ReadStringHash();
     /// Read a buffer with size encoded as VLE.
-    Vector<unsigned char> ReadBuffer();
+    Vector<byte> ReadBuffer();
     /// Read a resource reference.
     ResourceRef ReadResourceRef();
     /// Read a resource reference list.
@@ -125,15 +129,15 @@ public:
     /// Read a variable-length encoded unsigned integer, which can use 29 bits maximum.
     unsigned ReadVLE();
     /// Read a 24-bit network object ID.
-    unsigned ReadNetID();
+    id32 ReadNetID();
     /// Read a text line.
     String ReadLine();
 
 protected:
     /// Stream position.
-    unsigned position_;
+    i64 position_;
     /// Stream size.
-    unsigned size_;
+    i64 size_;
 };
 
 }

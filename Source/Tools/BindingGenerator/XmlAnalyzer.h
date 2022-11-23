@@ -208,12 +208,12 @@ public:
     bool IsInternal() const { return GetHeaderFile().empty(); } // true if declared in .cpp file
     std::string GetBaseType() const;
     std::string GetLocation() const;
+    bool IsClass() const;
 
     // <memberdef kind="enum">
     //     <enumvalue><name>...</name></enumvalue>
     //     <enumvalue><name>...</name></enumvalue>
     std::vector<std::string> GetEnumerators() const;
-
 };
 
 // <compounddef kind="namespace">
@@ -228,6 +228,7 @@ public:
 
     std::string GetName() const { return ExtractName(memberdef_); }
     std::string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
+    std::string GetComment() const { return ExtractComment(memberdef_); }
     bool IsStatic() const { return ::IsStatic(memberdef_); }
     TypeAnalyzer GetType() const { return ExtractType(memberdef_); }
     bool IsArray() const { return StartsWith(ExtractArgsstring(memberdef_), "["); }

@@ -13,27 +13,30 @@ namespace Urho3D
 {
 
 #ifdef URHO3D_NETWORK
-    static const bool URHO3D_NETWORK_DEFINED = true;
+inline constexpr bool URHO3D_NETWORK_DEFINED = true;
 #else
-    static const bool URHO3D_NETWORK_DEFINED = false;
+inline constexpr bool URHO3D_NETWORK_DEFINED = false;
 #endif
 
-static const AttributeInfo noAttributeInfo;
+inline const AttributeInfo noAttributeInfo;
 
-template <class T> const AttributeInfo& Serializable_GetAttributeInfo(unsigned index, T* ptr)
+template <class T> const AttributeInfo& Serializable_GetAttributeInfo(i32 index, T* ptr)
 {
     const Vector<AttributeInfo>* attributes = ptr->GetAttributes();
-    if (!attributes || index >= attributes->Size())
+
+    if (!attributes || index < 0 || index >= attributes->Size())
     {
         GetActiveASContext()->SetException("Index out of bounds");
         return noAttributeInfo;
     }
     else
+    {
         return attributes->At(index);
+    }
 }
 
 #define REGISTER_MEMBERS_MANUAL_PART_Serializable() \
-    engine->RegisterObjectMethod(className, "const AttributeInfo& get_attributeInfos(uint) const", AS_FUNCTION_OBJLAST(Serializable_GetAttributeInfo<T>), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "const AttributeInfo& get_attributeInfos(int) const", AS_FUNCTION_OBJLAST(Serializable_GetAttributeInfo<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
 
@@ -114,17 +117,20 @@ template <class T> unsigned Node_GetNumChildren_Recursive(T* ptr)
     return ptr->GetNumChildren(true);
 }
 
-// Node* Node::GetChild(unsigned index) const | File: ../Scene/Node.h
-template <class T> Node* Node_GetChild(unsigned index, T* ptr)
+// Node* Node::GetChild(i32 index) const | File: ../Scene/Node.h
+template <class T> Node* Node_GetChild(i32 index, T* ptr)
 {
     const Vector<SharedPtr<Node>>& children = ptr->GetChildren();
-    if (index >= children.Size())
+
+    if (index < 0 || index >= children.Size())
     {
         GetActiveASContext()->SetException("Index out of bounds");
         return nullptr;
     }
     else
+    {
         return children[index].Get();
+    }
 }
 
 // Node* Node::GetChild(const String& name, bool recursive = false) const | File: ../Scene/Node.h
@@ -140,16 +146,19 @@ template <class T> Node* Node_GetChild_Name_Recursive(const String& name, T* ptr
 }
 
 // const Vector<SharedPtr<Component>>& Node::GetComponents() const | File: ../Scene/Node.h
-template <class T> Component* Node_GetComponent(unsigned index, T* ptr)
+template <class T> Component* Node_GetComponent(i32 index, T* ptr)
 {
     const Vector<SharedPtr<Component>>& components = ptr->GetComponents();
-    if (index >= components.Size())
+
+    if (index < 0 || index >= components.Size())
     {
         GetActiveASContext()->SetException("Index out of bounds");
         return nullptr;
     }
     else
+    {
         return components[index];
+    }
 }
 
 // const VariantMap& Node::GetVars() const | File: ../Scene/Node.h
@@ -182,15 +191,15 @@ template <class T> VariantMap& Node_GetVars(T* ptr)
     engine->RegisterObjectMethod(className, "uint get_numChildren() const", AS_FUNCTION_OBJLAST(Node_GetNumChildren_NonRecursive<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "uint get_numAllChildren() const", AS_FUNCTION_OBJLAST(Node_GetNumChildren_Recursive<T>), AS_CALL_CDECL_OBJLAST); \
     \
-    /* Node* Node::GetChild(unsigned index) const | File: ../Scene/Node.h */ \
-    engine->RegisterObjectMethod(className, "Node@+ get_children(uint) const", AS_FUNCTION_OBJLAST(Node_GetChild<T>), AS_CALL_CDECL_OBJLAST); \
+    /* Node* Node::GetChild(i32 index) const | File: ../Scene/Node.h */ \
+    engine->RegisterObjectMethod(className, "Node@+ get_children(int) const", AS_FUNCTION_OBJLAST(Node_GetChild<T>), AS_CALL_CDECL_OBJLAST); \
     \
     /* Node* Node::GetChild(const String& name, bool recursive = false) const | File: ../Scene/Node.h */ \
     engine->RegisterObjectMethod(className, "Node@+ get_childrenByName(const String&in) const", AS_FUNCTION_OBJLAST(Node_GetChild_Name_NonRecursive<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "Node@+ get_allChildrenByName(const String&in) const", AS_FUNCTION_OBJLAST(Node_GetChild_Name_Recursive<T>), AS_CALL_CDECL_OBJLAST); \
     \
     /* const Vector<SharedPtr<Component>>& Node::GetComponents() const | File: ../Scene/Node.h */ \
-    engine->RegisterObjectMethod(className, "Component@+ get_components(uint) const", AS_FUNCTION_OBJLAST(Node_GetComponent<T>), AS_CALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Component@+ get_components(int) const", AS_FUNCTION_OBJLAST(Node_GetComponent<T>), AS_CALL_CDECL_OBJLAST); \
     \
     /* const VariantMap& Node::GetVars() const | File: ../Scene/Node.h */ \
     engine->RegisterObjectMethod(className, "VariantMap& get_vars()", AS_FUNCTION_OBJLAST(Node_GetVars<T>), AS_CALL_CDECL_OBJLAST); \

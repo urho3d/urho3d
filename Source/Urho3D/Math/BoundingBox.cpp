@@ -55,9 +55,8 @@ void BoundingBox::Merge(const Frustum& frustum)
 
 void BoundingBox::Merge(const Polyhedron& poly)
 {
-    for (unsigned i = 0; i < poly.faces_.Size(); ++i)
+    for (const Vector<Vector3>& face : poly.faces_)
     {
-        const Vector<Vector3>& face = poly.faces_[i];
         if (!face.Empty())
             Merge(&face[0], face.Size());
     }

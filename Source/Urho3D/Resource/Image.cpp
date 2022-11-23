@@ -522,19 +522,19 @@ bool Image::BeginLoad(Deserializer& source)
     {
         source.Seek(12);
 
-        unsigned endianness = source.ReadUInt();
-        unsigned type = source.ReadUInt();
-        /* unsigned typeSize = */ source.ReadUInt();
-        unsigned format = source.ReadUInt();
-        unsigned internalFormat = source.ReadUInt();
-        /* unsigned baseInternalFormat = */ source.ReadUInt();
-        unsigned width = source.ReadUInt();
-        unsigned height = source.ReadUInt();
-        unsigned depth = source.ReadUInt();
-        /* unsigned arrayElements = */ source.ReadUInt();
-        unsigned faces = source.ReadUInt();
-        unsigned mipmaps = source.ReadUInt();
-        unsigned keyValueBytes = source.ReadUInt();
+        unsigned endianness = source.ReadU32();
+        unsigned type = source.ReadU32();
+        /* unsigned typeSize = */ source.ReadU32();
+        unsigned format = source.ReadU32();
+        unsigned internalFormat = source.ReadU32();
+        /* unsigned baseInternalFormat = */ source.ReadU32();
+        unsigned width = source.ReadU32();
+        unsigned height = source.ReadU32();
+        unsigned depth = source.ReadU32();
+        /* unsigned arrayElements = */ source.ReadU32();
+        unsigned faces = source.ReadU32();
+        unsigned mipmaps = source.ReadU32();
+        unsigned keyValueBytes = source.ReadU32();
 
         if (endianness != 0x04030201)
         {
@@ -634,7 +634,7 @@ bool Image::BeginLoad(Deserializer& source)
         unsigned dataOffset = 0;
         for (unsigned i = 0; i < mipmaps; ++i)
         {
-            unsigned levelSize = source.ReadUInt();
+            unsigned levelSize = source.ReadU32();
             if (levelSize + dataOffset > dataSize)
             {
                 URHO3D_LOGERROR("KTX mipmap level data size exceeds file size");
@@ -651,18 +651,18 @@ bool Image::BeginLoad(Deserializer& source)
     }
     else if (fileID == "PVR\3")
     {
-        /* unsigned flags = */ source.ReadUInt();
-        unsigned pixelFormatLo = source.ReadUInt();
-        /* unsigned pixelFormatHi = */ source.ReadUInt();
-        /* unsigned colourSpace = */ source.ReadUInt();
-        /* unsigned channelType = */ source.ReadUInt();
-        unsigned height = source.ReadUInt();
-        unsigned width = source.ReadUInt();
-        unsigned depth = source.ReadUInt();
-        /* unsigned numSurfaces = */ source.ReadUInt();
-        unsigned numFaces = source.ReadUInt();
-        unsigned mipmapCount = source.ReadUInt();
-        unsigned metaDataSize = source.ReadUInt();
+        /* unsigned flags = */ source.ReadU32();
+        unsigned pixelFormatLo = source.ReadU32();
+        /* unsigned pixelFormatHi = */ source.ReadU32();
+        /* unsigned colourSpace = */ source.ReadU32();
+        /* unsigned channelType = */ source.ReadU32();
+        unsigned height = source.ReadU32();
+        unsigned width = source.ReadU32();
+        unsigned depth = source.ReadU32();
+        /* unsigned numSurfaces = */ source.ReadU32();
+        unsigned numFaces = source.ReadU32();
+        unsigned mipmapCount = source.ReadU32();
+        unsigned metaDataSize = source.ReadU32();
 
         if (depth > 1 || numFaces > 1)
         {
@@ -915,12 +915,12 @@ bool Image::SetSize(int width, int height, int depth, unsigned components)
 
 void Image::SetPixel(int x, int y, const Color& color)
 {
-    SetPixelInt(x, y, 0, color.ToUInt());
+    SetPixelInt(x, y, 0, color.ToU32());
 }
 
 void Image::SetPixel(int x, int y, int z, const Color& color)
 {
-    SetPixelInt(x, y, z, color.ToUInt());
+    SetPixelInt(x, y, z, color.ToU32());
 }
 
 void Image::SetPixelInt(int x, int y, unsigned uintColor)
@@ -1178,7 +1178,7 @@ bool Image::Resize(int width, int height)
             // Calculate float coordinates between 0 - 1 for resampling
             float xF = (width_ > 1) ? (float)x / (float)(width - 1) : 0.0f;
             float yF = (height_ > 1) ? (float)y / (float)(height - 1) : 0.0f;
-            unsigned uintColor = GetPixelBilinear(xF, yF).ToUInt();
+            color32 uintColor = GetPixelBilinear(xF, yF).ToU32();
             unsigned char* dest = newData + (y * width + x) * components_;
             auto* src = (unsigned char*)&uintColor;
 
@@ -1209,10 +1209,10 @@ bool Image::Resize(int width, int height)
 
 void Image::Clear(const Color& color)
 {
-    ClearInt(color.ToUInt());
+    Clear(color.ToU32());
 }
 
-void Image::ClearInt(unsigned uintColor)
+void Image::Clear(color32 uintColor)
 {
     URHO3D_PROFILE(ClearImage);
 
@@ -1227,7 +1227,7 @@ void Image::ClearInt(unsigned uintColor)
 
     if (components_ == 4)
     {
-        unsigned color = uintColor;
+        color32 color = uintColor;
         auto* data = (unsigned*)GetData();
         auto* data_end = (unsigned*)(GetData() + width_ * height_ * depth_ * components_);
         for (; data < data_end; ++data)
@@ -1367,8 +1367,9 @@ bool Image::SaveDDS(const String& fileName) const
     ddsd.ddpfPixelFormat_.dwRGBAlphaBitMask_ = 0xff000000;
 
     outFile.Write(&ddsd, sizeof(ddsd));
-    for (unsigned i = 0; i < levels.Size(); ++i)
-        outFile.Write(levels[i]->GetData(), levels[i]->GetWidth() * levels[i]->GetHeight() * 4);
+
+    for (const Image* level : levels)
+        outFile.Write(level->GetData(), level->GetWidth() * level->GetHeight() * 4);
 
     return true;
 }
@@ -2401,7 +2402,7 @@ bool Image::SetSubimage(const Image* image, const IntRect& rect)
                 // Calculate float coordinates between 0 - 1 for resampling
                 const float xF = (image->width_ > 1) ? static_cast<float>(x) / (destWidth - 1) : 0.0f;
                 const float yF = (image->height_ > 1) ? static_cast<float>(y) / (destHeight - 1) : 0.0f;
-                const unsigned uintColor = image->GetPixelBilinear(xF, yF).ToUInt();
+                const color32 uintColor = image->GetPixelBilinear(xF, yF).ToU32();
 
                 memcpy(dest, reinterpret_cast<const unsigned char*>(&uintColor), components_);
 

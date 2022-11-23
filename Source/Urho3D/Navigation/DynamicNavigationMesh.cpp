@@ -213,9 +213,9 @@ void DynamicNavigationMesh::RegisterObject(Context* context)
     context->RegisterFactory<DynamicNavigationMesh>(NAVIGATION_CATEGORY);
 
     URHO3D_COPY_BASE_ATTRIBUTES(NavigationMesh);
-    URHO3D_ACCESSOR_ATTRIBUTE("Max Obstacles", GetMaxObstacles, SetMaxObstacles, unsigned, DEFAULT_MAX_OBSTACLES, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Max Layers", GetMaxLayers, SetMaxLayers, unsigned, DEFAULT_MAX_LAYERS, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Draw Obstacles", GetDrawObstacles, SetDrawObstacles, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Max Obstacles", GetMaxObstacles, SetMaxObstacles, DEFAULT_MAX_OBSTACLES, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Max Layers", GetMaxLayers, SetMaxLayers, DEFAULT_MAX_LAYERS, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Draw Obstacles", GetDrawObstacles, SetDrawObstacles, false, AM_DEFAULT);
 }
 
 bool DynamicNavigationMesh::Allocate(const BoundingBox& boundingBox, unsigned maxTiles)
@@ -521,7 +521,7 @@ bool DynamicNavigationMesh::Build(const IntVector2& from, const IntVector2& to)
     return true;
 }
 
-Vector<unsigned char> DynamicNavigationMesh::GetTileData(const IntVector2& tile) const
+Vector<byte> DynamicNavigationMesh::GetTileData(const IntVector2& tile) const
 {
     VectorBuffer ret;
     WriteTiles(ret, tile.x_, tile.y_);
@@ -535,7 +535,7 @@ bool DynamicNavigationMesh::IsObstacleInTile(Obstacle* obstacle, const IntVector
     return tileBoundingBox.DistanceToPoint(obstaclePosition) < obstacle->GetRadius();
 }
 
-bool DynamicNavigationMesh::AddTile(const Vector<unsigned char>& tileData)
+bool DynamicNavigationMesh::AddTile(const Vector<byte>& tileData)
 {
     MemoryBuffer buffer(tileData);
     return ReadTiles(buffer, false);
@@ -655,7 +655,7 @@ void DynamicNavigationMesh::DrawDebugGeometry(bool depthTest)
     }
 }
 
-void DynamicNavigationMesh::SetNavigationDataAttr(const Vector<unsigned char>& value)
+void DynamicNavigationMesh::SetNavigationDataAttr(const Vector<byte>& value)
 {
     ReleaseNavigationMesh();
 
@@ -664,8 +664,8 @@ void DynamicNavigationMesh::SetNavigationDataAttr(const Vector<unsigned char>& v
 
     MemoryBuffer buffer(value);
     boundingBox_ = buffer.ReadBoundingBox();
-    numTilesX_ = buffer.ReadInt();
-    numTilesZ_ = buffer.ReadInt();
+    numTilesX_ = buffer.ReadI32();
+    numTilesZ_ = buffer.ReadI32();
 
     dtNavMeshParams params;     // NOLINT(hicpp-member-init)
     buffer.Read(&params, sizeof(dtNavMeshParams));
@@ -705,14 +705,14 @@ void DynamicNavigationMesh::SetNavigationDataAttr(const Vector<unsigned char>& v
     // \todo Shall we send E_NAVIGATION_MESH_REBUILT here?
 }
 
-Vector<unsigned char> DynamicNavigationMesh::GetNavigationDataAttr() const
+Vector<byte> DynamicNavigationMesh::GetNavigationDataAttr() const
 {
     VectorBuffer ret;
     if (navMesh_ && tileCache_)
     {
         ret.WriteBoundingBox(boundingBox_);
-        ret.WriteInt(numTilesX_);
-        ret.WriteInt(numTilesZ_);
+        ret.WriteI32(numTilesX_);
+        ret.WriteI32(numTilesZ_);
 
         const dtNavMeshParams* params = navMesh_->getParams();
         ret.Write(params, sizeof(dtNavMeshParams));
@@ -745,7 +745,7 @@ void DynamicNavigationMesh::WriteTiles(Serializer& dest, int x, int z) const
             continue; // Don't write "void-space" tiles
                       // The header conveniently has the majority of the information required
         dest.Write(tile->header, sizeof(dtTileCacheLayerHeader));
-        dest.WriteInt(tile->dataSize);
+        dest.WriteI32(tile->dataSize);
         dest.Write(tile->data, (unsigned)tile->dataSize);
     }
 }
@@ -757,7 +757,7 @@ bool DynamicNavigationMesh::ReadTiles(Deserializer& source, bool silent)
     {
         dtTileCacheLayerHeader header;      // NOLINT(hicpp-member-init)
         source.Read(&header, sizeof(dtTileCacheLayerHeader));
-        const int dataSize = source.ReadInt();
+        const int dataSize = source.ReadI32();
 
         auto* data = (unsigned char*)dtAlloc(dataSize, DT_ALLOC_PERM);
         if (!data)

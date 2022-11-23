@@ -27,7 +27,7 @@ static const float LOD_CONSTANT = 1.0f / 150.0f;
 extern const char* GEOMETRY_CATEGORY;
 
 TerrainPatch::TerrainPatch(Context* context) :
-    Drawable(context, DRAWABLE_GEOMETRY),
+    Drawable(context, DrawableTypes::Geometry),
     geometry_(new Geometry(context)),
     maxLodGeometry_(new Geometry(context)),
     occlusionGeometry_(new Geometry(context)),
@@ -140,15 +140,18 @@ UpdateGeometryType TerrainPatch::GetUpdateGeometryType()
     return UPDATE_MAIN_THREAD;
 }
 
-Geometry* TerrainPatch::GetLodGeometry(unsigned batchIndex, unsigned level)
+Geometry* TerrainPatch::GetLodGeometry(i32 batchIndex, i32 level)
 {
+    assert(batchIndex >= 0);
+    assert(level >= 0 || level == NINDEX);
+
     if (!level)
         return maxLodGeometry_;
     else
         return geometry_;
 }
 
-unsigned TerrainPatch::GetNumOccluderTriangles()
+i32 TerrainPatch::GetNumOccluderTriangles()
 {
     // Check that the material is suitable for occlusion (default material always is)
     Material* mat = batches_[0].material_;
@@ -171,10 +174,10 @@ bool TerrainPatch::DrawOcclusion(OcclusionBuffer* buffer)
     else
         buffer->SetCullMode(CULL_CCW);
 
-    const unsigned char* vertexData;
-    unsigned vertexSize;
-    const unsigned char* indexData;
-    unsigned indexSize;
+    const byte* vertexData;
+    i32 vertexSize;
+    const byte* indexData;
+    i32 indexSize;
     const Vector<VertexElement>* elements;
 
     occlusionGeometry_->GetRawData(vertexData, vertexSize, indexData, indexSize, elements);

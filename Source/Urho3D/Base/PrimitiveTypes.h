@@ -3,31 +3,47 @@
 
 #pragma once
 
-#include <climits>
-#include <cstdint>
-#include <stddef.h>
+#include <cstddef> // std::byte
+
+// User can inject Urho3D::PrimitiveTypes into other namespace
+namespace Urho3D::PrimitiveTypes
+{
 
 // https://en.cppreference.com/w/cpp/language/types
-static_assert(CHAR_BIT == 8);
-static_assert(sizeof(short) == 2);
-static_assert(sizeof(int) == 4);
-static_assert(sizeof(long) == 4 || sizeof(long) == 8); // (Win32, Win64, Unix32) || Unix64
-static_assert(sizeof(long long) == 8);
-
-// https://en.cppreference.com/w/cpp/types/integer
-typedef int8_t   i8;
-typedef uint8_t  u8;
-typedef int16_t  i16;
-typedef uint16_t u16;
-typedef int32_t  i32;
-typedef uint32_t u32;
-typedef int64_t  i64;
-typedef uint64_t u64;
+using i8 = signed char;
+using u8 = unsigned char;
+using i16 = short;
+using u16 = unsigned short;
+using i32 = int;
+using u32 = unsigned;
+using i64 = long long;
+using u64 = unsigned long long;
 
 // Unicode code point (UTF-32 code unit)
-static_assert(sizeof(char32_t) == 4);
-typedef char32_t c32;
+using c32 = char32_t;
 
-// Pointer arithmetics
-static_assert(sizeof(void*) == sizeof(ptrdiff_t));
-static_assert(sizeof(void*) == sizeof(intptr_t));
+// For raw data
+using std::byte;
+
+// Some hash value (checksum for example)
+using hash16 = u16;
+using hash32 = u32;
+using hash64 = u64;
+
+// Some ID
+using id32 = u32;
+
+// Some mask
+using mask32 = u32;
+
+// Some flags
+using flagset32 = u32;
+
+} // namespace Urho3D::PrimitiveTypes
+
+namespace Urho3D
+{
+
+using namespace Urho3D::PrimitiveTypes;
+
+} // namespace Urho3D

@@ -7,6 +7,22 @@ cmake_minimum_required (VERSION 3.15)
 # Set project name
 project (Urho3D)
 
+# Show command line options
+get_cmake_property (CACHE_VARS CACHE_VARIABLES)
+foreach (CACHE_VAR ${CACHE_VARS})
+  get_property(CACHE_VAR_HELPSTRING CACHE ${CACHE_VAR} PROPERTY HELPSTRING)
+  if (CACHE_VAR_HELPSTRING STREQUAL "No help, variable specified on the command line.")
+    get_property(CACHE_VAR_TYPE CACHE ${CACHE_VAR} PROPERTY TYPE)
+    if (CACHE_VAR_TYPE STREQUAL "UNINITIALIZED")
+      set (CACHE_VAR_TYPE)
+    else ()
+      set (CACHE_VAR_TYPE ":${CACHE_VAR_TYPE}")
+    endif()
+    set (CMAKE_ARGS "${CMAKE_ARGS} -D ${CACHE_VAR}${CACHE_VAR_TYPE}=\"${${CACHE_VAR}}\"")
+  endif ()
+endforeach ()
+message ("!! CMAKE_ARGS: ${CMAKE_ARGS}")
+
 # Set CMake modules search path
 set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
@@ -62,7 +78,7 @@ if (MATCHED)
     set (CPACK_PACKAGE_VERSION_MINOR ${CMAKE_MATCH_2})
     set (CPACK_PACKAGE_VERSION_PATCH ${CMAKE_MATCH_3})
 endif ()
-set (CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE)
+set (CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/licenses/urho3d/LICENSE)
 set (CPACK_SYSTEM_NAME ${CMAKE_SYSTEM_NAME})
 set (CPACK_GENERATOR TGZ)
 if (ANDROID)

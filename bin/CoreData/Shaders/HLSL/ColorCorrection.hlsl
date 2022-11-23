@@ -18,9 +18,5 @@ void PS(float2 iScreenPos : TEXCOORD0,
     out float4 oColor : OUTCOLOR0)
 {
     float3 color = Sample2D(DiffMap, iScreenPos).rgb;
-    #ifndef D3D11
-        oColor = float4(ColorCorrection(color, sVolumeMap), 1.0);
-    #else
-        oColor = float4(ColorCorrection(color, tVolumeMap, sVolumeMap), 1.0);
-    #endif
+    oColor = float4(ColorCorrection(color, tVolumeMap, sVolumeMap), 1.0);
 }

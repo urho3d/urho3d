@@ -31,22 +31,26 @@ Geometry::Geometry(Context* context) :
 
 Geometry::~Geometry() = default;
 
-bool Geometry::SetNumVertexBuffers(unsigned num)
+bool Geometry::SetNumVertexBuffers(i32 num)
 {
+    assert(num >= 0);
+
     if (num >= MAX_VERTEX_STREAMS)
     {
         URHO3D_LOGERROR("Too many vertex streams");
         return false;
     }
 
-    unsigned oldSize = vertexBuffers_.Size();
+    i32 oldSize = vertexBuffers_.Size(); // TODO: unused
     vertexBuffers_.Resize(num);
 
     return true;
 }
 
-bool Geometry::SetVertexBuffer(unsigned index, VertexBuffer* buffer)
+bool Geometry::SetVertexBuffer(i32 index, VertexBuffer* buffer)
 {
+    assert(index >= 0);
+
     if (index >= vertexBuffers_.Size())
     {
         URHO3D_LOGERROR("Stream index out of bounds");
@@ -62,8 +66,11 @@ void Geometry::SetIndexBuffer(IndexBuffer* buffer)
     indexBuffer_ = buffer;
 }
 
-bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, bool getUsedVertexRange)
+bool Geometry::SetDrawRange(PrimitiveType type, i32 indexStart, i32 indexCount, bool getUsedVertexRange/* = true*/)
 {
+    assert(indexStart >= 0);
+    assert(indexCount >= 0);
+
     if (!indexBuffer_ && !rawIndexData_)
     {
         URHO3D_LOGERROR("Null index buffer and no raw index data, can not define indexed draw range");
@@ -98,9 +105,14 @@ bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned in
     return true;
 }
 
-bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount,
+bool Geometry::SetDrawRange(PrimitiveType type, i32 indexStart, i32 indexCount, i32 vertexStart, i32 vertexCount,
     bool checkIllegal)
 {
+    assert(indexStart >= 0);
+    assert(indexCount >= 0);
+    assert(vertexStart >= 0);
+    assert(vertexCount >= 0);
+
     if (indexBuffer_)
     {
         // We can allow setting an illegal draw range now if the caller guarantees to resize / fill the buffer later
@@ -134,22 +146,23 @@ void Geometry::SetLodDistance(float distance)
     lodDistance_ = distance;
 }
 
-void Geometry::SetRawVertexData(const SharedArrayPtr<unsigned char>& data, const Vector<VertexElement>& elements)
+void Geometry::SetRawVertexData(const SharedArrayPtr<byte>& data, const Vector<VertexElement>& elements)
 {
     rawVertexData_ = data;
     rawVertexSize_ = VertexBuffer::GetVertexSize(elements);
     rawElements_ = elements;
 }
 
-void Geometry::SetRawVertexData(const SharedArrayPtr<unsigned char>& data, unsigned elementMask)
+void Geometry::SetRawVertexData(const SharedArrayPtr<byte>& data, VertexElements elementMask)
 {
     rawVertexData_ = data;
     rawVertexSize_ = VertexBuffer::GetVertexSize(elementMask);
     rawElements_ = VertexBuffer::GetElements(elementMask);
 }
 
-void Geometry::SetRawIndexData(const SharedArrayPtr<unsigned char>& data, unsigned indexSize)
+void Geometry::SetRawIndexData(const SharedArrayPtr<byte>& data, i32 indexSize)
 {
+    assert(indexSize >= 0);
     rawIndexData_ = data;
     rawIndexSize_ = indexSize;
 }
@@ -169,8 +182,9 @@ void Geometry::Draw(Graphics* graphics)
     }
 }
 
-VertexBuffer* Geometry::GetVertexBuffer(unsigned index) const
+VertexBuffer* Geometry::GetVertexBuffer(i32 index) const
 {
+    assert(index >= 0);
     return index < vertexBuffers_.Size() ? vertexBuffers_[index] : nullptr;
 }
 
@@ -190,8 +204,8 @@ u16 Geometry::GetBufferHash() const
     return hash;
 }
 
-void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData,
-    unsigned& indexSize, const Vector<VertexElement>*& elements) const
+void Geometry::GetRawData(const byte*& vertexData, i32& vertexSize, const byte*& indexData,
+    i32& indexSize, const Vector<VertexElement>*& elements) const
 {
     if (rawVertexData_)
     {
@@ -235,8 +249,8 @@ void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize
     }
 }
 
-void Geometry::GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, unsigned& vertexSize,
-    SharedArrayPtr<unsigned char>& indexData, unsigned& indexSize, const Vector<VertexElement>*& elements) const
+void Geometry::GetRawDataShared(SharedArrayPtr<byte>& vertexData, i32& vertexSize,
+    SharedArrayPtr<byte>& indexData, i32& indexSize, const Vector<VertexElement>*& elements) const
 {
     if (rawVertexData_)
     {
@@ -282,10 +296,10 @@ void Geometry::GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, unsig
 
 float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal, Vector2* outUV) const
 {
-    const unsigned char* vertexData;
-    const unsigned char* indexData;
-    unsigned vertexSize;
-    unsigned indexSize;
+    const byte* vertexData;
+    const byte* indexData;
+    i32 vertexSize;
+    i32 indexSize;
     const Vector<VertexElement>* elements;
 
     GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
@@ -293,9 +307,9 @@ float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal, Vector2* outU
     if (!vertexData || !elements || VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR3, SEM_POSITION) != 0)
         return M_INFINITY;
 
-    unsigned uvOffset = VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR2, SEM_TEXCOORD);
+    i32 uvOffset = VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR2, SEM_TEXCOORD);
 
-    if (outUV && uvOffset == M_MAX_UNSIGNED)
+    if (outUV && uvOffset == NINDEX)
     {
         // requested UV output, but no texture data in vertex buffer
         URHO3D_LOGWARNING("Illegal GetHitDistance call: UV return requested on vertex buffer without UV coords");
@@ -309,10 +323,10 @@ float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal, Vector2* outU
 
 bool Geometry::IsInside(const Ray& ray) const
 {
-    const unsigned char* vertexData;
-    const unsigned char* indexData;
-    unsigned vertexSize;
-    unsigned indexSize;
+    const byte* vertexData;
+    const byte* indexData;
+    i32 vertexSize;
+    i32 indexSize;
     const Vector<VertexElement>* elements;
 
     GetRawData(vertexData, vertexSize, indexData, indexSize, elements);

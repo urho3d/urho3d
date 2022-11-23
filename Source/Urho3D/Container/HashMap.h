@@ -315,7 +315,7 @@ public:
         if (!ptrs_)
             return InsertNode(key, U(), false)->pair_.second_;
 
-        unsigned hashKey = Hash(key);
+        hash32 hashKey = Hash(key);
 
         Node* node = FindNode(key, hashKey);
         return node ? node->pair_.second_ : InsertNode(key, U(), false)->pair_.second_;
@@ -327,7 +327,7 @@ public:
         if (!ptrs_)
             return 0;
 
-        unsigned hashKey = Hash(key);
+        hash32 hashKey = Hash(key);
 
         Node* node = FindNode(key, hashKey);
         return node ? &node->pair_.second_ : 0;
@@ -391,7 +391,7 @@ public:
         if (!ptrs_)
             return false;
 
-        unsigned hashKey = Hash(key);
+        hash32 hashKey = Hash(key);
 
         Node* previous;
         Node* node = FindNode(key, hashKey, previous);
@@ -413,10 +413,10 @@ public:
         if (!ptrs_ || !it.ptr_)
             return End();
 
-        auto* node = static_cast<Node*>(it.ptr_);
+        Node* node = static_cast<Node*>(it.ptr_);
         Node* next = node->Next();
 
-        unsigned hashKey = Hash(node->pair_.first_);
+        hash32 hashKey = Hash(node->pair_.first_);
 
         Node* previous = 0;
         auto* current = static_cast<Node*>(Ptrs()[hashKey]);
@@ -512,7 +512,7 @@ public:
         if (!ptrs_)
             return End();
 
-        unsigned hashKey = Hash(key);
+        hash32 hashKey = Hash(key);
         Node* node = FindNode(key, hashKey);
         if (node)
             return Iterator(node);
@@ -526,7 +526,7 @@ public:
         if (!ptrs_)
             return End();
 
-        unsigned hashKey = Hash(key);
+        hash32 hashKey = Hash(key);
         Node* node = FindNode(key, hashKey);
         if (node)
             return ConstIterator(node);
@@ -540,7 +540,7 @@ public:
         if (!ptrs_)
             return false;
 
-        unsigned hashKey = Hash(key);
+        hash32 hashKey = Hash(key);
         return FindNode(key, hashKey) != 0;
     }
 
@@ -549,7 +549,7 @@ public:
     {
         if (!ptrs_)
             return false;
-        unsigned hashKey = Hash(key);
+        hash32 hashKey = Hash(key);
         Node* node = FindNode(key, hashKey);
         if (node)
         {
@@ -606,9 +606,9 @@ private:
     Node* Tail() const { return static_cast<Node*>(tail_); }
 
     /// Find a node from the buckets. Do not call if the buckets have not been allocated.
-    Node* FindNode(const T& key, unsigned hashKey) const
+    Node* FindNode(const T& key, hash32 hashKey) const
     {
-        auto* node = static_cast<Node*>(Ptrs()[hashKey]);
+        Node* node = static_cast<Node*>(Ptrs()[hashKey]);
         while (node)
         {
             if (node->pair_.first_ == key)
@@ -620,11 +620,11 @@ private:
     }
 
     /// Find a node and the previous node from the buckets. Do not call if the buckets have not been allocated.
-    Node* FindNode(const T& key, unsigned hashKey, Node*& previous) const
+    Node* FindNode(const T& key, hash32 hashKey, Node*& previous) const
     {
         previous = 0;
 
-        auto* node = static_cast<Node*>(Ptrs()[hashKey]);
+        Node* node = static_cast<Node*>(Ptrs()[hashKey]);
         while (node)
         {
             if (node->pair_.first_ == key)
@@ -646,7 +646,7 @@ private:
             Rehash();
         }
 
-        unsigned hashKey = Hash(key);
+        hash32 hashKey = Hash(key);
 
         if (findExisting)
         {
@@ -722,7 +722,7 @@ private:
     /// Reserve a node.
     Node* ReserveNode()
     {
-        auto* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
+        Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node();
         return newNode;
     }
@@ -730,7 +730,7 @@ private:
     /// Reserve a node with specified key and value.
     Node* ReserveNode(const T& key, const U& value)
     {
-        auto* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
+        Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node(key, value);
         return newNode;
     }
@@ -747,8 +747,8 @@ private:
     {
         for (Iterator i = Begin(); i != End(); ++i)
         {
-            auto* node = static_cast<Node*>(i.ptr_);
-            unsigned hashKey = Hash(i->first_);
+            Node* node = static_cast<Node*>(i.ptr_);
+            hash32 hashKey = Hash(i->first_);
             node->down_ = Ptrs()[hashKey];
             Ptrs()[hashKey] = node;
         }
@@ -758,7 +758,7 @@ private:
     static bool CompareNodes(Node*& lhs, Node*& rhs) { return lhs->pair_.first_ < rhs->pair_.first_; }
 
     /// Compute a hash based on the key and the bucket size.
-    unsigned Hash(const T& key) const { return MakeHash(key) & (NumBuckets() - 1); }
+    hash32 Hash(const T& key) const { return MakeHash(key) & (NumBuckets() - 1); }
 };
 
 template <class T, class U> typename Urho3D::HashMap<T, U>::ConstIterator begin(const Urho3D::HashMap<T, U>& v) { return v.Begin(); }

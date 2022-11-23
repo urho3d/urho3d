@@ -35,7 +35,7 @@ public:
     }
 
     /// Construct from an array of vertices.
-    Sphere(const Vector3* vertices, unsigned count) noexcept
+    Sphere(const Vector3* vertices, i32 count) noexcept
     {
         Define(vertices, count);
     }
@@ -81,7 +81,7 @@ public:
     }
 
     /// Define from an array of vertices.
-    void Define(const Vector3* vertices, unsigned count);
+    void Define(const Vector3* vertices, i32 count);
     /// Define from a bounding box.
     void Define(const BoundingBox& box);
     /// Define from a frustum.
@@ -111,7 +111,7 @@ public:
     }
 
     /// Merge an array of vertices.
-    void Merge(const Vector3* vertices, unsigned count);
+    void Merge(const Vector3* vertices, i32 count);
     /// Merge a bounding box.
     void Merge(const BoundingBox& box);
     /// Merge a frustum.

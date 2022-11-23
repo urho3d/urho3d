@@ -172,7 +172,7 @@ void ToggleParentToSelected(StringHash eventType, VariantMap& eventData)
 void UpdateNumberSpawnedObjects(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].GetPtr();
-    numberSpawnedObjects = edit.text.ToUInt();
+    numberSpawnedObjects = edit.text.ToU32();
     edit.text = String(numberSpawnedObjects);
     RefreshPickedObjects();
 }
@@ -186,7 +186,7 @@ void EditSpawnRadius(StringHash eventType, VariantMap& eventData)
 void EditSpawnCount(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].GetPtr();
-    spawnCount = edit.text.ToUInt();
+    spawnCount = edit.text.ToU32();
 }
 
 void RefreshPickedObjects()
@@ -218,7 +218,7 @@ void RefreshPickedObjects()
 void EditSpawnedObjectName(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ nameEdit = eventData["Element"].GetPtr();
-    int index = nameEdit.vars["Index"].GetUInt();
+    int index = nameEdit.vars["Index"].GetU32();
     String resourceName = VerifySpawnedObjectFile(nameEdit.text);
     nameEdit.text = resourceName;
     spawnedObjectsNames[index] = resourceName;
@@ -236,7 +236,7 @@ String VerifySpawnedObjectFile(const String&in resourceName)
 void PickSpawnedObject(StringHash eventType, VariantMap& eventData)
 {
     UIElement@ button = eventData["Element"].GetPtr();
-    resourcePickIndex = button.vars["Index"].GetUInt();
+    resourcePickIndex = button.vars["Index"].GetU32();
     CreateFileSelector("Pick spawned object", "Pick", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
     
     SubscribeToEvent(uiFileSelector, "FileSelected", "PickSpawnedObjectNameDone");
@@ -293,7 +293,7 @@ bool GetSpawnPosition(const Ray&in cameraRay, float maxDistance, Vector3&out pos
 {
     if (pickMode < PICK_RIGIDBODIES && editorScene.octree !is null)
     {
-        RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, maxDistance, DRAWABLE_GEOMETRY,
+        RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, maxDistance, DrawableTypes::Geometry,
             0x7fffffff);
         if (result.drawable !is null)
         {
@@ -302,7 +302,7 @@ bool GetSpawnPosition(const Ray&in cameraRay, float maxDistance, Vector3&out pos
                 Vector3 basePosition = RandomizeSpawnPosition(result.position, randomRadius);
                 basePosition.y += randomRadius;
                 result = editorScene.octree.RaycastSingle(Ray(basePosition, Vector3(0, -1, 0)), RAY_TRIANGLE, randomRadius * 2.0,
-                    DRAWABLE_GEOMETRY, 0x7fffffff);
+                    DrawableTypes::Geometry, 0x7fffffff);
                 if (result.drawable !is null)
                 {
                     position = result.position;
@@ -359,7 +359,7 @@ bool GetSpawnPositionOnNode(const Ray&in cameraRay, float maxDistance, Vector3&o
 {
     if (pickMode < PICK_RIGIDBODIES && editorScene.octree !is null)
     {
-        Array<RayQueryResult> results = editorScene.octree.Raycast(cameraRay, RAY_TRIANGLE, maxDistance, DRAWABLE_GEOMETRY, 0x7fffffff);
+        Array<RayQueryResult> results = editorScene.octree.Raycast(cameraRay, RAY_TRIANGLE, maxDistance, DrawableTypes::Geometry, 0x7fffffff);
         
         if (!results.empty)
         {
@@ -378,7 +378,7 @@ bool GetSpawnPositionOnNode(const Ray&in cameraRay, float maxDistance, Vector3&o
             {
                 Vector3 basePosition = RandomizeSpawnPosition(result.position, randomRadius);
                 basePosition.y += randomRadius;
-                Array<RayQueryResult> randomResults = editorScene.octree.Raycast(Ray(basePosition, Vector3(0, -1, 0)), RAY_TRIANGLE, randomRadius * 2.0, DRAWABLE_GEOMETRY, 0x7fffffff);
+                Array<RayQueryResult> randomResults = editorScene.octree.Raycast(Ray(basePosition, Vector3(0, -1, 0)), RAY_TRIANGLE, randomRadius * 2.0, DrawableTypes::Geometry, 0x7fffffff);
 
                 if (randomResults.length == 0)
                 {

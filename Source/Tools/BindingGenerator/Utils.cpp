@@ -6,6 +6,13 @@
 #include <cassert>
 #include <sstream>
 
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <dirent.h>
+#include <sys/stat.h>
+#endif
+
 using namespace std;
 
 string Trim(const string& str)
@@ -233,4 +240,87 @@ string ToIdentifier(const string& str)
     result = ReplaceAll(result, "<", "_leftAngleBracket_");
     result = ReplaceAll(result, ">", "_rightAngleBracket_");
     return result;
+}
+
+static string RemoveTrailingSlash(const string& pathName)
+{
+    string ret = Trim(pathName);
+    ret = ReplaceAll(ret, "\\", "/");
+    ret = CutEnd(ret, "/");
+    return ret;
+}
+
+static string GetParentPath(const string& path)
+{
+    size_t pos = RemoveTrailingSlash(path).find_last_of("/");
+
+    if (pos != string::npos)
+        return path.substr(0, pos + 1);
+    else
+        return string();
+}
+
+// setlocale(LC_ALL, "en_US.utf8") is required
+wstring ToWide(const string& multi)
+{
+    std::wstring ret;
+    wchar_t w;
+    mbstate_t mb{};
+
+    size_t n = 0;
+    size_t len = multi.length() + 1;
+
+    while (size_t res = mbrtowc(&w, multi.c_str() + n, len - n, &mb))
+    {
+        if (res == static_cast<size_t>(-1) || res == static_cast<size_t>(-2))
+            throw "Invalid encoding";
+
+        n += res;
+        ret += w;
+    }
+
+    return ret;
+}
+
+bool DirExists(const string& pathName)
+{
+#ifndef _WIN32
+    // Always return true for the root directory
+    if (pathName == "/")
+        return true;
+#endif
+
+    string fixedName = RemoveTrailingSlash(pathName);
+
+#ifdef _WIN32
+    DWORD attributes = GetFileAttributesW(ToWide(fixedName).c_str());
+    if (attributes == INVALID_FILE_ATTRIBUTES || !(attributes & FILE_ATTRIBUTE_DIRECTORY))
+        return false;
+#else
+    struct stat st {};
+    if (stat(fixedName.c_str(), &st) || !(st.st_mode & S_IFDIR))
+        return false;
+#endif
+
+    return true;
+}
+
+bool CreateDir(const string& pathName)
+{
+    // Create each of the parents if necessary
+    string parentPath = GetParentPath(pathName);
+    if (parentPath.length() > 1 && !DirExists(parentPath))
+    {
+        if (!CreateDir(parentPath))
+            return false;
+    }
+
+#ifdef _WIN32
+    bool success = (CreateDirectoryW(ToWide(RemoveTrailingSlash(pathName)).c_str(), nullptr) == TRUE) ||
+        (GetLastError() == ERROR_ALREADY_EXISTS);
+#else
+    bool success = mkdir(RemoveTrailingSlash(pathName).c_str(), S_IRWXU) == 0 || errno == EEXIST;
+#endif
+
+    return success;
 }

@@ -63,7 +63,7 @@ public:
     explicit operator bool() const { return type_ != PLVT_NONE; }
 
     /// Set int.
-    void SetInt(int value);
+    void SetI32(i32 value);
     /// Set boolean.
     void SetBool(bool value);
     /// Set float.
@@ -79,7 +79,7 @@ public:
     PListValueType GetType() const { return type_; }
 
     /// Return int.
-    int GetInt() const;
+    i32 GetI32() const;
     /// Return boolean.
     bool GetBool() const;
     /// Return float.
@@ -111,7 +111,7 @@ private:
     /// Values.
     union
     {
-        int int_;
+        i32 int_;
         bool bool_;
         float float_;
         String* string_;

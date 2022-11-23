@@ -32,9 +32,18 @@ public:
     void SetColor(const Color& color, bool overrideAlpha = false);
     /// Restore UI element's default color.
     void SetDefaultColor();
-    /// Add a quad.
+
+    /// Add a quad
     void AddQuad(float x, float y, float width, float height, int texOffsetX, int texOffsetY, int texWidth = 0, int texHeight = 0);
-    /// Add a quad using a transform matrix.
+
+    /// Add a quad (integer version)
+    void AddQuad(i32 x, i32 y, i32 width, i32 height, int texOffsetX, int texOffsetY, int texWidth = 0, int texHeight = 0)
+    {
+        AddQuad(static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height),
+                texOffsetX, texOffsetY, texWidth, texHeight);
+    }
+
+    /// Add a quad using a transform matrix
     void AddQuad(const Matrix3x4& transform, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth = 0,
         int texHeight = 0);
     /// Add a quad with tiled texture.
@@ -48,8 +57,15 @@ public:
         const Color& colB, const Color& colC, const Color& colD);
     /// Merge with another batch.
     bool Merge(const UIBatch& batch);
-    /// Return an interpolated color for the UI element.
+
+    /// Return an interpolated color for the UI element
     unsigned GetInterpolatedColor(float x, float y);
+
+    /// Return an interpolated color for the UI element (integer version)
+    unsigned GetInterpolatedColor(i32 x, i32 y)
+    {
+        return GetInterpolatedColor(static_cast<float>(x), static_cast<float>(y));
+    }
 
     /// Add or merge a batch.
     static void AddOrMerge(const UIBatch& batch, Vector<UIBatch>& batches);
@@ -71,14 +87,11 @@ public:
     /// Vertex data end index.
     unsigned vertexEnd_{};
     /// Current color. By default calculated from the element.
-    unsigned color_{};
+    color32 color_{};
     /// Gradient flag.
     bool useGradient_{};
     /// Custom material.
     Material* customMaterial_{};
-
-    /// Position adjustment vector for pixel-perfect rendering. Initialized by UI.
-    static Vector3 posAdjust;
 };
 
 }

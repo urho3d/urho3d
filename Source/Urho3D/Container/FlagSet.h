@@ -3,12 +3,79 @@
 
 #pragma once
 
+#include "../Base/PrimitiveTypes.h"
 
 #include <type_traits>
 
-
 namespace Urho3D
 {
+
+/// Define bitwise operators for scoped enum.
+/// Use !! to convert scoped enum to bool
+#define URHO3D_FLAGS(EnumClass) \
+    inline constexpr EnumClass operator |(const EnumClass lhs, const EnumClass rhs) \
+    { \
+        using UT = std::underlying_type_t<EnumClass>; \
+        return static_cast<EnumClass>(static_cast<UT>(lhs) | static_cast<UT>(rhs)); \
+    } \
+    inline constexpr EnumClass& operator |=(EnumClass& lhs, const EnumClass rhs) \
+    { \
+        using UT = std::underlying_type_t<EnumClass>; \
+        lhs = static_cast<EnumClass>(static_cast<UT>(lhs) | static_cast<UT>(rhs)); \
+        return lhs; \
+    } \
+    inline constexpr EnumClass operator &(const EnumClass lhs, const EnumClass rhs) \
+    { \
+        using UT = std::underlying_type_t<EnumClass>; \
+        return static_cast<EnumClass>(static_cast<UT>(lhs) & static_cast<UT>(rhs)); \
+    } \
+    inline constexpr EnumClass& operator &=(EnumClass& lhs, const EnumClass rhs) \
+    { \
+        using UT = std::underlying_type_t<EnumClass>; \
+        lhs = static_cast<EnumClass>(static_cast<UT>(lhs) & static_cast<UT>(rhs)); \
+        return lhs; \
+    } \
+    inline constexpr EnumClass operator ^(const EnumClass lhs, const EnumClass rhs) \
+    { \
+        using UT = std::underlying_type_t<EnumClass>; \
+        return static_cast<EnumClass>(static_cast<UT>(lhs) ^ static_cast<UT>(rhs)); \
+    } \
+    inline constexpr EnumClass& operator ^=(EnumClass& lhs, const EnumClass rhs) \
+    { \
+        using UT = std::underlying_type_t<EnumClass>; \
+        lhs = static_cast<EnumClass>(static_cast<UT>(lhs) ^ static_cast<UT>(rhs)); \
+        return lhs; \
+    } \
+    inline constexpr EnumClass operator ~(const EnumClass rhs) \
+    { \
+        using UT = std::underlying_type_t<EnumClass>; \
+        return static_cast<EnumClass>(~static_cast<UT>(rhs)); \
+    } \
+    inline constexpr bool operator ==(const EnumClass lhs, const std::underlying_type_t<EnumClass> rhs) \
+    { \
+        using UT = std::underlying_type_t<EnumClass>; \
+        return static_cast<UT>(lhs) == rhs; \
+    } \
+    inline constexpr bool operator ==(const std::underlying_type_t<EnumClass> lhs, const EnumClass rhs) \
+    { \
+        using UT = std::underlying_type_t<EnumClass>; \
+        return lhs == static_cast<UT>(rhs); \
+    } \
+    inline constexpr bool operator !=(const EnumClass lhs, const std::underlying_type_t<EnumClass> rhs) \
+    { \
+        using UT = std::underlying_type_t<EnumClass>; \
+        return static_cast<UT>(lhs) != rhs; \
+    } \
+    inline constexpr bool operator !=(const std::underlying_type_t<EnumClass> lhs, const EnumClass rhs) \
+    { \
+        using UT = std::underlying_type_t<EnumClass>; \
+        return lhs != static_cast<UT>(rhs); \
+    } \
+    inline constexpr bool operator !(const EnumClass rhs) \
+    { \
+        using UT = std::underlying_type_t<EnumClass>; \
+        return static_cast<UT>(rhs) == 0; \
+    }
 
 /// Make bitwise operators (| & ^ ~) automatically construct FlagSet from Enum.
 #define URHO3D_AUTOMATIC_FLAGSET(Enum) \
@@ -210,7 +277,7 @@ public:
     Integer& AsInteger() { return value_; }
 
     /// Return hash value.
-    unsigned ToHash() const { return static_cast<unsigned>(value_); }
+    hash32 ToHash() const { return static_cast<hash32>(value_); }
 
 protected:
     /// Value.

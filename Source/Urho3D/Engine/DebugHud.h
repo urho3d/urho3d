@@ -14,13 +14,17 @@ class Font;
 class Text;
 class XMLFile;
 
-static const unsigned DEBUGHUD_SHOW_NONE = 0x0;
-static const unsigned DEBUGHUD_SHOW_STATS = 0x1;
-static const unsigned DEBUGHUD_SHOW_MODE = 0x2;
-static const unsigned DEBUGHUD_SHOW_PROFILER = 0x4;
-static const unsigned DEBUGHUD_SHOW_MEMORY = 0x8;
-static const unsigned DEBUGHUD_SHOW_EVENTPROFILER = 0x10;
-static const unsigned DEBUGHUD_SHOW_ALL = DEBUGHUD_SHOW_STATS | DEBUGHUD_SHOW_MODE | DEBUGHUD_SHOW_PROFILER | DEBUGHUD_SHOW_MEMORY;
+enum class DebugHudElements
+{
+    None          = 0,
+    Stats         = 1 << 0,
+    Mode          = 1 << 1,
+    Profiler      = 1 << 2,
+    Memory        = 1 << 3,
+    EventProfiler = 1 << 4,
+    All           = Stats | Mode | Profiler | Memory
+};
+URHO3D_FLAGS(DebugHudElements);
 
 /// Displays rendering stats and profiling information.
 class URHO3D_API DebugHud : public Object
@@ -38,9 +42,11 @@ public:
     /// Set UI elements' style from an XML file.
     /// @property
     void SetDefaultStyle(XMLFile* style);
+
     /// Set elements to show.
     /// @property
-    void SetMode(unsigned mode);
+    void SetMode(DebugHudElements mode);
+
     /// Set maximum profiler block depth, default unlimited.
     /// @property
     void SetProfilerMaxDepth(unsigned depth);
@@ -50,8 +56,10 @@ public:
     /// Set whether to show 3D geometry primitive/batch count only. Default false.
     /// @property
     void SetUseRendererStats(bool enable);
+
     /// Toggle elements.
-    void Toggle(unsigned mode);
+    void Toggle(DebugHudElements mode);
+
     /// Toggle all elements.
     void ToggleAll();
 
@@ -77,7 +85,7 @@ public:
 
     /// Return currently shown elements.
     /// @property
-    unsigned GetMode() const { return mode_; }
+    DebugHudElements GetMode() const { return mode_; }
 
     /// Return maximum profiler block depth.
     /// @property
@@ -124,8 +132,9 @@ private:
     unsigned profilerInterval_;
     /// Show 3D geometry primitive/batch count flag.
     bool useRendererStats_;
+
     /// Current shown-element mode.
-    unsigned mode_;
+    DebugHudElements mode_;
 };
 
 }

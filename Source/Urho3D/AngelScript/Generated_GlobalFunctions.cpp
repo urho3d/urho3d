@@ -8,6 +8,13 @@
 namespace Urho3D
 {
 
+// Vector<unsigned char> DecodeBase64(const String& encodedString) | File: ../Core/StringUtils.h
+static CScriptArray* Vectorlesunsignedspchargre_DecodeBase64_constspStringamp(const String& encodedString)
+{
+    Vector<unsigned char> result = DecodeBase64(encodedString);
+    return VectorToArray(result, "Array<uint8>");
+}
+
 // const Vector<String>& GetArguments() | File: ../Core/ProcessUtils.h
 static CScriptArray* constspVectorlesStringgreamp_GetArguments_void()
 {
@@ -69,8 +76,8 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // unsigned ClosestPowerOfTwo(unsigned value) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("uint ClosestPowerOfTwo(uint)", AS_FUNCTIONPR(ClosestPowerOfTwo, (unsigned), unsigned), AS_CALL_CDECL);
 
-    // void CombineHash(unsigned& result, unsigned hash) | File: ../Container/Hash.h
-    engine->RegisterGlobalFunction("void CombineHash(uint&, uint)", AS_FUNCTIONPR(CombineHash, (unsigned&, unsigned), void), AS_CALL_CDECL);
+    // void CombineHash(hash32& result, hash32 hash) | File: ../Container/Hash.h
+    engine->RegisterGlobalFunction("void CombineHash(hash32&, hash32)", AS_FUNCTIONPR(CombineHash, (hash32&, hash32), void), AS_CALL_CDECL);
 
     // bool CompareDrawables(Drawable* lhs, Drawable* rhs) | File: ../Graphics/Drawable.h
     engine->RegisterGlobalFunction("bool CompareDrawables(Drawable@+, Drawable@+)", AS_FUNCTIONPR(CompareDrawables, (Drawable*, Drawable*), bool), AS_CALL_CDECL);
@@ -93,8 +100,8 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // i32 CountSetBits(u32 value) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("int CountSetBits(uint)", AS_FUNCTIONPR(CountSetBits, (u32), i32), AS_CALL_CDECL);
 
-    // Vector<unsigned char> DecodeBase64(String encodedString) | File: ../Core/StringUtils.h
-    // Error: type "Vector<unsigned char>" can not automatically bind
+    // Vector<unsigned char> DecodeBase64(const String& encodedString) | File: ../Core/StringUtils.h
+    engine->RegisterGlobalFunction("Array<uint8>@ DecodeBase64(const String&in)", AS_FUNCTION(Vectorlesunsignedspchargre_DecodeBase64_constspStringamp), AS_CALL_CDECL);
 
     // unsigned DecompressData(void* dest, const void* src, unsigned destSize) | File: ../IO/Compression.h
     // Error: type "void*" can not automatically bind
@@ -369,8 +376,11 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // template <class T> int RoundToInt(T x) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("int RoundToInt(float)", AS_FUNCTIONPR(RoundToInt, (float), int), AS_CALL_CDECL);
 
-    // constexpr unsigned SDBMHash(unsigned hash, unsigned char c) | File: ../Math/MathDefs.h
-    engine->RegisterGlobalFunction("uint SDBMHash(uint, uint8)", AS_FUNCTIONPR(SDBMHash, (unsigned, unsigned char), unsigned), AS_CALL_CDECL);
+    // constexpr hash32 SDBMHash(hash32 hash, byte b) | File: ../Math/MathDefs.h
+    // Not registered because have @nobind mark
+
+    // constexpr hash32 SDBMHash(hash32 hash, u8 c) | File: ../Math/MathDefs.h
+    engine->RegisterGlobalFunction("hash32 SDBMHash(hash32, uint8)", AS_FUNCTIONPR(SDBMHash, (hash32, u8), hash32), AS_CALL_CDECL);
 
     // void SetMiniDumpDir(const String& pathName) | File: ../Core/ProcessUtils.h
     engine->RegisterGlobalFunction("void SetMiniDumpDir(const String&in)", AS_FUNCTIONPR(SetMiniDumpDir, (const String&), void), AS_CALL_CDECL);
@@ -405,11 +415,11 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // float StableRandom(float seed) | File: ../Math/Vector2.h
     engine->RegisterGlobalFunction("float StableRandom(float)", AS_FUNCTIONPR(StableRandom, (float), float), AS_CALL_CDECL);
 
-    // void StringToBuffer(Vector<unsigned char>& dest, const String& source) | File: ../Core/StringUtils.h
-    // Error: type "Vector<unsigned char>&" can not automatically bind
+    // void StringToBuffer(Vector<byte>& dest, const String& source) | File: ../Core/StringUtils.h
+    // Error: type "Vector<byte>&" can not automatically bind
 
-    // void StringToBuffer(Vector<unsigned char>& dest, const char* source) | File: ../Core/StringUtils.h
-    // Error: type "Vector<unsigned char>&" can not automatically bind
+    // void StringToBuffer(Vector<byte>& dest, const char* source) | File: ../Core/StringUtils.h
+    // Error: type "Vector<byte>&" can not automatically bind
 
     // template <class T> T Tan(T angle) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Tan(float)", AS_FUNCTIONPR(Tan, (float), float), AS_CALL_CDECL);
@@ -438,16 +448,16 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // float ToFloat(const char* source) | File: ../Core/StringUtils.h
     // Error: type "const char*" can not automatically bind
 
-    // int ToInt(const String& source, int base = 10) | File: ../Core/StringUtils.h
-    engine->RegisterGlobalFunction("int ToInt(const String&in, int = 10)", AS_FUNCTIONPR(ToInt, (const String&, int), int), AS_CALL_CDECL);
+    // i32 ToI32(const String& source, i32 base = 10) | File: ../Core/StringUtils.h
+    engine->RegisterGlobalFunction("int ToI32(const String&in, int = 10)", AS_FUNCTIONPR(ToI32, (const String&, i32), i32), AS_CALL_CDECL);
 
-    // int ToInt(const char* source, int base = 10) | File: ../Core/StringUtils.h
+    // i32 ToI32(const char* source, i32 base = 10) | File: ../Core/StringUtils.h
     // Error: type "const char*" can not automatically bind
 
-    // long long ToInt64(const String& source, int base = 10) | File: ../Core/StringUtils.h
-    engine->RegisterGlobalFunction("int64 ToInt64(const String&in, int = 10)", AS_FUNCTIONPR(ToInt64, (const String&, int), long long), AS_CALL_CDECL);
+    // i64 ToI64(const String& source, i32 base = 10) | File: ../Core/StringUtils.h
+    engine->RegisterGlobalFunction("int64 ToI64(const String&in, int = 10)", AS_FUNCTIONPR(ToI64, (const String&, i32), i64), AS_CALL_CDECL);
 
-    // long long ToInt64(const char* source, int base = 10) | File: ../Core/StringUtils.h
+    // i64 ToI64(const char* source, i32 base = 10) | File: ../Core/StringUtils.h
     // Error: type "const char*" can not automatically bind
 
     // IntRect ToIntRect(const String& source) | File: ../Core/StringUtils.h
@@ -510,16 +520,16 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // String ToStringHex(unsigned value) | File: ../Core/StringUtils.h
     engine->RegisterGlobalFunction("String ToStringHex(uint)", AS_FUNCTIONPR(ToStringHex, (unsigned), String), AS_CALL_CDECL);
 
-    // unsigned ToUInt(const String& source, int base = 10) | File: ../Core/StringUtils.h
-    engine->RegisterGlobalFunction("uint ToUInt(const String&in, int = 10)", AS_FUNCTIONPR(ToUInt, (const String&, int), unsigned), AS_CALL_CDECL);
+    // u32 ToU32(const String& source, i32 base = 10) | File: ../Core/StringUtils.h
+    engine->RegisterGlobalFunction("uint ToU32(const String&in, int = 10)", AS_FUNCTIONPR(ToU32, (const String&, i32), u32), AS_CALL_CDECL);
 
-    // unsigned ToUInt(const char* source, int base = 10) | File: ../Core/StringUtils.h
+    // u32 ToU32(const char* source, i32 base = 10) | File: ../Core/StringUtils.h
     // Error: type "const char*" can not automatically bind
 
-    // unsigned long long ToUInt64(const String& source, int base = 10) | File: ../Core/StringUtils.h
-    engine->RegisterGlobalFunction("uint64 ToUInt64(const String&in, int = 10)", AS_FUNCTIONPR(ToUInt64, (const String&, int), unsigned long long), AS_CALL_CDECL);
+    // u64 ToU64(const String& source, i32 base = 10) | File: ../Core/StringUtils.h
+    engine->RegisterGlobalFunction("uint64 ToU64(const String&in, int = 10)", AS_FUNCTIONPR(ToU64, (const String&, i32), u64), AS_CALL_CDECL);
 
-    // unsigned long long ToUInt64(const char* source, int base = 10) | File: ../Core/StringUtils.h
+    // u64 ToU64(const char* source, i32 base = 10) | File: ../Core/StringUtils.h
     // Error: type "const char*" can not automatically bind
 
     // unsigned ToUpper(unsigned ch) | File: ../Core/StringUtils.h

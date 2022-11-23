@@ -319,7 +319,7 @@ void LoadChildUIElement(const String&in fileName)
     if (editUIElement.LoadChildXML(xmlFile, uiElementDefaultStyle !is null ? uiElementDefaultStyle : uiStyle) !is null)
     {
         XMLElement rootElem = xmlFile.root;
-        uint index = rootElem.HasAttribute("index") ? rootElem.GetUInt("index") : editUIElement.numChildren - 1;
+        uint index = rootElem.HasAttribute("index") ? rootElem.GetU32("index") : editUIElement.numChildren - 1;
         UIElement@ element = editUIElement.children[index];
         ResetSortChildren(element);
         RegisterUIElementVar(xmlFile.root);
@@ -416,7 +416,7 @@ void FilterInternalVars(XMLElement source)
     XMLElement resultElem = resultSet.firstResult;
     while (resultElem.notNull)
     {
-        String name = GetVarName(resultElem.GetUInt("hash"));
+        String name = GetVarName(resultElem.GetU32("hash"));
         if (name.empty)
         {
             XMLElement parent = resultElem.parent;
@@ -635,7 +635,7 @@ bool UIElementDelete()
 bool UIElementSelectAll()
 {
     BeginSelectionModify();
-    Array<uint> indices;
+    Array<int> indices;
     uint baseIndex = GetListIndex(editorUIElement);
     indices.Push(baseIndex);
     int baseIndent = hierarchyList.items[baseIndex].indent;

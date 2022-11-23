@@ -60,7 +60,7 @@ void prepareUVCoords(float coords[4], float low, float high, float lowBorder, fl
     coords[3] = high;
 }
 
-void prepareVertices(Vertex2D vtx[4][4], const float xs[4], const float ys[4], const float us[4], const float vs[4], unsigned color,
+void prepareVertices(Vertex2D vtx[4][4], const float xs[4], const float ys[4], const float us[4], const float vs[4], color32 color,
     const Vector3& position, const Quaternion& rotation)
 {
     for (unsigned i = 0; i < 4; ++i)
@@ -110,7 +110,7 @@ void StretchableSprite2D::RegisterObject(Context* context)
     context->RegisterFactory<StretchableSprite2D>(URHO2D_CATEGORY);
 
     URHO3D_COPY_BASE_ATTRIBUTES(StaticSprite2D);
-    URHO3D_ACCESSOR_ATTRIBUTE("Border", GetBorder, SetBorder, IntRect, IntRect::ZERO, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Border", GetBorder, SetBorder, IntRect::ZERO, AM_DEFAULT);
 }
 
 void StretchableSprite2D::SetBorder(const IntRect& border)
@@ -167,7 +167,7 @@ void StretchableSprite2D::UpdateSourceBatches()
         -effectiveBorder.max_.y_ /* texture y direction inverted*/, drawRect_.max_.y_ - drawRect_.min_.y_);
 
     Vertex2D vtx[4][4]; // prepare all vertices
-    prepareVertices(vtx, xs, ys, us, vs, color_.ToUInt(), node_->GetWorldPosition(), node_->GetWorldRotation());
+    prepareVertices(vtx, xs, ys, us, vs, color_.ToU32(), node_->GetWorldPosition(), node_->GetWorldRotation());
 
     pushVertices(vertices, vtx); // push the vertices that make up each patch
 

@@ -26,7 +26,7 @@
 #include <Urho3D/Scene/Scene.h>
 
 #ifdef WIN32
-#include <windows.h>
+#include <Urho3D/Engine/WinWrapped.h>
 #endif
 
 #include <assimp/config.h>
@@ -189,7 +189,7 @@ unsigned GetMeshIndex(aiMesh* mesh);
 unsigned GetBoneIndex(OutModel& model, const String& boneName);
 aiBone* GetMeshBone(OutModel& model, const String& boneName);
 Matrix3x4 GetOffsetMatrix(OutModel& model, const String& boneName);
-void GetBlendData(OutModel& model, aiMesh* mesh, aiNode* meshNode, Vector<unsigned>& boneMappings, Vector<Vector<unsigned char>>&
+void GetBlendData(OutModel& model, aiMesh* mesh, aiNode* meshNode, Vector<i32>& boneMappings, Vector<Vector<unsigned char>>&
     blendIndices, Vector<Vector<float>>& blendWeights);
 String GetMeshMaterialName(aiMesh* mesh);
 String GetMaterialTextureName(const String& nameIn);
@@ -388,7 +388,7 @@ void Run(const Vector<String>& arguments)
             }
             else if (argument == "mb" && !value.Empty())
             {
-                maxBones_ = ToUInt(value);
+                maxBones_ = ToU32(value);
                 if (maxBones_ < 1)
                     maxBones_ = 1;
                 ++i;
@@ -981,7 +981,7 @@ void BuildAndSaveModel(OutModel& model)
     PrintLine("Writing model " + rootNodeName);
 
     SharedPtr<Model> outModel(new Model(context_));
-    Vector<Vector<unsigned>> allBoneMappings;
+    Vector<Vector<i32>> allBoneMappings;
     BoundingBox box;
 
     unsigned numValidGeometries = 0;
@@ -1080,8 +1080,8 @@ void BuildAndSaveModel(OutModel& model)
         if (model.bones_.Size() > 0 && !mesh->HasBones())
             PrintLine("Warning: model has bones but geometry " + String(i) + " has no skinning information");
 
-        unsigned char* vertexData = vb->GetShadowData();
-        unsigned char* indexData = ib->GetShadowData();
+        byte* vertexData = vb->GetShadowData();
+        byte* indexData = ib->GetShadowData();
 
         // Build the index data
         if (!largeIndices)
@@ -1101,7 +1101,7 @@ void BuildAndSaveModel(OutModel& model)
         // If there are bones, get blend data
         Vector<Vector<unsigned char>> blendIndices;
         Vector<Vector<float>> blendWeights;
-        Vector<unsigned> boneMappings;
+        Vector<i32> boneMappings;
         if (model.bones_.Size())
             GetBlendData(model, mesh, model.meshNodes_[i], boneMappings, blendIndices, blendWeights);
 
@@ -1142,7 +1142,7 @@ void BuildAndSaveModel(OutModel& model)
     }
 
     // Define the model buffers and bounding box
-    Vector<unsigned> emptyMorphRange;
+    Vector<i32> emptyMorphRange;
     outModel->SetVertexBuffers(vbVector, emptyMorphRange, emptyMorphRange);
     outModel->SetIndexBuffers(ibVector);
     outModel->SetBoundingBox(box);
@@ -1349,15 +1349,15 @@ void BuildAndSaveAnimations(OutModel* model)
             AnimationTrack* track = outAnim->CreateTrack(channelName);
 
             // Check which channels are used
-            track->channelMask_ = CHANNEL_NONE;
+            track->channelMask_ = AnimationChannels::None;
             if (channel->mNumPositionKeys > 1 || !posEqual)
-                track->channelMask_ |= CHANNEL_POSITION;
+                track->channelMask_ |= AnimationChannels::Position;
             if (channel->mNumRotationKeys > 1 || !rotEqual)
-                track->channelMask_ |= CHANNEL_ROTATION;
+                track->channelMask_ |= AnimationChannels::Rotation;
             if (channel->mNumScalingKeys > 1 || !scaleEqual)
-                track->channelMask_ |= CHANNEL_SCALE;
+                track->channelMask_ |= AnimationChannels::Scale;
             // Check for redundant identity scale in all keyframes and remove in that case
-            if (track->channelMask_ & CHANNEL_SCALE)
+            if (!!(track->channelMask_ & AnimationChannels::Scale))
             {
                 bool redundantScale = true;
                 for (unsigned k = 0; k < channel->mNumScalingKeys; ++k)
@@ -1372,7 +1372,7 @@ void BuildAndSaveAnimations(OutModel* model)
                     }
                 }
                 if (redundantScale)
-                    track->channelMask_ &= ~CHANNEL_SCALE;
+                    track->channelMask_ &= ~AnimationChannels::Scale;
             }
 
             if (!track->channelMask_)
@@ -1408,11 +1408,11 @@ void BuildAndSaveAnimations(OutModel* model)
                 kf.scale_ = Vector3::ONE;
 
                 // Get time for the keyframe. Adjust with animation's start time
-                if (track->channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
+                if (!!(track->channelMask_ & AnimationChannels::Position) && k < channel->mNumPositionKeys)
                     kf.time_ = ((float)channel->mPositionKeys[k].mTime - startTime);
-                else if (track->channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
+                else if (!!(track->channelMask_ & AnimationChannels::Rotation) && k < channel->mNumRotationKeys)
                     kf.time_ = ((float)channel->mRotationKeys[k].mTime - startTime);
-                else if (track->channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
+                else if (!!(track->channelMask_ & AnimationChannels::Scale) && k < channel->mNumScalingKeys)
                     kf.time_ = ((float)channel->mScalingKeys[k].mTime - startTime);
 
                 // Make sure time stays positive
@@ -1424,11 +1424,11 @@ void BuildAndSaveAnimations(OutModel* model)
                 aiQuaternion rot;
                 boneTransform.Decompose(scale, rot, pos);
                 // Then apply the active channels
-                if (track->channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
+                if (!!(track->channelMask_ & AnimationChannels::Position) && k < channel->mNumPositionKeys)
                     pos = channel->mPositionKeys[k].mValue;
-                if (track->channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
+                if (!!(track->channelMask_ & AnimationChannels::Rotation) && k < channel->mNumRotationKeys)
                     rot = channel->mRotationKeys[k].mValue;
-                if (track->channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
+                if (!!(track->channelMask_ & AnimationChannels::Scale) && k < channel->mNumScalingKeys)
                     scale = channel->mScalingKeys[k].mValue;
 
                 // If root bone, transform with nodes in between model root node (if any)
@@ -1446,11 +1446,11 @@ void BuildAndSaveAnimations(OutModel* model)
                         tform.Decompose(scale, rot, pos);
                 }
 
-                if (track->channelMask_ & CHANNEL_POSITION)
+                if (!!(track->channelMask_ & AnimationChannels::Position))
                     kf.position_ = ToVector3(pos);
-                if (track->channelMask_ & CHANNEL_ROTATION)
+                if (!!(track->channelMask_ & AnimationChannels::Rotation))
                     kf.rotation_ = ToQuaternion(rot);
-                if (track->channelMask_ & CHANNEL_SCALE)
+                if (!!(track->channelMask_ & AnimationChannels::Scale))
                     kf.scale_ = ToVector3(scale);
                 if (kf.time_ >= thisImportStartTime && kf.time_ <= thisImportEndTime)
                 {
@@ -1960,7 +1960,7 @@ void CopyTextures(const HashSet<String>& usedTextures, const String& sourcePath)
         // Handle assimp embedded textures
         if (i->Length() && i->At(0) == '*')
         {
-            unsigned texIndex = ToInt(i->Substring(1));
+            unsigned texIndex = ToI32(i->Substring(1));
             if (texIndex >= scene_->mNumTextures)
                 PrintLine("Skipping out of range texture index " + String(texIndex));
             else
@@ -2077,7 +2077,7 @@ void CombineLods(const Vector<float>& lodDistances, const Vector<String>& modelN
 
     Vector<SharedPtr<VertexBuffer>> vbVector;
     Vector<SharedPtr<IndexBuffer>> ibVector;
-    Vector<unsigned> emptyMorphRange;
+    Vector<i32> emptyMorphRange;
 
     // Create the final model
     SharedPtr<Model> outModel(new Model(context_));
@@ -2196,7 +2196,7 @@ Matrix3x4 GetOffsetMatrix(OutModel& model, const String& boneName)
     return Matrix3x4::IDENTITY;
 }
 
-void GetBlendData(OutModel& model, aiMesh* mesh, aiNode* meshNode, Vector<unsigned>& boneMappings, Vector<Vector<unsigned char>>&
+void GetBlendData(OutModel& model, aiMesh* mesh, aiNode* meshNode, Vector<i32>& boneMappings, Vector<Vector<unsigned char>>&
     blendIndices, Vector<Vector<float>>& blendWeights)
 {
     blendIndices.Resize(mesh->mNumVertices);
@@ -2349,7 +2349,7 @@ String GetMaterialTextureName(const String& nameIn)
 {
     // Detect assimp embedded texture
     if (nameIn.Length() && nameIn[0] == '*')
-        return GenerateTextureName(ToInt(nameIn.Substring(1)));
+        return GenerateTextureName(ToI32(nameIn.Substring(1)));
     else
         return (useSubdirs_ ? "Textures/" : "") + nameIn;
 }
@@ -2424,7 +2424,7 @@ void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, bool isSkinned, Bou
     for (unsigned i = 0; i < mesh->GetNumColorChannels() && i < MAX_CHANNELS; ++i)
     {
         *((unsigned*)dest) = Color(mesh->mColors[i][index].r, mesh->mColors[i][index].g, mesh->mColors[i][index].b,
-            mesh->mColors[i][index].a).ToUInt();
+            mesh->mColors[i][index].a).ToU32();
         ++dest;
     }
 

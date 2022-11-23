@@ -121,7 +121,7 @@ RaycastVehicle::RaycastVehicle(Context* context) :
     LogicComponent(context)
 {
     // fixed update() for inputs and post update() to sync wheels for rendering
-    SetUpdateEventMask(USE_FIXEDUPDATE | USE_FIXEDPOSTUPDATE | USE_POSTUPDATE);
+    SetUpdateEventMask(LogicComponentEvents::FixedUpdate | LogicComponentEvents::FixedPostUpdate | LogicComponentEvents::PostUpdate);
     vehicleData_ = new RaycastVehicleData();
     coordinateSystem_ = RIGHT_UP_FORWARD;
     wheelNodes_.Clear();
@@ -166,11 +166,11 @@ static const StringVector wheelElementNames =
 void RaycastVehicle::RegisterObject(Context* context)
 {
     context->RegisterFactory<RaycastVehicle>();
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Wheel data", GetWheelDataAttr, SetWheelDataAttr, VariantVector, Variant::emptyVariantVector, AM_DEFAULT)
+    URHO3D_ACCESSOR_ATTRIBUTE("Wheel data", GetWheelDataAttr, SetWheelDataAttr, Variant::emptyVariantVector, AM_DEFAULT)
         .SetMetadata(AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, wheelElementNames);
-    URHO3D_ATTRIBUTE("Maximum side slip threshold", float, maxSideSlipSpeed_, 4.0f, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("RPM for wheel motors in air (0=calculate)", float, inAirRPM_, 0.0f, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Coordinate system", IntVector3, coordinateSystem_, RIGHT_UP_FORWARD, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Maximum side slip threshold", maxSideSlipSpeed_, 4.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("RPM for wheel motors in air (0=calculate)", inAirRPM_, 0.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Coordinate system", coordinateSystem_, RIGHT_UP_FORWARD, AM_DEFAULT);
 }
 
 void RaycastVehicle::OnSetEnabled()
@@ -186,7 +186,7 @@ void RaycastVehicle::ApplyAttributes()
     Scene* scene = GetScene();
     vehicleData_->Init(scene, hullBody_, IsEnabledEffective(), coordinateSystem_);
     VariantVector& value = loadedWheelData_;
-    int numObjects = value[index++].GetInt();
+    int numObjects = value[index++].GetI32();
     int wheelIndex = 0;
     origRotation_.Clear();
     skidInfoCumulative_.Clear();
@@ -194,7 +194,7 @@ void RaycastVehicle::ApplyAttributes()
 
     for (int i = 0; i < numObjects; i++)
     {
-        int node_id = value[index++].GetInt();
+        int node_id = value[index++].GetI32();
         Vector3 direction = value[index++].GetVector3();
         Vector3 axle = value[index++].GetVector3();
         float restLength = value[index++].GetFloat();

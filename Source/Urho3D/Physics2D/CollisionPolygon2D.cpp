@@ -28,9 +28,9 @@ void CollisionPolygon2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<CollisionPolygon2D>(PHYSICS2D_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, true, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(CollisionShape2D);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Vertices", GetVerticesAttr, SetVerticesAttr, Vector<u8>, Variant::emptyBuffer, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Vertices", GetVerticesAttr, SetVerticesAttr, Variant::emptyBuffer, AM_FILE);
 }
 
 void CollisionPolygon2D::SetVertexCount(i32 count)
@@ -63,7 +63,7 @@ void CollisionPolygon2D::SetVertices(const Vector<Vector2>& vertices)
     RecreateFixture();
 }
 
-void CollisionPolygon2D::SetVerticesAttr(const Vector<u8>& value)
+void CollisionPolygon2D::SetVerticesAttr(const Vector<byte>& value)
 {
     if (value.Empty())
         return;
@@ -77,7 +77,7 @@ void CollisionPolygon2D::SetVerticesAttr(const Vector<u8>& value)
     SetVertices(vertices);
 }
 
-Vector<u8> CollisionPolygon2D::GetVerticesAttr() const
+Vector<byte> CollisionPolygon2D::GetVerticesAttr() const
 {
     VectorBuffer ret;
 

@@ -410,7 +410,7 @@ void FileSelector::HandleFileListKey(StringHash eventType, VariantMap& eventData
 
     using namespace UnhandledKey;
 
-    int key = eventData[P_KEY].GetInt();
+    int key = eventData[P_KEY].GetI32();
     if (key == KEY_RETURN || key == KEY_RETURN2 || key == KEY_KP_ENTER)
     {
         bool entered = EnterFile();

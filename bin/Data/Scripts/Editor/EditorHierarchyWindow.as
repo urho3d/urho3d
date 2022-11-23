@@ -31,7 +31,7 @@ const uint UI_ELEMENT_BASE_ID = 1;
 uint uiElementNextID = UI_ELEMENT_BASE_ID;
 bool showInternalUIElement = false;
 bool showTemporaryObject = false;
-Array<uint> hierarchyUpdateSelections;
+Array<int> hierarchyUpdateSelections;
 
 Variant GetUIElementID(UIElement@ element)
 {
@@ -122,7 +122,7 @@ void ExpandCollapseHierarchy(StringHash eventType, VariantMap& eventData)
     bool all = checkBox.checked;
     checkBox.checked = false;    // Auto-reset
 
-    Array<uint> selections = hierarchyList.selections;
+    Array<int> selections = hierarchyList.selections;
     for (uint i = 0; i < selections.length; ++i)
         hierarchyList.Expand(selections[i], enable, all);
 }
@@ -190,7 +190,7 @@ uint UpdateHierarchyItem(uint itemIndex, Serializable@ serializable, UIElement@ 
     Variant id = GetID(serializable, itemType);
 
     // Remove old item if exists
-    if (itemIndex < hierarchyList.numItems && MatchID(hierarchyList.items[itemIndex], id, itemType))
+    if (itemIndex < hierarchyList.numItems && itemIndex != NINDEX && MatchID(hierarchyList.items[itemIndex], id, itemType))
         hierarchyList.RemoveItem(itemIndex);
 
     Text@ text = Text();
@@ -334,7 +334,7 @@ void SetID(Text@ text, Serializable@ serializable, int itemType = ITEM_NONE)
 
     // Set node ID as drag and drop content for node ID editing
     if (itemType == ITEM_NODE)
-        text.vars[DRAGDROPCONTENT_VAR] = String(text.vars[NODE_ID_VAR].GetUInt());
+        text.vars[DRAGDROPCONTENT_VAR] = String(text.vars[NODE_ID_VAR].GetU32());
 
     switch (itemType)
     {
@@ -370,7 +370,7 @@ uint GetID(Serializable@ serializable, int itemType = ITEM_NONE)
         return cast<Component>(serializable).id;
 
     case ITEM_UI_ELEMENT:
-        return GetUIElementID(cast<UIElement>(serializable)).GetUInt();
+        return GetUIElementID(cast<UIElement>(serializable)).GetU32();
     }
 
     return M_MAX_UNSIGNED;
@@ -378,7 +378,7 @@ uint GetID(Serializable@ serializable, int itemType = ITEM_NONE)
 
 bool MatchID(UIElement@ element, const Variant&in id, int itemType)
 {
-    return element.GetVar(TYPE_VAR).GetInt() == itemType && element.GetVar(ID_VARS[itemType]) == id;
+    return element.GetVar(TYPE_VAR).GetI32() == itemType && element.GetVar(ID_VARS[itemType]) == id;
 }
 
 uint GetListIndex(Serializable@ serializable)
@@ -415,7 +415,7 @@ Node@ GetListNode(uint index)
     if (item is null)
         return null;
 
-    return editorScene.GetNode(item.vars[NODE_ID_VAR].GetUInt());
+    return editorScene.GetNode(item.vars[NODE_ID_VAR].GetU32());
 }
 
 Component@ GetListComponent(uint index)
@@ -429,10 +429,10 @@ Component@ GetListComponent(UIElement@ item)
     if (item is null)
         return null;
 
-    if (item.vars[TYPE_VAR].GetInt() != ITEM_COMPONENT)
+    if (item.vars[TYPE_VAR].GetI32() != ITEM_COMPONENT)
         return null;
 
-    return editorScene.GetComponent(item.vars[COMPONENT_ID_VAR].GetUInt());
+    return editorScene.GetComponent(item.vars[COMPONENT_ID_VAR].GetU32());
 }
 
 uint GetComponentListIndex(Component@ component)
@@ -444,7 +444,7 @@ uint GetComponentListIndex(Component@ component)
     for (uint i = 0; i < numItems; ++i)
     {
         UIElement@ item = hierarchyList.items[i];
-        if (item.vars[TYPE_VAR].GetInt() == ITEM_COMPONENT && item.vars[COMPONENT_ID_VAR].GetUInt() == component.id)
+        if (item.vars[TYPE_VAR].GetI32() == ITEM_COMPONENT && item.vars[COMPONENT_ID_VAR].GetU32() == component.id)
             return i;
     }
 
@@ -689,7 +689,7 @@ void HandleHierarchyListSelectionChange()
     ClearSceneSelection();
     ClearUIElementSelection();
 
-    Array<uint> indices = hierarchyList.selections;
+    Array<int> indices = hierarchyList.selections;
 
     // Enable Expand/Collapse button when there is selection
     EnableExpandCollapseButtons(indices.length > 0);
@@ -698,7 +698,7 @@ void HandleHierarchyListSelectionChange()
     {
         uint index = indices[i];
         UIElement@ item = hierarchyList.items[index];
-        int type = item.vars[TYPE_VAR].GetInt();
+        int type = item.vars[TYPE_VAR].GetI32();
         if (type == ITEM_COMPONENT)
         {
             Component@ comp = GetListComponent(index);
@@ -822,18 +822,18 @@ void HandleHierarchyListSelectionChange()
 void HandleHierarchyListDoubleClick(StringHash eventType, VariantMap& eventData)
 {
     UIElement@ item = eventData["Item"].GetPtr();
-    int type = item.vars[TYPE_VAR].GetInt();
+    int type = item.vars[TYPE_VAR].GetI32();
     // Locate nodes from the scene by double-clicking
     if (type == ITEM_NODE)
     {
-        Node@ node = editorScene.GetNode(item.vars[NODE_ID_VAR].GetUInt());
+        Node@ node = editorScene.GetNode(item.vars[NODE_ID_VAR].GetU32());
         Array<Node@> nodes;
         nodes.Push(node);
         LocateNodes(nodes);
     }
     else if (type == ITEM_COMPONENT)
     {
-        Component@ component = editorScene.GetComponent(item.vars[COMPONENT_ID_VAR].GetUInt());
+        Component@ component = editorScene.GetComponent(item.vars[COMPONENT_ID_VAR].GetU32());
         Array<Component@> components;
         components.Push(component);
         LocateComponents(components);
@@ -841,7 +841,7 @@ void HandleHierarchyListDoubleClick(StringHash eventType, VariantMap& eventData)
 
     bool isExpanded = hierarchyList.IsExpanded(hierarchyList.selection);
 
-    if (!isExpanded && eventData["Button"].GetInt() == MOUSEB_LEFT)
+    if (!isExpanded && eventData["Button"].GetI32() == MOUSEB_LEFT)
     {
         isExpanded = !isExpanded;
         hierarchyList.Expand(hierarchyList.selection, isExpanded, false);
@@ -850,14 +850,14 @@ void HandleHierarchyListDoubleClick(StringHash eventType, VariantMap& eventData)
 
 void HandleHierarchyItemClick(StringHash eventType, VariantMap& eventData)
 {
-    if (eventData["Button"].GetInt() != MOUSEB_RIGHT)
+    if (eventData["Button"].GetI32() != MOUSEB_RIGHT)
         return;
 
     UIElement@ uiElement = eventData["Item"].GetPtr();
-    int selectionIndex = eventData["Selection"].GetInt();
+    int selectionIndex = eventData["Selection"].GetI32();
 
     Array<UIElement@> actions;
-    int type = uiElement.vars[TYPE_VAR].GetInt();
+    int type = uiElement.vars[TYPE_VAR].GetI32();
 
     // Adds left clicked items to selection which is not normal listview behavior
     if (type == ITEM_COMPONENT || type == ITEM_NODE)
@@ -873,7 +873,7 @@ void HandleHierarchyItemClick(StringHash eventType, VariantMap& eventData)
 
     if (type == ITEM_COMPONENT)
     {
-        Component@ targetComponent = editorScene.GetComponent(uiElement.vars[COMPONENT_ID_VAR].GetUInt());
+        Component@ targetComponent = editorScene.GetComponent(uiElement.vars[COMPONENT_ID_VAR].GetU32());
         if (targetComponent is null)
             return;
 
@@ -931,18 +931,18 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
         return;
 
     // Resource browser
-    if (source !is null && source.GetVar(TEXT_VAR_RESOURCE_TYPE).GetInt() > 0)
+    if (source !is null && source.GetVar(TEXT_VAR_RESOURCE_TYPE).GetI32() > 0)
     {
-        int type = source.GetVar(TEXT_VAR_RESOURCE_TYPE).GetInt();
+        int type = source.GetVar(TEXT_VAR_RESOURCE_TYPE).GetI32();
 
-        BrowserFile@ browserFile = GetBrowserFileFromId(source.vars[TEXT_VAR_FILE_ID].GetUInt());
+        BrowserFile@ browserFile = GetBrowserFileFromId(source.vars[TEXT_VAR_FILE_ID].GetU32());
         if (browserFile is null)
             return;
 
         Component@ createdComponent;
         if (itemType == ITEM_NODE)
         {
-            Node@ targetNode = editorScene.GetNode(target.vars[NODE_ID_VAR].GetUInt());
+            Node@ targetNode = editorScene.GetNode(target.vars[NODE_ID_VAR].GetU32());
             if (targetNode is null)
                 return;
 
@@ -992,7 +992,7 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
         }
         else if (itemType == ITEM_COMPONENT)
         {
-            Component@ targetComponent = editorScene.GetComponent(target.vars[COMPONENT_ID_VAR].GetUInt());
+            Component@ targetComponent = editorScene.GetComponent(target.vars[COMPONENT_ID_VAR].GetU32());
 
             if (targetComponent is null)
                 return;
@@ -1035,7 +1035,7 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
 
     if (itemType == ITEM_NODE)
     {
-        Node@ targetNode = editorScene.GetNode(target.vars[NODE_ID_VAR].GetUInt());
+        Node@ targetNode = editorScene.GetNode(target.vars[NODE_ID_VAR].GetU32());
         Array<Node@> sourceNodes = GetMultipleSourceNodes(source);
 
         if (sourceNodes.length > 0)
@@ -1060,8 +1060,8 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
     }
     else if (itemType == ITEM_UI_ELEMENT)
     {
-        UIElement@ sourceElement = GetUIElementByID(source.vars[UI_ELEMENT_ID_VAR].GetUInt());
-        UIElement@ targetElement = GetUIElementByID(target.vars[UI_ELEMENT_ID_VAR].GetUInt());
+        UIElement@ sourceElement = GetUIElementByID(source.vars[UI_ELEMENT_ID_VAR].GetU32());
+        UIElement@ targetElement = GetUIElementByID(target.vars[UI_ELEMENT_ID_VAR].GetU32());
 
         // If target is null, cannot proceed
         if (targetElement is null)
@@ -1083,13 +1083,13 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
     }
     else if (itemType == ITEM_COMPONENT)
     {
-        Component@ targetComponent = editorScene.GetComponent(target.vars[COMPONENT_ID_VAR].GetUInt());
+        Component@ targetComponent = editorScene.GetComponent(target.vars[COMPONENT_ID_VAR].GetU32());
         Array<Node@> sourceNodes = GetMultipleSourceNodes(source);
 
         if (input.qualifierDown[QUAL_CTRL] && sourceNodes.length == 1)
         {
             // Reorder components within node
-            Component@ sourceComponent = editorScene.GetComponent(source.vars[COMPONENT_ID_VAR].GetUInt());
+            Component@ sourceComponent = editorScene.GetComponent(source.vars[COMPONENT_ID_VAR].GetU32());
             SceneReorder(sourceComponent, targetComponent);
         }
         else
@@ -1158,7 +1158,7 @@ Array<Node@> GetMultipleSourceNodes(UIElement@ source)
 {
     Array<Node@> nodeList;
 
-    Node@ node = editorScene.GetNode(source.vars[NODE_ID_VAR].GetUInt());
+    Node@ node = editorScene.GetNode(source.vars[NODE_ID_VAR].GetU32());
     if (node !is null)
         nodeList.Push(node);
 
@@ -1190,7 +1190,7 @@ Array<Node@> GetMultipleSourceNodes(UIElement@ source)
 
                 if (item_.vars[TYPE_VAR] == ITEM_NODE)
                 {
-                    Node@ n = editorScene.GetNode(item_.vars[NODE_ID_VAR].GetUInt());
+                    Node@ n = editorScene.GetNode(item_.vars[NODE_ID_VAR].GetU32());
                     if (n !is null)
                         nodeList.Push(n);
                 }
@@ -1203,7 +1203,7 @@ Array<Node@> GetMultipleSourceNodes(UIElement@ source)
 
 bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
 {
-    int targetItemType = target.GetVar(TYPE_VAR).GetInt();
+    int targetItemType = target.GetVar(TYPE_VAR).GetI32();
 
     if (targetItemType == ITEM_NODE)
     {
@@ -1211,10 +1211,10 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
         Node@ targetNode;
         Variant variant = source.GetVar(NODE_ID_VAR);
         if (!variant.empty)
-            sourceNode = editorScene.GetNode(variant.GetUInt());
+            sourceNode = editorScene.GetNode(variant.GetU32());
         variant = target.GetVar(NODE_ID_VAR);
         if (!variant.empty)
-            targetNode = editorScene.GetNode(variant.GetUInt());
+            targetNode = editorScene.GetNode(variant.GetU32());
         Array<Node@> sourceNodes = GetMultipleSourceNodes(source);
 
         if (sourceNode !is null && targetNode !is null)
@@ -1242,7 +1242,7 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
         if (sourceNode is null && targetNode !is null)
         {
             itemType = ITEM_NODE;
-            int type = source.GetVar(TEXT_VAR_RESOURCE_TYPE).GetInt();
+            int type = source.GetVar(TEXT_VAR_RESOURCE_TYPE).GetI32();
             return type == RESOURCE_TYPE_PREFAB ||
                 type == RESOURCE_TYPE_SCRIPTFILE ||
                 type == RESOURCE_TYPE_MODEL ||
@@ -1258,10 +1258,10 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
         UIElement@ targetElement;
         Variant variant = source.GetVar(UI_ELEMENT_ID_VAR);
         if (!variant.empty)
-            sourceElement = GetUIElementByID(variant.GetUInt());
+            sourceElement = GetUIElementByID(variant.GetU32());
         variant = target.GetVar(UI_ELEMENT_ID_VAR);
         if (!variant.empty)
-            targetElement = GetUIElementByID(variant.GetUInt());
+            targetElement = GetUIElementByID(variant.GetU32());
 
         if (sourceElement !is null && targetElement !is null)
         {
@@ -1293,13 +1293,13 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
         Component@ targetComponent;
         Variant variant = source.GetVar(NODE_ID_VAR);
         if (!variant.empty)
-            sourceNode = editorScene.GetNode(variant.GetUInt());
+            sourceNode = editorScene.GetNode(variant.GetU32());
         variant = target.GetVar(COMPONENT_ID_VAR);
         if (!variant.empty)
-            targetComponent = editorScene.GetComponent(variant.GetUInt());
+            targetComponent = editorScene.GetComponent(variant.GetU32());
         variant = source.GetVar(COMPONENT_ID_VAR);
         if (!variant.empty)
-            sourceComponent = editorScene.GetComponent(variant.GetUInt());
+            sourceComponent = editorScene.GetComponent(variant.GetU32());
         Array<Node@> sourceNodes = GetMultipleSourceNodes(source);
 
         itemType = ITEM_COMPONENT;
@@ -1318,7 +1318,7 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
                 return true;
 
             // Resource browser
-            int type = source.GetVar(TEXT_VAR_RESOURCE_TYPE).GetInt();
+            int type = source.GetVar(TEXT_VAR_RESOURCE_TYPE).GetI32();
             if (targetComponent.type == STATICMODEL_TYPE || targetComponent.type == ANIMATEDMODEL_TYPE)
                 return type == RESOURCE_TYPE_MATERIAL || type == RESOURCE_TYPE_MODEL;
         }
@@ -1327,7 +1327,7 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
     }
     else if (source.vars.Contains(TEXT_VAR_RESOURCE_TYPE)) // only testing resource browser ui elements
     {
-        int type = source.GetVar(TEXT_VAR_RESOURCE_TYPE).GetInt();
+        int type = source.GetVar(TEXT_VAR_RESOURCE_TYPE).GetI32();
 
         // Test against resource pickers
         LineEdit@ lineEdit = cast<LineEdit>(target);
@@ -1350,8 +1350,8 @@ StringHash GetResourceTypeFromPickerLineEdit(UIElement@ lineEdit)
     Array<Serializable@>@ targets = GetAttributeEditorTargets(lineEdit);
     if (!targets.empty)
     {
-        resourcePickIndex = lineEdit.vars["Index"].GetUInt();
-        resourcePickSubIndex = lineEdit.vars["SubIndex"].GetUInt();
+        resourcePickIndex = lineEdit.vars["Index"].GetU32();
+        resourcePickSubIndex = lineEdit.vars["SubIndex"].GetU32();
         AttributeInfo info = targets[0].attributeInfos[resourcePickIndex];
         StringHash resourceType;
         if (info.type == VAR_RESOURCEREF)
@@ -1917,8 +1917,8 @@ void HandleHierarchyContextUIElementCloseAllUILayouts()
 
 void CollapseHierarchy()
 {
-    Array<uint> oldSelections = hierarchyList.selections;
-    Array<uint> selections = {0};
+    Array<int> oldSelections = hierarchyList.selections;
+    Array<int> selections = {0};
 
     hierarchyList.SetSelections(selections);
 

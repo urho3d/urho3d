@@ -86,10 +86,10 @@ public:
                 continue;
             }
 
-            SharedArrayPtr<unsigned char> vertexData;
-            SharedArrayPtr<unsigned char> indexData;
-            unsigned vertexSize;
-            unsigned indexSize;
+            SharedArrayPtr<byte> vertexData;
+            SharedArrayPtr<byte> indexData;
+            i32 vertexSize;
+            i32 indexSize;
             const Vector<VertexElement>* elements;
 
             geometry->GetRawDataShared(vertexData, vertexSize, indexData, indexSize, elements);
@@ -103,15 +103,15 @@ public:
             dataArrays_.Push(vertexData);
             dataArrays_.Push(indexData);
 
-            unsigned indexStart = geometry->GetIndexStart();
-            unsigned indexCount = geometry->GetIndexCount();
+            i32 indexStart = geometry->GetIndexStart();
+            i32 indexCount = geometry->GetIndexCount();
 
             btIndexedMesh meshIndex;
             meshIndex.m_numTriangles = indexCount / 3;
-            meshIndex.m_triangleIndexBase = &indexData[indexStart * indexSize];
+            meshIndex.m_triangleIndexBase = reinterpret_cast<unsigned char*>(&indexData[indexStart * indexSize]);
             meshIndex.m_triangleIndexStride = 3 * indexSize;
             meshIndex.m_numVertices = 0;
-            meshIndex.m_vertexBase = vertexData;
+            meshIndex.m_vertexBase = reinterpret_cast<unsigned char*>(vertexData.Get());
             meshIndex.m_vertexStride = vertexSize;
             meshIndex.m_indexType = (indexSize == sizeof(unsigned short)) ? PHY_SHORT : PHY_INTEGER;
             meshIndex.m_vertexType = PHY_FLOAT;
@@ -138,8 +138,8 @@ public:
         if (totalVertexCount)
         {
             // CustomGeometry vertex data is unindexed, so build index data here
-            SharedArrayPtr<unsigned char> vertexData(new unsigned char[totalVertexCount * sizeof(Vector3)]);
-            SharedArrayPtr<unsigned char> indexData(new unsigned char[totalVertexCount * sizeof(unsigned)]);
+            SharedArrayPtr<byte> vertexData(new byte[totalVertexCount * sizeof(Vector3)]);
+            SharedArrayPtr<byte> indexData(new byte[totalVertexCount * sizeof(unsigned)]);
             dataArrays_.Push(vertexData);
             dataArrays_.Push(indexData);
 
@@ -158,10 +158,10 @@ public:
 
             btIndexedMesh meshIndex;
             meshIndex.m_numTriangles = totalVertexCount / 3;
-            meshIndex.m_triangleIndexBase = indexData;
+            meshIndex.m_triangleIndexBase = reinterpret_cast<unsigned char*>(indexData.Get());
             meshIndex.m_triangleIndexStride = 3 * sizeof(unsigned);
             meshIndex.m_numVertices = totalVertexCount;
-            meshIndex.m_vertexBase = vertexData;
+            meshIndex.m_vertexBase = reinterpret_cast<unsigned char*>(vertexData.Get());
             meshIndex.m_vertexStride = sizeof(Vector3);
             meshIndex.m_indexType = PHY_INTEGER;
             meshIndex.m_vertexType = PHY_FLOAT;
@@ -178,7 +178,7 @@ public:
 
 private:
     /// Shared vertex/index data used in the collision.
-    Vector<SharedArrayPtr<unsigned char>> dataArrays_;
+    Vector<SharedArrayPtr<byte>> dataArrays_;
 };
 
 TriangleMeshData::TriangleMeshData(Model* model, i32 lodLevel)
@@ -226,10 +226,10 @@ ConvexData::ConvexData(Model* model, i32 lodLevel)
             continue;
         };
 
-        const unsigned char* vertexData;
-        const unsigned char* indexData;
-        unsigned vertexSize;
-        unsigned indexSize;
+        const byte* vertexData;
+        const byte* indexData;
+        i32 vertexSize;
+        i32 indexSize;
         const Vector<VertexElement>* elements;
 
         geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
@@ -473,15 +473,15 @@ void CollisionShape::RegisterObject(Context* context)
 {
     context->RegisterFactory<CollisionShape>(PHYSICS_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, true, AM_DEFAULT);
     URHO3D_ENUM_ATTRIBUTE_EX("Shape Type", shapeType_, MarkShapeDirty, typeNames, SHAPE_BOX, AM_DEFAULT);
-    URHO3D_ATTRIBUTE_EX("Size", Vector3, size_, MarkShapeDirty, Vector3::ONE, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Offset Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Offset Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
-    URHO3D_ATTRIBUTE_EX("LOD Level", int, lodLevel_, MarkShapeDirty, 0, AM_DEFAULT);
-    URHO3D_ATTRIBUTE_EX("Collision Margin", float, margin_, MarkShapeDirty, DEFAULT_COLLISION_MARGIN, AM_DEFAULT);
-    URHO3D_ATTRIBUTE_EX("CustomGeometry ComponentID", unsigned, customGeometryID_, MarkShapeDirty, 0, AM_DEFAULT | AM_COMPONENTID);
+    URHO3D_ATTRIBUTE_EX("Size", size_, MarkShapeDirty, Vector3::ONE, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Offset Position", GetPosition, SetPosition, Vector3::ZERO, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Offset Rotation", GetRotation, SetRotation, Quaternion::IDENTITY, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Model", GetModelAttr, SetModelAttr, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
+    URHO3D_ATTRIBUTE_EX("LOD Level", lodLevel_, MarkShapeDirty, 0, AM_DEFAULT);
+    URHO3D_ATTRIBUTE_EX("Collision Margin", margin_, MarkShapeDirty, DEFAULT_COLLISION_MARGIN, AM_DEFAULT);
+    URHO3D_ATTRIBUTE_EX("CustomGeometry ComponentID", customGeometryID_, MarkShapeDirty, 0, AM_DEFAULT | AM_COMPONENTID);
 }
 
 void CollisionShape::ApplyAttributes()

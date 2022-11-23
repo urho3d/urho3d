@@ -10,11 +10,11 @@
 namespace Urho3D
 {
 
-// enum AnimationChannel : unsigned char | File: ../Graphics/Animation.h
-static const unsigned char AnimationChannel_CHANNEL_NONE = CHANNEL_NONE;
-static const unsigned char AnimationChannel_CHANNEL_POSITION = CHANNEL_POSITION;
-static const unsigned char AnimationChannel_CHANNEL_ROTATION = CHANNEL_ROTATION;
-static const unsigned char AnimationChannel_CHANNEL_SCALE = CHANNEL_SCALE;
+// enum class AnimationChannels : u8 | File: ../Graphics/Animation.h
+static const u8 AnimationChannels_None = static_cast<u8>(AnimationChannels::None);
+static const u8 AnimationChannels_Position = static_cast<u8>(AnimationChannels::Position);
+static const u8 AnimationChannels_Rotation = static_cast<u8>(AnimationChannels::Rotation);
+static const u8 AnimationChannels_Scale = static_cast<u8>(AnimationChannels::Scale);
 
 // enum BoneCollisionShape : unsigned char | File: ../Graphics/Skeleton.h
 static const unsigned char BoneCollisionShape_BONECOLLISION_NONE = BONECOLLISION_NONE;
@@ -51,11 +51,28 @@ static const unsigned ControllerButton_CONTROLLER_BUTTON_DPAD_DOWN = CONTROLLER_
 static const unsigned ControllerButton_CONTROLLER_BUTTON_DPAD_LEFT = CONTROLLER_BUTTON_DPAD_LEFT;
 static const unsigned ControllerButton_CONTROLLER_BUTTON_DPAD_RIGHT = CONTROLLER_BUTTON_DPAD_RIGHT;
 
+// enum class DebugHudElements | File: ../Engine/DebugHud.h
+static const int DebugHudElements_None = static_cast<int>(DebugHudElements::None);
+static const int DebugHudElements_Stats = static_cast<int>(DebugHudElements::Stats);
+static const int DebugHudElements_Mode = static_cast<int>(DebugHudElements::Mode);
+static const int DebugHudElements_Profiler = static_cast<int>(DebugHudElements::Profiler);
+static const int DebugHudElements_Memory = static_cast<int>(DebugHudElements::Memory);
+static const int DebugHudElements_EventProfiler = static_cast<int>(DebugHudElements::EventProfiler);
+static const int DebugHudElements_All = static_cast<int>(DebugHudElements::All);
+
 // enum DragAndDropMode : unsigned | File: ../UI/UIElement.h
 static const unsigned DragAndDropMode_DD_DISABLED = DD_DISABLED;
 static const unsigned DragAndDropMode_DD_SOURCE = DD_SOURCE;
 static const unsigned DragAndDropMode_DD_TARGET = DD_TARGET;
 static const unsigned DragAndDropMode_DD_SOURCE_AND_TARGET = DD_SOURCE_AND_TARGET;
+
+// enum class DrawableTypes : u8 | File: ../Graphics/Drawable.h
+static const u8 DrawableTypes_Undefined = static_cast<u8>(DrawableTypes::Undefined);
+static const u8 DrawableTypes_Geometry = static_cast<u8>(DrawableTypes::Geometry);
+static const u8 DrawableTypes_Light = static_cast<u8>(DrawableTypes::Light);
+static const u8 DrawableTypes_Zone = static_cast<u8>(DrawableTypes::Zone);
+static const u8 DrawableTypes_Geometry2D = static_cast<u8>(DrawableTypes::Geometry2D);
+static const u8 DrawableTypes_Any = static_cast<u8>(DrawableTypes::Any);
 
 // enum HatPosition : unsigned | File: ../Input/InputConstants.h
 static const unsigned HatPosition_HAT_CENTER = HAT_CENTER;
@@ -304,6 +321,14 @@ static const unsigned Key_KEY_UNDO = KEY_UNDO;
 static const unsigned Key_KEY_VOLUMEDOWN = KEY_VOLUMEDOWN;
 static const unsigned Key_KEY_VOLUMEUP = KEY_VOLUMEUP;
 static const unsigned Key_KEY_WWW = KEY_WWW;
+
+// enum class LogicComponentEvents | File: ../Scene/LogicComponent.h
+static const int LogicComponentEvents_None = static_cast<int>(LogicComponentEvents::None);
+static const int LogicComponentEvents_Update = static_cast<int>(LogicComponentEvents::Update);
+static const int LogicComponentEvents_PostUpdate = static_cast<int>(LogicComponentEvents::PostUpdate);
+static const int LogicComponentEvents_FixedUpdate = static_cast<int>(LogicComponentEvents::FixedUpdate);
+static const int LogicComponentEvents_FixedPostUpdate = static_cast<int>(LogicComponentEvents::FixedPostUpdate);
+static const int LogicComponentEvents_All = static_cast<int>(LogicComponentEvents::All);
 
 // enum MaterialQuality : u32 | File: ../GraphicsAPI/GraphicsDefs.h
 static const u32 MaterialQuality_QUALITY_LOW = QUALITY_LOW;
@@ -579,29 +604,27 @@ static const unsigned SmoothingType_SMOOTH_NONE = SMOOTH_NONE;
 static const unsigned SmoothingType_SMOOTH_POSITION = SMOOTH_POSITION;
 static const unsigned SmoothingType_SMOOTH_ROTATION = SMOOTH_ROTATION;
 
-// enum UpdateEvent : unsigned | File: ../Scene/LogicComponent.h
-static const unsigned UpdateEvent_USE_NO_EVENT = USE_NO_EVENT;
-static const unsigned UpdateEvent_USE_UPDATE = USE_UPDATE;
-static const unsigned UpdateEvent_USE_POSTUPDATE = USE_POSTUPDATE;
-static const unsigned UpdateEvent_USE_FIXEDUPDATE = USE_FIXEDUPDATE;
-static const unsigned UpdateEvent_USE_FIXEDPOSTUPDATE = USE_FIXEDPOSTUPDATE;
+// enum class TransformSpace | File: ../Scene/Node.h
+static const int TransformSpace_Local = static_cast<int>(TransformSpace::Local);
+static const int TransformSpace_Parent = static_cast<int>(TransformSpace::Parent);
+static const int TransformSpace_World = static_cast<int>(TransformSpace::World);
 
-// enum VertexMask : u32 | File: ../GraphicsAPI/GraphicsDefs.h
-static const u32 VertexMask_MASK_NONE = MASK_NONE;
-static const u32 VertexMask_MASK_POSITION = MASK_POSITION;
-static const u32 VertexMask_MASK_NORMAL = MASK_NORMAL;
-static const u32 VertexMask_MASK_COLOR = MASK_COLOR;
-static const u32 VertexMask_MASK_TEXCOORD1 = MASK_TEXCOORD1;
-static const u32 VertexMask_MASK_TEXCOORD2 = MASK_TEXCOORD2;
-static const u32 VertexMask_MASK_CUBETEXCOORD1 = MASK_CUBETEXCOORD1;
-static const u32 VertexMask_MASK_CUBETEXCOORD2 = MASK_CUBETEXCOORD2;
-static const u32 VertexMask_MASK_TANGENT = MASK_TANGENT;
-static const u32 VertexMask_MASK_BLENDWEIGHTS = MASK_BLENDWEIGHTS;
-static const u32 VertexMask_MASK_BLENDINDICES = MASK_BLENDINDICES;
-static const u32 VertexMask_MASK_INSTANCEMATRIX1 = MASK_INSTANCEMATRIX1;
-static const u32 VertexMask_MASK_INSTANCEMATRIX2 = MASK_INSTANCEMATRIX2;
-static const u32 VertexMask_MASK_INSTANCEMATRIX3 = MASK_INSTANCEMATRIX3;
-static const u32 VertexMask_MASK_OBJECTINDEX = MASK_OBJECTINDEX;
+// enum class VertexElements : u32 | File: ../GraphicsAPI/GraphicsDefs.h
+static const u32 VertexElements_None = static_cast<u32>(VertexElements::None);
+static const u32 VertexElements_Position = static_cast<u32>(VertexElements::Position);
+static const u32 VertexElements_Normal = static_cast<u32>(VertexElements::Normal);
+static const u32 VertexElements_Color = static_cast<u32>(VertexElements::Color);
+static const u32 VertexElements_TexCoord1 = static_cast<u32>(VertexElements::TexCoord1);
+static const u32 VertexElements_TexCoord2 = static_cast<u32>(VertexElements::TexCoord2);
+static const u32 VertexElements_CubeTexCoord1 = static_cast<u32>(VertexElements::CubeTexCoord1);
+static const u32 VertexElements_CubeTexCoord2 = static_cast<u32>(VertexElements::CubeTexCoord2);
+static const u32 VertexElements_Tangent = static_cast<u32>(VertexElements::Tangent);
+static const u32 VertexElements_BlendWeights = static_cast<u32>(VertexElements::BlendWeights);
+static const u32 VertexElements_BlendIndices = static_cast<u32>(VertexElements::BlendIndices);
+static const u32 VertexElements_InstanceMatrix1 = static_cast<u32>(VertexElements::InstanceMatrix1);
+static const u32 VertexElements_InstanceMatrix2 = static_cast<u32>(VertexElements::InstanceMatrix2);
+static const u32 VertexElements_InstanceMatrix3 = static_cast<u32>(VertexElements::InstanceMatrix3);
+static const u32 VertexElements_ObjectIndex = static_cast<u32>(VertexElements::ObjectIndex);
 
 // enum ViewOverride : unsigned | File: ../Graphics/Camera.h
 static const unsigned ViewOverride_VO_NONE = VO_NONE;
@@ -616,15 +639,14 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("AnimationBlendMode", "ABM_LERP", ABM_LERP);
     engine->RegisterEnumValue("AnimationBlendMode", "ABM_ADDITIVE", ABM_ADDITIVE);
 
-    // enum AnimationChannel : unsigned char | File: ../Graphics/Animation.h
-    engine->RegisterTypedef("AnimationChannel", "uint8");
-    engine->RegisterGlobalProperty("const uint8 CHANNEL_NONE", (void*)&AnimationChannel_CHANNEL_NONE);
-    engine->RegisterGlobalProperty("const uint8 CHANNEL_POSITION", (void*)&AnimationChannel_CHANNEL_POSITION);
-    engine->RegisterGlobalProperty("const uint8 CHANNEL_ROTATION", (void*)&AnimationChannel_CHANNEL_ROTATION);
-    engine->RegisterGlobalProperty("const uint8 CHANNEL_SCALE", (void*)&AnimationChannel_CHANNEL_SCALE);
-
-    // URHO3D_FLAGSET(AnimationChannel, AnimationChannelFlags) | File: ../Graphics/Animation.h
-    engine->RegisterTypedef("AnimationChannelFlags", "uint8");
+    // enum class AnimationChannels : u8 | File: ../Graphics/Animation.h
+    engine->RegisterTypedef("AnimationChannels", "uint8");
+    engine->SetDefaultNamespace("AnimationChannels");
+    engine->RegisterGlobalProperty("const uint8 None", (void*)&AnimationChannels_None);
+    engine->RegisterGlobalProperty("const uint8 Position", (void*)&AnimationChannels_Position);
+    engine->RegisterGlobalProperty("const uint8 Rotation", (void*)&AnimationChannels_Rotation);
+    engine->RegisterGlobalProperty("const uint8 Scale", (void*)&AnimationChannels_Scale);
+    engine->SetDefaultNamespace("");
 
     // enum AsyncLoadState | File: ../Resource/Resource.h
     engine->RegisterEnum("AsyncLoadState");
@@ -794,6 +816,18 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("CursorShape", "CS_BUSY_ARROW", CS_BUSY_ARROW);
     engine->RegisterEnumValue("CursorShape", "CS_MAX_SHAPES", CS_MAX_SHAPES);
 
+    // enum class DebugHudElements | File: ../Engine/DebugHud.h
+    engine->RegisterTypedef("DebugHudElements", "int");
+    engine->SetDefaultNamespace("DebugHudElements");
+    engine->RegisterGlobalProperty("const int None", (void*)&DebugHudElements_None);
+    engine->RegisterGlobalProperty("const int Stats", (void*)&DebugHudElements_Stats);
+    engine->RegisterGlobalProperty("const int Mode", (void*)&DebugHudElements_Mode);
+    engine->RegisterGlobalProperty("const int Profiler", (void*)&DebugHudElements_Profiler);
+    engine->RegisterGlobalProperty("const int Memory", (void*)&DebugHudElements_Memory);
+    engine->RegisterGlobalProperty("const int EventProfiler", (void*)&DebugHudElements_EventProfiler);
+    engine->RegisterGlobalProperty("const int All", (void*)&DebugHudElements_All);
+    engine->SetDefaultNamespace("");
+
     // enum DeferredLightPSVariation | File: ../Graphics/Renderer.h
     engine->RegisterEnum("DeferredLightPSVariation");
     engine->RegisterEnumValue("DeferredLightPSVariation", "DLPS_NONE", DLPS_NONE);
@@ -864,6 +898,17 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     // URHO3D_FLAGSET(DragAndDropMode, DragAndDropModeFlags) | File: ../UI/UIElement.h
     engine->RegisterTypedef("DragAndDropModeFlags", "uint");
 
+    // enum class DrawableTypes : u8 | File: ../Graphics/Drawable.h
+    engine->RegisterTypedef("DrawableTypes", "uint8");
+    engine->SetDefaultNamespace("DrawableTypes");
+    engine->RegisterGlobalProperty("const uint8 Undefined", (void*)&DrawableTypes_Undefined);
+    engine->RegisterGlobalProperty("const uint8 Geometry", (void*)&DrawableTypes_Geometry);
+    engine->RegisterGlobalProperty("const uint8 Light", (void*)&DrawableTypes_Light);
+    engine->RegisterGlobalProperty("const uint8 Zone", (void*)&DrawableTypes_Zone);
+    engine->RegisterGlobalProperty("const uint8 Geometry2D", (void*)&DrawableTypes_Geometry2D);
+    engine->RegisterGlobalProperty("const uint8 Any", (void*)&DrawableTypes_Any);
+    engine->SetDefaultNamespace("");
+
     // enum EmitterType | File: ../Graphics/ParticleEffect.h
     engine->RegisterEnum("EmitterType");
     engine->RegisterEnumValue("EmitterType", "EMITTER_SPHERE", EMITTER_SPHERE);
@@ -927,7 +972,6 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnum("GAPI");
     engine->RegisterEnumValue("GAPI", "GAPI_NONE", GAPI_NONE);
     engine->RegisterEnumValue("GAPI", "GAPI_OPENGL", GAPI_OPENGL);
-    engine->RegisterEnumValue("GAPI", "GAPI_D3D9", GAPI_D3D9);
     engine->RegisterEnumValue("GAPI", "GAPI_D3D11", GAPI_D3D11);
 
     // enum GeometryType | File: ../GraphicsAPI/GraphicsDefs.h
@@ -1315,6 +1359,17 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("LockState", "LOCK_HARDWARE", LOCK_HARDWARE);
     engine->RegisterEnumValue("LockState", "LOCK_SHADOW", LOCK_SHADOW);
     engine->RegisterEnumValue("LockState", "LOCK_SCRATCH", LOCK_SCRATCH);
+
+    // enum class LogicComponentEvents | File: ../Scene/LogicComponent.h
+    engine->RegisterTypedef("LogicComponentEvents", "int");
+    engine->SetDefaultNamespace("LogicComponentEvents");
+    engine->RegisterGlobalProperty("const int None", (void*)&LogicComponentEvents_None);
+    engine->RegisterGlobalProperty("const int Update", (void*)&LogicComponentEvents_Update);
+    engine->RegisterGlobalProperty("const int PostUpdate", (void*)&LogicComponentEvents_PostUpdate);
+    engine->RegisterGlobalProperty("const int FixedUpdate", (void*)&LogicComponentEvents_FixedUpdate);
+    engine->RegisterGlobalProperty("const int FixedPostUpdate", (void*)&LogicComponentEvents_FixedPostUpdate);
+    engine->RegisterGlobalProperty("const int All", (void*)&LogicComponentEvents_All);
+    engine->SetDefaultNamespace("");
 
     // enum MaterialQuality : u32 | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterTypedef("MaterialQuality", "uint");
@@ -1751,27 +1806,18 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("TrailType", "TT_FACE_CAMERA", TT_FACE_CAMERA);
     engine->RegisterEnumValue("TrailType", "TT_BONE", TT_BONE);
 
-    // enum TransformSpace | File: ../Scene/Node.h
-    engine->RegisterEnum("TransformSpace");
-    engine->RegisterEnumValue("TransformSpace", "TS_LOCAL", TS_LOCAL);
-    engine->RegisterEnumValue("TransformSpace", "TS_PARENT", TS_PARENT);
-    engine->RegisterEnumValue("TransformSpace", "TS_WORLD", TS_WORLD);
+    // enum class TransformSpace | File: ../Scene/Node.h
+    engine->RegisterTypedef("TransformSpace", "int");
+    engine->SetDefaultNamespace("TransformSpace");
+    engine->RegisterGlobalProperty("const int Local", (void*)&TransformSpace_Local);
+    engine->RegisterGlobalProperty("const int Parent", (void*)&TransformSpace_Parent);
+    engine->RegisterGlobalProperty("const int World", (void*)&TransformSpace_World);
+    engine->SetDefaultNamespace("");
 
     // enum TraversalMode | File: ../UI/UIElement.h
     engine->RegisterEnum("TraversalMode");
     engine->RegisterEnumValue("TraversalMode", "TM_BREADTH_FIRST", TM_BREADTH_FIRST);
     engine->RegisterEnumValue("TraversalMode", "TM_DEPTH_FIRST", TM_DEPTH_FIRST);
-
-    // enum UpdateEvent : unsigned | File: ../Scene/LogicComponent.h
-    engine->RegisterTypedef("UpdateEvent", "uint");
-    engine->RegisterGlobalProperty("const uint USE_NO_EVENT", (void*)&UpdateEvent_USE_NO_EVENT);
-    engine->RegisterGlobalProperty("const uint USE_UPDATE", (void*)&UpdateEvent_USE_UPDATE);
-    engine->RegisterGlobalProperty("const uint USE_POSTUPDATE", (void*)&UpdateEvent_USE_POSTUPDATE);
-    engine->RegisterGlobalProperty("const uint USE_FIXEDUPDATE", (void*)&UpdateEvent_USE_FIXEDUPDATE);
-    engine->RegisterGlobalProperty("const uint USE_FIXEDPOSTUPDATE", (void*)&UpdateEvent_USE_FIXEDPOSTUPDATE);
-
-    // URHO3D_FLAGSET(UpdateEvent, UpdateEventFlags) | File: ../Scene/LogicComponent.h
-    engine->RegisterTypedef("UpdateEventFlags", "uint");
 
     // enum UpdateGeometryType | File: ../Graphics/Drawable.h
     engine->RegisterEnum("UpdateGeometryType");
@@ -1836,6 +1882,26 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("VertexElementType", "TYPE_UBYTE4_NORM", TYPE_UBYTE4_NORM);
     engine->RegisterEnumValue("VertexElementType", "MAX_VERTEX_ELEMENT_TYPES", MAX_VERTEX_ELEMENT_TYPES);
 
+    // enum class VertexElements : u32 | File: ../GraphicsAPI/GraphicsDefs.h
+    engine->RegisterTypedef("VertexElements", "uint");
+    engine->SetDefaultNamespace("VertexElements");
+    engine->RegisterGlobalProperty("const uint None", (void*)&VertexElements_None);
+    engine->RegisterGlobalProperty("const uint Position", (void*)&VertexElements_Position);
+    engine->RegisterGlobalProperty("const uint Normal", (void*)&VertexElements_Normal);
+    engine->RegisterGlobalProperty("const uint Color", (void*)&VertexElements_Color);
+    engine->RegisterGlobalProperty("const uint TexCoord1", (void*)&VertexElements_TexCoord1);
+    engine->RegisterGlobalProperty("const uint TexCoord2", (void*)&VertexElements_TexCoord2);
+    engine->RegisterGlobalProperty("const uint CubeTexCoord1", (void*)&VertexElements_CubeTexCoord1);
+    engine->RegisterGlobalProperty("const uint CubeTexCoord2", (void*)&VertexElements_CubeTexCoord2);
+    engine->RegisterGlobalProperty("const uint Tangent", (void*)&VertexElements_Tangent);
+    engine->RegisterGlobalProperty("const uint BlendWeights", (void*)&VertexElements_BlendWeights);
+    engine->RegisterGlobalProperty("const uint BlendIndices", (void*)&VertexElements_BlendIndices);
+    engine->RegisterGlobalProperty("const uint InstanceMatrix1", (void*)&VertexElements_InstanceMatrix1);
+    engine->RegisterGlobalProperty("const uint InstanceMatrix2", (void*)&VertexElements_InstanceMatrix2);
+    engine->RegisterGlobalProperty("const uint InstanceMatrix3", (void*)&VertexElements_InstanceMatrix3);
+    engine->RegisterGlobalProperty("const uint ObjectIndex", (void*)&VertexElements_ObjectIndex);
+    engine->SetDefaultNamespace("");
+
     // enum VertexLightVSVariation | File: ../Graphics/Renderer.h
     engine->RegisterEnum("VertexLightVSVariation");
     engine->RegisterEnumValue("VertexLightVSVariation", "VLVS_NOLIGHTS", VLVS_NOLIGHTS);
@@ -1844,27 +1910,6 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("VertexLightVSVariation", "VLVS_3LIGHTS", VLVS_3LIGHTS);
     engine->RegisterEnumValue("VertexLightVSVariation", "VLVS_4LIGHTS", VLVS_4LIGHTS);
     engine->RegisterEnumValue("VertexLightVSVariation", "MAX_VERTEXLIGHT_VS_VARIATIONS", MAX_VERTEXLIGHT_VS_VARIATIONS);
-
-    // enum VertexMask : u32 | File: ../GraphicsAPI/GraphicsDefs.h
-    engine->RegisterTypedef("VertexMask", "uint");
-    engine->RegisterGlobalProperty("const uint MASK_NONE", (void*)&VertexMask_MASK_NONE);
-    engine->RegisterGlobalProperty("const uint MASK_POSITION", (void*)&VertexMask_MASK_POSITION);
-    engine->RegisterGlobalProperty("const uint MASK_NORMAL", (void*)&VertexMask_MASK_NORMAL);
-    engine->RegisterGlobalProperty("const uint MASK_COLOR", (void*)&VertexMask_MASK_COLOR);
-    engine->RegisterGlobalProperty("const uint MASK_TEXCOORD1", (void*)&VertexMask_MASK_TEXCOORD1);
-    engine->RegisterGlobalProperty("const uint MASK_TEXCOORD2", (void*)&VertexMask_MASK_TEXCOORD2);
-    engine->RegisterGlobalProperty("const uint MASK_CUBETEXCOORD1", (void*)&VertexMask_MASK_CUBETEXCOORD1);
-    engine->RegisterGlobalProperty("const uint MASK_CUBETEXCOORD2", (void*)&VertexMask_MASK_CUBETEXCOORD2);
-    engine->RegisterGlobalProperty("const uint MASK_TANGENT", (void*)&VertexMask_MASK_TANGENT);
-    engine->RegisterGlobalProperty("const uint MASK_BLENDWEIGHTS", (void*)&VertexMask_MASK_BLENDWEIGHTS);
-    engine->RegisterGlobalProperty("const uint MASK_BLENDINDICES", (void*)&VertexMask_MASK_BLENDINDICES);
-    engine->RegisterGlobalProperty("const uint MASK_INSTANCEMATRIX1", (void*)&VertexMask_MASK_INSTANCEMATRIX1);
-    engine->RegisterGlobalProperty("const uint MASK_INSTANCEMATRIX2", (void*)&VertexMask_MASK_INSTANCEMATRIX2);
-    engine->RegisterGlobalProperty("const uint MASK_INSTANCEMATRIX3", (void*)&VertexMask_MASK_INSTANCEMATRIX3);
-    engine->RegisterGlobalProperty("const uint MASK_OBJECTINDEX", (void*)&VertexMask_MASK_OBJECTINDEX);
-
-    // URHO3D_FLAGSET(VertexMask, VertexMaskFlags) | File: ../GraphicsAPI/GraphicsDefs.h
-    engine->RegisterTypedef("VertexMaskFlags", "uint");
 
     // enum VerticalAlignment | File: ../UI/UIElement.h
     engine->RegisterEnum("VerticalAlignment");

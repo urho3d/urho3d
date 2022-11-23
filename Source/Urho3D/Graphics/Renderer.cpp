@@ -254,13 +254,16 @@ Renderer::Renderer(Context* context) :
 
 Renderer::~Renderer() = default;
 
-void Renderer::SetNumViewports(unsigned num)
+void Renderer::SetNumViewports(i32 num)
 {
+    assert(num >= 0);
     viewports_.Resize(num);
 }
 
-void Renderer::SetViewport(unsigned index, Viewport* viewport)
+void Renderer::SetViewport(i32 index, Viewport* viewport)
 {
+    assert(index >= 0);
+
     if (index >= viewports_.Size())
         viewports_.Resize(index + 1);
 
@@ -511,13 +514,16 @@ void Renderer::ApplyShadowMapFilter(View* view, Texture2D* shadowMap, float blur
         (shadowMapFilterInstance_->*shadowMapFilter_)(view, shadowMap, blurScale);
 }
 
-Viewport* Renderer::GetViewport(unsigned index) const
+Viewport* Renderer::GetViewport(i32 index) const
 {
+    assert(index >= 0);
     return index < viewports_.Size() ? viewports_[index] : nullptr;
 }
 
-Viewport* Renderer::GetViewportForScene(Scene* scene, unsigned index) const
+Viewport* Renderer::GetViewportForScene(Scene* scene, i32 index) const
 {
+    assert(index >= 0);
+
     for (unsigned i = 0; i < viewports_.Size(); ++i)
     {
         Viewport* viewport = viewports_[i];
@@ -547,10 +553,10 @@ Technique* Renderer::GetDefaultTechnique() const
     return defaultTechnique_;
 }
 
-unsigned Renderer::GetNumGeometries(bool allViews) const
+i32 Renderer::GetNumGeometries(bool allViews) const
 {
-    unsigned numGeometries = 0;
-    unsigned lastView = allViews ? views_.Size() : 1;
+    i32 numGeometries = 0;
+    i32 lastView = allViews ? views_.Size() : 1;
 
     for (unsigned i = 0; i < lastView; ++i)
     {
@@ -565,10 +571,10 @@ unsigned Renderer::GetNumGeometries(bool allViews) const
     return numGeometries;
 }
 
-unsigned Renderer::GetNumLights(bool allViews) const
+i32 Renderer::GetNumLights(bool allViews) const
 {
-    unsigned numLights = 0;
-    unsigned lastView = allViews ? views_.Size() : 1;
+    i32 numLights = 0;
+    i32 lastView = allViews ? views_.Size() : 1;
 
     for (unsigned i = 0; i < lastView; ++i)
     {
@@ -582,10 +588,10 @@ unsigned Renderer::GetNumLights(bool allViews) const
     return numLights;
 }
 
-unsigned Renderer::GetNumShadowMaps(bool allViews) const
+i32 Renderer::GetNumShadowMaps(bool allViews) const
 {
-    unsigned numShadowMaps = 0;
-    unsigned lastView = allViews ? views_.Size() : 1;
+    i32 numShadowMaps = 0;
+    i32 lastView = allViews ? views_.Size() : 1;
 
     for (unsigned i = 0; i < lastView; ++i)
     {
@@ -604,10 +610,10 @@ unsigned Renderer::GetNumShadowMaps(bool allViews) const
     return numShadowMaps;
 }
 
-unsigned Renderer::GetNumOccluders(bool allViews) const
+i32 Renderer::GetNumOccluders(bool allViews) const
 {
-    unsigned numOccluders = 0;
-    unsigned lastView = allViews ? views_.Size() : 1;
+    i32 numOccluders = 0;
+    i32 lastView = allViews ? views_.Size() : 1;
 
     for (unsigned i = 0; i < lastView; ++i)
     {
@@ -813,8 +819,11 @@ Geometry* Renderer::GetQuadGeometry()
     return dirLightGeometry_;
 }
 
-Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight)
+Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, i32 viewWidth, i32 viewHeight)
 {
+    assert(viewWidth > 0);
+    assert(viewHeight > 0);
+
     LightType type = light->GetLightType();
     const FocusParameters& parameters = light->GetShadowFocus();
     float size = (float)shadowMapSize_ * light->GetShadowResolution();
@@ -977,7 +986,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
 }
 
 Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, int multiSample, bool autoResolve, bool cubemap, bool filtered, bool srgb,
-    unsigned persistentKey)
+    hash32 persistentKey)
 {
     bool depthStencil = (format == Graphics::GetDepthStencilFormat()) || (format == Graphics::GetReadableDepthFormat());
     if (depthStencil)
@@ -993,7 +1002,7 @@ Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, int m
     if (multiSample == 1)
         autoResolve = false;
 
-    auto searchKey = (unsigned long long)format << 32u | multiSample << 24u | width << 12u | height;
+    hash64 searchKey = (hash64)format << 32u | multiSample << 24u | width << 12u | height;
     if (filtered)
         searchKey |= 0x8000000000000000ULL;
     if (srgb)
@@ -1005,7 +1014,7 @@ Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, int m
 
     // Add persistent key if defined
     if (persistentKey)
-        searchKey += (unsigned long long)persistentKey << 32u;
+        searchKey += (hash64)persistentKey << 32u;
 
     // If new size or format, initialize the allocation stats
     if (screenBuffers_.Find(searchKey) == screenBuffers_.End())
@@ -1326,16 +1335,18 @@ void Renderer::SetCullMode(CullMode mode, Camera* camera)
     graphics_->SetCullMode(mode);
 }
 
-bool Renderer::ResizeInstancingBuffer(unsigned numInstances)
+bool Renderer::ResizeInstancingBuffer(i32 numInstances)
 {
+    assert(numInstances >= 0);
+
     if (!instancingBuffer_ || !dynamicInstancing_)
         return false;
 
-    unsigned oldSize = instancingBuffer_->GetVertexCount();
+    i32 oldSize = instancingBuffer_->GetVertexCount();
     if (numInstances <= oldSize)
         return true;
 
-    unsigned newSize = INSTANCING_BUFFER_DEFAULT_SIZE;
+    i32 newSize = INSTANCING_BUFFER_DEFAULT_SIZE;
     while (newSize < numInstances)
         newSize <<= 1;
 
@@ -1455,8 +1466,10 @@ const Rect& Renderer::GetLightScissor(Light* light, Camera* camera)
     }
 }
 
-void Renderer::UpdateQueuedViewport(unsigned index)
+void Renderer::UpdateQueuedViewport(i32 index)
 {
+    assert(index >= 0);
+
     WeakPtr<RenderSurface>& renderTarget = queuedViewports_[index].first_;
     WeakPtr<Viewport>& viewport = queuedViewports_[index].second_;
 
@@ -1524,9 +1537,9 @@ void Renderer::RemoveUnusedBuffers()
         }
     }
 
-    for (HashMap<unsigned long long, Vector<SharedPtr<Texture>>>::Iterator i = screenBuffers_.Begin(); i != screenBuffers_.End();)
+    for (HashMap<hash64, Vector<SharedPtr<Texture>>>::Iterator i = screenBuffers_.Begin(); i != screenBuffers_.End();)
     {
-        HashMap<unsigned long long, Vector<SharedPtr<Texture>>>::Iterator current = i++;
+        HashMap<hash64, Vector<SharedPtr<Texture>>>::Iterator current = i++;
         Vector<SharedPtr<Texture>>& buffers = current->second_;
         for (i32 j = buffers.Size() - 1; j >= 0; --j)
         {
@@ -1554,7 +1567,7 @@ void Renderer::ResetShadowMapAllocations()
 
 void Renderer::ResetScreenBufferAllocations()
 {
-    for (HashMap<unsigned long long, unsigned>::Iterator i = screenBufferAllocations_.Begin(); i != screenBufferAllocations_.End(); ++i)
+    for (HashMap<hash64, i32>::Iterator i = screenBufferAllocations_.Begin(); i != screenBufferAllocations_.End(); ++i)
         i->second_ = 0;
 }
 
@@ -1752,7 +1765,7 @@ void Renderer::CreateGeometries()
 {
     SharedPtr<VertexBuffer> dlvb(new VertexBuffer(context_));
     dlvb->SetShadowed(true);
-    dlvb->SetSize(4, MASK_POSITION);
+    dlvb->SetSize(4, VertexElements::Position);
     dlvb->SetData(dirLightVertexData);
 
     SharedPtr<IndexBuffer> dlib(new IndexBuffer(context_));
@@ -1767,7 +1780,7 @@ void Renderer::CreateGeometries()
 
     SharedPtr<VertexBuffer> slvb(new VertexBuffer(context_));
     slvb->SetShadowed(true);
-    slvb->SetSize(8, MASK_POSITION);
+    slvb->SetSize(8, VertexElements::Position);
     slvb->SetData(spotLightVertexData);
 
     SharedPtr<IndexBuffer> slib(new IndexBuffer(context_));
@@ -1782,7 +1795,7 @@ void Renderer::CreateGeometries()
 
     SharedPtr<VertexBuffer> plvb(new VertexBuffer(context_));
     plvb->SetShadowed(true);
-    plvb->SetSize(24, MASK_POSITION);
+    plvb->SetSize(24, VertexElements::Position);
     plvb->SetData(pointLightVertexData);
 
     SharedPtr<IndexBuffer> plib(new IndexBuffer(context_));

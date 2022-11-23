@@ -474,10 +474,10 @@ Color gridXColor(0.5, 0.1, 0.1);
 Color gridYColor(0.1, 0.5, 0.1);
 Color gridZColor(0.1, 0.1, 0.5);
 
-Array<int> pickModeDrawableFlags = {
-    DRAWABLE_GEOMETRY,
-    DRAWABLE_LIGHT,
-    DRAWABLE_ZONE
+Array<DrawableTypes> pickModeDrawableTypes = {
+    DrawableTypes::Geometry,
+    DrawableTypes::Light,
+    DrawableTypes::Zone
 };
 
 Array<String> editModeText = {
@@ -1127,7 +1127,7 @@ void HandleViewportBorderDragMove(StringHash eventType, VariantMap& eventData)
         if (border is null || border is dragBorder || border.name != "border")
             continue;
 
-        uint borderViewMode = border.vars["VIEWMODE"].GetUInt();
+        uint borderViewMode = border.vars["VIEWMODE"].GetU32();
         if (resizingBorder == VIEWPORT_BORDER_H)
         {
             if (borderViewMode == VIEWPORT_BORDER_V1)
@@ -1173,7 +1173,7 @@ void HandleViewportBorderDragEnd(StringHash eventType, VariantMap& eventData)
         if (children[i].name == "border")
         {
             BorderImage@ border = children[i];
-            uint mode = border.vars["VIEWMODE"].GetUInt();
+            uint mode = border.vars["VIEWMODE"].GetU32();
             if (mode == VIEWPORT_BORDER_V)
                 borderV = border;
             else if (mode == VIEWPORT_BORDER_V1)
@@ -1579,7 +1579,7 @@ void CameraMoveForward(Vector3 trans)
 {
     cameraSmoothInterpolate.Stop();
     
-    cameraNode.Translate(trans, TS_PARENT);
+    cameraNode.Translate(trans, TransformSpace::Parent);
 }
 
 void CameraRotateAroundLookAt(Quaternion rot)
@@ -2078,7 +2078,7 @@ void UpdateView(float timeStep)
         UIElement@ uiElement = ui.GetElementAt(ui.cursorPosition);
         if (uiElement !is null && uiElement.vars.Contains("VIEWMODE"))
         {
-            setViewportCursor = uiElement.vars["VIEWMODE"].GetUInt();
+            setViewportCursor = uiElement.vars["VIEWMODE"].GetU32();
             if (input.mouseButtonDown[MOUSEB_LEFT])
                 resizingBorder = setViewportCursor;
         }
@@ -2244,7 +2244,7 @@ void ViewMouseMove()
     if (pickMode < PICK_RIGIDBODIES && editorScene.octree !is null)
     {
         RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip,
-            pickModeDrawableFlags[pickMode], 0x7fffffff);
+            pickModeDrawableTypes[pickMode], 0x7fffffff);
 
         if (result.drawable !is null && result.drawable.typeName == "TerrainPatch" && result.drawable.node.parent !is null)
         {
@@ -2366,7 +2366,7 @@ void ViewRaycast(bool mouseClick)
             return;
 
         RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip,
-            pickModeDrawableFlags[pickMode], 0x7fffffff);
+            pickModeDrawableTypes[pickMode], 0x7fffffff);
 
         if (result.drawable !is null)
         {
@@ -2762,7 +2762,7 @@ Drawable@ GetDrawableAtMousePostion()
     if (editorScene.octree is null)
         return null;
 
-    RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip, DRAWABLE_GEOMETRY, 0x7fffffff);
+    RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip, DrawableTypes::Geometry, 0x7fffffff);
 
     return result.drawable;
 }

@@ -35,7 +35,7 @@ public:
     /// Set size, vertex elements and dynamic mode. Previous data will be lost.
     bool SetSize(i32 vertexCount, const Vector<VertexElement>& elements, bool dynamic = false);
     /// Set size and vertex elements and dynamic mode using legacy element bitmask. Previous data will be lost.
-    bool SetSize(i32 vertexCount, unsigned elementMask, bool dynamic = false);
+    bool SetSize(i32 vertexCount, VertexElements elementMask, bool dynamic = false);
     /// Set all data in the buffer.
     bool SetData(const void* data);
     /// Set a data range in the buffer. Optionally discard data outside the range.
@@ -106,16 +106,16 @@ public:
 
     /// Return legacy vertex element mask. Note that both semantic and type must match the legacy element for a mask bit to be set.
     /// @property
-    VertexMaskFlags GetElementMask() const { return elementMask_; }
+    VertexElements GetElementMask() const { return elementMask_; }
 
     /// Return CPU memory shadow data.
-    u8* GetShadowData() const { return shadowData_.Get(); }
+    byte* GetShadowData() const { return shadowData_.Get(); }
 
     /// Return shared array pointer to the CPU memory shadow data.
-    SharedArrayPtr<u8> GetShadowDataShared() const { return shadowData_; }
+    SharedArrayPtr<byte> GetShadowDataShared() const { return shadowData_; }
 
     /// Return buffer hash for building vertex declarations. Used internally.
-    u64 GetBufferHash(i32 streamIndex) { return elementHash_ << (streamIndex * 16); }
+    hash64 GetBufferHash(i32 streamIndex) { return elementHash_ << (streamIndex * 16); }
 
     /// Return element with specified type and semantic from a vertex element list, or null if does not exist.
     static const VertexElement* GetElement(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, i8 index = 0);
@@ -127,13 +127,13 @@ public:
     static i32 GetElementOffset(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, i8 index = 0);
 
     /// Return a vertex element list from a legacy element bitmask.
-    static Vector<VertexElement> GetElements(unsigned elementMask);
+    static Vector<VertexElement> GetElements(VertexElements elementMask);
 
     /// Return vertex size from an element list.
     static i32 GetVertexSize(const Vector<VertexElement>& elements);
 
     /// Return vertex size for a legacy vertex element bitmask.
-    static i32 GetVertexSize(unsigned elementMask);
+    static i32 GetVertexSize(VertexElements elementMask);
 
     /// Update offsets of vertex elements.
     static void UpdateOffsets(Vector<VertexElement>& elements);
@@ -164,20 +164,6 @@ private:
     void UnmapBuffer_OGL();
 #endif // def URHO3D_OPENGL
 
-#ifdef URHO3D_D3D9
-    void OnDeviceLost_D3D9();
-    void OnDeviceReset_D3D9();
-    void Release_D3D9();
-    bool SetData_D3D9(const void* data);
-    bool SetDataRange_D3D9(const void* data, i32 start, i32 count, bool discard = false);
-    void* Lock_D3D9(i32 start, i32 count, bool discard);
-    void Unlock_D3D9();
-    bool Create_D3D9();
-    bool UpdateToGPU_D3D9();
-    void* MapBuffer_D3D9(i32 start, i32 count, bool discard);
-    void UnmapBuffer_D3D9();
-#endif // def URHO3D_D3D9
-
 #ifdef URHO3D_D3D11
     void OnDeviceLost_D3D11();
     void OnDeviceReset_D3D11();
@@ -193,7 +179,7 @@ private:
 #endif // def URHO3D_D3D11
 
     /// Shadow data.
-    SharedArrayPtr<u8> shadowData_;
+    SharedArrayPtr<byte> shadowData_;
     /// Number of vertices.
     i32 vertexCount_{};
     /// Vertex size.
@@ -201,9 +187,9 @@ private:
     /// Vertex elements.
     Vector<VertexElement> elements_;
     /// Vertex element hash.
-    u64 elementHash_{};
+    hash64 elementHash_{};
     /// Vertex element legacy bitmask.
-    VertexMaskFlags elementMask_{};
+    VertexElements elementMask_{};
     /// Buffer locking state.
     LockState lockState_{LOCK_NONE};
     /// Lock start vertex.

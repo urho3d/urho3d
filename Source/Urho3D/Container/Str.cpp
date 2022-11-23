@@ -554,24 +554,60 @@ String String::Trimmed() const
 
 String String::ToLower() const
 {
-    String ret(*this);
-    const char* buffer = GetBuffer();
-    i32 retLength = ret.Length();
-    char* retBuffer = ret.GetBuffer();
-    for (i32 i = 0; i < retLength; ++i)
-        retBuffer[i] = (char)tolower(buffer[i]);
+    String ret;
+    i32 byte_offset = 0;
+
+    while (byte_offset < Length())
+    {
+        c32 cp = NextUTF8Char(byte_offset);
+
+        // Первые символы Юникода (0 - 127) совпадают с 7-ми битной кодировкой US-ASCII
+        // Коды кириллицы: https://ru.wikipedia.org/wiki/Кириллица_(блок_Юникода)
+
+        if ((cp >= 0x41 && cp <= 0x5a) // Английские A - Z
+            || (cp >= 0x410 && cp <= 0x42f)) // Русские А - Я без Ё
+        {
+            ret.AppendUTF8(cp + 32);
+        }
+        else if (cp >= 0x400 && cp <= 0x40f) // Другие большие буквы кириллицы
+        {
+            ret.AppendUTF8(cp + 80);
+        }
+        else
+        {
+            ret.AppendUTF8(cp);
+        }
+    }
 
     return ret;
 }
 
 String String::ToUpper() const
 {
-    String ret(*this);
-    const char* buffer = GetBuffer();
-    i32 retLength = ret.Length();
-    char* retBuffer = ret.GetBuffer();
-    for (i32 i = 0; i < retLength; ++i)
-        retBuffer[i] = (char)toupper(buffer[i]);
+    String ret;
+    i32 byte_offset = 0;
+
+    while (byte_offset < Length())
+    {
+        c32 cp = NextUTF8Char(byte_offset);
+
+        // Первые символы Юникода (0 - 127) совпадают с 7-ми битной кодировкой US-ASCII
+        // Коды кириллицы: https://ru.wikipedia.org/wiki/Кириллица_(блок_Юникода)
+
+        if ((cp >= 0x61 && cp <= 0x7a) // Английские a - z
+            || (cp >= 0x430 && cp <= 0x44f)) // Русские а - я без ё
+        {
+            ret.AppendUTF8(cp - 32);
+        }
+        else if (cp >= 0x450 && cp <= 0x45f) // Другие маленькие буквы кириллицы
+        {
+            ret.AppendUTF8(cp - 80);
+        }
+        else
+        {
+            ret.AppendUTF8(cp);
+        }
+    }
 
     return ret;
 }

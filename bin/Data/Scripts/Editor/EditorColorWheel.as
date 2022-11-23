@@ -180,7 +180,7 @@ void HandleColorWheelKeyDown(StringHash eventType, VariantMap& eventData)
 {
     if (colorWheelWindow.visible == false) return;
 
-    int key = eventData["Key"].GetInt();
+    int key = eventData["Key"].GetI32();
 
     if (key == KEY_ESCAPE)
     {
@@ -193,9 +193,9 @@ void HandleColorWheelMouseButtonDown(StringHash eventType, VariantMap& eventData
 {
     if (colorWheelWindow.visible == false) return;
 
-    int x = eventData["X"].GetInt();
-    int y = eventData["Y"].GetInt();
-    int button = eventData["Button"].GetInt();
+    int x = eventData["X"].GetI32();
+    int y = eventData["Y"].GetI32();
+    int button = eventData["Button"].GetI32();
 
     if (button == 1) 
     {
@@ -215,7 +215,7 @@ void HandleColorWheelMouseWheel(StringHash eventType, VariantMap& eventData)
     if (colorWheelWindow.visible == false || !isBWGradientHovering ) return;
 
     int multipler = 16;
-    int wheelValue = eventData["Wheel"].GetInt();
+    int wheelValue = eventData["Wheel"].GetI32();
 
     wheelValue = wheelValue * multipler;
 
@@ -245,9 +245,9 @@ void HandleColorWheelMouseMove(StringHash eventType, VariantMap& eventData)
 {
     if (colorWheelWindow.visible == false) return;
 
-    int x = eventData["X"].GetInt();
-    int y = eventData["Y"].GetInt();
-    int button = eventData["Button"].GetInt();
+    int x = eventData["X"].GetI32();
+    int y = eventData["Y"].GetI32();
+    int button = eventData["Button"].GetI32();
 
     if (colorWheelWindow.IsInside(IntVector2(x,y), true))
         colorWheelWindow.opacity = 1.0f;

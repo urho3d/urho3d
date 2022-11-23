@@ -13,7 +13,7 @@ namespace Urho3D
 
 void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
 {
-    // static const float ANIMATION_LOD_BASESCALE | File: ../Graphics/Drawable.h
+    // constexpr float ANIMATION_LOD_BASESCALE | File: ../Graphics/Drawable.h
     engine->RegisterGlobalProperty("const float ANIMATION_LOD_BASESCALE", (void*)&ANIMATION_LOD_BASESCALE);
 
     // constexpr i32 BITS_PER_COMPONENT | File: ../GraphicsAPI/GraphicsDefs.h
@@ -25,38 +25,17 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const int CONVERSION_BUFFER_LENGTH | File: ../Container/Str.h
     engine->RegisterGlobalProperty("const int CONVERSION_BUFFER_LENGTH", (void*)&CONVERSION_BUFFER_LENGTH);
 
-    // static const unsigned DEBUGHUD_SHOW_ALL | File: ../Engine/DebugHud.h
-    engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_ALL", (void*)&DEBUGHUD_SHOW_ALL);
-
-    // static const unsigned DEBUGHUD_SHOW_EVENTPROFILER | File: ../Engine/DebugHud.h
-    engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_EVENTPROFILER", (void*)&DEBUGHUD_SHOW_EVENTPROFILER);
-
-    // static const unsigned DEBUGHUD_SHOW_MEMORY | File: ../Engine/DebugHud.h
-    engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_MEMORY", (void*)&DEBUGHUD_SHOW_MEMORY);
-
-    // static const unsigned DEBUGHUD_SHOW_MODE | File: ../Engine/DebugHud.h
-    engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_MODE", (void*)&DEBUGHUD_SHOW_MODE);
-
-    // static const unsigned DEBUGHUD_SHOW_NONE | File: ../Engine/DebugHud.h
-    engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_NONE", (void*)&DEBUGHUD_SHOW_NONE);
-
-    // static const unsigned DEBUGHUD_SHOW_PROFILER | File: ../Engine/DebugHud.h
-    engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_PROFILER", (void*)&DEBUGHUD_SHOW_PROFILER);
-
-    // static const unsigned DEBUGHUD_SHOW_STATS | File: ../Engine/DebugHud.h
-    engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_STATS", (void*)&DEBUGHUD_SHOW_STATS);
-
     // static const float DEFAULT_CAMERA_FOV | File: ../Graphics/Camera.h
     engine->RegisterGlobalProperty("const float DEFAULT_CAMERA_FOV", (void*)&DEFAULT_CAMERA_FOV);
 
     // static const float DEFAULT_FARCLIP | File: ../Graphics/Camera.h
     engine->RegisterGlobalProperty("const float DEFAULT_FARCLIP", (void*)&DEFAULT_FARCLIP);
 
-    // static const float DEFAULT_FONT_SIZE | File: ../UI/Text.h
+    // constexpr float DEFAULT_FONT_SIZE | File: ../UI/Text.h
     engine->RegisterGlobalProperty("const float DEFAULT_FONT_SIZE", (void*)&DEFAULT_FONT_SIZE);
 
-    // static const unsigned DEFAULT_LIGHTMASK | File: ../Graphics/Drawable.h
-    engine->RegisterGlobalProperty("const uint DEFAULT_LIGHTMASK", (void*)&DEFAULT_LIGHTMASK);
+    // constexpr mask32 DEFAULT_LIGHTMASK | File: ../Graphics/Drawable.h
+    engine->RegisterGlobalProperty("const mask32 DEFAULT_LIGHTMASK", (void*)&DEFAULT_LIGHTMASK);
 
     // static const float DEFAULT_NEARCLIP | File: ../Graphics/Camera.h
     engine->RegisterGlobalProperty("const float DEFAULT_NEARCLIP", (void*)&DEFAULT_NEARCLIP);
@@ -67,38 +46,20 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const float DEFAULT_ORTHOSIZE | File: ../Graphics/Camera.h
     engine->RegisterGlobalProperty("const float DEFAULT_ORTHOSIZE", (void*)&DEFAULT_ORTHOSIZE);
 
-    // static const unsigned char DEFAULT_RENDER_ORDER | File: ../Graphics/Material.h
-    engine->RegisterGlobalProperty("const uint8 DEFAULT_RENDER_ORDER", (void*)&DEFAULT_RENDER_ORDER);
+    // static constexpr i8 DEFAULT_RENDER_ORDER | File: ../Graphics/Material.h
+    engine->RegisterGlobalProperty("const int8 DEFAULT_RENDER_ORDER", (void*)&DEFAULT_RENDER_ORDER);
 
-    // static const unsigned DEFAULT_SHADOWMASK | File: ../Graphics/Drawable.h
-    engine->RegisterGlobalProperty("const uint DEFAULT_SHADOWMASK", (void*)&DEFAULT_SHADOWMASK);
+    // constexpr mask32 DEFAULT_SHADOWMASK | File: ../Graphics/Drawable.h
+    engine->RegisterGlobalProperty("const mask32 DEFAULT_SHADOWMASK", (void*)&DEFAULT_SHADOWMASK);
 
-    // static const unsigned DEFAULT_VIEWMASK | File: ../Graphics/Drawable.h
-    engine->RegisterGlobalProperty("const uint DEFAULT_VIEWMASK", (void*)&DEFAULT_VIEWMASK);
+    // constexpr mask32 DEFAULT_VIEWMASK | File: ../Graphics/Drawable.h
+    engine->RegisterGlobalProperty("const mask32 DEFAULT_VIEWMASK", (void*)&DEFAULT_VIEWMASK);
 
-    // static const unsigned DEFAULT_ZONEMASK | File: ../Graphics/Drawable.h
-    engine->RegisterGlobalProperty("const uint DEFAULT_ZONEMASK", (void*)&DEFAULT_ZONEMASK);
+    // constexpr mask32 DEFAULT_ZONEMASK | File: ../Graphics/Drawable.h
+    engine->RegisterGlobalProperty("const mask32 DEFAULT_ZONEMASK", (void*)&DEFAULT_ZONEMASK);
 
     // const Vector3 DOT_SCALE | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const Vector3 DOT_SCALE", (void*)&DOT_SCALE);
-
-    // static const unsigned DRAWABLE_ANY | File: ../Graphics/Drawable.h
-    engine->RegisterGlobalProperty("const uint DRAWABLE_ANY", (void*)&DRAWABLE_ANY);
-
-    // static const unsigned DRAWABLE_GEOMETRY | File: ../Graphics/Drawable.h
-    engine->RegisterGlobalProperty("const uint DRAWABLE_GEOMETRY", (void*)&DRAWABLE_GEOMETRY);
-
-    // static const unsigned DRAWABLE_GEOMETRY2D | File: ../Graphics/Drawable.h
-    engine->RegisterGlobalProperty("const uint DRAWABLE_GEOMETRY2D", (void*)&DRAWABLE_GEOMETRY2D);
-
-    // static const unsigned DRAWABLE_LIGHT | File: ../Graphics/Drawable.h
-    engine->RegisterGlobalProperty("const uint DRAWABLE_LIGHT", (void*)&DRAWABLE_LIGHT);
-
-    // static const unsigned DRAWABLE_UNDEFINED | File: ../Graphics/Drawable.h
-    engine->RegisterGlobalProperty("const uint DRAWABLE_UNDEFINED", (void*)&DRAWABLE_UNDEFINED);
-
-    // static const unsigned DRAWABLE_ZONE | File: ../Graphics/Drawable.h
-    engine->RegisterGlobalProperty("const uint DRAWABLE_ZONE", (void*)&DRAWABLE_ZONE);
 
     // const i32 ELEMENT_TYPESIZES[] | File: ../GraphicsAPI/GraphicsDefs.h
     // Not registered because array
@@ -114,9 +75,6 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
 
     // static const String EP_DIRECT3D11 | File: ../Engine/EngineDefs.h
     engine->RegisterGlobalProperty("const String EP_DIRECT3D11", (void*)&EP_DIRECT3D11);
-
-    // static const String EP_DIRECT3D9 | File: ../Engine/EngineDefs.h
-    engine->RegisterGlobalProperty("const String EP_DIRECT3D9", (void*)&EP_DIRECT3D9);
 
     // static const String EP_DUMP_SHADERS | File: ../Engine/EngineDefs.h
     engine->RegisterGlobalProperty("const String EP_DUMP_SHADERS", (void*)&EP_DUMP_SHADERS);
@@ -256,11 +214,11 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const String EP_WORKER_THREADS | File: ../Engine/EngineDefs.h
     engine->RegisterGlobalProperty("const String EP_WORKER_THREADS", (void*)&EP_WORKER_THREADS);
 
-    // static const unsigned FIRST_LOCAL_ID | File: ../Scene/Scene.h
-    engine->RegisterGlobalProperty("const uint FIRST_LOCAL_ID", (void*)&FIRST_LOCAL_ID);
+    // constexpr id32 FIRST_LOCAL_ID | File: ../Scene/Scene.h
+    engine->RegisterGlobalProperty("const id32 FIRST_LOCAL_ID", (void*)&FIRST_LOCAL_ID);
 
-    // static const unsigned FIRST_REPLICATED_ID | File: ../Scene/Scene.h
-    engine->RegisterGlobalProperty("const uint FIRST_REPLICATED_ID", (void*)&FIRST_REPLICATED_ID);
+    // constexpr id32 FIRST_REPLICATED_ID | File: ../Scene/Scene.h
+    engine->RegisterGlobalProperty("const id32 FIRST_REPLICATED_ID", (void*)&FIRST_REPLICATED_ID);
 
     // static const int FONT_DPI | File: ../UI/Font.h
     engine->RegisterGlobalProperty("const int FONT_DPI", (void*)&FONT_DPI);
@@ -271,11 +229,11 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const int INSTANCING_BUFFER_DEFAULT_SIZE | File: ../Graphics/Renderer.h
     engine->RegisterGlobalProperty("const int INSTANCING_BUFFER_DEFAULT_SIZE", (void*)&INSTANCING_BUFFER_DEFAULT_SIZE);
 
-    // static const unsigned LAST_LOCAL_ID | File: ../Scene/Scene.h
-    engine->RegisterGlobalProperty("const uint LAST_LOCAL_ID", (void*)&LAST_LOCAL_ID);
+    // constexpr id32 LAST_LOCAL_ID | File: ../Scene/Scene.h
+    engine->RegisterGlobalProperty("const id32 LAST_LOCAL_ID", (void*)&LAST_LOCAL_ID);
 
-    // static const unsigned LAST_REPLICATED_ID | File: ../Scene/Scene.h
-    engine->RegisterGlobalProperty("const uint LAST_REPLICATED_ID", (void*)&LAST_REPLICATED_ID);
+    // constexpr id32 LAST_REPLICATED_ID | File: ../Scene/Scene.h
+    engine->RegisterGlobalProperty("const id32 LAST_REPLICATED_ID", (void*)&LAST_REPLICATED_ID);
 
     // const VertexElement LEGACY_VERTEXELEMENTS[] | File: ../GraphicsAPI/GraphicsDefs.h
     // Not registered because array
@@ -304,13 +262,13 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const int MATRIX_CONVERSION_BUFFER_LENGTH | File: ../Container/Str.h
     engine->RegisterGlobalProperty("const int MATRIX_CONVERSION_BUFFER_LENGTH", (void*)&MATRIX_CONVERSION_BUFFER_LENGTH);
 
-    // static const unsigned MAX_CASCADE_SPLITS | File: ../Graphics/Light.h
-    engine->RegisterGlobalProperty("const uint MAX_CASCADE_SPLITS", (void*)&MAX_CASCADE_SPLITS);
+    // constexpr i32 MAX_CASCADE_SPLITS | File: ../Graphics/Light.h
+    engine->RegisterGlobalProperty("const int MAX_CASCADE_SPLITS", (void*)&MAX_CASCADE_SPLITS);
 
     // constexpr i32 MAX_CONSTANT_REGISTERS | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const int MAX_CONSTANT_REGISTERS", (void*)&MAX_CONSTANT_REGISTERS);
 
-    // static const int MAX_LIGHT_SPLITS | File: ../Graphics/Light.h
+    // constexpr i32 MAX_LIGHT_SPLITS | File: ../Graphics/Light.h
     engine->RegisterGlobalProperty("const int MAX_LIGHT_SPLITS", (void*)&MAX_LIGHT_SPLITS);
 
     // static const unsigned MAX_NETWORK_ATTRIBUTES | File: ../Scene/ReplicationState.h
@@ -322,14 +280,14 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const int MAX_TEXTURE_QUALITY_LEVELS | File: ../GraphicsAPI/Texture.h
     engine->RegisterGlobalProperty("const int MAX_TEXTURE_QUALITY_LEVELS", (void*)&MAX_TEXTURE_QUALITY_LEVELS);
 
-    // static const int MAX_VERTEX_LIGHTS | File: ../Graphics/Drawable.h
+    // constexpr i32 MAX_VERTEX_LIGHTS | File: ../Graphics/Drawable.h
     engine->RegisterGlobalProperty("const int MAX_VERTEX_LIGHTS", (void*)&MAX_VERTEX_LIGHTS);
 
     // constexpr i32 MAX_VERTEX_STREAMS | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const int MAX_VERTEX_STREAMS", (void*)&MAX_VERTEX_STREAMS);
 
-    // static const unsigned MAX_VIEWPORT_TEXTURES | File: ../Graphics/View.h
-    engine->RegisterGlobalProperty("const uint MAX_VIEWPORT_TEXTURES", (void*)&MAX_VIEWPORT_TEXTURES);
+    // constexpr i32 MAX_VIEWPORT_TEXTURES | File: ../Graphics/View.h
+    engine->RegisterGlobalProperty("const int MAX_VIEWPORT_TEXTURES", (void*)&MAX_VIEWPORT_TEXTURES);
 
     // const IntVector2 MOUSE_POSITION_OFFSCREEN | File: ../Input/Input.h
     engine->RegisterGlobalProperty("const IntVector2 MOUSE_POSITION_OFFSCREEN", (void*)&MOUSE_POSITION_OFFSCREEN);
@@ -364,17 +322,65 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // constexpr float M_MAX_FOV | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const float M_MAX_FOV", (void*)&M_MAX_FOV);
 
+    // constexpr i16 M_MAX_I16 | File: ../Math/MathDefs.h
+    engine->RegisterGlobalProperty("const int16 M_MAX_I16", (void*)&M_MAX_I16);
+
+    // constexpr i32 M_MAX_I32 | File: ../Math/MathDefs.h
+    engine->RegisterGlobalProperty("const int M_MAX_I32", (void*)&M_MAX_I32);
+
+    // constexpr i64 M_MAX_I64 | File: ../Math/MathDefs.h
+    engine->RegisterGlobalProperty("const int64 M_MAX_I64", (void*)&M_MAX_I64);
+
+    // constexpr i8 M_MAX_I8 | File: ../Math/MathDefs.h
+    engine->RegisterGlobalProperty("const int8 M_MAX_I8", (void*)&M_MAX_I8);
+
     // constexpr i32 M_MAX_INT | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const int M_MAX_INT", (void*)&M_MAX_INT);
 
+    // constexpr u16 M_MAX_U16 | File: ../Math/MathDefs.h
+    engine->RegisterGlobalProperty("const uint16 M_MAX_U16", (void*)&M_MAX_U16);
+
+    // constexpr u32 M_MAX_U32 | File: ../Math/MathDefs.h
+    engine->RegisterGlobalProperty("const uint M_MAX_U32", (void*)&M_MAX_U32);
+
+    // constexpr u64 M_MAX_U64 | File: ../Math/MathDefs.h
+    engine->RegisterGlobalProperty("const uint64 M_MAX_U64", (void*)&M_MAX_U64);
+
+    // constexpr u8 M_MAX_U8 | File: ../Math/MathDefs.h
+    engine->RegisterGlobalProperty("const uint8 M_MAX_U8", (void*)&M_MAX_U8);
+
     // constexpr u32 M_MAX_UNSIGNED | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const uint M_MAX_UNSIGNED", (void*)&M_MAX_UNSIGNED);
+
+    // constexpr i16 M_MIN_I16 | File: ../Math/MathDefs.h
+    engine->RegisterGlobalProperty("const int16 M_MIN_I16", (void*)&M_MIN_I16);
+
+    // constexpr i32 M_MIN_I32 | File: ../Math/MathDefs.h
+    engine->RegisterGlobalProperty("const int M_MIN_I32", (void*)&M_MIN_I32);
+
+    // constexpr i64 M_MIN_I64 | File: ../Math/MathDefs.h
+    engine->RegisterGlobalProperty("const int64 M_MIN_I64", (void*)&M_MIN_I64);
+
+    // constexpr i8 M_MIN_I8 | File: ../Math/MathDefs.h
+    engine->RegisterGlobalProperty("const int8 M_MIN_I8", (void*)&M_MIN_I8);
 
     // constexpr i32 M_MIN_INT | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const int M_MIN_INT", (void*)&M_MIN_INT);
 
     // constexpr float M_MIN_NEARCLIP | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const float M_MIN_NEARCLIP", (void*)&M_MIN_NEARCLIP);
+
+    // constexpr u16 M_MIN_U16 | File: ../Math/MathDefs.h
+    engine->RegisterGlobalProperty("const uint16 M_MIN_U16", (void*)&M_MIN_U16);
+
+    // constexpr u32 M_MIN_U32 | File: ../Math/MathDefs.h
+    engine->RegisterGlobalProperty("const uint M_MIN_U32", (void*)&M_MIN_U32);
+
+    // constexpr u64 M_MIN_U64 | File: ../Math/MathDefs.h
+    engine->RegisterGlobalProperty("const uint64 M_MIN_U64", (void*)&M_MIN_U64);
+
+    // constexpr u8 M_MIN_U8 | File: ../Math/MathDefs.h
+    engine->RegisterGlobalProperty("const uint8 M_MIN_U8", (void*)&M_MIN_U8);
 
     // constexpr u32 M_MIN_UNSIGNED | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const uint M_MIN_UNSIGNED", (void*)&M_MIN_UNSIGNED);
@@ -394,17 +400,17 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // constexpr i32 NINDEX | File: ../Container/Vector.h
     engine->RegisterGlobalProperty("const int NINDEX", (void*)&NINDEX);
 
-    // static const unsigned NUM_FRUSTUM_PLANES | File: ../Math/Frustum.h
-    engine->RegisterGlobalProperty("const uint NUM_FRUSTUM_PLANES", (void*)&NUM_FRUSTUM_PLANES);
+    // constexpr i32 NUM_FRUSTUM_PLANES | File: ../Math/Frustum.h
+    engine->RegisterGlobalProperty("const int NUM_FRUSTUM_PLANES", (void*)&NUM_FRUSTUM_PLANES);
 
-    // static const unsigned NUM_FRUSTUM_VERTICES | File: ../Math/Frustum.h
-    engine->RegisterGlobalProperty("const uint NUM_FRUSTUM_VERTICES", (void*)&NUM_FRUSTUM_VERTICES);
+    // constexpr i32 NUM_FRUSTUM_VERTICES | File: ../Math/Frustum.h
+    engine->RegisterGlobalProperty("const int NUM_FRUSTUM_VERTICES", (void*)&NUM_FRUSTUM_VERTICES);
 
     // static const int NUM_OCTANTS | File: ../Graphics/Octree.h
     engine->RegisterGlobalProperty("const int NUM_OCTANTS", (void*)&NUM_OCTANTS);
 
-    // static const unsigned PRIORITY_LAST | File: ../Resource/ResourceCache.h
-    engine->RegisterGlobalProperty("const uint PRIORITY_LAST", (void*)&PRIORITY_LAST);
+    // constexpr i32 PRIORITY_LAST | File: ../Resource/ResourceCache.h
+    engine->RegisterGlobalProperty("const int PRIORITY_LAST", (void*)&PRIORITY_LAST);
 
     // const StringHash PSP_AMBIENTCOLOR | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_AMBIENTCOLOR", (void*)&PSP_AMBIENTCOLOR);
@@ -517,10 +523,10 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const int SHADOW_MIN_PIXELS | File: ../Graphics/Renderer.h
     engine->RegisterGlobalProperty("const int SHADOW_MIN_PIXELS", (void*)&SHADOW_MIN_PIXELS);
 
-    // static const float SHADOW_MIN_QUANTIZE | File: ../Graphics/Light.h
+    // constexpr float SHADOW_MIN_QUANTIZE | File: ../Graphics/Light.h
     engine->RegisterGlobalProperty("const float SHADOW_MIN_QUANTIZE", (void*)&SHADOW_MIN_QUANTIZE);
 
-    // static const float SHADOW_MIN_VIEW | File: ../Graphics/Light.h
+    // constexpr float SHADOW_MIN_VIEW | File: ../Graphics/Light.h
     engine->RegisterGlobalProperty("const float SHADOW_MIN_VIEW", (void*)&SHADOW_MIN_VIEW);
 
     // static const String SOUND_AMBIENT | File: ../Audio/AudioDefs.h
@@ -624,6 +630,9 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
 
     // constexpr i32 WI_MAX_PRIORITY | File: ../Core/WorkQueue.h
     engine->RegisterGlobalProperty("const int WI_MAX_PRIORITY", (void*)&WI_MAX_PRIORITY);
+
+    // constexpr bool always_false | File: ../Container/Vector.h
+    // Not registered because have @nobind mark
 
 #ifdef URHO3D_NETWORK
     // static const unsigned CONTROLS_CONTENT_ID | File: ../Network/Protocol.h

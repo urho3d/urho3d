@@ -158,56 +158,50 @@ bool Engine::Initialize(const VariantMap& parameters)
     // Set headless mode
     headless_ = GetParameter(parameters, EP_HEADLESS, false).GetBool();
 
-    // Register the rest of the subsystems
-    if (!headless_)
-    {
-        GAPI gapi = GAPI_NONE;
+    // Detect GAPI even in headless mode
+    // https://github.com/urho3d/Urho3D/issues/3040
+    GAPI gapi = GAPI_NONE;
 
-        // Try to set any possible graphics API as default
+    // Try to set any possible graphics API as default
 
 #ifdef URHO3D_OPENGL
+    gapi = GAPI_OPENGL;
+#endif
+
+#ifdef URHO3D_D3D11
+    gapi = GAPI_D3D11;
+#endif
+
+    // Use command line parameters
+
+#ifdef URHO3D_OPENGL
+    bool gapi_gl = GetParameter(parameters, EP_OPENGL, false).GetBool();
+    if (gapi_gl)
         gapi = GAPI_OPENGL;
 #endif
 
-#ifdef URHO3D_D3D9
-        gapi = GAPI_D3D9;
-#endif
-
 #ifdef URHO3D_D3D11
+    bool gapi_d3d11 = GetParameter(parameters, EP_DIRECT3D11, false).GetBool();
+    if (gapi_d3d11)
         gapi = GAPI_D3D11;
 #endif
 
-        // Use command line parameters
+    if (gapi == GAPI_NONE)
+    {
+        URHO3D_LOGERROR("Graphics API not selected");
+        return false;
+    }
 
-#ifdef URHO3D_OPENGL
-        bool gapi_gl = GetParameter(parameters, EP_OPENGL, false).GetBool();
-        if (gapi_gl)
-            gapi = GAPI_OPENGL;
-#endif
-
-#ifdef URHO3D_D3D9
-        bool gapi_d3d9 = GetParameter(parameters, EP_DIRECT3D9, false).GetBool();
-        if (gapi_d3d9)
-            gapi = GAPI_D3D9;
-#endif
-
-#ifdef URHO3D_D3D11
-        bool gapi_d3d11 = GetParameter(parameters, EP_DIRECT3D11, false).GetBool();
-        if (gapi_d3d11)
-            gapi = GAPI_D3D11;
-#endif
-
-        if (gapi == GAPI_NONE)
-        {
-            URHO3D_LOGERROR("Graphics API not selected");
-            return false;
-        }
-
+    // Register the rest of the subsystems
+    if (!headless_)
+    {
         context_->RegisterSubsystem(new Graphics(context_, gapi));
         context_->RegisterSubsystem(new Renderer(context_));
     }
     else
     {
+        Graphics::SetGAPI(gapi); // https://github.com/urho3d/Urho3D/issues/3040
+
         // Register graphics library objects explicitly in headless mode to allow them to work without using actual GPU resources
         RegisterGraphicsLibrary(context_);
     }
@@ -222,7 +216,7 @@ bool Engine::Initialize(const VariantMap& parameters)
     if (log)
     {
         if (HasParameter(parameters, EP_LOG_LEVEL))
-            log->SetLevel(GetParameter(parameters, EP_LOG_LEVEL).GetInt());
+            log->SetLevel(GetParameter(parameters, EP_LOG_LEVEL).GetI32());
         log->SetQuiet(GetParameter(parameters, EP_LOG_QUIET, false).GetBool());
         log->Open(GetParameter(parameters, EP_LOG_NAME, "Urho3D.log").GetString());
     }
@@ -267,8 +261,8 @@ bool Engine::Initialize(const VariantMap& parameters)
         graphics->SetOrientations(GetParameter(parameters, EP_ORIENTATIONS, "LandscapeLeft LandscapeRight").GetString());
 
         if (HasParameter(parameters, EP_WINDOW_POSITION_X) && HasParameter(parameters, EP_WINDOW_POSITION_Y))
-            graphics->SetWindowPosition(GetParameter(parameters, EP_WINDOW_POSITION_X).GetInt(),
-                GetParameter(parameters, EP_WINDOW_POSITION_Y).GetInt());
+            graphics->SetWindowPosition(GetParameter(parameters, EP_WINDOW_POSITION_X).GetI32(),
+                GetParameter(parameters, EP_WINDOW_POSITION_Y).GetI32());
 
         if (Graphics::GetGAPI() == GAPI_OPENGL)
         {
@@ -277,17 +271,17 @@ bool Engine::Initialize(const VariantMap& parameters)
         }
 
         if (!graphics->SetMode(
-            GetParameter(parameters, EP_WINDOW_WIDTH, 0).GetInt(),
-            GetParameter(parameters, EP_WINDOW_HEIGHT, 0).GetInt(),
+            GetParameter(parameters, EP_WINDOW_WIDTH, 0).GetI32(),
+            GetParameter(parameters, EP_WINDOW_HEIGHT, 0).GetI32(),
             GetParameter(parameters, EP_FULL_SCREEN, true).GetBool(),
             GetParameter(parameters, EP_BORDERLESS, false).GetBool(),
             GetParameter(parameters, EP_WINDOW_RESIZABLE, false).GetBool(),
             GetParameter(parameters, EP_HIGH_DPI, true).GetBool(),
             GetParameter(parameters, EP_VSYNC, false).GetBool(),
             GetParameter(parameters, EP_TRIPLE_BUFFER, false).GetBool(),
-            GetParameter(parameters, EP_MULTI_SAMPLE, 1).GetInt(),
-            GetParameter(parameters, EP_MONITOR, 0).GetInt(),
-            GetParameter(parameters, EP_REFRESH_RATE, 0).GetInt()
+            GetParameter(parameters, EP_MULTI_SAMPLE, 1).GetI32(),
+            GetParameter(parameters, EP_MONITOR, 0).GetI32(),
+            GetParameter(parameters, EP_REFRESH_RATE, 0).GetI32()
         ))
             return false;
 
@@ -301,16 +295,16 @@ bool Engine::Initialize(const VariantMap& parameters)
         renderer->SetDrawShadows(GetParameter(parameters, EP_SHADOWS, true).GetBool());
         if (renderer->GetDrawShadows() && GetParameter(parameters, EP_LOW_QUALITY_SHADOWS, false).GetBool())
             renderer->SetShadowQuality(SHADOWQUALITY_SIMPLE_16BIT);
-        renderer->SetMaterialQuality((MaterialQuality)GetParameter(parameters, EP_MATERIAL_QUALITY, QUALITY_HIGH).GetInt());
-        renderer->SetTextureQuality((MaterialQuality)GetParameter(parameters, EP_TEXTURE_QUALITY, QUALITY_HIGH).GetInt());
-        renderer->SetTextureFilterMode((TextureFilterMode)GetParameter(parameters, EP_TEXTURE_FILTER_MODE, FILTER_TRILINEAR).GetInt());
-        renderer->SetTextureAnisotropy(GetParameter(parameters, EP_TEXTURE_ANISOTROPY, 4).GetInt());
+        renderer->SetMaterialQuality((MaterialQuality)GetParameter(parameters, EP_MATERIAL_QUALITY, QUALITY_HIGH).GetI32());
+        renderer->SetTextureQuality((MaterialQuality)GetParameter(parameters, EP_TEXTURE_QUALITY, QUALITY_HIGH).GetI32());
+        renderer->SetTextureFilterMode((TextureFilterMode)GetParameter(parameters, EP_TEXTURE_FILTER_MODE, FILTER_TRILINEAR).GetI32());
+        renderer->SetTextureAnisotropy(GetParameter(parameters, EP_TEXTURE_ANISOTROPY, 4).GetI32());
 
         if (GetParameter(parameters, EP_SOUND, true).GetBool())
         {
             GetSubsystem<Audio>()->SetMode(
-                GetParameter(parameters, EP_SOUND_BUFFER, 100).GetInt(),
-                GetParameter(parameters, EP_SOUND_MIX_RATE, 44100).GetInt(),
+                GetParameter(parameters, EP_SOUND_BUFFER, 100).GetI32(),
+                GetParameter(parameters, EP_SOUND_MIX_RATE, 44100).GetI32(),
                 GetParameter(parameters, EP_SOUND_STEREO, true).GetBool(),
                 GetParameter(parameters, EP_SOUND_INTERPOLATION, true).GetBool()
             );
@@ -332,7 +326,7 @@ bool Engine::Initialize(const VariantMap& parameters)
 
 #ifdef URHO3D_TESTING
     if (HasParameter(parameters, EP_TIME_OUT))
-        timeOut_ = GetParameter(parameters, EP_TIME_OUT, 0).GetInt() * 1000000LL;
+        timeOut_ = GetParameter(parameters, EP_TIME_OUT, 0).GetI32() * 1000000LL;
 #endif
 
 #ifdef URHO3D_PROFILING
@@ -851,8 +845,6 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret[EP_FLUSH_GPU] = true;
             else if (argument == "opengl")
                 ret[EP_OPENGL] = true;
-            else if (argument == "d3d9")
-                ret[EP_DIRECT3D9] = true;
             else if (argument == "d3d11")
                 ret[EP_DIRECT3D11] = true;
             else if (argument == "gl2")
@@ -907,35 +899,35 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
             }
             else if (argument == "x" && !value.Empty())
             {
-                ret[EP_WINDOW_WIDTH] = ToInt(value);
+                ret[EP_WINDOW_WIDTH] = ToI32(value);
                 ++i;
             }
             else if (argument == "y" && !value.Empty())
             {
-                ret[EP_WINDOW_HEIGHT] = ToInt(value);
+                ret[EP_WINDOW_HEIGHT] = ToI32(value);
                 ++i;
             }
             else if (argument == "monitor" && !value.Empty()) {
-                ret[EP_MONITOR] = ToInt(value);
+                ret[EP_MONITOR] = ToI32(value);
                 ++i;
             }
             else if (argument == "hz" && !value.Empty()) {
-                ret[EP_REFRESH_RATE] = ToInt(value);
+                ret[EP_REFRESH_RATE] = ToI32(value);
                 ++i;
             }
             else if (argument == "m" && !value.Empty())
             {
-                ret[EP_MULTI_SAMPLE] = ToInt(value);
+                ret[EP_MULTI_SAMPLE] = ToI32(value);
                 ++i;
             }
             else if (argument == "b" && !value.Empty())
             {
-                ret[EP_SOUND_BUFFER] = ToInt(value);
+                ret[EP_SOUND_BUFFER] = ToI32(value);
                 ++i;
             }
             else if (argument == "r" && !value.Empty())
             {
-                ret[EP_SOUND_MIX_RATE] = ToInt(value);
+                ret[EP_SOUND_MIX_RATE] = ToI32(value);
                 ++i;
             }
             else if (argument == "pp" && !value.Empty())
@@ -965,23 +957,23 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
             }
             else if (argument == "mq" && !value.Empty())
             {
-                ret[EP_MATERIAL_QUALITY] = ToInt(value);
+                ret[EP_MATERIAL_QUALITY] = ToI32(value);
                 ++i;
             }
             else if (argument == "tq" && !value.Empty())
             {
-                ret[EP_TEXTURE_QUALITY] = ToInt(value);
+                ret[EP_TEXTURE_QUALITY] = ToI32(value);
                 ++i;
             }
             else if (argument == "tf" && !value.Empty())
             {
-                ret[EP_TEXTURE_FILTER_MODE] = ToInt(value);
+                ret[EP_TEXTURE_FILTER_MODE] = ToI32(value);
                 ++i;
             }
             else if (argument == "af" && !value.Empty())
             {
                 ret[EP_TEXTURE_FILTER_MODE] = FILTER_ANISOTROPIC;
-                ret[EP_TEXTURE_ANISOTROPY] = ToInt(value);
+                ret[EP_TEXTURE_ANISOTROPY] = ToI32(value);
                 ++i;
             }
             else if (argument == "touch")
@@ -989,7 +981,7 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
 #ifdef URHO3D_TESTING
             else if (argument == "timeout" && !value.Empty())
             {
-                ret[EP_TIME_OUT] = ToInt(value);
+                ret[EP_TIME_OUT] = ToI32(value);
                 ++i;
             }
 #endif

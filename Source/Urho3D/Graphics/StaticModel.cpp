@@ -26,8 +26,8 @@ namespace Urho3D
 extern const char* GEOMETRY_CATEGORY;
 
 StaticModel::StaticModel(Context* context) :
-    Drawable(context, DRAWABLE_GEOMETRY),
-    occlusionLodLevel_(M_MAX_UNSIGNED),
+    Drawable(context, DrawableTypes::Geometry),
+    occlusionLodLevel_(NINDEX),
     materialsAttr_(Material::GetTypeStatic())
 {
 }
@@ -38,18 +38,18 @@ void StaticModel::RegisterObject(Context* context)
 {
     context->RegisterFactory<StaticModel>(GEOMETRY_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Material", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()),
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Model", GetModelAttr, SetModelAttr, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Material", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList(Material::GetTypeStatic()),
         AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Is Occluder", bool, occluder_, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Cast Shadows", bool, castShadows_, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Is Occluder", occluder_, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, true, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Cast Shadows", castShadows_, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, 1.0f, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
-    URHO3D_ATTRIBUTE("Occlusion LOD Level", int, occlusionLodLevel_, M_MAX_UNSIGNED, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Occlusion LOD Level", occlusionLodLevel_, NINDEX, AM_DEFAULT);
 }
 
 void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results)
@@ -134,23 +134,26 @@ void StaticModel::UpdateBatches(const FrameInfo& frame)
     }
 }
 
-Geometry* StaticModel::GetLodGeometry(unsigned batchIndex, unsigned level)
+Geometry* StaticModel::GetLodGeometry(i32 batchIndex, i32 level)
 {
+    assert(batchIndex >= 0);
+    assert(level >= 0 || level == NINDEX);
+
     if (batchIndex >= geometries_.Size())
         return nullptr;
 
     // If level is out of range, use visible geometry
-    if (level < geometries_[batchIndex].Size())
+    if (level >= 0 && level < geometries_[batchIndex].Size())
         return geometries_[batchIndex][level];
     else
         return batches_[batchIndex].geometry_;
 }
 
-unsigned StaticModel::GetNumOccluderTriangles()
+i32 StaticModel::GetNumOccluderTriangles()
 {
-    unsigned triangles = 0;
+    i32 triangles = 0;
 
-    for (unsigned i = 0; i < batches_.Size(); ++i)
+    for (i32 i = 0; i < batches_.Size(); ++i)
     {
         Geometry* geometry = GetLodGeometry(i, occlusionLodLevel_);
         if (!geometry)
@@ -186,10 +189,10 @@ bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
         else
             buffer->SetCullMode(CULL_CCW);
 
-        const unsigned char* vertexData;
-        unsigned vertexSize;
-        const unsigned char* indexData;
-        unsigned indexSize;
+        const byte* vertexData;
+        i32 vertexSize;
+        const byte* indexData;
+        i32 indexSize;
         const Vector<VertexElement>* elements;
 
         geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
@@ -274,8 +277,10 @@ bool StaticModel::SetMaterial(unsigned index, Material* material)
     return true;
 }
 
-void StaticModel::SetOcclusionLodLevel(unsigned level)
+void StaticModel::SetOcclusionLodLevel(i32 level)
 {
+    assert(level >= 0 || level == NINDEX);
+
     occlusionLodLevel_ = level;
     MarkNetworkUpdate();
 }

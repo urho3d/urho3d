@@ -222,15 +222,6 @@ protected:
     void RegenerateLevels_OGL();
 #endif // def URHO3D_OPENGL
 
-#ifdef URHO3D_D3D9
-    void SetSRGB_D3D9(bool enable);
-    void UpdateParameters_D3D9();
-    bool GetParametersDirty_D3D9() const;
-    bool IsCompressed_D3D9() const;
-    unsigned GetRowDataSize_D3D9(int width) const;
-    void RegenerateLevels_D3D9();
-#endif // def URHO3D_D3D9
-
 #ifdef URHO3D_D3D11
     void SetSRGB_D3D11(bool enable);
     void UpdateParameters_D3D11();

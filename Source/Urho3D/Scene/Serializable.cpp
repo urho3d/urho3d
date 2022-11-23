@@ -67,13 +67,13 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     case VAR_INT:
         // If enum type, use the low 8 bits only
         if (attr.enumNames_)
-            *(reinterpret_cast<unsigned char*>(dest)) = src.GetInt();
+            *(reinterpret_cast<unsigned char*>(dest)) = src.GetI32();
         else
-            *(reinterpret_cast<int*>(dest)) = src.GetInt();
+            *(reinterpret_cast<int*>(dest)) = src.GetI32();
         break;
 
     case VAR_INT64:
-        *(reinterpret_cast<long long*>(dest)) = src.GetInt64();
+        *(reinterpret_cast<long long*>(dest)) = src.GetI64();
         break;
 
     case VAR_BOOL:
@@ -109,7 +109,7 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
         break;
 
     case VAR_BUFFER:
-        *(reinterpret_cast<Vector<unsigned char>*>(dest)) = src.GetBuffer();
+        *(reinterpret_cast<Vector<byte>*>(dest)) = src.GetBuffer();
         break;
 
     case VAR_RESOURCEREF:
@@ -218,7 +218,7 @@ void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) cons
         break;
 
     case VAR_BUFFER:
-        dest = *(reinterpret_cast<const Vector<unsigned char>*>(src));
+        dest = *(reinterpret_cast<const Vector<byte>*>(src));
         break;
 
     case VAR_RESOURCEREF:
@@ -519,7 +519,7 @@ bool Serializable::SaveXML(XMLElement& dest) const
         // If enums specified, set as an enum string. Otherwise set directly as a Variant
         if (attr.enumNames_)
         {
-            int enumValue = value.GetInt();
+            int enumValue = value.GetI32();
             attrElem.SetAttribute("value", attr.enumNames_[enumValue]);
         }
         else
@@ -555,7 +555,7 @@ bool Serializable::SaveJSON(JSONValue& dest) const
         // If enums specified, set as an enum string. Otherwise set directly as a Variant
         if (attr.enumNames_)
         {
-            int enumValue = value.GetInt();
+            int enumValue = value.GetI32();
             attrVal = attr.enumNames_[enumValue];
         }
         else
@@ -741,7 +741,7 @@ void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeS
     }
 
     // First write the change bitfield, then attribute data for non-default attributes
-    dest.WriteUByte(timeStamp);
+    dest.WriteU8(timeStamp);
     dest.Write(attributeBits.data_, (numAttributes + 7) >> 3u);
 
     for (unsigned i = 0; i < numAttributes; ++i)
@@ -767,7 +767,7 @@ void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attribute
 
     // First write the change bitfield, then attribute data for changed attributes
     // Note: the attribute bits should not contain LATESTDATA attributes
-    dest.WriteUByte(timeStamp);
+    dest.WriteU8(timeStamp);
     dest.Write(attributeBits.data_, (numAttributes + 7) >> 3u);
 
     for (unsigned i = 0; i < numAttributes; ++i)
@@ -791,7 +791,7 @@ void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeSta
 
     unsigned numAttributes = attributes->Size();
 
-    dest.WriteUByte(timeStamp);
+    dest.WriteU8(timeStamp);
 
     for (unsigned i = 0; i < numAttributes; ++i)
     {
@@ -811,7 +811,7 @@ bool Serializable::ReadDeltaUpdate(Deserializer& source)
     bool changed = false;
 
     unsigned long long interceptMask = networkState_ ? networkState_->interceptMask_ : 0;
-    unsigned char timeStamp = source.ReadUByte();
+    unsigned char timeStamp = source.ReadU8();
     source.Read(attributeBits.data_, (numAttributes + 7) >> 3u);
 
     for (unsigned i = 0; i < numAttributes && !source.IsEof(); ++i)
@@ -852,7 +852,7 @@ bool Serializable::ReadLatestDataUpdate(Deserializer& source)
     bool changed = false;
 
     unsigned long long interceptMask = networkState_ ? networkState_->interceptMask_ : 0;
-    unsigned char timeStamp = source.ReadUByte();
+    unsigned char timeStamp = source.ReadU8();
 
     for (unsigned i = 0; i < numAttributes && !source.IsEof(); ++i)
     {

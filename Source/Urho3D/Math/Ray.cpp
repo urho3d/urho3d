@@ -224,12 +224,17 @@ float Ray::HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2, 
     return M_INFINITY;
 }
 
-float Ray::HitDistance(const void* vertexData, unsigned vertexStride, unsigned vertexStart, unsigned vertexCount,
-    Vector3* outNormal, Vector2* outUV, unsigned uvOffset) const
+float Ray::HitDistance(const void* vertexData, i32 vertexStride, i32 vertexStart, i32 vertexCount,
+    Vector3* outNormal, Vector2* outUV, i32 uvOffset) const
 {
+    assert(vertexStride >= 0);
+    assert(vertexStart >= 0);
+    assert(vertexCount >= 0);
+    assert(uvOffset >= 0 || (uvOffset == NINDEX && !outUV));
+
     float nearest = M_INFINITY;
-    const unsigned char* vertices = ((const unsigned char*)vertexData) + vertexStart * vertexStride;
-    unsigned index = 0, nearestIdx = M_MAX_UNSIGNED;
+    const u8* vertices = ((const u8*)vertexData) + vertexStart * vertexStride;
+    i32 index = 0, nearestIdx = NINDEX;
 
     Vector3 tempNormal;
     Vector3* tempNormalPtr = outNormal ? &tempNormal : nullptr;
@@ -260,7 +265,7 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, unsigned v
 
     if (outUV)
     {
-        if (nearestIdx == M_MAX_UNSIGNED)
+        if (nearestIdx == NINDEX)
             *outUV = Vector2::ZERO;
         else
         {
@@ -276,11 +281,17 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, unsigned v
     return nearest;
 }
 
-float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void* indexData, unsigned indexSize,
-    unsigned indexStart, unsigned indexCount, Vector3* outNormal, Vector2* outUV, unsigned uvOffset) const
+float Ray::HitDistance(const void* vertexData, i32 vertexStride, const void* indexData, i32 indexSize,
+    i32 indexStart, i32 indexCount, Vector3* outNormal, Vector2* outUV, i32 uvOffset) const
 {
+    assert(vertexStride >= 0);
+    assert(indexSize >= 0);
+    assert(indexStart >= 0);
+    assert(indexCount >= 0);
+    assert(uvOffset >= 0 || (uvOffset == NINDEX && !outUV));
+
     float nearest = M_INFINITY;
-    const auto* vertices = (const unsigned char*)vertexData;
+    const u8* vertices = (const u8*)vertexData;
 
     Vector3 tempNormal;
     Vector3* tempNormalPtr = outNormal ? &tempNormal : nullptr;
@@ -377,12 +388,16 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void
     return nearest;
 }
 
-bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, unsigned vertexStart, unsigned vertexCount) const
+bool Ray::InsideGeometry(const void* vertexData, i32 vertexSize, i32 vertexStart, i32 vertexCount) const
 {
+    assert(vertexSize >= 0);
+    assert(vertexStart >= 0);
+    assert(vertexCount >= 0);
+
     float currentFrontFace = M_INFINITY;
     float currentBackFace = M_INFINITY;
-    const unsigned char* vertices = ((const unsigned char*)vertexData) + vertexStart * vertexSize;
-    unsigned index = 0;
+    const u8* vertices = ((const u8*)vertexData) + vertexStart * vertexSize;
+    i32 index = 0;
 
     while (index + 2 < vertexCount)
     {
@@ -409,12 +424,17 @@ bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, unsigned v
     return false;
 }
 
-bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize,
-    unsigned indexStart, unsigned indexCount) const
+bool Ray::InsideGeometry(const void* vertexData, i32 vertexSize, const void* indexData, i32 indexSize,
+    i32 indexStart, i32 indexCount) const
 {
+    assert(vertexSize >= 0);
+    assert(indexSize >= 0);
+    assert(indexStart >= 0);
+    assert(indexCount >= 0);
+
     float currentFrontFace = M_INFINITY;
     float currentBackFace = M_INFINITY;
-    const auto* vertices = (const unsigned char*)vertexData;
+    const u8* vertices = (const u8*)vertexData;
 
     // 16-bit indices
     if (indexSize == sizeof(unsigned short))

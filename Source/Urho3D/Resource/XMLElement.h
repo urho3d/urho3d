@@ -37,7 +37,7 @@ public:
     /// Construct with document and node pointers.
     XMLElement(XMLFile* file, pugi::xml_node_struct* node);
     /// Construct from xpath query result set.
-    XMLElement(XMLFile* file, const XPathResultSet* resultSet, const pugi::xpath_node* xpathNode, unsigned xpathResultIndex);
+    XMLElement(XMLFile* file, const XPathResultSet* resultSet, const pugi::xpath_node* xpathNode, i32 xpathResultIndex);
     /// Copy-construct from another element.
     XMLElement(const XMLElement& rhs);
     /// Destruct.
@@ -99,7 +99,7 @@ public:
     /// Set a BoundingBox attribute.
     bool SetBoundingBox(const BoundingBox& value);
     /// Set a buffer attribute.
-    bool SetBuffer(const String& name, const void* data, unsigned size);
+    bool SetBuffer(const String& name, const void* data, i32 size);
     /// Set a buffer attribute.
     bool SetBuffer(const String& name, const Vector<unsigned char>& value);
     /// Set a color attribute.
@@ -109,13 +109,13 @@ public:
     /// Set a double attribute.
     bool SetDouble(const String& name, double value);
     /// Set an unsigned integer attribute.
-    bool SetUInt(const String& name, unsigned value);
+    bool SetU32(const String& name, u32 value);
     /// Set an integer attribute.
-    bool SetInt(const String& name, int value);
+    bool SetI32(const String& name, i32 value);
     /// Set an unsigned long long integer attribute.
-    bool SetUInt64(const String& name, unsigned long long value);
+    bool SetU64(const String& name, u64 value);
     /// Set a long long integer attribute.
-    bool SetInt64(const String& name, long long value);
+    bool SetI64(const String& name, i64 value);
     /// Set an IntRect attribute.
     bool SetIntRect(const String& name, const IntRect& value);
     /// Set an IntVector2 attribute.
@@ -185,7 +185,7 @@ public:
     XMLElement GetParent() const;
     /// Return number of attributes.
     /// @property
-    unsigned GetNumAttributes() const;
+    i32 GetNumAttributes() const;
     /// Return whether has an attribute.
     bool HasAttribute(const String& name) const;
     /// Return whether has an attribute.
@@ -212,9 +212,9 @@ public:
     /// Return bool attribute, or false if missing.
     bool GetBool(const String& name) const;
     /// Return buffer attribute, or empty if missing.
-    Vector<unsigned char> GetBuffer(const String& name) const;
+    Vector<byte> GetBuffer(const String& name) const;
     /// Copy buffer attribute into a supplied buffer. Return true if buffer was large enough.
-    bool GetBuffer(const String& name, void* dest, unsigned size) const;
+    bool GetBuffer(const String& name, void* dest, i32 size) const;
     /// Return bounding box attribute, or empty if missing.
     BoundingBox GetBoundingBox() const;
     /// Return a color attribute, or default if missing.
@@ -224,13 +224,13 @@ public:
     /// Return a double attribute, or zero if missing.
     double GetDouble(const String& name) const;
     /// Return an unsigned integer attribute, or zero if missing.
-    unsigned GetUInt(const String& name) const;
+    u32 GetU32(const String& name) const;
     /// Return an integer attribute, or zero if missing.
-    int GetInt(const String& name) const;
+    i32 GetI32(const String& name) const;
     /// Return an unsigned long long integer attribute, or zero if missing.
-    unsigned long long GetUInt64(const String& name) const;
+    u64 GetU64(const String& name) const;
     /// Return a long long integer attribute, or zero if missing.
-    long long GetInt64(const String& name) const;
+    i64 GetI64(const String& name) const;
     /// Return an IntRect attribute, or default if missing.
     IntRect GetIntRect(const String& name) const;
     /// Return an IntVector2 attribute, or default if missing.
@@ -285,7 +285,7 @@ public:
     const pugi::xpath_node* GetXPathNode() const { return xpathNode_; }
 
     /// Return current result index.
-    unsigned GetXPathResultIndex() const { return xpathResultIndex_; }
+    i32 GetXPathResultIndex() const { return xpathResultIndex_; }
 
     /// Return next XPath query result. Only valid when this instance of XMLElement is itself one of the query result in the result set.
     /// @property
@@ -304,7 +304,7 @@ private:
     /// Pugixml xpath_node.
     const pugi::xpath_node* xpathNode_;
     /// Current XPath query result index (used internally to advance to subsequent query result).
-    mutable unsigned xpathResultIndex_;
+    mutable i32 xpathResultIndex_;
 };
 
 /// XPath query result set.
@@ -323,14 +323,14 @@ public:
     XPathResultSet& operator =(const XPathResultSet& rhs);
     /// Return the n-th result in the set. Call XMLElement::GetNextResult() to get the subsequent result in the set.
     /// Note: The XPathResultSet return value must be stored in a lhs variable to ensure the underlying xpath_node_set* is still valid while performing XPathResultSet::FirstResult(), XPathResultSet::operator [], and XMLElement::NextResult().
-    XMLElement operator [](unsigned index) const;
+    XMLElement operator [](i32 index) const;
     /// Return the first result in the set. Call XMLElement::GetNextResult() to get the subsequent result in the set.
     /// Note: The XPathResultSet return value must be stored in a lhs variable to ensure the underlying xpath_node_set* is still valid while performing XPathResultSet::FirstResult(), XPathResultSet::operator [], and XMLElement::NextResult().
     /// @property
     XMLElement FirstResult();
     /// Return size of result set.
     /// @property
-    unsigned Size() const;
+    i32 Size() const;
     /// Return whether result set is empty.
     /// @property
     bool Empty() const;

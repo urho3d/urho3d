@@ -372,7 +372,7 @@ bool CrowdNavigation::Raycast(float maxDistance, Vector3& hitPos, Drawable*& hit
     Ray cameraRay = camera->GetScreenRay((float)pos.x_ / graphics->GetWidth(), (float)pos.y_ / graphics->GetHeight());
     // Pick only geometry objects, not eg. zones or lights, only get the first (closest) hit
     Vector<RayQueryResult> results;
-    RayOctreeQuery query(results, cameraRay, RAY_TRIANGLE, maxDistance, DRAWABLE_GEOMETRY);
+    RayOctreeQuery query(results, cameraRay, RAY_TRIANGLE, maxDistance, DrawableTypes::Geometry);
     scene_->GetComponent<Octree>()->RaycastSingle(query);
     if (results.Size())
     {
@@ -566,7 +566,7 @@ void CrowdNavigation::HandleCrowdAgentFailure(StringHash eventType, VariantMap& 
     using namespace CrowdAgentFailure;
 
     auto* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
-    auto agentState = (CrowdAgentState)eventData[P_CROWD_AGENT_STATE].GetInt();
+    auto agentState = (CrowdAgentState)eventData[P_CROWD_AGENT_STATE].GetI32();
 
     // If the agent's state is invalid, likely from spawning on the side of a box, find a point in a larger area
     if (agentState == CA_STATE_INVALID)
@@ -615,8 +615,8 @@ void CrowdNavigation::HandleCrowdAgentFormation(StringHash eventType, VariantMap
 {
     using namespace CrowdAgentFormation;
 
-    unsigned index = eventData[P_INDEX].GetUInt();
-    unsigned size = eventData[P_SIZE].GetUInt();
+    unsigned index = eventData[P_INDEX].GetU32();
+    unsigned size = eventData[P_SIZE].GetU32();
     Vector3 position = eventData[P_POSITION].GetVector3();
 
     // The first agent will always move to the exact position, all other agents will select a random point nearby

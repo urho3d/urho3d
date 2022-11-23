@@ -219,19 +219,19 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
             Swap(kerningTable[i], kerningTable[i + 1]);
         MemoryBuffer deserializer(kerningTable, (unsigned)kerningTableSize);
 
-        unsigned short version = deserializer.ReadUShort();
+        unsigned short version = deserializer.ReadU16();
         if (version == 0)
         {
-            unsigned numKerningTables = deserializer.ReadUShort();
+            unsigned numKerningTables = deserializer.ReadU16();
             for (unsigned i = 0; i < numKerningTables; ++i)
             {
-                unsigned short version = deserializer.ReadUShort();
-                unsigned short length = deserializer.ReadUShort();
-                unsigned short coverage = deserializer.ReadUShort();
+                unsigned short version = deserializer.ReadU16();
+                unsigned short length = deserializer.ReadU16();
+                unsigned short coverage = deserializer.ReadU16();
 
                 if (version == 0 && coverage == 1)
                 {
-                    unsigned numKerningPairs = deserializer.ReadUShort();
+                    unsigned numKerningPairs = deserializer.ReadU16();
                     // Skip searchRange, entrySelector and rangeShift
                     deserializer.Seek((unsigned)(deserializer.GetPosition() + 3 * sizeof(unsigned short)));
 
@@ -240,9 +240,9 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
 
                     for (unsigned j = 0; j < numKerningPairs; ++j)
                     {
-                        unsigned leftIndex = deserializer.ReadUShort();
-                        unsigned rightIndex = deserializer.ReadUShort();
-                        float amount = deserializer.ReadShort() * xScale;
+                        unsigned leftIndex = deserializer.ReadU16();
+                        unsigned rightIndex = deserializer.ReadU16();
+                        float amount = deserializer.ReadI16() * xScale;
 
                         unsigned leftCharCode = charCodes[leftIndex];
                         unsigned rightCharCode = charCodes[rightIndex];

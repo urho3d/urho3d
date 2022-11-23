@@ -41,7 +41,7 @@ TrailPoint::TrailPoint(const Vector3& position, const Vector3& forward) :
 }
 
 RibbonTrail::RibbonTrail(Context* context) :
-    Drawable(context, DRAWABLE_GEOMETRY),
+    Drawable(context, DrawableTypes::Geometry),
     geometry_(new Geometry(context_)),
     animationLodBias_(1.0f),
     animationLodTimer_(0.0f),
@@ -87,23 +87,23 @@ void RibbonTrail::RegisterObject(Context* context)
 {
     context->RegisterFactory<RibbonTrail>(GEOMETRY_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled,true, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Emitting", IsEmitting, SetEmitting, bool, true, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Update Invisible", GetUpdateInvisible, SetUpdateInvisible, bool, false, AM_DEFAULT);
-    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Trail Type", GetTrailType, SetTrailType, TrailType, trailTypeNames, TT_FACE_CAMERA, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Base Velocity", GetBaseVelocity, SetBaseVelocity, Vector3, Vector3::ZERO, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Tail Lifetime", GetLifetime, SetLifetime, float, 1.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Tail Column", GetTailColumn, SetTailColumn, unsigned, 0, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Vertex Distance", GetVertexDistance, SetVertexDistance, float, 0.1f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Width", GetWidth, SetWidth, float, 0.2f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Start Scale", GetStartScale, SetStartScale, float, 1.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("End Scale", GetEndScale, SetEndScale, float, 1.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Start Color", GetStartColor, SetStartColor, Color, Color::WHITE, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("End Color", GetEndColor, SetEndColor, Color, Color(1.0f, 1.0f, 1.0f, 0.0f), AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Sort By Distance", IsSorted, SetSorted, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Emitting", IsEmitting, SetEmitting, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Update Invisible", GetUpdateInvisible, SetUpdateInvisible, false, AM_DEFAULT);
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Trail Type", GetTrailType, SetTrailType, trailTypeNames, TT_FACE_CAMERA, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Base Velocity", GetBaseVelocity, SetBaseVelocity, Vector3::ZERO, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Tail Lifetime", GetLifetime, SetLifetime, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Tail Column", GetTailColumn, SetTailColumn, 0, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Vertex Distance", GetVertexDistance, SetVertexDistance, 0.1f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Width", GetWidth, SetWidth, 0.2f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Start Scale", GetStartScale, SetStartScale, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("End Scale", GetEndScale, SetEndScale, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Start Color", GetStartColor, SetStartColor, Color::WHITE, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("End Color", GetEndColor, SetEndColor, Color(1.0f, 1.0f, 1.0f, 0.0f), AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Sort By Distance", IsSorted, SetSorted, false, AM_DEFAULT);
 }
 
 void RibbonTrail::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results)
@@ -429,17 +429,17 @@ void RibbonTrail::UpdateBufferSize()
     unsigned indexPerSegment = 6 + (tailColumn_ - 1) * 6;
     unsigned vertexPerSegment = 4 + (tailColumn_ - 1) * 2;
 
-    unsigned mask = 0;
+    VertexElements mask = VertexElements::None;
 
     if (trailType_ == TT_FACE_CAMERA)
     {
         batches_[0].geometryType_ = GEOM_TRAIL_FACE_CAMERA;
-        mask =  MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 | MASK_TANGENT;
+        mask = VertexElements::Position | VertexElements::Color | VertexElements::TexCoord1 | VertexElements::Tangent;
     }
     else if (trailType_ == TT_BONE)
     {
         batches_[0].geometryType_ = GEOM_TRAIL_BONE;
-        mask =  MASK_POSITION | MASK_NORMAL | MASK_COLOR | MASK_TEXCOORD1 | MASK_TANGENT;
+        mask = VertexElements::Position | VertexElements::Normal | VertexElements::Color | VertexElements::TexCoord1 | VertexElements::Tangent;
     }
 
     bufferSizeDirty_ = false;
@@ -571,19 +571,19 @@ void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame)
 
             // This point
             float factor = SmoothStep(0.0f, trailLength, point.elapsedLength_);
-            unsigned c = endColor_.Lerp(startColor_, factor).ToUInt();
+            color32 c = endColor_.Lerp(startColor_, factor).ToU32();
             float width = Lerp(width_ * endScale_, width_ * startScale_, factor);
 
             // Next point
             float nextFactor = SmoothStep(0.0f, trailLength, point.next_->elapsedLength_);
-            unsigned nextC = endColor_.Lerp(startColor_, nextFactor).ToUInt();
+            color32 nextC = endColor_.Lerp(startColor_, nextFactor).ToU32();
             float nextWidth = Lerp(width_ * endScale_, width_ * startScale_, nextFactor);
 
             // First row
             dest[0] = point.position_.x_;
             dest[1] = point.position_.y_;
             dest[2] = point.position_.z_;
-            ((unsigned&)dest[3]) = c;
+            ((color32&)dest[3]) = c;
             dest[4] = factor;
             dest[5] = 0.0f;
             dest[6] = point.forward_.x_;
@@ -594,7 +594,7 @@ void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame)
             dest[10] = point.next_->position_.x_;
             dest[11] = point.next_->position_.y_;
             dest[12] = point.next_->position_.z_;
-            ((unsigned&)dest[13]) = nextC;
+            ((color32&)dest[13]) = nextC;
             dest[14] = nextFactor;
             dest[15] = 0.0f;
             dest[16] = point.next_->forward_.x_;
@@ -614,7 +614,7 @@ void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame)
                 dest[0] = point.position_.x_;
                 dest[1] = point.position_.y_;
                 dest[2] = point.position_.z_;
-                ((unsigned&)dest[3]) = c;
+                ((color32&)dest[3]) = c;
                 dest[4] = factor;
                 dest[5] = elapsed;
                 dest[6] = point.forward_.x_;
@@ -625,7 +625,7 @@ void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame)
                 dest[10] = point.next_->position_.x_;
                 dest[11] = point.next_->position_.y_;
                 dest[12] = point.next_->position_.z_;
-                ((unsigned&)dest[13]) = nextC;
+                ((color32&)dest[13]) = nextC;
                 dest[14] = nextFactor;
                 dest[15] = elapsed;
                 dest[16] = point.next_->forward_.x_;
@@ -672,7 +672,7 @@ void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame)
 
             // This point
             float factor = SmoothStep(0.0f, trailLength, point.elapsedLength_);
-            unsigned c = endColor_.Lerp(startColor_, factor).ToUInt();
+            color32 c = endColor_.Lerp(startColor_, factor).ToU32();
 
             float rightScale = Lerp(endScale_, startScale_, factor);
             float shift = (rightScale - 1.0f) / 2.0f;
@@ -680,7 +680,7 @@ void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame)
 
             // Next point
             float nextFactor = SmoothStep(0.0f, trailLength, point.next_->elapsedLength_);
-            unsigned nextC = endColor_.Lerp(startColor_, nextFactor).ToUInt();
+            color32 nextC = endColor_.Lerp(startColor_, nextFactor).ToU32();
 
             float nextRightScale = Lerp(endScale_, startScale_, nextFactor);
             float nextShift = (nextRightScale - 1.0f) / 2.0f;
@@ -693,7 +693,7 @@ void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame)
             dest[3] = point.forward_.x_;
             dest[4] = point.forward_.y_;
             dest[5] = point.forward_.z_;
-            ((unsigned&)dest[6]) = c;
+            ((color32&)dest[6]) = c;
             dest[7] = factor;
             dest[8] = 0.0f;
             dest[9] = point.parentPos_.x_;
@@ -707,7 +707,7 @@ void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame)
             dest[16] = point.next_->forward_.x_;
             dest[17] = point.next_->forward_.y_;
             dest[18] = point.next_->forward_.z_;
-            ((unsigned&)dest[19]) = nextC;
+            ((color32&)dest[19]) = nextC;
             dest[20] = nextFactor;
             dest[21] = 0.0f;
             dest[22] = point.next_->parentPos_.x_;
@@ -728,7 +728,7 @@ void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame)
                 dest[3] = point.forward_.x_;
                 dest[4] = point.forward_.y_;
                 dest[5] = point.forward_.z_;
-                ((unsigned&)dest[6]) = c;
+                ((color32&)dest[6]) = c;
                 dest[7] = factor;
                 dest[8] = elapsed;
                 dest[9] = point.parentPos_.x_;
@@ -742,7 +742,7 @@ void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame)
                 dest[16] = point.next_->forward_.x_;
                 dest[17] = point.next_->forward_.y_;
                 dest[18] = point.next_->forward_.z_;
-                ((unsigned&)dest[19]) = nextC;
+                ((color32&)dest[19]) = nextC;
                 dest[20] = nextFactor;
                 dest[21] = elapsed;
                 dest[22] = point.next_->parentPos_.x_;
@@ -760,7 +760,7 @@ void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame)
             dest[3] = point.forward_.x_;
             dest[4] = point.forward_.y_;
             dest[5] = point.forward_.z_;
-            ((unsigned&)dest[6]) = c;
+            ((color32&)dest[6]) = c;
             dest[7] = factor;
             dest[8] = 1.0f;
             dest[9] = point.parentPos_.x_;
@@ -774,7 +774,7 @@ void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame)
             dest[16] = point.next_->forward_.x_;
             dest[17] = point.next_->forward_.y_;
             dest[18] = point.next_->forward_.z_;
-            ((unsigned&)dest[19]) = nextC;
+            ((color32&)dest[19]) = nextC;
             dest[20] = nextFactor;
             dest[21] = 1.0f;
             dest[22] = point.next_->parentPos_.x_;

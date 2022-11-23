@@ -90,8 +90,8 @@ template <class T> void RegisterMembers_AnimationStateTrack(asIScriptEngine* eng
     // float AnimationStateTrack::weight_
     engine->RegisterObjectProperty(className, "float weight", offsetof(T, weight_));
 
-    // unsigned AnimationStateTrack::keyFrame_
-    engine->RegisterObjectProperty(className, "uint keyFrame", offsetof(T, keyFrame_));
+    // i32 AnimationStateTrack::keyFrame_
+    engine->RegisterObjectProperty(className, "int keyFrame", offsetof(T, keyFrame_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AnimationStateTrack
         REGISTER_MEMBERS_MANUAL_PART_AnimationStateTrack();
@@ -101,31 +101,31 @@ template <class T> void RegisterMembers_AnimationStateTrack(asIScriptEngine* eng
 // struct AnimationTrack | File: ../Graphics/Animation.h
 template <class T> void RegisterMembers_AnimationTrack(asIScriptEngine* engine, const char* className)
 {
-    // AnimationKeyFrame* AnimationTrack::GetKeyFrame(unsigned index)
+    // AnimationKeyFrame* AnimationTrack::GetKeyFrame(i32 index)
     // Error: type "AnimationKeyFrame*" can not automatically bind
 
     // void AnimationTrack::AddKeyFrame(const AnimationKeyFrame& keyFrame)
     engine->RegisterObjectMethod(className, "void AddKeyFrame(const AnimationKeyFrame&in)", AS_METHODPR(T, AddKeyFrame, (const AnimationKeyFrame&), void), AS_CALL_THISCALL);
 
-    // bool AnimationTrack::GetKeyFrameIndex(float time, unsigned& index) const
-    engine->RegisterObjectMethod(className, "bool GetKeyFrameIndex(float, uint&) const", AS_METHODPR(T, GetKeyFrameIndex, (float, unsigned&) const, bool), AS_CALL_THISCALL);
+    // bool AnimationTrack::GetKeyFrameIndex(float time, i32& index) const
+    engine->RegisterObjectMethod(className, "bool GetKeyFrameIndex(float, int&) const", AS_METHODPR(T, GetKeyFrameIndex, (float, i32&) const, bool), AS_CALL_THISCALL);
 
-    // unsigned AnimationTrack::GetNumKeyFrames() const
-    engine->RegisterObjectMethod(className, "uint GetNumKeyFrames() const", AS_METHODPR(T, GetNumKeyFrames, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numKeyFrames() const", AS_METHODPR(T, GetNumKeyFrames, () const, unsigned), AS_CALL_THISCALL);
+    // i32 AnimationTrack::GetNumKeyFrames() const
+    engine->RegisterObjectMethod(className, "int GetNumKeyFrames() const", AS_METHODPR(T, GetNumKeyFrames, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numKeyFrames() const", AS_METHODPR(T, GetNumKeyFrames, () const, i32), AS_CALL_THISCALL);
 
-    // void AnimationTrack::InsertKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame)
-    engine->RegisterObjectMethod(className, "void InsertKeyFrame(uint, const AnimationKeyFrame&in)", AS_METHODPR(T, InsertKeyFrame, (unsigned, const AnimationKeyFrame&), void), AS_CALL_THISCALL);
+    // void AnimationTrack::InsertKeyFrame(i32 index, const AnimationKeyFrame& keyFrame)
+    engine->RegisterObjectMethod(className, "void InsertKeyFrame(int, const AnimationKeyFrame&in)", AS_METHODPR(T, InsertKeyFrame, (i32, const AnimationKeyFrame&), void), AS_CALL_THISCALL);
 
     // void AnimationTrack::RemoveAllKeyFrames()
     engine->RegisterObjectMethod(className, "void RemoveAllKeyFrames()", AS_METHODPR(T, RemoveAllKeyFrames, (), void), AS_CALL_THISCALL);
 
-    // void AnimationTrack::RemoveKeyFrame(unsigned index)
-    engine->RegisterObjectMethod(className, "void RemoveKeyFrame(uint)", AS_METHODPR(T, RemoveKeyFrame, (unsigned), void), AS_CALL_THISCALL);
+    // void AnimationTrack::RemoveKeyFrame(i32 index)
+    engine->RegisterObjectMethod(className, "void RemoveKeyFrame(int)", AS_METHODPR(T, RemoveKeyFrame, (i32), void), AS_CALL_THISCALL);
 
-    // void AnimationTrack::SetKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame)
-    engine->RegisterObjectMethod(className, "void SetKeyFrame(uint, const AnimationKeyFrame&in)", AS_METHODPR(T, SetKeyFrame, (unsigned, const AnimationKeyFrame&), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_keyFrames(uint, const AnimationKeyFrame&in)", AS_METHODPR(T, SetKeyFrame, (unsigned, const AnimationKeyFrame&), void), AS_CALL_THISCALL);
+    // void AnimationTrack::SetKeyFrame(i32 index, const AnimationKeyFrame& keyFrame)
+    engine->RegisterObjectMethod(className, "void SetKeyFrame(int, const AnimationKeyFrame&in)", AS_METHODPR(T, SetKeyFrame, (i32, const AnimationKeyFrame&), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_keyFrames(int, const AnimationKeyFrame&in)", AS_METHODPR(T, SetKeyFrame, (i32, const AnimationKeyFrame&), void), AS_CALL_THISCALL);
 
     // Vector<AnimationKeyFrame> AnimationTrack::keyFrames_
     // Error: type "Vector<AnimationKeyFrame>" can not automatically bind
@@ -136,8 +136,8 @@ template <class T> void RegisterMembers_AnimationTrack(asIScriptEngine* engine, 
     // StringHash AnimationTrack::nameHash_
     engine->RegisterObjectProperty(className, "StringHash nameHash", offsetof(T, nameHash_));
 
-    // AnimationChannelFlags AnimationTrack::channelMask_
-    engine->RegisterObjectProperty(className, "AnimationChannelFlags channelMask", offsetof(T, channelMask_));
+    // AnimationChannels AnimationTrack::channelMask_
+    engine->RegisterObjectProperty(className, "AnimationChannels channelMask", offsetof(T, channelMask_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AnimationTrack
         REGISTER_MEMBERS_MANUAL_PART_AnimationTrack();
@@ -161,20 +161,20 @@ template <class T> void RegisterMembers_AnimationTriggerPoint(asIScriptEngine* e
 // class AreaAllocator | File: ../Math/AreaAllocator.h
 template <class T> void RegisterMembers_AreaAllocator(asIScriptEngine* engine, const char* className)
 {
-    // bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
-    engine->RegisterObjectMethod(className, "bool Allocate(int, int, int&, int&)", AS_METHODPR(T, Allocate, (int, int, int&, int&), bool), AS_CALL_THISCALL);
+    // bool AreaAllocator::Allocate(i32 width, i32 height, i32& x, i32& y)
+    engine->RegisterObjectMethod(className, "bool Allocate(int, int, int&, int&)", AS_METHODPR(T, Allocate, (i32, i32, i32&, i32&), bool), AS_CALL_THISCALL);
 
     // bool AreaAllocator::GetFastMode() const
     engine->RegisterObjectMethod(className, "bool GetFastMode() const", AS_METHODPR(T, GetFastMode, () const, bool), AS_CALL_THISCALL);
 
-    // int AreaAllocator::GetHeight() const
-    engine->RegisterObjectMethod(className, "int GetHeight() const", AS_METHODPR(T, GetHeight, () const, int), AS_CALL_THISCALL);
+    // i32 AreaAllocator::GetHeight() const
+    engine->RegisterObjectMethod(className, "int GetHeight() const", AS_METHODPR(T, GetHeight, () const, i32), AS_CALL_THISCALL);
 
-    // int AreaAllocator::GetWidth() const
-    engine->RegisterObjectMethod(className, "int GetWidth() const", AS_METHODPR(T, GetWidth, () const, int), AS_CALL_THISCALL);
+    // i32 AreaAllocator::GetWidth() const
+    engine->RegisterObjectMethod(className, "int GetWidth() const", AS_METHODPR(T, GetWidth, () const, i32), AS_CALL_THISCALL);
 
-    // void AreaAllocator::Reset(int width, int height, int maxWidth = 0, int maxHeight = 0, bool fastMode = true)
-    engine->RegisterObjectMethod(className, "void Reset(int, int, int = 0, int = 0, bool = true)", AS_METHODPR(T, Reset, (int, int, int, int, bool), void), AS_CALL_THISCALL);
+    // void AreaAllocator::Reset(i32 width, i32 height, i32 maxWidth = 0, i32 maxHeight = 0, bool fastMode = true)
+    engine->RegisterObjectMethod(className, "void Reset(int, int, int = 0, int = 0, bool = true)", AS_METHODPR(T, Reset, (i32, i32, i32, i32, bool), void), AS_CALL_THISCALL);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AreaAllocator
         REGISTER_MEMBERS_MANUAL_PART_AreaAllocator();
@@ -196,23 +196,23 @@ template <class T> void RegisterMembers_AsyncProgress(asIScriptEngine* engine, c
     // XMLElement AsyncProgress::xmlElement_
     engine->RegisterObjectProperty(className, "XMLElement xmlElement", offsetof(T, xmlElement_));
 
-    // unsigned AsyncProgress::jsonIndex_
-    engine->RegisterObjectProperty(className, "uint jsonIndex", offsetof(T, jsonIndex_));
+    // i32 AsyncProgress::jsonIndex_
+    engine->RegisterObjectProperty(className, "int jsonIndex", offsetof(T, jsonIndex_));
 
     // LoadMode AsyncProgress::mode_
     engine->RegisterObjectProperty(className, "LoadMode mode", offsetof(T, mode_));
 
-    // unsigned AsyncProgress::loadedResources_
-    engine->RegisterObjectProperty(className, "uint loadedResources", offsetof(T, loadedResources_));
+    // i32 AsyncProgress::loadedResources_
+    engine->RegisterObjectProperty(className, "int loadedResources", offsetof(T, loadedResources_));
 
-    // unsigned AsyncProgress::totalResources_
-    engine->RegisterObjectProperty(className, "uint totalResources", offsetof(T, totalResources_));
+    // i32 AsyncProgress::totalResources_
+    engine->RegisterObjectProperty(className, "int totalResources", offsetof(T, totalResources_));
 
-    // unsigned AsyncProgress::loadedNodes_
-    engine->RegisterObjectProperty(className, "uint loadedNodes", offsetof(T, loadedNodes_));
+    // i32 AsyncProgress::loadedNodes_
+    engine->RegisterObjectProperty(className, "int loadedNodes", offsetof(T, loadedNodes_));
 
-    // unsigned AsyncProgress::totalNodes_
-    engine->RegisterObjectProperty(className, "uint totalNodes", offsetof(T, totalNodes_));
+    // i32 AsyncProgress::totalNodes_
+    engine->RegisterObjectProperty(className, "int totalNodes", offsetof(T, totalNodes_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AsyncProgress
         REGISTER_MEMBERS_MANUAL_PART_AsyncProgress();
@@ -323,14 +323,14 @@ template <class T> void RegisterMembers_Batch(asIScriptEngine* engine, const cha
     // ShaderVariation* Batch::pixelShader_
     // Not registered because pointer
 
-    // unsigned long long Batch::sortKey_
-    engine->RegisterObjectProperty(className, "uint64 sortKey", offsetof(T, sortKey_));
+    // hash64 Batch::sortKey_
+    engine->RegisterObjectProperty(className, "hash64 sortKey", offsetof(T, sortKey_));
 
     // float Batch::distance_
     engine->RegisterObjectProperty(className, "float distance", offsetof(T, distance_));
 
-    // unsigned char Batch::renderOrder_
-    engine->RegisterObjectProperty(className, "uint8 renderOrder", offsetof(T, renderOrder_));
+    // i8 Batch::renderOrder_
+    engine->RegisterObjectProperty(className, "int8 renderOrder", offsetof(T, renderOrder_));
 
     // unsigned char Batch::lightMask_
     engine->RegisterObjectProperty(className, "uint8 lightMask", offsetof(T, lightMask_));
@@ -338,8 +338,8 @@ template <class T> void RegisterMembers_Batch(asIScriptEngine* engine, const cha
     // bool Batch::isBase_
     engine->RegisterObjectProperty(className, "bool isBase", offsetof(T, isBase_));
 
-    // unsigned Batch::numWorldTransforms_
-    engine->RegisterObjectProperty(className, "uint numWorldTransforms", offsetof(T, numWorldTransforms_));
+    // i32 Batch::numWorldTransforms_
+    engine->RegisterObjectProperty(className, "int numWorldTransforms", offsetof(T, numWorldTransforms_));
 
     // GeometryType Batch::geometryType_
     engine->RegisterObjectProperty(className, "GeometryType geometryType", offsetof(T, geometryType_));
@@ -358,8 +358,8 @@ template <class T> void RegisterMembers_BatchGroupKey(asIScriptEngine* engine, c
     // bool BatchGroupKey::operator ==(const BatchGroupKey& rhs) const
     engine->RegisterObjectMethod(className, "bool opEquals(const BatchGroupKey&in) const", AS_METHODPR(T, operator==, (const BatchGroupKey&) const, bool), AS_CALL_THISCALL);
 
-    // unsigned BatchGroupKey::ToHash() const
-    engine->RegisterObjectMethod(className, "uint ToHash() const", AS_METHODPR(T, ToHash, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 BatchGroupKey::ToHash() const
+    engine->RegisterObjectMethod(className, "hash32 ToHash() const", AS_METHODPR(T, ToHash, () const, hash32), AS_CALL_THISCALL);
 
     // Zone* BatchGroupKey::zone_
     // Not registered because pointer
@@ -372,8 +372,8 @@ template <class T> void RegisterMembers_BatchGroupKey(asIScriptEngine* engine, c
     // Geometry* BatchGroupKey::geometry_
     // Not registered because pointer
 
-    // unsigned char BatchGroupKey::renderOrder_
-    engine->RegisterObjectProperty(className, "uint8 renderOrder", offsetof(T, renderOrder_));
+    // i8 BatchGroupKey::renderOrder_
+    engine->RegisterObjectProperty(className, "int8 renderOrder", offsetof(T, renderOrder_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_BatchGroupKey
         REGISTER_MEMBERS_MANUAL_PART_BatchGroupKey();
@@ -383,7 +383,7 @@ template <class T> void RegisterMembers_BatchGroupKey(asIScriptEngine* engine, c
 // struct BatchQueue | File: ../Graphics/Batch.h
 template <class T> void RegisterMembers_BatchQueue(asIScriptEngine* engine, const char* className)
 {
-    // void BatchQueue::SetInstancingData(void* lockedData, unsigned stride, unsigned& freeIndex)
+    // void BatchQueue::SetInstancingData(void* lockedData, i32 stride, i32& freeIndex)
     // Error: type "void*" can not automatically bind
     // void BatchQueue::SortFrontToBack2Pass(Vector<Batch*>& batches)
     // Error: type "Vector<Batch*>&" can not automatically bind
@@ -394,8 +394,8 @@ template <class T> void RegisterMembers_BatchQueue(asIScriptEngine* engine, cons
     // void BatchQueue::Draw(View* view, Camera* camera, bool markToStencil, bool usingLightOptimization, bool allowDepthWrite) const
     engine->RegisterObjectMethod(className, "void Draw(View@+, Camera@+, bool, bool, bool) const", AS_METHODPR(T, Draw, (View*, Camera*, bool, bool, bool) const, void), AS_CALL_THISCALL);
 
-    // unsigned BatchQueue::GetNumInstances() const
-    engine->RegisterObjectMethod(className, "uint GetNumInstances() const", AS_METHODPR(T, GetNumInstances, () const, unsigned), AS_CALL_THISCALL);
+    // i32 BatchQueue::GetNumInstances() const
+    engine->RegisterObjectMethod(className, "int GetNumInstances() const", AS_METHODPR(T, GetNumInstances, () const, i32), AS_CALL_THISCALL);
 
     // bool BatchQueue::IsEmpty() const
     engine->RegisterObjectMethod(className, "bool IsEmpty() const", AS_METHODPR(T, IsEmpty, () const, bool), AS_CALL_THISCALL);
@@ -408,12 +408,12 @@ template <class T> void RegisterMembers_BatchQueue(asIScriptEngine* engine, cons
 
     // HashMap<BatchGroupKey, BatchGroup> BatchQueue::batchGroups_
     // Error: type "HashMap<BatchGroupKey, BatchGroup>" can not automatically bind
-    // HashMap<unsigned, unsigned> BatchQueue::shaderRemapping_
-    // Error: type "HashMap<unsigned, unsigned>" can not automatically bind
-    // HashMap<unsigned short, unsigned short> BatchQueue::materialRemapping_
-    // Error: type "HashMap<unsigned short, unsigned short>" can not automatically bind
-    // HashMap<unsigned short, unsigned short> BatchQueue::geometryRemapping_
-    // Error: type "HashMap<unsigned short, unsigned short>" can not automatically bind
+    // HashMap<hash32, hash32> BatchQueue::shaderRemapping_
+    // Error: type "HashMap<hash32, hash32>" can not automatically bind
+    // HashMap<hash16, hash16> BatchQueue::materialRemapping_
+    // Error: type "HashMap<hash16, hash16>" can not automatically bind
+    // HashMap<hash16, hash16> BatchQueue::geometryRemapping_
+    // Error: type "HashMap<hash16, hash16>" can not automatically bind
     // Vector<Batch> BatchQueue::batches_
     // Error: type "Vector<Batch>" can not automatically bind
     // Vector<Batch*> BatchQueue::sortedBatches_
@@ -421,8 +421,8 @@ template <class T> void RegisterMembers_BatchQueue(asIScriptEngine* engine, cons
     // Vector<BatchGroup*> BatchQueue::sortedBatchGroups_
     // Error: type "Vector<BatchGroup*>" can not automatically bind
 
-    // unsigned BatchQueue::maxSortedInstances_
-    engine->RegisterObjectProperty(className, "uint maxSortedInstances", offsetof(T, maxSortedInstances_));
+    // i32 BatchQueue::maxSortedInstances_
+    engine->RegisterObjectProperty(className, "int maxSortedInstances", offsetof(T, maxSortedInstances_));
 
     // bool BatchQueue::hasExtraDefines_
     engine->RegisterObjectProperty(className, "bool hasExtraDefines", offsetof(T, hasExtraDefines_));
@@ -829,11 +829,11 @@ template <class T> void RegisterMembers_Color(asIScriptEngine* engine, const cha
     // Error: type "float*" can not automatically bind
     // const float* Color::Data() const
     // Error: type "const float*" can not automatically bind
-    // void Color::FromUIntMask(unsigned color, const ChannelMask& mask)
+    // void Color::FromU32(color32 color, const ChannelMask& mask)
     // Error: type "const ChannelMask&" can not automatically bind
     // bool Color::operator !=(const Color& rhs) const
     // Only operator == is needed
-    // unsigned Color::ToUIntMask(const ChannelMask& mask) const
+    // color32 Color::ToU32(const ChannelMask& mask) const
     // Error: type "const ChannelMask&" can not automatically bind
 
     // Color Color::Abs() const
@@ -857,8 +857,8 @@ template <class T> void RegisterMembers_Color(asIScriptEngine* engine, const cha
     // void Color::FromHSV(float h, float s, float v, float a = 1.0f)
     engine->RegisterObjectMethod(className, "void FromHSV(float, float, float, float = 1.0f)", AS_METHODPR(T, FromHSV, (float, float, float, float), void), AS_CALL_THISCALL);
 
-    // void Color::FromUInt(unsigned color)
-    engine->RegisterObjectMethod(className, "void FromUInt(uint)", AS_METHODPR(T, FromUInt, (unsigned), void), AS_CALL_THISCALL);
+    // void Color::FromU32(color32 color)
+    engine->RegisterObjectMethod(className, "void FromU32(color32)", AS_METHODPR(T, FromU32, (color32), void), AS_CALL_THISCALL);
 
     // Color Color::GammaToLinear() const
     engine->RegisterObjectMethod(className, "Color GammaToLinear() const", AS_METHODPR(T, GammaToLinear, () const, Color), AS_CALL_THISCALL);
@@ -920,8 +920,8 @@ template <class T> void RegisterMembers_Color(asIScriptEngine* engine, const cha
     // float Color::SumRGB() const
     engine->RegisterObjectMethod(className, "float SumRGB() const", AS_METHODPR(T, SumRGB, () const, float), AS_CALL_THISCALL);
 
-    // unsigned Color::ToHash() const
-    engine->RegisterObjectMethod(className, "uint ToHash() const", AS_METHODPR(T, ToHash, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 Color::ToHash() const
+    engine->RegisterObjectMethod(className, "hash32 ToHash() const", AS_METHODPR(T, ToHash, () const, hash32), AS_CALL_THISCALL);
 
     // Vector3 Color::ToHSL() const
     engine->RegisterObjectMethod(className, "Vector3 ToHSL() const", AS_METHODPR(T, ToHSL, () const, Vector3), AS_CALL_THISCALL);
@@ -932,11 +932,11 @@ template <class T> void RegisterMembers_Color(asIScriptEngine* engine, const cha
     // String Color::ToString() const
     engine->RegisterObjectMethod(className, "String ToString() const", AS_METHODPR(T, ToString, () const, String), AS_CALL_THISCALL);
 
-    // unsigned Color::ToUInt() const
-    engine->RegisterObjectMethod(className, "uint ToUInt() const", AS_METHODPR(T, ToUInt, () const, unsigned), AS_CALL_THISCALL);
+    // color32 Color::ToU32() const
+    engine->RegisterObjectMethod(className, "color32 ToU32() const", AS_METHODPR(T, ToU32, () const, color32), AS_CALL_THISCALL);
 
-    // unsigned Color::ToUIntArgb() const
-    engine->RegisterObjectMethod(className, "uint ToUIntArgb() const", AS_METHODPR(T, ToUIntArgb, () const, unsigned), AS_CALL_THISCALL);
+    // color32 Color::ToU32Argb() const
+    engine->RegisterObjectMethod(className, "color32 ToU32Argb() const", AS_METHODPR(T, ToU32Argb, () const, color32), AS_CALL_THISCALL);
 
     // Vector3 Color::ToVector3() const
     engine->RegisterObjectMethod(className, "Vector3 ToVector3() const", AS_METHODPR(T, ToVector3, () const, Vector3), AS_CALL_THISCALL);
@@ -1144,8 +1144,8 @@ template <class T> void RegisterMembers_CustomGeometryVertex(asIScriptEngine* en
     // Vector3 CustomGeometryVertex::normal_
     engine->RegisterObjectProperty(className, "Vector3 normal", offsetof(T, normal_));
 
-    // unsigned CustomGeometryVertex::color_
-    engine->RegisterObjectProperty(className, "uint color", offsetof(T, color_));
+    // color32 CustomGeometryVertex::color_
+    engine->RegisterObjectProperty(className, "color32 color", offsetof(T, color_));
 
     // Vector2 CustomGeometryVertex::texCoord_
     engine->RegisterObjectProperty(className, "Vector2 texCoord", offsetof(T, texCoord_));
@@ -1297,6 +1297,13 @@ template <class T> void RegisterMembers_DepthValue(asIScriptEngine* engine, cons
     #endif
 }
 
+// Vector<byte> Deserializer::ReadBuffer()
+template <class T> CScriptArray* Deserializer_Vectorlesbytegre_ReadBuffer_void_template(T* _ptr)
+{
+    Vector<byte> result = _ptr->ReadBuffer();
+    return VectorToArray(result, "Array<byte>");
+}
+
 // StringVector Deserializer::ReadStringVector()
 template <class T> CScriptArray* Deserializer_StringVector_ReadStringVector_void_template(T* _ptr)
 {
@@ -1307,28 +1314,26 @@ template <class T> CScriptArray* Deserializer_StringVector_ReadStringVector_void
 // class Deserializer | File: ../IO/Deserializer.h
 template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, const char* className)
 {
-    // virtual unsigned Deserializer::Read(void* dest, unsigned size) = 0
+    // virtual i32 Deserializer::Read(void* dest, i32 size) = 0
     // Error: type "void*" can not automatically bind
-    // Vector<unsigned char> Deserializer::ReadBuffer()
-    // Error: type "Vector<unsigned char>" can not automatically bind
     // VariantVector Deserializer::ReadVariantVector()
     // Error: type "VariantVector" can not automatically bind
 
-    // virtual unsigned Deserializer::GetChecksum()
-    engine->RegisterObjectMethod(className, "uint GetChecksum()", AS_METHODPR(T, GetChecksum, (), unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_checksum()", AS_METHODPR(T, GetChecksum, (), unsigned), AS_CALL_THISCALL);
+    // virtual hash32 Deserializer::GetChecksum()
+    engine->RegisterObjectMethod(className, "hash32 GetChecksum()", AS_METHODPR(T, GetChecksum, (), hash32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "hash32 get_checksum()", AS_METHODPR(T, GetChecksum, (), hash32), AS_CALL_THISCALL);
 
     // virtual const String& Deserializer::GetName() const
     engine->RegisterObjectMethod(className, "const String& GetName() const", AS_METHODPR(T, GetName, () const, const String&), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_name() const", AS_METHODPR(T, GetName, () const, const String&), AS_CALL_THISCALL);
 
-    // unsigned Deserializer::GetPosition() const
-    engine->RegisterObjectMethod(className, "uint GetPosition() const", AS_METHODPR(T, GetPosition, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_position() const", AS_METHODPR(T, GetPosition, () const, unsigned), AS_CALL_THISCALL);
+    // i64 Deserializer::GetPosition() const
+    engine->RegisterObjectMethod(className, "int64 GetPosition() const", AS_METHODPR(T, GetPosition, () const, i64), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int64 get_position() const", AS_METHODPR(T, GetPosition, () const, i64), AS_CALL_THISCALL);
 
-    // unsigned Deserializer::GetSize() const
-    engine->RegisterObjectMethod(className, "uint GetSize() const", AS_METHODPR(T, GetSize, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_size() const", AS_METHODPR(T, GetSize, () const, unsigned), AS_CALL_THISCALL);
+    // i64 Deserializer::GetSize() const
+    engine->RegisterObjectMethod(className, "int64 GetSize() const", AS_METHODPR(T, GetSize, () const, i64), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int64 get_size() const", AS_METHODPR(T, GetSize, () const, i64), AS_CALL_THISCALL);
 
     // virtual bool Deserializer::IsEof() const
     engine->RegisterObjectMethod(className, "bool IsEof() const", AS_METHODPR(T, IsEof, () const, bool), AS_CALL_THISCALL);
@@ -1340,8 +1345,11 @@ template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, co
     // BoundingBox Deserializer::ReadBoundingBox()
     engine->RegisterObjectMethod(className, "BoundingBox ReadBoundingBox()", AS_METHODPR(T, ReadBoundingBox, (), BoundingBox), AS_CALL_THISCALL);
 
-    // signed char Deserializer::ReadByte()
-    engine->RegisterObjectMethod(className, "int8 ReadByte()", AS_METHODPR(T, ReadByte, (), signed char), AS_CALL_THISCALL);
+    // Vector<byte> Deserializer::ReadBuffer()
+    engine->RegisterObjectMethod(className, "Array<byte>@ ReadBuffer()", AS_FUNCTION_OBJFIRST(Deserializer_Vectorlesbytegre_ReadBuffer_void_template<Deserializer>), AS_CALL_CDECL_OBJFIRST);
+
+    // byte Deserializer::ReadByte()
+    engine->RegisterObjectMethod(className, "byte ReadByte()", AS_METHODPR(T, ReadByte, (), byte), AS_CALL_THISCALL);
 
     // Color Deserializer::ReadColor()
     engine->RegisterObjectMethod(className, "Color ReadColor()", AS_METHODPR(T, ReadColor, (), Color), AS_CALL_THISCALL);
@@ -1355,11 +1363,17 @@ template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, co
     // float Deserializer::ReadFloat()
     engine->RegisterObjectMethod(className, "float ReadFloat()", AS_METHODPR(T, ReadFloat, (), float), AS_CALL_THISCALL);
 
-    // int Deserializer::ReadInt()
-    engine->RegisterObjectMethod(className, "int ReadInt()", AS_METHODPR(T, ReadInt, (), int), AS_CALL_THISCALL);
+    // i16 Deserializer::ReadI16()
+    engine->RegisterObjectMethod(className, "int16 ReadI16()", AS_METHODPR(T, ReadI16, (), i16), AS_CALL_THISCALL);
 
-    // long long Deserializer::ReadInt64()
-    engine->RegisterObjectMethod(className, "int64 ReadInt64()", AS_METHODPR(T, ReadInt64, (), long long), AS_CALL_THISCALL);
+    // i32 Deserializer::ReadI32()
+    engine->RegisterObjectMethod(className, "int ReadI32()", AS_METHODPR(T, ReadI32, (), i32), AS_CALL_THISCALL);
+
+    // i64 Deserializer::ReadI64()
+    engine->RegisterObjectMethod(className, "int64 ReadI64()", AS_METHODPR(T, ReadI64, (), i64), AS_CALL_THISCALL);
+
+    // i8 Deserializer::ReadI8()
+    engine->RegisterObjectMethod(className, "int8 ReadI8()", AS_METHODPR(T, ReadI8, (), i8), AS_CALL_THISCALL);
 
     // IntRect Deserializer::ReadIntRect()
     engine->RegisterObjectMethod(className, "IntRect ReadIntRect()", AS_METHODPR(T, ReadIntRect, (), IntRect), AS_CALL_THISCALL);
@@ -1382,8 +1396,8 @@ template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, co
     // Matrix4 Deserializer::ReadMatrix4()
     engine->RegisterObjectMethod(className, "Matrix4 ReadMatrix4()", AS_METHODPR(T, ReadMatrix4, (), Matrix4), AS_CALL_THISCALL);
 
-    // unsigned Deserializer::ReadNetID()
-    engine->RegisterObjectMethod(className, "uint ReadNetID()", AS_METHODPR(T, ReadNetID, (), unsigned), AS_CALL_THISCALL);
+    // id32 Deserializer::ReadNetID()
+    engine->RegisterObjectMethod(className, "id32 ReadNetID()", AS_METHODPR(T, ReadNetID, (), id32), AS_CALL_THISCALL);
 
     // Quaternion Deserializer::ReadPackedQuaternion()
     engine->RegisterObjectMethod(className, "Quaternion ReadPackedQuaternion()", AS_METHODPR(T, ReadPackedQuaternion, (), Quaternion), AS_CALL_THISCALL);
@@ -1403,9 +1417,6 @@ template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, co
     // ResourceRefList Deserializer::ReadResourceRefList()
     engine->RegisterObjectMethod(className, "ResourceRefList ReadResourceRefList()", AS_METHODPR(T, ReadResourceRefList, (), ResourceRefList), AS_CALL_THISCALL);
 
-    // short Deserializer::ReadShort()
-    engine->RegisterObjectMethod(className, "int16 ReadShort()", AS_METHODPR(T, ReadShort, (), short), AS_CALL_THISCALL);
-
     // String Deserializer::ReadString()
     engine->RegisterObjectMethod(className, "String ReadString()", AS_METHODPR(T, ReadString, (), String), AS_CALL_THISCALL);
 
@@ -1415,17 +1426,17 @@ template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, co
     // StringVector Deserializer::ReadStringVector()
     engine->RegisterObjectMethod(className, "Array<String>@ ReadStringVector()", AS_FUNCTION_OBJFIRST(Deserializer_StringVector_ReadStringVector_void_template<Deserializer>), AS_CALL_CDECL_OBJFIRST);
 
-    // unsigned char Deserializer::ReadUByte()
-    engine->RegisterObjectMethod(className, "uint8 ReadUByte()", AS_METHODPR(T, ReadUByte, (), unsigned char), AS_CALL_THISCALL);
+    // u16 Deserializer::ReadU16()
+    engine->RegisterObjectMethod(className, "uint16 ReadU16()", AS_METHODPR(T, ReadU16, (), u16), AS_CALL_THISCALL);
 
-    // unsigned Deserializer::ReadUInt()
-    engine->RegisterObjectMethod(className, "uint ReadUInt()", AS_METHODPR(T, ReadUInt, (), unsigned), AS_CALL_THISCALL);
+    // u32 Deserializer::ReadU32()
+    engine->RegisterObjectMethod(className, "uint ReadU32()", AS_METHODPR(T, ReadU32, (), u32), AS_CALL_THISCALL);
 
-    // unsigned long long Deserializer::ReadUInt64()
-    engine->RegisterObjectMethod(className, "uint64 ReadUInt64()", AS_METHODPR(T, ReadUInt64, (), unsigned long long), AS_CALL_THISCALL);
+    // u64 Deserializer::ReadU64()
+    engine->RegisterObjectMethod(className, "uint64 ReadU64()", AS_METHODPR(T, ReadU64, (), u64), AS_CALL_THISCALL);
 
-    // unsigned short Deserializer::ReadUShort()
-    engine->RegisterObjectMethod(className, "uint16 ReadUShort()", AS_METHODPR(T, ReadUShort, (), unsigned short), AS_CALL_THISCALL);
+    // u8 Deserializer::ReadU8()
+    engine->RegisterObjectMethod(className, "uint8 ReadU8()", AS_METHODPR(T, ReadU8, (), u8), AS_CALL_THISCALL);
 
     // Variant Deserializer::ReadVariant()
     engine->RegisterObjectMethod(className, "Variant ReadVariant()", AS_METHODPR(T, ReadVariant, (), Variant), AS_CALL_THISCALL);
@@ -1448,14 +1459,14 @@ template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, co
     // unsigned Deserializer::ReadVLE()
     engine->RegisterObjectMethod(className, "uint ReadVLE()", AS_METHODPR(T, ReadVLE, (), unsigned), AS_CALL_THISCALL);
 
-    // virtual unsigned Deserializer::Seek(unsigned position) = 0
-    engine->RegisterObjectMethod(className, "uint Seek(uint)", AS_METHODPR(T, Seek, (unsigned), unsigned), AS_CALL_THISCALL);
+    // virtual i64 Deserializer::Seek(i64 position) = 0
+    engine->RegisterObjectMethod(className, "int64 Seek(int64)", AS_METHODPR(T, Seek, (i64), i64), AS_CALL_THISCALL);
 
-    // unsigned Deserializer::SeekRelative(int delta)
-    engine->RegisterObjectMethod(className, "uint SeekRelative(int)", AS_METHODPR(T, SeekRelative, (int), unsigned), AS_CALL_THISCALL);
+    // i64 Deserializer::SeekRelative(i64 delta)
+    engine->RegisterObjectMethod(className, "int64 SeekRelative(int64)", AS_METHODPR(T, SeekRelative, (i64), i64), AS_CALL_THISCALL);
 
-    // unsigned Deserializer::Tell() const
-    engine->RegisterObjectMethod(className, "uint Tell() const", AS_METHODPR(T, Tell, () const, unsigned), AS_CALL_THISCALL);
+    // i64 Deserializer::Tell() const
+    engine->RegisterObjectMethod(className, "int64 Tell() const", AS_METHODPR(T, Tell, () const, i64), AS_CALL_THISCALL);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Deserializer
         REGISTER_MEMBERS_MANUAL_PART_Deserializer();
@@ -1671,8 +1682,8 @@ template <class T> void RegisterMembers_GPUObject(asIScriptEngine* engine, const
     // void GPUObject::ClearDataLost()
     engine->RegisterObjectMethod(className, "void ClearDataLost()", AS_METHODPR(T, ClearDataLost, (), void), AS_CALL_THISCALL);
 
-    // unsigned GPUObject::GetGPUObjectName() const
-    engine->RegisterObjectMethod(className, "uint GetGPUObjectName() const", AS_METHODPR(T, GetGPUObjectName, () const, unsigned), AS_CALL_THISCALL);
+    // u32 GPUObject::GetGPUObjectName() const
+    engine->RegisterObjectMethod(className, "uint GetGPUObjectName() const", AS_METHODPR(T, GetGPUObjectName, () const, u32), AS_CALL_THISCALL);
 
     // Graphics* GPUObject::GetGraphics() const
     engine->RegisterObjectMethod(className, "Graphics@+ GetGraphics() const", AS_METHODPR(T, GetGraphics, () const, Graphics*), AS_CALL_THISCALL);
@@ -1704,17 +1715,17 @@ template <class T> void RegisterMembers_GeometryDesc(asIScriptEngine* engine, co
     // PrimitiveType GeometryDesc::type_
     engine->RegisterObjectProperty(className, "PrimitiveType type", offsetof(T, type_));
 
-    // unsigned GeometryDesc::vbRef_
-    engine->RegisterObjectProperty(className, "uint vbRef", offsetof(T, vbRef_));
+    // i32 GeometryDesc::vbRef_
+    engine->RegisterObjectProperty(className, "int vbRef", offsetof(T, vbRef_));
 
-    // unsigned GeometryDesc::ibRef_
-    engine->RegisterObjectProperty(className, "uint ibRef", offsetof(T, ibRef_));
+    // i32 GeometryDesc::ibRef_
+    engine->RegisterObjectProperty(className, "int ibRef", offsetof(T, ibRef_));
 
-    // unsigned GeometryDesc::indexStart_
-    engine->RegisterObjectProperty(className, "uint indexStart", offsetof(T, indexStart_));
+    // i32 GeometryDesc::indexStart_
+    engine->RegisterObjectProperty(className, "int indexStart", offsetof(T, indexStart_));
 
-    // unsigned GeometryDesc::indexCount_
-    engine->RegisterObjectProperty(className, "uint indexCount", offsetof(T, indexCount_));
+    // i32 GeometryDesc::indexCount_
+    engine->RegisterObjectProperty(className, "int indexCount", offsetof(T, indexCount_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_GeometryDesc
         REGISTER_MEMBERS_MANUAL_PART_GeometryDesc();
@@ -1825,17 +1836,17 @@ template <class T> void RegisterMembers_HiresTimer(asIScriptEngine* engine, cons
 // struct IndexBufferDesc | File: ../Graphics/Model.h
 template <class T> void RegisterMembers_IndexBufferDesc(asIScriptEngine* engine, const char* className)
 {
-    // SharedArrayPtr<unsigned char> IndexBufferDesc::data_
-    // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
+    // SharedArrayPtr<byte> IndexBufferDesc::data_
+    // Error: type "SharedArrayPtr<byte>" can not automatically bind
 
-    // unsigned IndexBufferDesc::indexCount_
-    engine->RegisterObjectProperty(className, "uint indexCount", offsetof(T, indexCount_));
+    // i32 IndexBufferDesc::indexCount_
+    engine->RegisterObjectProperty(className, "int indexCount", offsetof(T, indexCount_));
 
-    // unsigned IndexBufferDesc::indexSize_
-    engine->RegisterObjectProperty(className, "uint indexSize", offsetof(T, indexSize_));
+    // i32 IndexBufferDesc::indexSize_
+    engine->RegisterObjectProperty(className, "int indexSize", offsetof(T, indexSize_));
 
-    // unsigned IndexBufferDesc::dataSize_
-    engine->RegisterObjectProperty(className, "uint dataSize", offsetof(T, dataSize_));
+    // i32 IndexBufferDesc::dataSize_
+    engine->RegisterObjectProperty(className, "int dataSize", offsetof(T, dataSize_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_IndexBufferDesc
         REGISTER_MEMBERS_MANUAL_PART_IndexBufferDesc();
@@ -2014,8 +2025,8 @@ template <class T> void RegisterMembers_IntVector2(asIScriptEngine* engine, cons
     // bool IntVector2::operator ==(const IntVector2& rhs) const
     engine->RegisterObjectMethod(className, "bool opEquals(const IntVector2&in) const", AS_METHODPR(T, operator==, (const IntVector2&) const, bool), AS_CALL_THISCALL);
 
-    // unsigned IntVector2::ToHash() const
-    engine->RegisterObjectMethod(className, "uint ToHash() const", AS_METHODPR(T, ToHash, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 IntVector2::ToHash() const
+    engine->RegisterObjectMethod(className, "hash32 ToHash() const", AS_METHODPR(T, ToHash, () const, hash32), AS_CALL_THISCALL);
 
     // String IntVector2::ToString() const
     engine->RegisterObjectMethod(className, "String ToString() const", AS_METHODPR(T, ToString, () const, String), AS_CALL_THISCALL);
@@ -2105,8 +2116,8 @@ template <class T> void RegisterMembers_IntVector3(asIScriptEngine* engine, cons
     // bool IntVector3::operator ==(const IntVector3& rhs) const
     engine->RegisterObjectMethod(className, "bool opEquals(const IntVector3&in) const", AS_METHODPR(T, operator==, (const IntVector3&) const, bool), AS_CALL_THISCALL);
 
-    // unsigned IntVector3::ToHash() const
-    engine->RegisterObjectMethod(className, "uint ToHash() const", AS_METHODPR(T, ToHash, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 IntVector3::ToHash() const
+    engine->RegisterObjectMethod(className, "hash32 ToHash() const", AS_METHODPR(T, ToHash, () const, hash32), AS_CALL_THISCALL);
 
     // String IntVector3::ToString() const
     engine->RegisterObjectMethod(className, "String ToString() const", AS_METHODPR(T, ToString, () const, String), AS_CALL_THISCALL);
@@ -2222,8 +2233,8 @@ template <class T> void RegisterMembers_JSONValue(asIScriptEngine* engine, const
     // float JSONValue::GetFloat(float defaultValue = 0.0f) const
     engine->RegisterObjectMethod(className, "float GetFloat(float = 0.0f) const", AS_METHODPR(T, GetFloat, (float) const, float), AS_CALL_THISCALL);
 
-    // int JSONValue::GetInt(int defaultValue = 0) const
-    engine->RegisterObjectMethod(className, "int GetInt(int = 0) const", AS_METHODPR(T, GetInt, (int) const, int), AS_CALL_THISCALL);
+    // i32 JSONValue::GetI32(i32 defaultValue = 0) const
+    engine->RegisterObjectMethod(className, "int GetI32(int = 0) const", AS_METHODPR(T, GetI32, (i32) const, i32), AS_CALL_THISCALL);
 
     // JSONNumberType JSONValue::GetNumberType() const
     engine->RegisterObjectMethod(className, "JSONNumberType GetNumberType() const", AS_METHODPR(T, GetNumberType, () const, JSONNumberType), AS_CALL_THISCALL);
@@ -2236,8 +2247,8 @@ template <class T> void RegisterMembers_JSONValue(asIScriptEngine* engine, const
     // const String& JSONValue::GetString(const String& defaultValue = String::EMPTY) const
     engine->RegisterObjectMethod(className, "const String& GetString(const String&in = String::EMPTY) const", AS_METHODPR(T, GetString, (const String&) const, const String&), AS_CALL_THISCALL);
 
-    // unsigned JSONValue::GetUInt(unsigned defaultValue = 0) const
-    engine->RegisterObjectMethod(className, "uint GetUInt(uint = 0) const", AS_METHODPR(T, GetUInt, (unsigned) const, unsigned), AS_CALL_THISCALL);
+    // u32 JSONValue::GetU32(u32 defaultValue = 0) const
+    engine->RegisterObjectMethod(className, "uint GetU32(uint = 0) const", AS_METHODPR(T, GetU32, (u32) const, u32), AS_CALL_THISCALL);
 
     // JSONValueType JSONValue::GetValueType() const
     engine->RegisterObjectMethod(className, "JSONValueType GetValueType() const", AS_METHODPR(T, GetValueType, () const, JSONValueType), AS_CALL_THISCALL);
@@ -2491,9 +2502,9 @@ template <class T> void RegisterMembers_LightQueryResult(asIScriptEngine* engine
     // Error: type "Vector<Drawable*>" can not automatically bind
     // Camera* LightQueryResult::shadowCameras_[MAX_LIGHT_SPLITS]
     // Not registered because array
-    // unsigned LightQueryResult::shadowCasterBegin_[MAX_LIGHT_SPLITS]
+    // i32 LightQueryResult::shadowCasterBegin_[MAX_LIGHT_SPLITS]
     // Not registered because array
-    // unsigned LightQueryResult::shadowCasterEnd_[MAX_LIGHT_SPLITS]
+    // i32 LightQueryResult::shadowCasterEnd_[MAX_LIGHT_SPLITS]
     // Not registered because array
     // BoundingBox LightQueryResult::shadowCasterBox_[MAX_LIGHT_SPLITS]
     // Not registered because array
@@ -2502,8 +2513,8 @@ template <class T> void RegisterMembers_LightQueryResult(asIScriptEngine* engine
     // float LightQueryResult::shadowFarSplits_[MAX_LIGHT_SPLITS]
     // Not registered because array
 
-    // unsigned LightQueryResult::numSplits_
-    engine->RegisterObjectProperty(className, "uint numSplits", offsetof(T, numSplits_));
+    // i32 LightQueryResult::numSplits_
+    engine->RegisterObjectProperty(className, "int numSplits", offsetof(T, numSplits_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_LightQueryResult
         REGISTER_MEMBERS_MANUAL_PART_LightQueryResult();
@@ -3090,8 +3101,8 @@ template <class T> void RegisterMembers_Matrix4(asIScriptEngine* engine, const c
 // struct ModelMorph | File: ../Graphics/Model.h
 template <class T> void RegisterMembers_ModelMorph(asIScriptEngine* engine, const char* className)
 {
-    // HashMap<unsigned, VertexBufferMorph> ModelMorph::buffers_
-    // Error: type "HashMap<unsigned, VertexBufferMorph>" can not automatically bind
+    // HashMap<i32, VertexBufferMorph> ModelMorph::buffers_
+    // Error: type "HashMap<i32, VertexBufferMorph>" can not automatically bind
 
     // String ModelMorph::name_
     engine->RegisterObjectProperty(className, "String name", offsetof(T, name_));
@@ -3291,8 +3302,8 @@ template <class T> void RegisterMembers_OctreeQuery(asIScriptEngine* engine, con
     // Vector<Drawable*>& OctreeQuery::result_
     // Error: type "Vector<Drawable*>&" can not automatically bind
 
-    // unsigned char OctreeQuery::drawableFlags_
-    engine->RegisterObjectProperty(className, "uint8 drawableFlags", offsetof(T, drawableFlags_));
+    // DrawableTypes OctreeQuery::drawableTypes_
+    engine->RegisterObjectProperty(className, "DrawableTypes drawableTypes", offsetof(T, drawableTypes_));
 
     // unsigned OctreeQuery::viewMask_
     engine->RegisterObjectProperty(className, "uint viewMask", offsetof(T, viewMask_));
@@ -3327,8 +3338,8 @@ template <class T> void RegisterMembers_PackageEntry(asIScriptEngine* engine, co
     // unsigned PackageEntry::size_
     engine->RegisterObjectProperty(className, "uint size", offsetof(T, size_));
 
-    // unsigned PackageEntry::checksum_
-    engine->RegisterObjectProperty(className, "uint checksum", offsetof(T, checksum_));
+    // hash32 PackageEntry::checksum_
+    engine->RegisterObjectProperty(className, "hash32 checksum", offsetof(T, checksum_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_PackageEntry
         REGISTER_MEMBERS_MANUAL_PART_PackageEntry();
@@ -3729,13 +3740,13 @@ template <class T> void RegisterMembers_Ray(asIScriptEngine* engine, const char*
 {
     // float Ray::HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2, Vector3* outNormal = nullptr, Vector3* outBary = nullptr) const
     // Error: type "Vector3*" can not automatically bind
-    // float Ray::HitDistance(const void* vertexData, unsigned vertexStride, unsigned vertexStart, unsigned vertexCount, Vector3* outNormal = nullptr, Vector2* outUV = nullptr, unsigned uvOffset = 0) const
+    // float Ray::HitDistance(const void* vertexData, i32 vertexStride, i32 vertexStart, i32 vertexCount, Vector3* outNormal = nullptr, Vector2* outUV = nullptr, i32 uvOffset = 0) const
     // Error: type "const void*" can not automatically bind
-    // float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount, Vector3* outNormal = nullptr, Vector2* outUV = nullptr, unsigned uvOffset = 0) const
+    // float Ray::HitDistance(const void* vertexData, i32 vertexStride, const void* indexData, i32 indexSize, i32 indexStart, i32 indexCount, Vector3* outNormal = nullptr, Vector2* outUV = nullptr, i32 uvOffset = 0) const
     // Error: type "const void*" can not automatically bind
-    // bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, unsigned vertexStart, unsigned vertexCount) const
+    // bool Ray::InsideGeometry(const void* vertexData, i32 vertexSize, i32 vertexStart, i32 vertexCount) const
     // Error: type "const void*" can not automatically bind
-    // bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount) const
+    // bool Ray::InsideGeometry(const void* vertexData, i32 vertexSize, const void* indexData, i32 indexSize, i32 indexStart, i32 indexCount) const
     // Error: type "const void*" can not automatically bind
     // bool Ray::operator !=(const Ray& rhs) const
     // Only operator == is needed
@@ -3796,8 +3807,8 @@ template <class T> void RegisterMembers_RayOctreeQuery(asIScriptEngine* engine, 
     // Ray RayOctreeQuery::ray_
     engine->RegisterObjectProperty(className, "Ray ray", offsetof(T, ray_));
 
-    // unsigned char RayOctreeQuery::drawableFlags_
-    engine->RegisterObjectProperty(className, "uint8 drawableFlags", offsetof(T, drawableFlags_));
+    // DrawableTypes RayOctreeQuery::drawableTypes_
+    engine->RegisterObjectProperty(className, "DrawableTypes drawableTypes", offsetof(T, drawableTypes_));
 
     // unsigned RayOctreeQuery::viewMask_
     engine->RegisterObjectProperty(className, "uint viewMask", offsetof(T, viewMask_));
@@ -4274,8 +4285,8 @@ template <class T> void RegisterMembers_ScenePassInfo(asIScriptEngine* engine, c
     // BatchQueue* ScenePassInfo::batchQueue_
     // Not registered because pointer
 
-    // unsigned ScenePassInfo::passIndex_
-    engine->RegisterObjectProperty(className, "uint passIndex", offsetof(T, passIndex_));
+    // i32 ScenePassInfo::passIndex_
+    engine->RegisterObjectProperty(className, "int passIndex", offsetof(T, passIndex_));
 
     // bool ScenePassInfo::allowInstancing_
     engine->RegisterObjectProperty(className, "bool allowInstancing", offsetof(T, allowInstancing_));
@@ -4294,11 +4305,11 @@ template <class T> void RegisterMembers_ScenePassInfo(asIScriptEngine* engine, c
 // class SceneResolver | File: ../Scene/SceneResolver.h
 template <class T> void RegisterMembers_SceneResolver(asIScriptEngine* engine, const char* className)
 {
-    // void SceneResolver::AddComponent(unsigned oldID, Component* component)
-    engine->RegisterObjectMethod(className, "void AddComponent(uint, Component@+)", AS_METHODPR(T, AddComponent, (unsigned, Component*), void), AS_CALL_THISCALL);
+    // void SceneResolver::AddComponent(ComponentId oldID, Component* component)
+    engine->RegisterObjectMethod(className, "void AddComponent(ComponentId, Component@+)", AS_METHODPR(T, AddComponent, (ComponentId, Component*), void), AS_CALL_THISCALL);
 
-    // void SceneResolver::AddNode(unsigned oldID, Node* node)
-    engine->RegisterObjectMethod(className, "void AddNode(uint, Node@+)", AS_METHODPR(T, AddNode, (unsigned, Node*), void), AS_CALL_THISCALL);
+    // void SceneResolver::AddNode(NodeId oldID, Node* node)
+    engine->RegisterObjectMethod(className, "void AddNode(NodeId, Node@+)", AS_METHODPR(T, AddNode, (NodeId, Node*), void), AS_CALL_THISCALL);
 
     // void SceneResolver::Reset()
     engine->RegisterObjectMethod(className, "void Reset()", AS_METHODPR(T, Reset, (), void), AS_CALL_THISCALL);
@@ -4372,6 +4383,14 @@ template <class T> void RegisterMembers_ScreenModeParams(asIScriptEngine* engine
     #endif
 }
 
+// bool Serializer::WriteBuffer(const Vector<byte>& value)
+template <class T> bool Serializer_bool_WriteBuffer_constspVectorlesbytegreamp_template(T* _ptr, CScriptArray* value_conv)
+{
+    Vector<byte> value = ArrayToVector<byte>(value_conv);
+    bool result = _ptr->WriteBuffer(value);
+    return result;
+}
+
 // bool Serializer::WriteStringVector(const StringVector& value)
 template <class T> bool Serializer_bool_WriteStringVector_constspStringVectoramp_template(T* _ptr, CScriptArray* value_conv)
 {
@@ -4383,10 +4402,8 @@ template <class T> bool Serializer_bool_WriteStringVector_constspStringVectoramp
 // class Serializer | File: ../IO/Serializer.h
 template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, const char* className)
 {
-    // virtual unsigned Serializer::Write(const void* data, unsigned size) = 0
+    // virtual i32 Serializer::Write(const void* data, i32 size) = 0
     // Error: type "const void*" can not automatically bind
-    // bool Serializer::WriteBuffer(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // bool Serializer::WriteVariantVector(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
 
@@ -4396,8 +4413,11 @@ template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, cons
     // bool Serializer::WriteBoundingBox(const BoundingBox& value)
     engine->RegisterObjectMethod(className, "bool WriteBoundingBox(const BoundingBox&in)", AS_METHODPR(T, WriteBoundingBox, (const BoundingBox&), bool), AS_CALL_THISCALL);
 
-    // bool Serializer::WriteByte(signed char value)
-    engine->RegisterObjectMethod(className, "bool WriteByte(int8)", AS_METHODPR(T, WriteByte, (signed char), bool), AS_CALL_THISCALL);
+    // bool Serializer::WriteBuffer(const Vector<byte>& value)
+    engine->RegisterObjectMethod(className, "bool WriteBuffer(Array<byte>@+)", AS_FUNCTION_OBJFIRST(Serializer_bool_WriteBuffer_constspVectorlesbytegreamp_template<Serializer>), AS_CALL_CDECL_OBJFIRST);
+
+    // bool Serializer::WriteByte(byte value)
+    engine->RegisterObjectMethod(className, "bool WriteByte(byte)", AS_METHODPR(T, WriteByte, (byte), bool), AS_CALL_THISCALL);
 
     // bool Serializer::WriteColor(const Color& value)
     engine->RegisterObjectMethod(className, "bool WriteColor(const Color&in)", AS_METHODPR(T, WriteColor, (const Color&), bool), AS_CALL_THISCALL);
@@ -4411,11 +4431,17 @@ template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, cons
     // bool Serializer::WriteFloat(float value)
     engine->RegisterObjectMethod(className, "bool WriteFloat(float)", AS_METHODPR(T, WriteFloat, (float), bool), AS_CALL_THISCALL);
 
-    // bool Serializer::WriteInt(int value)
-    engine->RegisterObjectMethod(className, "bool WriteInt(int)", AS_METHODPR(T, WriteInt, (int), bool), AS_CALL_THISCALL);
+    // bool Serializer::WriteI16(i16 value)
+    engine->RegisterObjectMethod(className, "bool WriteI16(int16)", AS_METHODPR(T, WriteI16, (i16), bool), AS_CALL_THISCALL);
 
-    // bool Serializer::WriteInt64(long long value)
-    engine->RegisterObjectMethod(className, "bool WriteInt64(int64)", AS_METHODPR(T, WriteInt64, (long long), bool), AS_CALL_THISCALL);
+    // bool Serializer::WriteI32(i32 value)
+    engine->RegisterObjectMethod(className, "bool WriteI32(int)", AS_METHODPR(T, WriteI32, (i32), bool), AS_CALL_THISCALL);
+
+    // bool Serializer::WriteI64(i64 value)
+    engine->RegisterObjectMethod(className, "bool WriteI64(int64)", AS_METHODPR(T, WriteI64, (i64), bool), AS_CALL_THISCALL);
+
+    // bool Serializer::WriteI8(i8 value)
+    engine->RegisterObjectMethod(className, "bool WriteI8(int8)", AS_METHODPR(T, WriteI8, (i8), bool), AS_CALL_THISCALL);
 
     // bool Serializer::WriteIntRect(const IntRect& value)
     engine->RegisterObjectMethod(className, "bool WriteIntRect(const IntRect&in)", AS_METHODPR(T, WriteIntRect, (const IntRect&), bool), AS_CALL_THISCALL);
@@ -4438,8 +4464,8 @@ template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, cons
     // bool Serializer::WriteMatrix4(const Matrix4& value)
     engine->RegisterObjectMethod(className, "bool WriteMatrix4(const Matrix4&in)", AS_METHODPR(T, WriteMatrix4, (const Matrix4&), bool), AS_CALL_THISCALL);
 
-    // bool Serializer::WriteNetID(unsigned value)
-    engine->RegisterObjectMethod(className, "bool WriteNetID(uint)", AS_METHODPR(T, WriteNetID, (unsigned), bool), AS_CALL_THISCALL);
+    // bool Serializer::WriteNetID(id32 value)
+    engine->RegisterObjectMethod(className, "bool WriteNetID(id32)", AS_METHODPR(T, WriteNetID, (id32), bool), AS_CALL_THISCALL);
 
     // bool Serializer::WritePackedQuaternion(const Quaternion& value)
     engine->RegisterObjectMethod(className, "bool WritePackedQuaternion(const Quaternion&in)", AS_METHODPR(T, WritePackedQuaternion, (const Quaternion&), bool), AS_CALL_THISCALL);
@@ -4459,9 +4485,6 @@ template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, cons
     // bool Serializer::WriteResourceRefList(const ResourceRefList& value)
     engine->RegisterObjectMethod(className, "bool WriteResourceRefList(const ResourceRefList&in)", AS_METHODPR(T, WriteResourceRefList, (const ResourceRefList&), bool), AS_CALL_THISCALL);
 
-    // bool Serializer::WriteShort(short value)
-    engine->RegisterObjectMethod(className, "bool WriteShort(int16)", AS_METHODPR(T, WriteShort, (short), bool), AS_CALL_THISCALL);
-
     // bool Serializer::WriteString(const String& value)
     engine->RegisterObjectMethod(className, "bool WriteString(const String&in)", AS_METHODPR(T, WriteString, (const String&), bool), AS_CALL_THISCALL);
 
@@ -4471,17 +4494,17 @@ template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, cons
     // bool Serializer::WriteStringVector(const StringVector& value)
     engine->RegisterObjectMethod(className, "bool WriteStringVector(Array<String>@+)", AS_FUNCTION_OBJFIRST(Serializer_bool_WriteStringVector_constspStringVectoramp_template<Serializer>), AS_CALL_CDECL_OBJFIRST);
 
-    // bool Serializer::WriteUByte(unsigned char value)
-    engine->RegisterObjectMethod(className, "bool WriteUByte(uint8)", AS_METHODPR(T, WriteUByte, (unsigned char), bool), AS_CALL_THISCALL);
+    // bool Serializer::WriteU16(u16 value)
+    engine->RegisterObjectMethod(className, "bool WriteU16(uint16)", AS_METHODPR(T, WriteU16, (u16), bool), AS_CALL_THISCALL);
 
-    // bool Serializer::WriteUInt(unsigned value)
-    engine->RegisterObjectMethod(className, "bool WriteUInt(uint)", AS_METHODPR(T, WriteUInt, (unsigned), bool), AS_CALL_THISCALL);
+    // bool Serializer::WriteU32(u32 value)
+    engine->RegisterObjectMethod(className, "bool WriteU32(uint)", AS_METHODPR(T, WriteU32, (u32), bool), AS_CALL_THISCALL);
 
-    // bool Serializer::WriteUInt64(unsigned long long value)
-    engine->RegisterObjectMethod(className, "bool WriteUInt64(uint64)", AS_METHODPR(T, WriteUInt64, (unsigned long long), bool), AS_CALL_THISCALL);
+    // bool Serializer::WriteU64(u64 value)
+    engine->RegisterObjectMethod(className, "bool WriteU64(uint64)", AS_METHODPR(T, WriteU64, (u64), bool), AS_CALL_THISCALL);
 
-    // bool Serializer::WriteUShort(unsigned short value)
-    engine->RegisterObjectMethod(className, "bool WriteUShort(uint16)", AS_METHODPR(T, WriteUShort, (unsigned short), bool), AS_CALL_THISCALL);
+    // bool Serializer::WriteU8(u8 value)
+    engine->RegisterObjectMethod(className, "bool WriteU8(uint8)", AS_METHODPR(T, WriteU8, (u8), bool), AS_CALL_THISCALL);
 
     // bool Serializer::WriteVariant(const Variant& value)
     engine->RegisterObjectMethod(className, "bool WriteVariant(const Variant&in)", AS_METHODPR(T, WriteVariant, (const Variant&), bool), AS_CALL_THISCALL);
@@ -4658,8 +4681,8 @@ template <class T> void RegisterMembers_SourceBatch(asIScriptEngine* engine, con
     // float SourceBatch::distance_
     engine->RegisterObjectProperty(className, "float distance", offsetof(T, distance_));
 
-    // unsigned SourceBatch::numWorldTransforms_
-    engine->RegisterObjectProperty(className, "uint numWorldTransforms", offsetof(T, numWorldTransforms_));
+    // i32 SourceBatch::numWorldTransforms_
+    engine->RegisterObjectProperty(className, "int numWorldTransforms", offsetof(T, numWorldTransforms_));
 
     // GeometryType SourceBatch::geometryType_
     engine->RegisterObjectProperty(className, "GeometryType geometryType", offsetof(T, geometryType_));
@@ -4672,9 +4695,9 @@ template <class T> void RegisterMembers_SourceBatch(asIScriptEngine* engine, con
 // class Sphere | File: ../Math/Sphere.h
 template <class T> void RegisterMembers_Sphere(asIScriptEngine* engine, const char* className)
 {
-    // void Sphere::Define(const Vector3* vertices, unsigned count)
+    // void Sphere::Define(const Vector3* vertices, i32 count)
     // Error: type "const Vector3*" can not automatically bind
-    // void Sphere::Merge(const Vector3* vertices, unsigned count)
+    // void Sphere::Merge(const Vector3* vertices, i32 count)
     // Error: type "const Vector3*" can not automatically bind
     // bool Sphere::operator !=(const Sphere& rhs) const
     // Only operator == is needed
@@ -5127,8 +5150,8 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // void String::Swap(String& str)
     engine->RegisterObjectMethod(className, "void Swap(String&)", AS_METHODPR(T, Swap, (String&), void), AS_CALL_THISCALL);
 
-    // unsigned String::ToHash() const
-    engine->RegisterObjectMethod(className, "uint ToHash() const", AS_METHODPR(T, ToHash, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 String::ToHash() const
+    engine->RegisterObjectMethod(className, "hash32 ToHash() const", AS_METHODPR(T, ToHash, () const, hash32), AS_CALL_THISCALL);
 
     // String String::ToLower() const
     engine->RegisterObjectMethod(className, "String ToLower() const", AS_METHODPR(T, ToLower, () const, String), AS_CALL_THISCALL);
@@ -5213,20 +5236,20 @@ template <class T> void RegisterMembers_StringHash(asIScriptEngine* engine, cons
     // String StringHash::Reverse() const
     engine->RegisterObjectMethod(className, "String Reverse() const", AS_METHODPR(T, Reverse, () const, String), AS_CALL_THISCALL);
 
-    // unsigned StringHash::ToHash() const
-    engine->RegisterObjectMethod(className, "uint ToHash() const", AS_METHODPR(T, ToHash, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 StringHash::ToHash() const
+    engine->RegisterObjectMethod(className, "hash32 ToHash() const", AS_METHODPR(T, ToHash, () const, hash32), AS_CALL_THISCALL);
 
     // String StringHash::ToString() const
     engine->RegisterObjectMethod(className, "String ToString() const", AS_METHODPR(T, ToString, () const, String), AS_CALL_THISCALL);
 
-    // unsigned StringHash::Value() const
-    engine->RegisterObjectMethod(className, "uint Value() const", AS_METHODPR(T, Value, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_value() const", AS_METHODPR(T, Value, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 StringHash::Value() const
+    engine->RegisterObjectMethod(className, "hash32 Value() const", AS_METHODPR(T, Value, () const, hash32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "hash32 get_value() const", AS_METHODPR(T, Value, () const, hash32), AS_CALL_THISCALL);
 
     // bool StringHash::operator <(const StringHash& rhs) const
     engine->RegisterObjectMethod(className, "int opCmp(const StringHash& in) const", AS_FUNCTION_OBJFIRST(StringHash_bool_operatorles_constspStringHashamp<T>), AS_CALL_CDECL_OBJFIRST);
 
-    // static constexpr u32 StringHash::Calculate(const char* str, unsigned hash = 0)
+    // static constexpr hash32 StringHash::Calculate(const char* str, hash32 hash = 0)
     // Error: type "const char*" can not automatically bind
     // static StringHashRegister* StringHash::GetGlobalStringHashRegister()
     // Error: type "StringHashRegister*" can not automatically bind
@@ -5432,6 +5455,9 @@ template <class T> void RegisterMembers_UIBatch(asIScriptEngine* engine, const c
     // void UIBatch::AddQuad(float x, float y, float width, float height, int texOffsetX, int texOffsetY, int texWidth = 0, int texHeight = 0)
     engine->RegisterObjectMethod(className, "void AddQuad(float, float, float, float, int, int, int = 0, int = 0)", AS_METHODPR(T, AddQuad, (float, float, float, float, int, int, int, int), void), AS_CALL_THISCALL);
 
+    // void UIBatch::AddQuad(i32 x, i32 y, i32 width, i32 height, int texOffsetX, int texOffsetY, int texWidth = 0, int texHeight = 0)
+    engine->RegisterObjectMethod(className, "void AddQuad(int, int, int, int, int, int, int = 0, int = 0)", AS_METHODPR(T, AddQuad, (i32, i32, i32, i32, int, int, int, int), void), AS_CALL_THISCALL);
+
     // void UIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth = 0, int texHeight = 0)
     engine->RegisterObjectMethod(className, "void AddQuad(const Matrix3x4&in, int, int, int, int, int, int, int = 0, int = 0)", AS_METHODPR(T, AddQuad, (const Matrix3x4&, int, int, int, int, int, int, int, int), void), AS_CALL_THISCALL);
 
@@ -5446,6 +5472,9 @@ template <class T> void RegisterMembers_UIBatch(asIScriptEngine* engine, const c
 
     // unsigned UIBatch::GetInterpolatedColor(float x, float y)
     engine->RegisterObjectMethod(className, "uint GetInterpolatedColor(float, float)", AS_METHODPR(T, GetInterpolatedColor, (float, float), unsigned), AS_CALL_THISCALL);
+
+    // unsigned UIBatch::GetInterpolatedColor(i32 x, i32 y)
+    engine->RegisterObjectMethod(className, "uint GetInterpolatedColor(int, int)", AS_METHODPR(T, GetInterpolatedColor, (i32, i32), unsigned), AS_CALL_THISCALL);
 
     // bool UIBatch::Merge(const UIBatch& batch)
     engine->RegisterObjectMethod(className, "bool Merge(const UIBatch&in)", AS_METHODPR(T, Merge, (const UIBatch&), bool), AS_CALL_THISCALL);
@@ -5483,14 +5512,11 @@ template <class T> void RegisterMembers_UIBatch(asIScriptEngine* engine, const c
     // unsigned UIBatch::vertexEnd_
     engine->RegisterObjectProperty(className, "uint vertexEnd", offsetof(T, vertexEnd_));
 
-    // unsigned UIBatch::color_
-    engine->RegisterObjectProperty(className, "uint color", offsetof(T, color_));
+    // color32 UIBatch::color_
+    engine->RegisterObjectProperty(className, "color32 color", offsetof(T, color_));
 
     // bool UIBatch::useGradient_
     engine->RegisterObjectProperty(className, "bool useGradient", offsetof(T, useGradient_));
-
-    // static Vector3 UIBatch::posAdjust
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("Vector3 posAdjust", (void*)&T::posAdjust);engine->SetDefaultNamespace("");
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_UIBatch
         REGISTER_MEMBERS_MANUAL_PART_UIBatch();
@@ -5528,6 +5554,13 @@ template <class T> void RegisterMembers_VAnimKeyFrame(asIScriptEngine* engine, c
     #endif
 }
 
+// const Vector<byte>& Variant::GetBuffer() const
+template <class T> CScriptArray* Variant_constspVectorlesbytegreamp_GetBuffer_void_template(T* _ptr)
+{
+    const Vector<byte>& result = _ptr->GetBuffer();
+    return VectorToArray(result, "Array<byte>");
+}
+
 // const StringVector& Variant::GetStringVector() const
 template <class T> CScriptArray* Variant_constspStringVectoramp_GetStringVector_void_template(T* _ptr)
 {
@@ -5535,11 +5568,27 @@ template <class T> CScriptArray* Variant_constspStringVectoramp_GetStringVector_
     return VectorToArray<String>(result, "Array<String>");
 }
 
+// Variant& Variant::operator =(const Vector<byte>& rhs)
+template <class T> Variant& Variant_Variantamp_operatoreq_constspVectorlesbytegreamp_template(T* _ptr, CScriptArray* rhs_conv)
+{
+    Vector<byte> rhs = ArrayToVector<byte>(rhs_conv);
+    Variant& result = _ptr->operator=(rhs);
+    return result;
+}
+
 // Variant& Variant::operator =(const StringVector& rhs)
 template <class T> Variant& Variant_Variantamp_operatoreq_constspStringVectoramp_template(T* _ptr, CScriptArray* rhs_conv)
 {
     StringVector rhs = ArrayToVector<String>(rhs_conv);
     Variant& result = _ptr->operator=(rhs);
+    return result;
+}
+
+// bool Variant::operator ==(const Vector<byte>& rhs) const
+template <class T> bool Variant_bool_operatoreqeq_constspVectorlesbytegreamp_template(T* _ptr, CScriptArray* rhs_conv)
+{
+    Vector<byte> rhs = ArrayToVector<byte>(rhs_conv);
+    bool result = _ptr->operator==(rhs);
     return result;
 }
 
@@ -5558,10 +5607,8 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // Error: type "const char*" can not automatically bind
     // void Variant::FromString(VariantType type, const char* value)
     // Error: type "const char*" can not automatically bind
-    // const Vector<unsigned char>& Variant::GetBuffer() const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
-    // Vector<unsigned char>* Variant::GetBufferPtr()
-    // Error: type "Vector<unsigned char>*" can not automatically bind
+    // Vector<byte>* Variant::GetBufferPtr()
+    // Error: type "Vector<byte>*" can not automatically bind
     // CustomVariantValue* Variant::GetCustomVariantValuePtr()
     // Error: type "CustomVariantValue" can not automatically bind bacause have @nobind mark
     // const CustomVariantValue* Variant::GetCustomVariantValuePtr() const
@@ -5581,6 +5628,8 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // bool Variant::operator !=(int rhs) const
     // Only operator == is needed
     // bool Variant::operator !=(unsigned rhs) const
+    // Only operator == is needed
+    // bool Variant::operator !=(c32 rhs) const
     // Only operator == is needed
     // bool Variant::operator !=(long long rhs) const
     // Only operator == is needed
@@ -5602,8 +5651,8 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // Only operator == is needed
     // bool Variant::operator !=(const String& rhs) const
     // Only operator == is needed
-    // bool Variant::operator !=(const Vector<unsigned char>& rhs) const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
+    // bool Variant::operator !=(const Vector<byte>& rhs) const
+    // Only operator == is needed
     // bool Variant::operator !=(const VectorBuffer& rhs) const
     // Only operator == is needed
     // bool Variant::operator !=(void* rhs) const
@@ -5636,16 +5685,16 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // Only operator == is needed
     // bool Variant::operator !=(const Matrix4& rhs) const
     // Only operator == is needed
+    // Variant& Variant::operator =(c32 rhs)
+    // Not registered because have @nobind mark
     // Variant& Variant::operator =(const char* rhs)
     // Error: type "const char*" can not automatically bind
-    // Variant& Variant::operator =(const Vector<unsigned char>& rhs)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // Variant& Variant::operator =(void* rhs)
     // Error: type "void*" can not automatically bind
     // Variant& Variant::operator =(const VariantVector& rhs)
     // Error: type "const VariantVector&" can not automatically bind
-    // bool Variant::operator ==(const Vector<unsigned char>& rhs) const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
+    // bool Variant::operator ==(c32 rhs) const
+    // Not registered because have @nobind mark
     // bool Variant::operator ==(void* rhs) const
     // Error: type "void*" can not automatically bind
     // bool Variant::operator ==(const VariantVector& rhs) const
@@ -5667,6 +5716,12 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // bool Variant::GetBool() const
     engine->RegisterObjectMethod(className, "bool GetBool() const", AS_METHODPR(T, GetBool, () const, bool), AS_CALL_THISCALL);
 
+    // const Vector<byte>& Variant::GetBuffer() const
+    engine->RegisterObjectMethod(className, "Array<byte>@ GetBuffer() const", AS_FUNCTION_OBJFIRST(Variant_constspVectorlesbytegreamp_GetBuffer_void_template<Variant>), AS_CALL_CDECL_OBJFIRST);
+
+    // c32 Variant::GetC32() const
+    engine->RegisterObjectMethod(className, "c32 GetC32() const", AS_METHODPR(T, GetC32, () const, c32), AS_CALL_THISCALL);
+
     // const Color& Variant::GetColor() const
     engine->RegisterObjectMethod(className, "const Color& GetColor() const", AS_METHODPR(T, GetColor, () const, const Color&), AS_CALL_THISCALL);
 
@@ -5676,11 +5731,11 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // float Variant::GetFloat() const
     engine->RegisterObjectMethod(className, "float GetFloat() const", AS_METHODPR(T, GetFloat, () const, float), AS_CALL_THISCALL);
 
-    // int Variant::GetInt() const
-    engine->RegisterObjectMethod(className, "int GetInt() const", AS_METHODPR(T, GetInt, () const, int), AS_CALL_THISCALL);
+    // i32 Variant::GetI32() const
+    engine->RegisterObjectMethod(className, "int GetI32() const", AS_METHODPR(T, GetI32, () const, i32), AS_CALL_THISCALL);
 
-    // long long Variant::GetInt64() const
-    engine->RegisterObjectMethod(className, "int64 GetInt64() const", AS_METHODPR(T, GetInt64, () const, long long), AS_CALL_THISCALL);
+    // i64 Variant::GetI64() const
+    engine->RegisterObjectMethod(className, "int64 GetI64() const", AS_METHODPR(T, GetI64, () const, i64), AS_CALL_THISCALL);
 
     // const IntRect& Variant::GetIntRect() const
     engine->RegisterObjectMethod(className, "const IntRect& GetIntRect() const", AS_METHODPR(T, GetIntRect, () const, const IntRect&), AS_CALL_THISCALL);
@@ -5732,11 +5787,11 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     engine->RegisterObjectMethod(className, "String GetTypeName() const", AS_METHODPR(T, GetTypeName, () const, String), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "String get_typeName() const", AS_METHODPR(T, GetTypeName, () const, String), AS_CALL_THISCALL);
 
-    // unsigned Variant::GetUInt() const
-    engine->RegisterObjectMethod(className, "uint GetUInt() const", AS_METHODPR(T, GetUInt, () const, unsigned), AS_CALL_THISCALL);
+    // u32 Variant::GetU32() const
+    engine->RegisterObjectMethod(className, "uint GetU32() const", AS_METHODPR(T, GetU32, () const, u32), AS_CALL_THISCALL);
 
-    // unsigned long long Variant::GetUInt64() const
-    engine->RegisterObjectMethod(className, "uint64 GetUInt64() const", AS_METHODPR(T, GetUInt64, () const, unsigned long long), AS_CALL_THISCALL);
+    // u64 Variant::GetU64() const
+    engine->RegisterObjectMethod(className, "uint64 GetU64() const", AS_METHODPR(T, GetU64, () const, u64), AS_CALL_THISCALL);
 
     // const VariantMap& Variant::GetVariantMap() const
     engine->RegisterObjectMethod(className, "const VariantMap& GetVariantMap() const", AS_METHODPR(T, GetVariantMap, () const, const VariantMap&), AS_CALL_THISCALL);
@@ -5808,6 +5863,9 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
 
     // Variant& Variant::operator =(const String& rhs)
     engine->RegisterObjectMethod(className, "Variant& opAssign(const String&in)", AS_METHODPR(T, operator=, (const String&), Variant&), AS_CALL_THISCALL);
+
+    // Variant& Variant::operator =(const Vector<byte>& rhs)
+    engine->RegisterObjectMethod(className, "Variant& opAssign(Array<byte>@+)", AS_FUNCTION_OBJFIRST(Variant_Variantamp_operatoreq_constspVectorlesbytegreamp_template<Variant>), AS_CALL_CDECL_OBJFIRST);
 
     // Variant& Variant::operator =(const VectorBuffer& rhs)
     engine->RegisterObjectMethod(className, "Variant& opAssign(const VectorBuffer&in)", AS_METHODPR(T, operator=, (const VectorBuffer&), Variant&), AS_CALL_THISCALL);
@@ -5890,6 +5948,9 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // bool Variant::operator ==(const String& rhs) const
     engine->RegisterObjectMethod(className, "bool opEquals(const String&in) const", AS_METHODPR(T, operator==, (const String&) const, bool), AS_CALL_THISCALL);
 
+    // bool Variant::operator ==(const Vector<byte>& rhs) const
+    engine->RegisterObjectMethod(className, "bool opEquals(Array<byte>@+) const", AS_FUNCTION_OBJFIRST(Variant_bool_operatoreqeq_constspVectorlesbytegreamp_template<Variant>), AS_CALL_CDECL_OBJFIRST);
+
     // bool Variant::operator ==(const VectorBuffer& rhs) const
     engine->RegisterObjectMethod(className, "bool opEquals(const VectorBuffer&in) const", AS_METHODPR(T, operator==, (const VectorBuffer&) const, bool), AS_CALL_THISCALL);
 
@@ -5941,6 +6002,8 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // Not registered because template
     // template <> unsigned Variant::Get() const
     // Not registered because template
+    // template <> c32 Variant::Get() const
+    // Not registered because template
     // template <> long long Variant::Get() const
     // Not registered because template
     // template <> unsigned long long Variant::Get() const
@@ -5973,7 +6036,7 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // Not registered because template
     // template <> const IntVector3& Variant::Get() const
     // Not registered because template
-    // template <> const Vector<unsigned char>& Variant::Get() const
+    // template <> const Vector<byte>& Variant::Get() const
     // Not registered because template
     // template <> void* Variant::Get() const
     // Not registered because template
@@ -6015,7 +6078,7 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // Not registered because template
     // template <> IntVector3 Variant::Get() const
     // Not registered because template
-    // template <> Vector<unsigned char> Variant::Get() const
+    // template <> Vector<byte> Variant::Get() const
     // Not registered because template
     // template <> Matrix3 Variant::Get() const
     // Not registered because template
@@ -6042,8 +6105,8 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // static VariantType Variant::GetTypeFromName(const String& typeName)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("VariantType GetTypeFromName(const String&in)", AS_FUNCTIONPR(T::GetTypeFromName, (const String&), VariantType), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
-    // static const Vector<unsigned char> Variant::emptyBuffer
-    // Error: type "const Vector<unsigned char>" can not automatically bind
+    // static const Vector<byte> Variant::emptyBuffer
+    // Error: type "const Vector<byte>" can not automatically bind
     // static const VariantVector Variant::emptyVariantVector
     // Error: type "const VariantVector" can not automatically bind
     // static const StringVector Variant::emptyStringVector
@@ -6316,8 +6379,8 @@ template <class T> void RegisterMembers_Vector3(asIScriptEngine* engine, const c
     // Vector3 Vector3::ReNormalized(float minLength, float maxLength, const Vector3& defaultValue = Vector3::ZERO, float eps = M_LARGE_EPSILON) const
     engine->RegisterObjectMethod(className, "Vector3 ReNormalized(float, float, const Vector3&in = Vector3::ZERO, float = M_LARGE_EPSILON) const", AS_METHODPR(T, ReNormalized, (float, float, const Vector3&, float) const, Vector3), AS_CALL_THISCALL);
 
-    // unsigned Vector3::ToHash() const
-    engine->RegisterObjectMethod(className, "uint ToHash() const", AS_METHODPR(T, ToHash, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 Vector3::ToHash() const
+    engine->RegisterObjectMethod(className, "hash32 ToHash() const", AS_METHODPR(T, ToHash, () const, hash32), AS_CALL_THISCALL);
 
     // String Vector3::ToString() const
     engine->RegisterObjectMethod(className, "String ToString() const", AS_METHODPR(T, ToString, () const, String), AS_CALL_THISCALL);
@@ -6449,8 +6512,8 @@ template <class T> void RegisterMembers_Vector4(asIScriptEngine* engine, const c
     // float Vector4::ProjectOntoAxis(const Vector3& axis) const
     engine->RegisterObjectMethod(className, "float ProjectOntoAxis(const Vector3&in) const", AS_METHODPR(T, ProjectOntoAxis, (const Vector3&) const, float), AS_CALL_THISCALL);
 
-    // unsigned Vector4::ToHash() const
-    engine->RegisterObjectMethod(className, "uint ToHash() const", AS_METHODPR(T, ToHash, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 Vector4::ToHash() const
+    engine->RegisterObjectMethod(className, "hash32 ToHash() const", AS_METHODPR(T, ToHash, () const, hash32), AS_CALL_THISCALL);
 
     // String Vector4::ToString() const
     engine->RegisterObjectMethod(className, "String ToString() const", AS_METHODPR(T, ToString, () const, String), AS_CALL_THISCALL);
@@ -6494,14 +6557,14 @@ template <class T> void RegisterMembers_VertexBufferDesc(asIScriptEngine* engine
 {
     // Vector<VertexElement> VertexBufferDesc::vertexElements_
     // Error: type "Vector<VertexElement>" can not automatically bind
-    // SharedArrayPtr<unsigned char> VertexBufferDesc::data_
-    // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
+    // SharedArrayPtr<byte> VertexBufferDesc::data_
+    // Error: type "SharedArrayPtr<byte>" can not automatically bind
 
-    // unsigned VertexBufferDesc::vertexCount_
-    engine->RegisterObjectProperty(className, "uint vertexCount", offsetof(T, vertexCount_));
+    // i32 VertexBufferDesc::vertexCount_
+    engine->RegisterObjectProperty(className, "int vertexCount", offsetof(T, vertexCount_));
 
-    // unsigned VertexBufferDesc::dataSize_
-    engine->RegisterObjectProperty(className, "uint dataSize", offsetof(T, dataSize_));
+    // i32 VertexBufferDesc::dataSize_
+    engine->RegisterObjectProperty(className, "int dataSize", offsetof(T, dataSize_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_VertexBufferDesc
         REGISTER_MEMBERS_MANUAL_PART_VertexBufferDesc();
@@ -6511,17 +6574,17 @@ template <class T> void RegisterMembers_VertexBufferDesc(asIScriptEngine* engine
 // struct VertexBufferMorph | File: ../Graphics/Model.h
 template <class T> void RegisterMembers_VertexBufferMorph(asIScriptEngine* engine, const char* className)
 {
-    // SharedArrayPtr<unsigned char> VertexBufferMorph::morphData_
-    // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
+    // SharedArrayPtr<byte> VertexBufferMorph::morphData_
+    // Error: type "SharedArrayPtr<byte>" can not automatically bind
 
-    // VertexMaskFlags VertexBufferMorph::elementMask_
-    engine->RegisterObjectProperty(className, "VertexMaskFlags elementMask", offsetof(T, elementMask_));
+    // VertexElements VertexBufferMorph::elementMask_
+    engine->RegisterObjectProperty(className, "VertexElements elementMask", offsetof(T, elementMask_));
 
-    // unsigned VertexBufferMorph::vertexCount_
-    engine->RegisterObjectProperty(className, "uint vertexCount", offsetof(T, vertexCount_));
+    // i32 VertexBufferMorph::vertexCount_
+    engine->RegisterObjectProperty(className, "int vertexCount", offsetof(T, vertexCount_));
 
-    // unsigned VertexBufferMorph::dataSize_
-    engine->RegisterObjectProperty(className, "uint dataSize", offsetof(T, dataSize_));
+    // i32 VertexBufferMorph::dataSize_
+    engine->RegisterObjectProperty(className, "int dataSize", offsetof(T, dataSize_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_VertexBufferMorph
         REGISTER_MEMBERS_MANUAL_PART_VertexBufferMorph();
@@ -6609,11 +6672,26 @@ template <class T> CScriptArray* XMLElement_VectorlesStringgre_GetAttributeNames
     return VectorToArray<String>(result, "Array<String>");
 }
 
+// Vector<byte> XMLElement::GetBuffer(const String& name) const
+template <class T> CScriptArray* XMLElement_Vectorlesbytegre_GetBuffer_constspStringamp_template(T* _ptr, const String& name)
+{
+    Vector<byte> result = _ptr->GetBuffer(name);
+    return VectorToArray(result, "Array<byte>");
+}
+
 // StringVector XMLElement::GetStringVector() const
 template <class T> CScriptArray* XMLElement_StringVector_GetStringVector_void_template(T* _ptr)
 {
     StringVector result = _ptr->GetStringVector();
     return VectorToArray<String>(result, "Array<String>");
+}
+
+// bool XMLElement::SetBuffer(const String& name, const Vector<unsigned char>& value)
+template <class T> bool XMLElement_bool_SetBuffer_constspStringamp_constspVectorlesunsignedspchargreamp_template(T* _ptr, const String& name, CScriptArray* value_conv)
+{
+    Vector<unsigned char> value = ArrayToVector<unsigned char>(value_conv);
+    bool result = _ptr->SetBuffer(name, value);
+    return result;
 }
 
 // bool XMLElement::SetStringVector(const StringVector& value)
@@ -6637,9 +6715,7 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // Error: type "const char*" can not automatically bind
     // String XMLElement::GetAttributeUpper(const char* name) const
     // Error: type "const char*" can not automatically bind
-    // Vector<unsigned char> XMLElement::GetBuffer(const String& name) const
-    // Error: type "Vector<unsigned char>" can not automatically bind
-    // bool XMLElement::GetBuffer(const String& name, void* dest, unsigned size) const
+    // bool XMLElement::GetBuffer(const String& name, void* dest, i32 size) const
     // Error: type "void*" can not automatically bind
     // XMLElement XMLElement::GetChild(const char* name) const
     // Error: type "const char*" can not automatically bind
@@ -6673,10 +6749,8 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // Error: type "const char*" can not automatically bind
     // bool XMLElement::SetAttribute(const char* value)
     // Error: type "const char*" can not automatically bind
-    // bool XMLElement::SetBuffer(const String& name, const void* data, unsigned size)
+    // bool XMLElement::SetBuffer(const String& name, const void* data, i32 size)
     // Error: type "const void*" can not automatically bind
-    // bool XMLElement::SetBuffer(const String& name, const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // bool XMLElement::SetValue(const char* value)
     // Error: type "const char*" can not automatically bind
     // bool XMLElement::SetVariantVector(const VariantVector& value)
@@ -6706,6 +6780,9 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // BoundingBox XMLElement::GetBoundingBox() const
     engine->RegisterObjectMethod(className, "BoundingBox GetBoundingBox() const", AS_METHODPR(T, GetBoundingBox, () const, BoundingBox), AS_CALL_THISCALL);
 
+    // Vector<byte> XMLElement::GetBuffer(const String& name) const
+    engine->RegisterObjectMethod(className, "Array<byte>@ GetBuffer(const String&in) const", AS_FUNCTION_OBJFIRST(XMLElement_Vectorlesbytegre_GetBuffer_constspStringamp_template<XMLElement>), AS_CALL_CDECL_OBJFIRST);
+
     // XMLElement XMLElement::GetChild(const String& name = String::EMPTY) const
     engine->RegisterObjectMethod(className, "XMLElement GetChild(const String&in = String::EMPTY) const", AS_METHODPR(T, GetChild, (const String&) const, XMLElement), AS_CALL_THISCALL);
 
@@ -6722,11 +6799,11 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // float XMLElement::GetFloat(const String& name) const
     engine->RegisterObjectMethod(className, "float GetFloat(const String&in) const", AS_METHODPR(T, GetFloat, (const String&) const, float), AS_CALL_THISCALL);
 
-    // int XMLElement::GetInt(const String& name) const
-    engine->RegisterObjectMethod(className, "int GetInt(const String&in) const", AS_METHODPR(T, GetInt, (const String&) const, int), AS_CALL_THISCALL);
+    // i32 XMLElement::GetI32(const String& name) const
+    engine->RegisterObjectMethod(className, "int GetI32(const String&in) const", AS_METHODPR(T, GetI32, (const String&) const, i32), AS_CALL_THISCALL);
 
-    // long long XMLElement::GetInt64(const String& name) const
-    engine->RegisterObjectMethod(className, "int64 GetInt64(const String&in) const", AS_METHODPR(T, GetInt64, (const String&) const, long long), AS_CALL_THISCALL);
+    // i64 XMLElement::GetI64(const String& name) const
+    engine->RegisterObjectMethod(className, "int64 GetI64(const String&in) const", AS_METHODPR(T, GetI64, (const String&) const, i64), AS_CALL_THISCALL);
 
     // IntRect XMLElement::GetIntRect(const String& name) const
     engine->RegisterObjectMethod(className, "IntRect GetIntRect(const String&in) const", AS_METHODPR(T, GetIntRect, (const String&) const, IntRect), AS_CALL_THISCALL);
@@ -6753,9 +6830,9 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // XMLElement XMLElement::GetNext(const String& name = String::EMPTY) const
     engine->RegisterObjectMethod(className, "XMLElement GetNext(const String&in = String::EMPTY) const", AS_METHODPR(T, GetNext, (const String&) const, XMLElement), AS_CALL_THISCALL);
 
-    // unsigned XMLElement::GetNumAttributes() const
-    engine->RegisterObjectMethod(className, "uint GetNumAttributes() const", AS_METHODPR(T, GetNumAttributes, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numAttributes() const", AS_METHODPR(T, GetNumAttributes, () const, unsigned), AS_CALL_THISCALL);
+    // i32 XMLElement::GetNumAttributes() const
+    engine->RegisterObjectMethod(className, "int GetNumAttributes() const", AS_METHODPR(T, GetNumAttributes, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numAttributes() const", AS_METHODPR(T, GetNumAttributes, () const, i32), AS_CALL_THISCALL);
 
     // XMLElement XMLElement::GetOrCreateChild(const String& name)
     engine->RegisterObjectMethod(className, "XMLElement GetOrCreateChild(const String&in)", AS_METHODPR(T, GetOrCreateChild, (const String&), XMLElement), AS_CALL_THISCALL);
@@ -6779,11 +6856,11 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // StringVector XMLElement::GetStringVector() const
     engine->RegisterObjectMethod(className, "Array<String>@ GetStringVector() const", AS_FUNCTION_OBJFIRST(XMLElement_StringVector_GetStringVector_void_template<XMLElement>), AS_CALL_CDECL_OBJFIRST);
 
-    // unsigned XMLElement::GetUInt(const String& name) const
-    engine->RegisterObjectMethod(className, "uint GetUInt(const String&in) const", AS_METHODPR(T, GetUInt, (const String&) const, unsigned), AS_CALL_THISCALL);
+    // u32 XMLElement::GetU32(const String& name) const
+    engine->RegisterObjectMethod(className, "uint GetU32(const String&in) const", AS_METHODPR(T, GetU32, (const String&) const, u32), AS_CALL_THISCALL);
 
-    // unsigned long long XMLElement::GetUInt64(const String& name) const
-    engine->RegisterObjectMethod(className, "uint64 GetUInt64(const String&in) const", AS_METHODPR(T, GetUInt64, (const String&) const, unsigned long long), AS_CALL_THISCALL);
+    // u64 XMLElement::GetU64(const String& name) const
+    engine->RegisterObjectMethod(className, "uint64 GetU64(const String&in) const", AS_METHODPR(T, GetU64, (const String&) const, u64), AS_CALL_THISCALL);
 
     // String XMLElement::GetValue() const
     engine->RegisterObjectMethod(className, "String GetValue() const", AS_METHODPR(T, GetValue, () const, String), AS_CALL_THISCALL);
@@ -6813,8 +6890,8 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // Variant XMLElement::GetVectorVariant(const String& name) const
     engine->RegisterObjectMethod(className, "Variant GetVectorVariant(const String&in) const", AS_METHODPR(T, GetVectorVariant, (const String&) const, Variant), AS_CALL_THISCALL);
 
-    // unsigned XMLElement::GetXPathResultIndex() const
-    engine->RegisterObjectMethod(className, "uint GetXPathResultIndex() const", AS_METHODPR(T, GetXPathResultIndex, () const, unsigned), AS_CALL_THISCALL);
+    // i32 XMLElement::GetXPathResultIndex() const
+    engine->RegisterObjectMethod(className, "int GetXPathResultIndex() const", AS_METHODPR(T, GetXPathResultIndex, () const, i32), AS_CALL_THISCALL);
 
     // bool XMLElement::HasAttribute(const String& name) const
     engine->RegisterObjectMethod(className, "bool HasAttribute(const String&in) const", AS_METHODPR(T, HasAttribute, (const String&) const, bool), AS_CALL_THISCALL);
@@ -6873,6 +6950,9 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // bool XMLElement::SetBoundingBox(const BoundingBox& value)
     engine->RegisterObjectMethod(className, "bool SetBoundingBox(const BoundingBox&in)", AS_METHODPR(T, SetBoundingBox, (const BoundingBox&), bool), AS_CALL_THISCALL);
 
+    // bool XMLElement::SetBuffer(const String& name, const Vector<unsigned char>& value)
+    engine->RegisterObjectMethod(className, "bool SetBuffer(const String&in, Array<uint8>@+)", AS_FUNCTION_OBJFIRST(XMLElement_bool_SetBuffer_constspStringamp_constspVectorlesunsignedspchargreamp_template<XMLElement>), AS_CALL_CDECL_OBJFIRST);
+
     // bool XMLElement::SetColor(const String& name, const Color& value)
     engine->RegisterObjectMethod(className, "bool SetColor(const String&in, const Color&in)", AS_METHODPR(T, SetColor, (const String&, const Color&), bool), AS_CALL_THISCALL);
 
@@ -6882,11 +6962,11 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // bool XMLElement::SetFloat(const String& name, float value)
     engine->RegisterObjectMethod(className, "bool SetFloat(const String&in, float)", AS_METHODPR(T, SetFloat, (const String&, float), bool), AS_CALL_THISCALL);
 
-    // bool XMLElement::SetInt(const String& name, int value)
-    engine->RegisterObjectMethod(className, "bool SetInt(const String&in, int)", AS_METHODPR(T, SetInt, (const String&, int), bool), AS_CALL_THISCALL);
+    // bool XMLElement::SetI32(const String& name, i32 value)
+    engine->RegisterObjectMethod(className, "bool SetI32(const String&in, int)", AS_METHODPR(T, SetI32, (const String&, i32), bool), AS_CALL_THISCALL);
 
-    // bool XMLElement::SetInt64(const String& name, long long value)
-    engine->RegisterObjectMethod(className, "bool SetInt64(const String&in, int64)", AS_METHODPR(T, SetInt64, (const String&, long long), bool), AS_CALL_THISCALL);
+    // bool XMLElement::SetI64(const String& name, i64 value)
+    engine->RegisterObjectMethod(className, "bool SetI64(const String&in, int64)", AS_METHODPR(T, SetI64, (const String&, i64), bool), AS_CALL_THISCALL);
 
     // bool XMLElement::SetIntRect(const String& name, const IntRect& value)
     engine->RegisterObjectMethod(className, "bool SetIntRect(const String&in, const IntRect&in)", AS_METHODPR(T, SetIntRect, (const String&, const IntRect&), bool), AS_CALL_THISCALL);
@@ -6924,11 +7004,11 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // bool XMLElement::SetStringVector(const StringVector& value)
     engine->RegisterObjectMethod(className, "bool SetStringVector(Array<String>@+)", AS_FUNCTION_OBJFIRST(XMLElement_bool_SetStringVector_constspStringVectoramp_template<XMLElement>), AS_CALL_CDECL_OBJFIRST);
 
-    // bool XMLElement::SetUInt(const String& name, unsigned value)
-    engine->RegisterObjectMethod(className, "bool SetUInt(const String&in, uint)", AS_METHODPR(T, SetUInt, (const String&, unsigned), bool), AS_CALL_THISCALL);
+    // bool XMLElement::SetU32(const String& name, u32 value)
+    engine->RegisterObjectMethod(className, "bool SetU32(const String&in, uint)", AS_METHODPR(T, SetU32, (const String&, u32), bool), AS_CALL_THISCALL);
 
-    // bool XMLElement::SetUInt64(const String& name, unsigned long long value)
-    engine->RegisterObjectMethod(className, "bool SetUInt64(const String&in, uint64)", AS_METHODPR(T, SetUInt64, (const String&, unsigned long long), bool), AS_CALL_THISCALL);
+    // bool XMLElement::SetU64(const String& name, u64 value)
+    engine->RegisterObjectMethod(className, "bool SetU64(const String&in, uint64)", AS_METHODPR(T, SetU64, (const String&, u64), bool), AS_CALL_THISCALL);
 
     // bool XMLElement::SetValue(const String& value)
     engine->RegisterObjectMethod(className, "bool SetValue(const String&in)", AS_METHODPR(T, SetValue, (const String&), bool), AS_CALL_THISCALL);
@@ -7032,12 +7112,12 @@ template <class T> void RegisterMembers_XPathResultSet(asIScriptEngine* engine, 
     // XPathResultSet& XPathResultSet::operator =(const XPathResultSet& rhs)
     engine->RegisterObjectMethod(className, "XPathResultSet& opAssign(const XPathResultSet&in)", AS_METHODPR(T, operator=, (const XPathResultSet&), XPathResultSet&), AS_CALL_THISCALL);
 
-    // XMLElement XPathResultSet::operator [](unsigned index) const
-    engine->RegisterObjectMethod(className, "XMLElement opIndex(uint) const", AS_METHODPR(T, operator[], (unsigned) const, XMLElement), AS_CALL_THISCALL);
+    // XMLElement XPathResultSet::operator [](i32 index) const
+    engine->RegisterObjectMethod(className, "XMLElement opIndex(int) const", AS_METHODPR(T, operator[], (i32) const, XMLElement), AS_CALL_THISCALL);
 
-    // unsigned XPathResultSet::Size() const
-    engine->RegisterObjectMethod(className, "uint Size() const", AS_METHODPR(T, Size, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_size() const", AS_METHODPR(T, Size, () const, unsigned), AS_CALL_THISCALL);
+    // i32 XPathResultSet::Size() const
+    engine->RegisterObjectMethod(className, "int Size() const", AS_METHODPR(T, Size, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_size() const", AS_METHODPR(T, Size, () const, i32), AS_CALL_THISCALL);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_XPathResultSet
         REGISTER_MEMBERS_MANUAL_PART_XPathResultSet();
@@ -7067,16 +7147,16 @@ template <class T> void RegisterMembers_CrowdObstacleAvoidanceParams(asIScriptEn
     // float CrowdObstacleAvoidanceParams::horizTime
     engine->RegisterObjectProperty(className, "float horizTime", offsetof(T, horizTime));
 
-    // unsigned char CrowdObstacleAvoidanceParams::gridSize
+    // u8 CrowdObstacleAvoidanceParams::gridSize
     engine->RegisterObjectProperty(className, "uint8 gridSize", offsetof(T, gridSize));
 
-    // unsigned char CrowdObstacleAvoidanceParams::adaptiveDivs
+    // u8 CrowdObstacleAvoidanceParams::adaptiveDivs
     engine->RegisterObjectProperty(className, "uint8 adaptiveDivs", offsetof(T, adaptiveDivs));
 
-    // unsigned char CrowdObstacleAvoidanceParams::adaptiveRings
+    // u8 CrowdObstacleAvoidanceParams::adaptiveRings
     engine->RegisterObjectProperty(className, "uint8 adaptiveRings", offsetof(T, adaptiveRings));
 
-    // unsigned char CrowdObstacleAvoidanceParams::adaptiveDepth
+    // u8 CrowdObstacleAvoidanceParams::adaptiveDepth
     engine->RegisterObjectProperty(className, "uint8 adaptiveDepth", offsetof(T, adaptiveDepth));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CrowdObstacleAvoidanceParams
@@ -7187,8 +7267,8 @@ template <class T> void RegisterMembers_PackageDownload(asIScriptEngine* engine,
     // unsigned PackageDownload::totalFragments_
     engine->RegisterObjectProperty(className, "uint totalFragments", offsetof(T, totalFragments_));
 
-    // unsigned PackageDownload::checksum_
-    engine->RegisterObjectProperty(className, "uint checksum", offsetof(T, checksum_));
+    // hash32 PackageDownload::checksum_
+    engine->RegisterObjectProperty(className, "hash32 checksum", offsetof(T, checksum_));
 
     // bool PackageDownload::initiated_
     engine->RegisterObjectProperty(className, "bool initiated", offsetof(T, initiated_));
@@ -7575,8 +7655,8 @@ template <class T> void RegisterMembers_AnimationState(asIScriptEngine* engine, 
     engine->RegisterObjectMethod(className, "AnimationBlendMode GetBlendMode() const", AS_METHODPR(T, GetBlendMode, () const, AnimationBlendMode), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "AnimationBlendMode get_blendMode() const", AS_METHODPR(T, GetBlendMode, () const, AnimationBlendMode), AS_CALL_THISCALL);
 
-    // float AnimationState::GetBoneWeight(unsigned index) const
-    engine->RegisterObjectMethod(className, "float GetBoneWeight(uint) const", AS_METHODPR(T, GetBoneWeight, (unsigned) const, float), AS_CALL_THISCALL);
+    // float AnimationState::GetBoneWeight(i32 index) const
+    engine->RegisterObjectMethod(className, "float GetBoneWeight(int) const", AS_METHODPR(T, GetBoneWeight, (i32) const, float), AS_CALL_THISCALL);
 
     // float AnimationState::GetBoneWeight(const String& name) const
     engine->RegisterObjectMethod(className, "float GetBoneWeight(const String&in) const", AS_METHODPR(T, GetBoneWeight, (const String&) const, float), AS_CALL_THISCALL);
@@ -7609,14 +7689,14 @@ template <class T> void RegisterMembers_AnimationState(asIScriptEngine* engine, 
     engine->RegisterObjectMethod(className, "float GetTime() const", AS_METHODPR(T, GetTime, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_time() const", AS_METHODPR(T, GetTime, () const, float), AS_CALL_THISCALL);
 
-    // unsigned AnimationState::GetTrackIndex(Node* node) const
-    engine->RegisterObjectMethod(className, "uint GetTrackIndex(Node@+) const", AS_METHODPR(T, GetTrackIndex, (Node*) const, unsigned), AS_CALL_THISCALL);
+    // i32 AnimationState::GetTrackIndex(Node* node) const
+    engine->RegisterObjectMethod(className, "int GetTrackIndex(Node@+) const", AS_METHODPR(T, GetTrackIndex, (Node*) const, i32), AS_CALL_THISCALL);
 
-    // unsigned AnimationState::GetTrackIndex(const String& name) const
-    engine->RegisterObjectMethod(className, "uint GetTrackIndex(const String&in) const", AS_METHODPR(T, GetTrackIndex, (const String&) const, unsigned), AS_CALL_THISCALL);
+    // i32 AnimationState::GetTrackIndex(const String& name) const
+    engine->RegisterObjectMethod(className, "int GetTrackIndex(const String&in) const", AS_METHODPR(T, GetTrackIndex, (const String&) const, i32), AS_CALL_THISCALL);
 
-    // unsigned AnimationState::GetTrackIndex(StringHash nameHash) const
-    engine->RegisterObjectMethod(className, "uint GetTrackIndex(StringHash) const", AS_METHODPR(T, GetTrackIndex, (StringHash) const, unsigned), AS_CALL_THISCALL);
+    // i32 AnimationState::GetTrackIndex(StringHash nameHash) const
+    engine->RegisterObjectMethod(className, "int GetTrackIndex(StringHash) const", AS_METHODPR(T, GetTrackIndex, (StringHash) const, i32), AS_CALL_THISCALL);
 
     // float AnimationState::GetWeight() const
     engine->RegisterObjectMethod(className, "float GetWeight() const", AS_METHODPR(T, GetWeight, () const, float), AS_CALL_THISCALL);
@@ -7634,8 +7714,8 @@ template <class T> void RegisterMembers_AnimationState(asIScriptEngine* engine, 
     engine->RegisterObjectMethod(className, "void SetBlendMode(AnimationBlendMode)", AS_METHODPR(T, SetBlendMode, (AnimationBlendMode), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_blendMode(AnimationBlendMode)", AS_METHODPR(T, SetBlendMode, (AnimationBlendMode), void), AS_CALL_THISCALL);
 
-    // void AnimationState::SetBoneWeight(unsigned index, float weight, bool recursive = false)
-    engine->RegisterObjectMethod(className, "void SetBoneWeight(uint, float, bool = false)", AS_METHODPR(T, SetBoneWeight, (unsigned, float, bool), void), AS_CALL_THISCALL);
+    // void AnimationState::SetBoneWeight(i32 index, float weight, bool recursive = false)
+    engine->RegisterObjectMethod(className, "void SetBoneWeight(int, float, bool = false)", AS_METHODPR(T, SetBoneWeight, (i32, float, bool), void), AS_CALL_THISCALL);
 
     // void AnimationState::SetBoneWeight(const String& name, float weight, bool recursive = false)
     engine->RegisterObjectMethod(className, "void SetBoneWeight(const String&in, float, bool = false)", AS_METHODPR(T, SetBoneWeight, (const String&, float, bool), void), AS_CALL_THISCALL);
@@ -7712,7 +7792,7 @@ template <class T> void RegisterMembers_BatchGroup(asIScriptEngine* engine, cons
 {
     RegisterMembers_Batch<T>(engine, className);
 
-    // void BatchGroup::SetInstancingData(void* lockedData, unsigned stride, unsigned& freeIndex)
+    // void BatchGroup::SetInstancingData(void* lockedData, i32 stride, i32& freeIndex)
     // Error: type "void*" can not automatically bind
 
     // void BatchGroup::AddTransforms(const Batch& batch)
@@ -7721,8 +7801,8 @@ template <class T> void RegisterMembers_BatchGroup(asIScriptEngine* engine, cons
     // Vector<InstanceData> BatchGroup::instances_
     // Error: type "Vector<InstanceData>" can not automatically bind
 
-    // unsigned BatchGroup::startIndex_
-    engine->RegisterObjectProperty(className, "uint startIndex", offsetof(T, startIndex_));
+    // i32 BatchGroup::startIndex_
+    engine->RegisterObjectProperty(className, "int startIndex", offsetof(T, startIndex_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_BatchGroup
         REGISTER_MEMBERS_MANUAL_PART_BatchGroup();
@@ -8606,14 +8686,19 @@ template <class T> void RegisterMembers_SceneReplicationState(asIScriptEngine* e
     #endif
 }
 
+// const Vector<unsigned char>& ShaderVariation::GetByteCode() const
+template <class T> CScriptArray* ShaderVariation_constspVectorlesunsignedspchargreamp_GetByteCode_void_template(T* _ptr)
+{
+    const Vector<unsigned char>& result = _ptr->GetByteCode();
+    return VectorToArray(result, "Array<uint8>");
+}
+
 // class ShaderVariation | File: ../GraphicsAPI/ShaderVariation.h
 template <class T> void RegisterMembers_ShaderVariation(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_RefCounted<T>(engine, className);
     RegisterMembers_GPUObject<T>(engine, className);
 
-    // const Vector<unsigned char>& ShaderVariation::GetByteCode() const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // const unsigned* ShaderVariation::GetConstantBufferSizes() const
     // Error: type "const unsigned*" can not automatically bind
     // const HashMap<StringHash, ShaderParameter>& ShaderVariation::GetParameters() const
@@ -8621,6 +8706,9 @@ template <class T> void RegisterMembers_ShaderVariation(asIScriptEngine* engine,
 
     // bool ShaderVariation::Create()
     engine->RegisterObjectMethod(className, "bool Create()", AS_METHODPR(T, Create, (), bool), AS_CALL_THISCALL);
+
+    // const Vector<unsigned char>& ShaderVariation::GetByteCode() const
+    engine->RegisterObjectMethod(className, "Array<uint8>@ GetByteCode() const", AS_FUNCTION_OBJFIRST(ShaderVariation_constspVectorlesunsignedspchargreamp_GetByteCode_void_template<ShaderVariation>), AS_CALL_CDECL_OBJFIRST);
 
     // const String& ShaderVariation::GetCompilerOutput() const
     engine->RegisterObjectMethod(className, "const String& GetCompilerOutput() const", AS_METHODPR(T, GetCompilerOutput, () const, const String&), AS_CALL_THISCALL);
@@ -8631,8 +8719,8 @@ template <class T> void RegisterMembers_ShaderVariation(asIScriptEngine* engine,
     // const String& ShaderVariation::GetDefinesClipPlane()
     engine->RegisterObjectMethod(className, "const String& GetDefinesClipPlane()", AS_METHODPR(T, GetDefinesClipPlane, (), const String&), AS_CALL_THISCALL);
 
-    // unsigned long long ShaderVariation::GetElementHash() const
-    engine->RegisterObjectMethod(className, "uint64 GetElementHash() const", AS_METHODPR(T, GetElementHash, () const, unsigned long long), AS_CALL_THISCALL);
+    // hash64 ShaderVariation::GetElementHash() const
+    engine->RegisterObjectMethod(className, "hash64 GetElementHash() const", AS_METHODPR(T, GetElementHash, () const, hash64), AS_CALL_THISCALL);
 
     // String ShaderVariation::GetFullName() const
     engine->RegisterObjectMethod(className, "String GetFullName() const", AS_METHODPR(T, GetFullName, () const, String), AS_CALL_THISCALL);
@@ -8834,9 +8922,9 @@ template <class T> void RegisterMembers_HttpRequest(asIScriptEngine* engine, con
     RegisterMembers_Deserializer<T>(engine, className);
     RegisterMembers_Thread<T>(engine, className);
 
-    // unsigned HttpRequest::GetAvailableSize() const
-    engine->RegisterObjectMethod(className, "uint GetAvailableSize() const", AS_METHODPR(T, GetAvailableSize, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_availableSize() const", AS_METHODPR(T, GetAvailableSize, () const, unsigned), AS_CALL_THISCALL);
+    // i32 HttpRequest::GetAvailableSize() const
+    engine->RegisterObjectMethod(className, "int GetAvailableSize() const", AS_METHODPR(T, GetAvailableSize, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_availableSize() const", AS_METHODPR(T, GetAvailableSize, () const, i32), AS_CALL_THISCALL);
 
     // String HttpRequest::GetError() const
     engine->RegisterObjectMethod(className, "String GetError() const", AS_METHODPR(T, GetError, () const, String), AS_CALL_THISCALL);
@@ -9332,9 +9420,9 @@ template <class T> void RegisterMembers_DebugHud(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "Text@+ GetMemoryText() const", AS_METHODPR(T, GetMemoryText, () const, Text*), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "Text@+ get_memoryText() const", AS_METHODPR(T, GetMemoryText, () const, Text*), AS_CALL_THISCALL);
 
-    // unsigned DebugHud::GetMode() const
-    engine->RegisterObjectMethod(className, "uint GetMode() const", AS_METHODPR(T, GetMode, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_mode() const", AS_METHODPR(T, GetMode, () const, unsigned), AS_CALL_THISCALL);
+    // DebugHudElements DebugHud::GetMode() const
+    engine->RegisterObjectMethod(className, "DebugHudElements GetMode() const", AS_METHODPR(T, GetMode, () const, DebugHudElements), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "DebugHudElements get_mode() const", AS_METHODPR(T, GetMode, () const, DebugHudElements), AS_CALL_THISCALL);
 
     // Text* DebugHud::GetModeText() const
     engine->RegisterObjectMethod(className, "Text@+ GetModeText() const", AS_METHODPR(T, GetModeText, () const, Text*), AS_CALL_THISCALL);
@@ -9373,9 +9461,9 @@ template <class T> void RegisterMembers_DebugHud(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetDefaultStyle(XMLFile@+)", AS_METHODPR(T, SetDefaultStyle, (XMLFile*), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_defaultStyle(XMLFile@+)", AS_METHODPR(T, SetDefaultStyle, (XMLFile*), void), AS_CALL_THISCALL);
 
-    // void DebugHud::SetMode(unsigned mode)
-    engine->RegisterObjectMethod(className, "void SetMode(uint)", AS_METHODPR(T, SetMode, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_mode(uint)", AS_METHODPR(T, SetMode, (unsigned), void), AS_CALL_THISCALL);
+    // void DebugHud::SetMode(DebugHudElements mode)
+    engine->RegisterObjectMethod(className, "void SetMode(DebugHudElements)", AS_METHODPR(T, SetMode, (DebugHudElements), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_mode(DebugHudElements)", AS_METHODPR(T, SetMode, (DebugHudElements), void), AS_CALL_THISCALL);
 
     // void DebugHud::SetProfilerInterval(float interval)
     engine->RegisterObjectMethod(className, "void SetProfilerInterval(float)", AS_METHODPR(T, SetProfilerInterval, (float), void), AS_CALL_THISCALL);
@@ -9389,8 +9477,8 @@ template <class T> void RegisterMembers_DebugHud(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetUseRendererStats(bool)", AS_METHODPR(T, SetUseRendererStats, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_useRendererStats(bool)", AS_METHODPR(T, SetUseRendererStats, (bool), void), AS_CALL_THISCALL);
 
-    // void DebugHud::Toggle(unsigned mode)
-    engine->RegisterObjectMethod(className, "void Toggle(uint)", AS_METHODPR(T, Toggle, (unsigned), void), AS_CALL_THISCALL);
+    // void DebugHud::Toggle(DebugHudElements mode)
+    engine->RegisterObjectMethod(className, "void Toggle(DebugHudElements)", AS_METHODPR(T, Toggle, (DebugHudElements), void), AS_CALL_THISCALL);
 
     // void DebugHud::ToggleAll()
     engine->RegisterObjectMethod(className, "void ToggleAll()", AS_METHODPR(T, ToggleAll, (), void), AS_CALL_THISCALL);
@@ -9872,16 +9960,16 @@ template <class T> void RegisterMembers_Geometry(asIScriptEngine* engine, const 
 
     // float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal = nullptr, Vector2* outUV = nullptr) const
     // Error: type "Vector3*" can not automatically bind
-    // void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize, const Vector<VertexElement>*& elements) const
-    // Error: type "const unsigned char*&" can not automatically bind
-    // void Geometry::GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, unsigned& vertexSize, SharedArrayPtr<unsigned char>& indexData, unsigned& indexSize, const Vector<VertexElement>*& elements) const
-    // Error: type "SharedArrayPtr<unsigned char>&" can not automatically bind
-    // void Geometry::SetRawIndexData(const SharedArrayPtr<unsigned char>& data, unsigned indexSize)
-    // Error: type "const SharedArrayPtr<unsigned char>&" can not automatically bind
-    // void Geometry::SetRawVertexData(const SharedArrayPtr<unsigned char>& data, const Vector<VertexElement>& elements)
-    // Error: type "const SharedArrayPtr<unsigned char>&" can not automatically bind
-    // void Geometry::SetRawVertexData(const SharedArrayPtr<unsigned char>& data, unsigned elementMask)
-    // Error: type "const SharedArrayPtr<unsigned char>&" can not automatically bind
+    // void Geometry::GetRawData(const byte*& vertexData, i32& vertexSize, const byte*& indexData, i32& indexSize, const Vector<VertexElement>*& elements) const
+    // Error: type "const byte*&" can not automatically bind
+    // void Geometry::GetRawDataShared(SharedArrayPtr<byte>& vertexData, i32& vertexSize, SharedArrayPtr<byte>& indexData, i32& indexSize, const Vector<VertexElement>*& elements) const
+    // Error: type "SharedArrayPtr<byte>&" can not automatically bind
+    // void Geometry::SetRawIndexData(const SharedArrayPtr<byte>& data, i32 indexSize)
+    // Error: type "const SharedArrayPtr<byte>&" can not automatically bind
+    // void Geometry::SetRawVertexData(const SharedArrayPtr<byte>& data, const Vector<VertexElement>& elements)
+    // Error: type "const SharedArrayPtr<byte>&" can not automatically bind
+    // void Geometry::SetRawVertexData(const SharedArrayPtr<byte>& data, VertexElements elementMask)
+    // Error: type "const SharedArrayPtr<byte>&" can not automatically bind
 
     // void Geometry::Draw(Graphics* graphics)
     engine->RegisterObjectMethod(className, "void Draw(Graphics@+)", AS_METHODPR(T, Draw, (Graphics*), void), AS_CALL_THISCALL);
@@ -9893,40 +9981,40 @@ template <class T> void RegisterMembers_Geometry(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "IndexBuffer@+ GetIndexBuffer() const", AS_METHODPR(T, GetIndexBuffer, () const, IndexBuffer*), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "IndexBuffer@+ get_indexBuffer() const", AS_METHODPR(T, GetIndexBuffer, () const, IndexBuffer*), AS_CALL_THISCALL);
 
-    // unsigned Geometry::GetIndexCount() const
-    engine->RegisterObjectMethod(className, "uint GetIndexCount() const", AS_METHODPR(T, GetIndexCount, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_indexCount() const", AS_METHODPR(T, GetIndexCount, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Geometry::GetIndexCount() const
+    engine->RegisterObjectMethod(className, "int GetIndexCount() const", AS_METHODPR(T, GetIndexCount, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_indexCount() const", AS_METHODPR(T, GetIndexCount, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Geometry::GetIndexStart() const
-    engine->RegisterObjectMethod(className, "uint GetIndexStart() const", AS_METHODPR(T, GetIndexStart, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_indexStart() const", AS_METHODPR(T, GetIndexStart, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Geometry::GetIndexStart() const
+    engine->RegisterObjectMethod(className, "int GetIndexStart() const", AS_METHODPR(T, GetIndexStart, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_indexStart() const", AS_METHODPR(T, GetIndexStart, () const, i32), AS_CALL_THISCALL);
 
     // float Geometry::GetLodDistance() const
     engine->RegisterObjectMethod(className, "float GetLodDistance() const", AS_METHODPR(T, GetLodDistance, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_lodDistance() const", AS_METHODPR(T, GetLodDistance, () const, float), AS_CALL_THISCALL);
 
-    // unsigned Geometry::GetNumVertexBuffers() const
-    engine->RegisterObjectMethod(className, "uint GetNumVertexBuffers() const", AS_METHODPR(T, GetNumVertexBuffers, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numVertexBuffers() const", AS_METHODPR(T, GetNumVertexBuffers, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Geometry::GetNumVertexBuffers() const
+    engine->RegisterObjectMethod(className, "int GetNumVertexBuffers() const", AS_METHODPR(T, GetNumVertexBuffers, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numVertexBuffers() const", AS_METHODPR(T, GetNumVertexBuffers, () const, i32), AS_CALL_THISCALL);
 
     // PrimitiveType Geometry::GetPrimitiveType() const
     engine->RegisterObjectMethod(className, "PrimitiveType GetPrimitiveType() const", AS_METHODPR(T, GetPrimitiveType, () const, PrimitiveType), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "PrimitiveType get_primitiveType() const", AS_METHODPR(T, GetPrimitiveType, () const, PrimitiveType), AS_CALL_THISCALL);
 
-    // VertexBuffer* Geometry::GetVertexBuffer(unsigned index) const
-    engine->RegisterObjectMethod(className, "VertexBuffer@+ GetVertexBuffer(uint) const", AS_METHODPR(T, GetVertexBuffer, (unsigned) const, VertexBuffer*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "VertexBuffer@+ get_vertexBuffers(uint) const", AS_METHODPR(T, GetVertexBuffer, (unsigned) const, VertexBuffer*), AS_CALL_THISCALL);
+    // VertexBuffer* Geometry::GetVertexBuffer(i32 index) const
+    engine->RegisterObjectMethod(className, "VertexBuffer@+ GetVertexBuffer(int) const", AS_METHODPR(T, GetVertexBuffer, (i32) const, VertexBuffer*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "VertexBuffer@+ get_vertexBuffers(int) const", AS_METHODPR(T, GetVertexBuffer, (i32) const, VertexBuffer*), AS_CALL_THISCALL);
 
     // const Vector<SharedPtr<VertexBuffer>>& Geometry::GetVertexBuffers() const
     engine->RegisterObjectMethod(className, "Array<VertexBuffer@>@ GetVertexBuffers() const", AS_FUNCTION_OBJFIRST(Geometry_constspVectorlesSharedPtrlesVertexBuffergregreamp_GetVertexBuffers_void_template<Geometry>), AS_CALL_CDECL_OBJFIRST);
 
-    // unsigned Geometry::GetVertexCount() const
-    engine->RegisterObjectMethod(className, "uint GetVertexCount() const", AS_METHODPR(T, GetVertexCount, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_vertexCount() const", AS_METHODPR(T, GetVertexCount, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Geometry::GetVertexCount() const
+    engine->RegisterObjectMethod(className, "int GetVertexCount() const", AS_METHODPR(T, GetVertexCount, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_vertexCount() const", AS_METHODPR(T, GetVertexCount, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Geometry::GetVertexStart() const
-    engine->RegisterObjectMethod(className, "uint GetVertexStart() const", AS_METHODPR(T, GetVertexStart, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_vertexStart() const", AS_METHODPR(T, GetVertexStart, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Geometry::GetVertexStart() const
+    engine->RegisterObjectMethod(className, "int GetVertexStart() const", AS_METHODPR(T, GetVertexStart, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_vertexStart() const", AS_METHODPR(T, GetVertexStart, () const, i32), AS_CALL_THISCALL);
 
     // bool Geometry::IsEmpty() const
     engine->RegisterObjectMethod(className, "bool IsEmpty() const", AS_METHODPR(T, IsEmpty, () const, bool), AS_CALL_THISCALL);
@@ -9935,11 +10023,11 @@ template <class T> void RegisterMembers_Geometry(asIScriptEngine* engine, const 
     // bool Geometry::IsInside(const Ray& ray) const
     engine->RegisterObjectMethod(className, "bool IsInside(const Ray&in) const", AS_METHODPR(T, IsInside, (const Ray&) const, bool), AS_CALL_THISCALL);
 
-    // bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, bool getUsedVertexRange = true)
-    engine->RegisterObjectMethod(className, "bool SetDrawRange(PrimitiveType, uint, uint, bool = true)", AS_METHODPR(T, SetDrawRange, (PrimitiveType, unsigned, unsigned, bool), bool), AS_CALL_THISCALL);
+    // bool Geometry::SetDrawRange(PrimitiveType type, i32 indexStart, i32 indexCount, bool getUsedVertexRange = true)
+    engine->RegisterObjectMethod(className, "bool SetDrawRange(PrimitiveType, int, int, bool = true)", AS_METHODPR(T, SetDrawRange, (PrimitiveType, i32, i32, bool), bool), AS_CALL_THISCALL);
 
-    // bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount, bool checkIllegal = true)
-    engine->RegisterObjectMethod(className, "bool SetDrawRange(PrimitiveType, uint, uint, uint, uint, bool = true)", AS_METHODPR(T, SetDrawRange, (PrimitiveType, unsigned, unsigned, unsigned, unsigned, bool), bool), AS_CALL_THISCALL);
+    // bool Geometry::SetDrawRange(PrimitiveType type, i32 indexStart, i32 indexCount, i32 vertexStart, i32 vertexCount, bool checkIllegal = true)
+    engine->RegisterObjectMethod(className, "bool SetDrawRange(PrimitiveType, int, int, int, int, bool = true)", AS_METHODPR(T, SetDrawRange, (PrimitiveType, i32, i32, i32, i32, bool), bool), AS_CALL_THISCALL);
 
     // void Geometry::SetIndexBuffer(IndexBuffer* buffer)
     engine->RegisterObjectMethod(className, "void SetIndexBuffer(IndexBuffer@+)", AS_METHODPR(T, SetIndexBuffer, (IndexBuffer*), void), AS_CALL_THISCALL);
@@ -9949,12 +10037,12 @@ template <class T> void RegisterMembers_Geometry(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetLodDistance(float)", AS_METHODPR(T, SetLodDistance, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_lodDistance(float)", AS_METHODPR(T, SetLodDistance, (float), void), AS_CALL_THISCALL);
 
-    // bool Geometry::SetNumVertexBuffers(unsigned num)
-    engine->RegisterObjectMethod(className, "bool SetNumVertexBuffers(uint)", AS_METHODPR(T, SetNumVertexBuffers, (unsigned), bool), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool set_numVertexBuffers(uint)", AS_METHODPR(T, SetNumVertexBuffers, (unsigned), bool), AS_CALL_THISCALL);
+    // bool Geometry::SetNumVertexBuffers(i32 num)
+    engine->RegisterObjectMethod(className, "bool SetNumVertexBuffers(int)", AS_METHODPR(T, SetNumVertexBuffers, (i32), bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool set_numVertexBuffers(int)", AS_METHODPR(T, SetNumVertexBuffers, (i32), bool), AS_CALL_THISCALL);
 
-    // bool Geometry::SetVertexBuffer(unsigned index, VertexBuffer* buffer)
-    engine->RegisterObjectMethod(className, "bool SetVertexBuffer(uint, VertexBuffer@+)", AS_METHODPR(T, SetVertexBuffer, (unsigned, VertexBuffer*), bool), AS_CALL_THISCALL);
+    // bool Geometry::SetVertexBuffer(i32 index, VertexBuffer* buffer)
+    engine->RegisterObjectMethod(className, "bool SetVertexBuffer(int, VertexBuffer@+)", AS_METHODPR(T, SetVertexBuffer, (i32, VertexBuffer*), bool), AS_CALL_THISCALL);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Geometry
         REGISTER_MEMBERS_MANUAL_PART_Geometry();
@@ -10548,6 +10636,9 @@ template <class T> void RegisterMembers_Graphics(asIScriptEngine* engine, const 
     // static GAPI Graphics::GetGAPI()
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("GAPI GetGAPI()", AS_FUNCTIONPR(T::GetGAPI, (), GAPI), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
+    // static GAPI Graphics::SetGAPI(GAPI value)
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("GAPI SetGAPI(GAPI)", AS_FUNCTIONPR(T::SetGAPI, (GAPI), GAPI), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+
     // static unsigned Graphics::GetAlphaFormat()
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("uint GetAlphaFormat()", AS_FUNCTIONPR(T::GetAlphaFormat, (), unsigned), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
@@ -10599,9 +10690,6 @@ template <class T> void RegisterMembers_Graphics(asIScriptEngine* engine, const 
     // static unsigned Graphics::GetFormat(const String& formatName)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("uint GetFormat(const String&in)", AS_FUNCTIONPR(T::GetFormat, (const String&), unsigned), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
-    // static const Vector2& Graphics::GetPixelUVOffset()
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("const Vector2& GetPixelUVOffset()", AS_FUNCTIONPR(T::GetPixelUVOffset, (), const Vector2&), AS_CALL_CDECL);engine->SetDefaultNamespace("");
-
     // static unsigned Graphics::GetMaxBones()
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("uint GetMaxBones()", AS_FUNCTIONPR(T::GetMaxBones, (), unsigned), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
@@ -10619,10 +10707,10 @@ template <class T> void RegisterMembers_IndexBuffer(asIScriptEngine* engine, con
     RegisterMembers_Object<T>(engine, className);
     RegisterMembers_GPUObject<T>(engine, className);
 
-    // u8* IndexBuffer::GetShadowData() const
-    // Error: type "u8*" can not automatically bind
-    // SharedArrayPtr<u8> IndexBuffer::GetShadowDataShared() const
-    // Error: type "SharedArrayPtr<u8>" can not automatically bind
+    // byte* IndexBuffer::GetShadowData() const
+    // Error: type "byte*" can not automatically bind
+    // SharedArrayPtr<byte> IndexBuffer::GetShadowDataShared() const
+    // Error: type "SharedArrayPtr<byte>" can not automatically bind
     // void* IndexBuffer::Lock(i32 start, i32 count, bool discard = false)
     // Error: type "void*" can not automatically bind
     // bool IndexBuffer::SetData(const void* data)
@@ -10686,9 +10774,9 @@ template <class T> void RegisterMembers_Input(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "JoystickState@ GetJoystick(SDL_JoystickID)", AS_METHODPR(T, GetJoystick, (SDL_JoystickID), JoystickState*), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "JoystickState@ get_joysticks(SDL_JoystickID)", AS_METHODPR(T, GetJoystick, (SDL_JoystickID), JoystickState*), AS_CALL_THISCALL);
 
-    // JoystickState* Input::GetJoystickByIndex(unsigned index)
-    engine->RegisterObjectMethod(className, "JoystickState@ GetJoystickByIndex(uint)", AS_METHODPR(T, GetJoystickByIndex, (unsigned), JoystickState*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "JoystickState@ get_joysticksByIndex(uint)", AS_METHODPR(T, GetJoystickByIndex, (unsigned), JoystickState*), AS_CALL_THISCALL);
+    // JoystickState* Input::GetJoystickByIndex(i32 index)
+    engine->RegisterObjectMethod(className, "JoystickState@ GetJoystickByIndex(int)", AS_METHODPR(T, GetJoystickByIndex, (i32), JoystickState*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "JoystickState@ get_joysticksByIndex(int)", AS_METHODPR(T, GetJoystickByIndex, (i32), JoystickState*), AS_CALL_THISCALL);
 
     // JoystickState* Input::GetJoystickByName(const String& name)
     engine->RegisterObjectMethod(className, "JoystickState@ GetJoystickByName(const String&in)", AS_METHODPR(T, GetJoystickByName, (const String&), JoystickState*), AS_CALL_THISCALL);
@@ -10743,13 +10831,13 @@ template <class T> void RegisterMembers_Input(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "IntVector2 GetMousePosition() const", AS_METHODPR(T, GetMousePosition, () const, IntVector2), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "IntVector2 get_mousePosition() const", AS_METHODPR(T, GetMousePosition, () const, IntVector2), AS_CALL_THISCALL);
 
-    // unsigned Input::GetNumJoysticks() const
-    engine->RegisterObjectMethod(className, "uint GetNumJoysticks() const", AS_METHODPR(T, GetNumJoysticks, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numJoysticks() const", AS_METHODPR(T, GetNumJoysticks, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Input::GetNumJoysticks() const
+    engine->RegisterObjectMethod(className, "int GetNumJoysticks() const", AS_METHODPR(T, GetNumJoysticks, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numJoysticks() const", AS_METHODPR(T, GetNumJoysticks, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Input::GetNumTouches() const
-    engine->RegisterObjectMethod(className, "uint GetNumTouches() const", AS_METHODPR(T, GetNumTouches, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numTouches() const", AS_METHODPR(T, GetNumTouches, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Input::GetNumTouches() const
+    engine->RegisterObjectMethod(className, "int GetNumTouches() const", AS_METHODPR(T, GetNumTouches, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numTouches() const", AS_METHODPR(T, GetNumTouches, () const, i32), AS_CALL_THISCALL);
 
     // bool Input::GetQualifierDown(Qualifier qualifier) const
     engine->RegisterObjectMethod(className, "bool GetQualifierDown(Qualifier) const", AS_METHODPR(T, GetQualifierDown, (Qualifier) const, bool), AS_CALL_THISCALL);
@@ -10788,9 +10876,9 @@ template <class T> void RegisterMembers_Input(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "bool GetToggleFullscreen() const", AS_METHODPR(T, GetToggleFullscreen, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_toggleFullscreen() const", AS_METHODPR(T, GetToggleFullscreen, () const, bool), AS_CALL_THISCALL);
 
-    // TouchState* Input::GetTouch(unsigned index) const
-    engine->RegisterObjectMethod(className, "TouchState@ GetTouch(uint) const", AS_METHODPR(T, GetTouch, (unsigned) const, TouchState*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "TouchState@ get_touches(uint) const", AS_METHODPR(T, GetTouch, (unsigned) const, TouchState*), AS_CALL_THISCALL);
+    // TouchState* Input::GetTouch(i32 index) const
+    engine->RegisterObjectMethod(className, "TouchState@ GetTouch(int) const", AS_METHODPR(T, GetTouch, (i32) const, TouchState*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "TouchState@ get_touches(int) const", AS_METHODPR(T, GetTouch, (i32) const, TouchState*), AS_CALL_THISCALL);
 
     // bool Input::GetTouchEmulation() const
     engine->RegisterObjectMethod(className, "bool GetTouchEmulation() const", AS_METHODPR(T, GetTouchEmulation, () const, bool), AS_CALL_THISCALL);
@@ -10824,8 +10912,8 @@ template <class T> void RegisterMembers_Input(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "bool IsScreenKeyboardVisible() const", AS_METHODPR(T, IsScreenKeyboardVisible, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_screenKeyboardVisible() const", AS_METHODPR(T, IsScreenKeyboardVisible, () const, bool), AS_CALL_THISCALL);
 
-    // unsigned Input::LoadGestures(Deserializer& source)
-    engine->RegisterObjectMethod(className, "uint LoadGestures(Deserializer&)", AS_METHODPR(T, LoadGestures, (Deserializer&), unsigned), AS_CALL_THISCALL);
+    // i32 Input::LoadGestures(Deserializer& source)
+    engine->RegisterObjectMethod(className, "int LoadGestures(Deserializer&)", AS_METHODPR(T, LoadGestures, (Deserializer&), i32), AS_CALL_THISCALL);
 
     // bool Input::RecordGesture()
     engine->RegisterObjectMethod(className, "bool RecordGesture()", AS_METHODPR(T, RecordGesture, (), bool), AS_CALL_THISCALL);
@@ -10997,8 +11085,8 @@ template <class T> void RegisterMembers_MemoryBuffer(asIScriptEngine* engine, co
 {
     RegisterMembers_AbstractFile<T>(engine, className);
 
-    // unsigned char* MemoryBuffer::GetData()
-    // Error: type "unsigned char*" can not automatically bind
+    // byte* MemoryBuffer::GetData()
+    // Error: type "byte*" can not automatically bind
 
     // bool MemoryBuffer::IsReadOnly()
     engine->RegisterObjectMethod(className, "bool IsReadOnly()", AS_METHODPR(T, IsReadOnly, (), bool), AS_CALL_THISCALL);
@@ -11173,9 +11261,9 @@ template <class T> void RegisterMembers_PackageFile(asIScriptEngine* engine, con
     // bool PackageFile::Exists(const String& fileName) const
     engine->RegisterObjectMethod(className, "bool Exists(const String&in) const", AS_METHODPR(T, Exists, (const String&) const, bool), AS_CALL_THISCALL);
 
-    // unsigned PackageFile::GetChecksum() const
-    engine->RegisterObjectMethod(className, "uint GetChecksum() const", AS_METHODPR(T, GetChecksum, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_checksum() const", AS_METHODPR(T, GetChecksum, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 PackageFile::GetChecksum() const
+    engine->RegisterObjectMethod(className, "hash32 GetChecksum() const", AS_METHODPR(T, GetChecksum, () const, hash32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "hash32 get_checksum() const", AS_METHODPR(T, GetChecksum, () const, hash32), AS_CALL_THISCALL);
 
     // const Vector<String> PackageFile::GetEntryNames() const
     engine->RegisterObjectMethod(className, "Array<String>@ GetEntryNames() const", AS_FUNCTION_OBJFIRST(PackageFile_constspVectorlesStringgre_GetEntryNames_void_template<PackageFile>), AS_CALL_CDECL_OBJFIRST);
@@ -11346,41 +11434,41 @@ template <class T> void RegisterMembers_Renderer(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "float GetMobileShadowBiasMul() const", AS_METHODPR(T, GetMobileShadowBiasMul, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_mobileShadowBiasMul() const", AS_METHODPR(T, GetMobileShadowBiasMul, () const, float), AS_CALL_THISCALL);
 
-    // unsigned Renderer::GetNumBatches() const
-    engine->RegisterObjectMethod(className, "uint GetNumBatches() const", AS_METHODPR(T, GetNumBatches, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numBatches() const", AS_METHODPR(T, GetNumBatches, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Renderer::GetNumBatches() const
+    engine->RegisterObjectMethod(className, "int GetNumBatches() const", AS_METHODPR(T, GetNumBatches, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numBatches() const", AS_METHODPR(T, GetNumBatches, () const, i32), AS_CALL_THISCALL);
 
     // int Renderer::GetNumExtraInstancingBufferElements() const
     engine->RegisterObjectMethod(className, "int GetNumExtraInstancingBufferElements() const", AS_METHODPR(T, GetNumExtraInstancingBufferElements, () const, int), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_numExtraInstancingBufferElements() const", AS_METHODPR(T, GetNumExtraInstancingBufferElements, () const, int), AS_CALL_THISCALL);
 
-    // unsigned Renderer::GetNumGeometries(bool allViews = false) const
-    engine->RegisterObjectMethod(className, "uint GetNumGeometries(bool = false) const", AS_METHODPR(T, GetNumGeometries, (bool) const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numGeometries(bool = false) const", AS_METHODPR(T, GetNumGeometries, (bool) const, unsigned), AS_CALL_THISCALL);
+    // i32 Renderer::GetNumGeometries(bool allViews = false) const
+    engine->RegisterObjectMethod(className, "int GetNumGeometries(bool = false) const", AS_METHODPR(T, GetNumGeometries, (bool) const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numGeometries(bool = false) const", AS_METHODPR(T, GetNumGeometries, (bool) const, i32), AS_CALL_THISCALL);
 
-    // unsigned Renderer::GetNumLights(bool allViews = false) const
-    engine->RegisterObjectMethod(className, "uint GetNumLights(bool = false) const", AS_METHODPR(T, GetNumLights, (bool) const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numLights(bool = false) const", AS_METHODPR(T, GetNumLights, (bool) const, unsigned), AS_CALL_THISCALL);
+    // i32 Renderer::GetNumLights(bool allViews = false) const
+    engine->RegisterObjectMethod(className, "int GetNumLights(bool = false) const", AS_METHODPR(T, GetNumLights, (bool) const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numLights(bool = false) const", AS_METHODPR(T, GetNumLights, (bool) const, i32), AS_CALL_THISCALL);
 
-    // unsigned Renderer::GetNumOccluders(bool allViews = false) const
-    engine->RegisterObjectMethod(className, "uint GetNumOccluders(bool = false) const", AS_METHODPR(T, GetNumOccluders, (bool) const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numOccluders(bool = false) const", AS_METHODPR(T, GetNumOccluders, (bool) const, unsigned), AS_CALL_THISCALL);
+    // i32 Renderer::GetNumOccluders(bool allViews = false) const
+    engine->RegisterObjectMethod(className, "int GetNumOccluders(bool = false) const", AS_METHODPR(T, GetNumOccluders, (bool) const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numOccluders(bool = false) const", AS_METHODPR(T, GetNumOccluders, (bool) const, i32), AS_CALL_THISCALL);
 
-    // unsigned Renderer::GetNumPrimitives() const
-    engine->RegisterObjectMethod(className, "uint GetNumPrimitives() const", AS_METHODPR(T, GetNumPrimitives, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numPrimitives() const", AS_METHODPR(T, GetNumPrimitives, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Renderer::GetNumPrimitives() const
+    engine->RegisterObjectMethod(className, "int GetNumPrimitives() const", AS_METHODPR(T, GetNumPrimitives, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numPrimitives() const", AS_METHODPR(T, GetNumPrimitives, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Renderer::GetNumShadowMaps(bool allViews = false) const
-    engine->RegisterObjectMethod(className, "uint GetNumShadowMaps(bool = false) const", AS_METHODPR(T, GetNumShadowMaps, (bool) const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numShadowMaps(bool = false) const", AS_METHODPR(T, GetNumShadowMaps, (bool) const, unsigned), AS_CALL_THISCALL);
+    // i32 Renderer::GetNumShadowMaps(bool allViews = false) const
+    engine->RegisterObjectMethod(className, "int GetNumShadowMaps(bool = false) const", AS_METHODPR(T, GetNumShadowMaps, (bool) const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numShadowMaps(bool = false) const", AS_METHODPR(T, GetNumShadowMaps, (bool) const, i32), AS_CALL_THISCALL);
 
-    // unsigned Renderer::GetNumViewports() const
-    engine->RegisterObjectMethod(className, "uint GetNumViewports() const", AS_METHODPR(T, GetNumViewports, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numViewports() const", AS_METHODPR(T, GetNumViewports, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Renderer::GetNumViewports() const
+    engine->RegisterObjectMethod(className, "int GetNumViewports() const", AS_METHODPR(T, GetNumViewports, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numViewports() const", AS_METHODPR(T, GetNumViewports, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Renderer::GetNumViews() const
-    engine->RegisterObjectMethod(className, "uint GetNumViews() const", AS_METHODPR(T, GetNumViews, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numViews() const", AS_METHODPR(T, GetNumViews, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Renderer::GetNumViews() const
+    engine->RegisterObjectMethod(className, "int GetNumViews() const", AS_METHODPR(T, GetNumViews, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numViews() const", AS_METHODPR(T, GetNumViews, () const, i32), AS_CALL_THISCALL);
 
     // float Renderer::GetOccluderSizeThreshold() const
     engine->RegisterObjectMethod(className, "float GetOccluderSizeThreshold() const", AS_METHODPR(T, GetOccluderSizeThreshold, () const, float), AS_CALL_THISCALL);
@@ -11403,14 +11491,14 @@ template <class T> void RegisterMembers_Renderer(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "bool GetReuseShadowMaps() const", AS_METHODPR(T, GetReuseShadowMaps, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_reuseShadowMaps() const", AS_METHODPR(T, GetReuseShadowMaps, () const, bool), AS_CALL_THISCALL);
 
-    // Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, int multiSample, bool autoResolve, bool cubemap, bool filtered, bool srgb, unsigned persistentKey = 0)
-    engine->RegisterObjectMethod(className, "Texture@+ GetScreenBuffer(int, int, uint, int, bool, bool, bool, bool, uint = 0)", AS_METHODPR(T, GetScreenBuffer, (int, int, unsigned, int, bool, bool, bool, bool, unsigned), Texture*), AS_CALL_THISCALL);
+    // Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, int multiSample, bool autoResolve, bool cubemap, bool filtered, bool srgb, hash32 persistentKey = 0)
+    engine->RegisterObjectMethod(className, "Texture@+ GetScreenBuffer(int, int, uint, int, bool, bool, bool, bool, hash32 = 0)", AS_METHODPR(T, GetScreenBuffer, (int, int, unsigned, int, bool, bool, bool, bool, hash32), Texture*), AS_CALL_THISCALL);
 
     // Camera* Renderer::GetShadowCamera()
     engine->RegisterObjectMethod(className, "Camera@+ GetShadowCamera()", AS_METHODPR(T, GetShadowCamera, (), Camera*), AS_CALL_THISCALL);
 
-    // Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight)
-    engine->RegisterObjectMethod(className, "Texture2D@+ GetShadowMap(Light@+, Camera@+, uint, uint)", AS_METHODPR(T, GetShadowMap, (Light*, Camera*, unsigned, unsigned), Texture2D*), AS_CALL_THISCALL);
+    // Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, i32 viewWidth, i32 viewHeight)
+    engine->RegisterObjectMethod(className, "Texture2D@+ GetShadowMap(Light@+, Camera@+, int, int)", AS_METHODPR(T, GetShadowMap, (Light*, Camera*, i32, i32), Texture2D*), AS_CALL_THISCALL);
 
     // int Renderer::GetShadowMapSize() const
     engine->RegisterObjectMethod(className, "int GetShadowMapSize() const", AS_METHODPR(T, GetShadowMapSize, () const, int), AS_CALL_THISCALL);
@@ -11444,12 +11532,12 @@ template <class T> void RegisterMembers_Renderer(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "bool GetThreadedOcclusion() const", AS_METHODPR(T, GetThreadedOcclusion, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_threadedOcclusion() const", AS_METHODPR(T, GetThreadedOcclusion, () const, bool), AS_CALL_THISCALL);
 
-    // Viewport* Renderer::GetViewport(unsigned index) const
-    engine->RegisterObjectMethod(className, "Viewport@+ GetViewport(uint) const", AS_METHODPR(T, GetViewport, (unsigned) const, Viewport*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Viewport@+ get_viewports(uint) const", AS_METHODPR(T, GetViewport, (unsigned) const, Viewport*), AS_CALL_THISCALL);
+    // Viewport* Renderer::GetViewport(i32 index) const
+    engine->RegisterObjectMethod(className, "Viewport@+ GetViewport(int) const", AS_METHODPR(T, GetViewport, (i32) const, Viewport*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Viewport@+ get_viewports(int) const", AS_METHODPR(T, GetViewport, (i32) const, Viewport*), AS_CALL_THISCALL);
 
-    // Viewport* Renderer::GetViewportForScene(Scene* scene, unsigned index) const
-    engine->RegisterObjectMethod(className, "Viewport@+ GetViewportForScene(Scene@+, uint) const", AS_METHODPR(T, GetViewportForScene, (Scene*, unsigned) const, Viewport*), AS_CALL_THISCALL);
+    // Viewport* Renderer::GetViewportForScene(Scene* scene, i32 index) const
+    engine->RegisterObjectMethod(className, "Viewport@+ GetViewportForScene(Scene@+, int) const", AS_METHODPR(T, GetViewportForScene, (Scene*, i32) const, Viewport*), AS_CALL_THISCALL);
 
     // int Renderer::GetVSMMultiSample() const
     engine->RegisterObjectMethod(className, "int GetVSMMultiSample() const", AS_METHODPR(T, GetVSMMultiSample, () const, int), AS_CALL_THISCALL);
@@ -11477,8 +11565,8 @@ template <class T> void RegisterMembers_Renderer(asIScriptEngine* engine, const 
     // void Renderer::Render()
     engine->RegisterObjectMethod(className, "void Render()", AS_METHODPR(T, Render, (), void), AS_CALL_THISCALL);
 
-    // bool Renderer::ResizeInstancingBuffer(unsigned numInstances)
-    engine->RegisterObjectMethod(className, "bool ResizeInstancingBuffer(uint)", AS_METHODPR(T, ResizeInstancingBuffer, (unsigned), bool), AS_CALL_THISCALL);
+    // bool Renderer::ResizeInstancingBuffer(i32 numInstances)
+    engine->RegisterObjectMethod(className, "bool ResizeInstancingBuffer(int)", AS_METHODPR(T, ResizeInstancingBuffer, (i32), bool), AS_CALL_THISCALL);
 
     // void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows, const BatchQueue& queue)
     engine->RegisterObjectMethod(className, "void SetBatchShaders(Batch&, Technique@+, bool, const BatchQueue&in)", AS_METHODPR(T, SetBatchShaders, (Batch&, Technique*, bool, const BatchQueue&), void), AS_CALL_THISCALL);
@@ -11548,9 +11636,9 @@ template <class T> void RegisterMembers_Renderer(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetNumExtraInstancingBufferElements(int)", AS_METHODPR(T, SetNumExtraInstancingBufferElements, (int), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_numExtraInstancingBufferElements(int)", AS_METHODPR(T, SetNumExtraInstancingBufferElements, (int), void), AS_CALL_THISCALL);
 
-    // void Renderer::SetNumViewports(unsigned num)
-    engine->RegisterObjectMethod(className, "void SetNumViewports(uint)", AS_METHODPR(T, SetNumViewports, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_numViewports(uint)", AS_METHODPR(T, SetNumViewports, (unsigned), void), AS_CALL_THISCALL);
+    // void Renderer::SetNumViewports(i32 num)
+    engine->RegisterObjectMethod(className, "void SetNumViewports(int)", AS_METHODPR(T, SetNumViewports, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_numViewports(int)", AS_METHODPR(T, SetNumViewports, (i32), void), AS_CALL_THISCALL);
 
     // void Renderer::SetOccluderSizeThreshold(float screenSize)
     engine->RegisterObjectMethod(className, "void SetOccluderSizeThreshold(float)", AS_METHODPR(T, SetOccluderSizeThreshold, (float), void), AS_CALL_THISCALL);
@@ -11596,9 +11684,9 @@ template <class T> void RegisterMembers_Renderer(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetThreadedOcclusion(bool)", AS_METHODPR(T, SetThreadedOcclusion, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_threadedOcclusion(bool)", AS_METHODPR(T, SetThreadedOcclusion, (bool), void), AS_CALL_THISCALL);
 
-    // void Renderer::SetViewport(unsigned index, Viewport* viewport)
-    engine->RegisterObjectMethod(className, "void SetViewport(uint, Viewport@+)", AS_METHODPR(T, SetViewport, (unsigned, Viewport*), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_viewports(uint, Viewport@+)", AS_METHODPR(T, SetViewport, (unsigned, Viewport*), void), AS_CALL_THISCALL);
+    // void Renderer::SetViewport(i32 index, Viewport* viewport)
+    engine->RegisterObjectMethod(className, "void SetViewport(int, Viewport@+)", AS_METHODPR(T, SetViewport, (i32, Viewport*), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_viewports(int, Viewport@+)", AS_METHODPR(T, SetViewport, (i32, Viewport*), void), AS_CALL_THISCALL);
 
     // void Renderer::SetVSMMultiSample(int multiSample)
     engine->RegisterObjectMethod(className, "void SetVSMMultiSample(int)", AS_METHODPR(T, SetVSMMultiSample, (int), void), AS_CALL_THISCALL);
@@ -11635,9 +11723,9 @@ template <class T> void RegisterMembers_Resource(asIScriptEngine* engine, const 
     // AsyncLoadState Resource::GetAsyncLoadState() const
     engine->RegisterObjectMethod(className, "AsyncLoadState GetAsyncLoadState() const", AS_METHODPR(T, GetAsyncLoadState, () const, AsyncLoadState), AS_CALL_THISCALL);
 
-    // unsigned Resource::GetMemoryUse() const
-    engine->RegisterObjectMethod(className, "uint GetMemoryUse() const", AS_METHODPR(T, GetMemoryUse, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_memoryUse() const", AS_METHODPR(T, GetMemoryUse, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Resource::GetMemoryUse() const
+    engine->RegisterObjectMethod(className, "int GetMemoryUse() const", AS_METHODPR(T, GetMemoryUse, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_memoryUse() const", AS_METHODPR(T, GetMemoryUse, () const, i32), AS_CALL_THISCALL);
 
     // const String& Resource::GetName() const
     engine->RegisterObjectMethod(className, "const String& GetName() const", AS_METHODPR(T, GetName, () const, const String&), AS_CALL_THISCALL);
@@ -11670,8 +11758,8 @@ template <class T> void RegisterMembers_Resource(asIScriptEngine* engine, const 
     // void Resource::SetAsyncLoadState(AsyncLoadState newState)
     engine->RegisterObjectMethod(className, "void SetAsyncLoadState(AsyncLoadState)", AS_METHODPR(T, SetAsyncLoadState, (AsyncLoadState), void), AS_CALL_THISCALL);
 
-    // void Resource::SetMemoryUse(unsigned size)
-    engine->RegisterObjectMethod(className, "void SetMemoryUse(uint)", AS_METHODPR(T, SetMemoryUse, (unsigned), void), AS_CALL_THISCALL);
+    // void Resource::SetMemoryUse(i32 size)
+    engine->RegisterObjectMethod(className, "void SetMemoryUse(int)", AS_METHODPR(T, SetMemoryUse, (i32), void), AS_CALL_THISCALL);
 
     // void Resource::SetName(const String& name)
     engine->RegisterObjectMethod(className, "void SetName(const String&in)", AS_METHODPR(T, SetName, (const String&), void), AS_CALL_THISCALL);
@@ -11729,14 +11817,14 @@ template <class T> void RegisterMembers_ResourceCache(asIScriptEngine* engine, c
     // bool ResourceCache::AddManualResource(Resource* resource)
     engine->RegisterObjectMethod(className, "bool AddManualResource(Resource@+)", AS_METHODPR(T, AddManualResource, (Resource*), bool), AS_CALL_THISCALL);
 
-    // bool ResourceCache::AddPackageFile(PackageFile* package, unsigned priority = PRIORITY_LAST)
-    engine->RegisterObjectMethod(className, "bool AddPackageFile(PackageFile@+, uint = PRIORITY_LAST)", AS_METHODPR(T, AddPackageFile, (PackageFile*, unsigned), bool), AS_CALL_THISCALL);
+    // bool ResourceCache::AddPackageFile(PackageFile* package, i32 priority = PRIORITY_LAST)
+    engine->RegisterObjectMethod(className, "bool AddPackageFile(PackageFile@+, int = PRIORITY_LAST)", AS_METHODPR(T, AddPackageFile, (PackageFile*, i32), bool), AS_CALL_THISCALL);
 
-    // bool ResourceCache::AddPackageFile(const String& fileName, unsigned priority = PRIORITY_LAST)
-    engine->RegisterObjectMethod(className, "bool AddPackageFile(const String&in, uint = PRIORITY_LAST)", AS_METHODPR(T, AddPackageFile, (const String&, unsigned), bool), AS_CALL_THISCALL);
+    // bool ResourceCache::AddPackageFile(const String& fileName, i32 priority = PRIORITY_LAST)
+    engine->RegisterObjectMethod(className, "bool AddPackageFile(const String&in, int = PRIORITY_LAST)", AS_METHODPR(T, AddPackageFile, (const String&, i32), bool), AS_CALL_THISCALL);
 
-    // bool ResourceCache::AddResourceDir(const String& pathName, unsigned priority = PRIORITY_LAST)
-    engine->RegisterObjectMethod(className, "bool AddResourceDir(const String&in, uint = PRIORITY_LAST)", AS_METHODPR(T, AddResourceDir, (const String&, unsigned), bool), AS_CALL_THISCALL);
+    // bool ResourceCache::AddResourceDir(const String& pathName, i32 priority = PRIORITY_LAST)
+    engine->RegisterObjectMethod(className, "bool AddResourceDir(const String&in, int = PRIORITY_LAST)", AS_METHODPR(T, AddResourceDir, (const String&, i32), bool), AS_CALL_THISCALL);
 
     // bool ResourceCache::BackgroundLoadResource(StringHash type, const String& name, bool sendEventOnFailure = true, Resource* caller = nullptr)
     engine->RegisterObjectMethod(className, "bool BackgroundLoadResource(StringHash, const String&in, bool = true, Resource@+ = null)", AS_METHODPR(T, BackgroundLoadResource, (StringHash, const String&, bool, Resource*), bool), AS_CALL_THISCALL);
@@ -12356,30 +12444,46 @@ template <class T> void RegisterMembers_UI(asIScriptEngine* engine, const char* 
     #endif
 }
 
+// const Vector<byte>& VectorBuffer::GetBuffer() const
+template <class T> CScriptArray* VectorBuffer_constspVectorlesbytegreamp_GetBuffer_void_template(T* _ptr)
+{
+    const Vector<byte>& result = _ptr->GetBuffer();
+    return VectorToArray(result, "Array<byte>");
+}
+
+// void VectorBuffer::SetData(const Vector<byte>& data)
+template <class T> void VectorBuffer_void_SetData_constspVectorlesbytegreamp_template(T* _ptr, CScriptArray* data_conv)
+{
+    Vector<byte> data = ArrayToVector<byte>(data_conv);
+    _ptr->SetData(data);
+}
+
 // class VectorBuffer | File: ../IO/VectorBuffer.h
 template <class T> void RegisterMembers_VectorBuffer(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_AbstractFile<T>(engine, className);
 
-    // const Vector<unsigned char>& VectorBuffer::GetBuffer() const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
-    // const unsigned char* VectorBuffer::GetData() const
-    // Error: type "const unsigned char*" can not automatically bind
-    // unsigned char* VectorBuffer::GetModifiableData()
-    // Error: type "unsigned char*" can not automatically bind
-    // void VectorBuffer::SetData(const Vector<unsigned char>& data)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
-    // void VectorBuffer::SetData(const void* data, unsigned size)
+    // const byte* VectorBuffer::GetData() const
+    // Error: type "const byte*" can not automatically bind
+    // byte* VectorBuffer::GetModifiableData()
+    // Error: type "byte*" can not automatically bind
+    // void VectorBuffer::SetData(const void* data, i32 size)
     // Error: type "const void*" can not automatically bind
 
     // void VectorBuffer::Clear()
     engine->RegisterObjectMethod(className, "void Clear()", AS_METHODPR(T, Clear, (), void), AS_CALL_THISCALL);
 
-    // void VectorBuffer::Resize(unsigned size)
-    engine->RegisterObjectMethod(className, "void Resize(uint)", AS_METHODPR(T, Resize, (unsigned), void), AS_CALL_THISCALL);
+    // const Vector<byte>& VectorBuffer::GetBuffer() const
+    engine->RegisterObjectMethod(className, "Array<byte>@ GetBuffer() const", AS_FUNCTION_OBJFIRST(VectorBuffer_constspVectorlesbytegreamp_GetBuffer_void_template<VectorBuffer>), AS_CALL_CDECL_OBJFIRST);
 
-    // void VectorBuffer::SetData(Deserializer& source, unsigned size)
-    engine->RegisterObjectMethod(className, "void SetData(Deserializer&, uint)", AS_METHODPR(T, SetData, (Deserializer&, unsigned), void), AS_CALL_THISCALL);
+    // void VectorBuffer::Resize(i32 size)
+    engine->RegisterObjectMethod(className, "void Resize(int)", AS_METHODPR(T, Resize, (i32), void), AS_CALL_THISCALL);
+
+    // void VectorBuffer::SetData(const Vector<byte>& data)
+    engine->RegisterObjectMethod(className, "void SetData(Array<byte>@+)", AS_FUNCTION_OBJFIRST(VectorBuffer_void_SetData_constspVectorlesbytegreamp_template<VectorBuffer>), AS_CALL_CDECL_OBJFIRST);
+
+    // void VectorBuffer::SetData(Deserializer& source, i32 size)
+    engine->RegisterObjectMethod(className, "void SetData(Deserializer&, int)", AS_METHODPR(T, SetData, (Deserializer&, i32), void), AS_CALL_THISCALL);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_VectorBuffer
         REGISTER_MEMBERS_MANUAL_PART_VectorBuffer();
@@ -12417,8 +12521,8 @@ template <class T> i32 VertexBuffer_i32_GetElementOffset_constspVectorlesVertexE
     return result;
 }
 
-// static Vector<VertexElement> VertexBuffer::GetElements(unsigned elementMask)
-template <class T> CScriptArray* VertexBuffer_VectorlesVertexElementgre_GetElements_unsigned(unsigned elementMask)
+// static Vector<VertexElement> VertexBuffer::GetElements(VertexElements elementMask)
+template <class T> CScriptArray* VertexBuffer_VectorlesVertexElementgre_GetElements_VertexElements(VertexElements elementMask)
 {
     Vector<VertexElement> result = T::GetElements(elementMask);
     return VectorToArray(result, "Array<VertexElement>");
@@ -12442,10 +12546,10 @@ template <class T> void RegisterMembers_VertexBuffer(asIScriptEngine* engine, co
     // Error: type "const VertexElement*" can not automatically bind
     // const VertexElement* VertexBuffer::GetElement(VertexElementType type, VertexElementSemantic semantic, i8 index = 0) const
     // Error: type "const VertexElement*" can not automatically bind
-    // u8* VertexBuffer::GetShadowData() const
-    // Error: type "u8*" can not automatically bind
-    // SharedArrayPtr<u8> VertexBuffer::GetShadowDataShared() const
-    // Error: type "SharedArrayPtr<u8>" can not automatically bind
+    // byte* VertexBuffer::GetShadowData() const
+    // Error: type "byte*" can not automatically bind
+    // SharedArrayPtr<byte> VertexBuffer::GetShadowDataShared() const
+    // Error: type "SharedArrayPtr<byte>" can not automatically bind
     // void* VertexBuffer::Lock(i32 start, i32 count, bool discard = false)
     // Error: type "void*" can not automatically bind
     // bool VertexBuffer::SetData(const void* data)
@@ -12453,12 +12557,12 @@ template <class T> void RegisterMembers_VertexBuffer(asIScriptEngine* engine, co
     // bool VertexBuffer::SetDataRange(const void* data, i32 start, i32 count, bool discard = false)
     // Error: type "const void*" can not automatically bind
 
-    // u64 VertexBuffer::GetBufferHash(i32 streamIndex)
-    engine->RegisterObjectMethod(className, "uint64 GetBufferHash(int)", AS_METHODPR(T, GetBufferHash, (i32), u64), AS_CALL_THISCALL);
+    // hash64 VertexBuffer::GetBufferHash(i32 streamIndex)
+    engine->RegisterObjectMethod(className, "hash64 GetBufferHash(int)", AS_METHODPR(T, GetBufferHash, (i32), hash64), AS_CALL_THISCALL);
 
-    // VertexMaskFlags VertexBuffer::GetElementMask() const
-    engine->RegisterObjectMethod(className, "VertexMaskFlags GetElementMask() const", AS_METHODPR(T, GetElementMask, () const, VertexMaskFlags), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "VertexMaskFlags get_elementMask() const", AS_METHODPR(T, GetElementMask, () const, VertexMaskFlags), AS_CALL_THISCALL);
+    // VertexElements VertexBuffer::GetElementMask() const
+    engine->RegisterObjectMethod(className, "VertexElements GetElementMask() const", AS_METHODPR(T, GetElementMask, () const, VertexElements), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "VertexElements get_elementMask() const", AS_METHODPR(T, GetElementMask, () const, VertexElements), AS_CALL_THISCALL);
 
     // i32 VertexBuffer::GetElementOffset(VertexElementSemantic semantic, i8 index = 0) const
     engine->RegisterObjectMethod(className, "int GetElementOffset(VertexElementSemantic, int8 = 0) const", AS_METHODPR(T, GetElementOffset, (VertexElementSemantic, i8) const, i32), AS_CALL_THISCALL);
@@ -12502,8 +12606,8 @@ template <class T> void RegisterMembers_VertexBuffer(asIScriptEngine* engine, co
     // bool VertexBuffer::SetSize(i32 vertexCount, const Vector<VertexElement>& elements, bool dynamic = false)
     engine->RegisterObjectMethod(className, "bool SetSize(int, Array<VertexElement>@+, bool = false)", AS_FUNCTION_OBJFIRST(VertexBuffer_bool_SetSize_i32_constspVectorlesVertexElementgreamp_bool_template<VertexBuffer>), AS_CALL_CDECL_OBJFIRST);
 
-    // bool VertexBuffer::SetSize(i32 vertexCount, unsigned elementMask, bool dynamic = false)
-    engine->RegisterObjectMethod(className, "bool SetSize(int, uint, bool = false)", AS_METHODPR(T, SetSize, (i32, unsigned, bool), bool), AS_CALL_THISCALL);
+    // bool VertexBuffer::SetSize(i32 vertexCount, VertexElements elementMask, bool dynamic = false)
+    engine->RegisterObjectMethod(className, "bool SetSize(int, VertexElements, bool = false)", AS_METHODPR(T, SetSize, (i32, VertexElements, bool), bool), AS_CALL_THISCALL);
 
     // void VertexBuffer::Unlock()
     engine->RegisterObjectMethod(className, "void Unlock()", AS_METHODPR(T, Unlock, (), void), AS_CALL_THISCALL);
@@ -12519,14 +12623,14 @@ template <class T> void RegisterMembers_VertexBuffer(asIScriptEngine* engine, co
     // static i32 VertexBuffer::GetElementOffset(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, i8 index = 0)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("int GetElementOffset(Array<VertexElement>@+, VertexElementType, VertexElementSemantic, int8 = 0)", AS_FUNCTION(VertexBuffer_i32_GetElementOffset_constspVectorlesVertexElementgreamp_VertexElementType_VertexElementSemantic_i8<VertexBuffer>), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
-    // static Vector<VertexElement> VertexBuffer::GetElements(unsigned elementMask)
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("Array<VertexElement>@ GetElements(uint)", AS_FUNCTION(VertexBuffer_VectorlesVertexElementgre_GetElements_unsigned<VertexBuffer>), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+    // static Vector<VertexElement> VertexBuffer::GetElements(VertexElements elementMask)
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("Array<VertexElement>@ GetElements(VertexElements)", AS_FUNCTION(VertexBuffer_VectorlesVertexElementgre_GetElements_VertexElements<VertexBuffer>), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
     // static i32 VertexBuffer::GetVertexSize(const Vector<VertexElement>& elements)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("int GetVertexSize(Array<VertexElement>@+)", AS_FUNCTION(VertexBuffer_i32_GetVertexSize_constspVectorlesVertexElementgreamp<VertexBuffer>), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
-    // static i32 VertexBuffer::GetVertexSize(unsigned elementMask)
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("int GetVertexSize(uint)", AS_FUNCTIONPR(T::GetVertexSize, (unsigned), i32), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+    // static i32 VertexBuffer::GetVertexSize(VertexElements elementMask)
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("int GetVertexSize(VertexElements)", AS_FUNCTIONPR(T::GetVertexSize, (VertexElements), i32), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_VertexBuffer
         REGISTER_MEMBERS_MANUAL_PART_VertexBuffer();
@@ -12599,8 +12703,8 @@ template <class T> void RegisterMembers_View(asIScriptEngine* engine, const char
     // const Vector<Light*>& View::GetLights() const
     engine->RegisterObjectMethod(className, "Array<Light@>@ GetLights() const", AS_FUNCTION_OBJFIRST(View_constspVectorlesLightstargreamp_GetLights_void_template<View>), AS_CALL_CDECL_OBJFIRST);
 
-    // unsigned View::GetNumActiveOccluders() const
-    engine->RegisterObjectMethod(className, "uint GetNumActiveOccluders() const", AS_METHODPR(T, GetNumActiveOccluders, () const, unsigned), AS_CALL_THISCALL);
+    // i32 View::GetNumActiveOccluders() const
+    engine->RegisterObjectMethod(className, "int GetNumActiveOccluders() const", AS_METHODPR(T, GetNumActiveOccluders, () const, i32), AS_CALL_THISCALL);
 
     // const Vector<Drawable*>& View::GetOccluders() const
     engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetOccluders() const", AS_FUNCTION_OBJFIRST(View_constspVectorlesDrawablestargreamp_GetOccluders_void_template<View>), AS_CALL_CDECL_OBJFIRST);
@@ -12826,8 +12930,8 @@ template <class T> void RegisterMembers_Connection(asIScriptEngine* engine, cons
     // Error: type "const SLNet::AddressOrGUID&" can not automatically bind
     // bool Connection::ProcessMessage(int msgID, MemoryBuffer& buffer)
     // Error: type "MemoryBuffer" can not automatically bind bacause have @nobind mark
-    // void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned contentID = 0)
-    // Error: type "const unsigned char*" can not automatically bind
+    // void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const byte* data, unsigned numBytes, unsigned contentID = 0)
+    // Error: type "const byte*" can not automatically bind
     // void Connection::SetAddressOrGUID(const SLNet::AddressOrGUID& addr)
     // Error: type "const SLNet::AddressOrGUID&" can not automatically bind
 
@@ -13026,8 +13130,8 @@ template <class T> void RegisterMembers_Network(asIScriptEngine* engine, const c
 {
     RegisterMembers_Object<T>(engine, className);
 
-    // void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned contentID = 0)
-    // Error: type "const unsigned char*" can not automatically bind
+    // void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const byte* data, unsigned numBytes, unsigned contentID = 0)
+    // Error: type "const byte*" can not automatically bind
     // void Network::ClientDisconnected(const SLNet::AddressOrGUID& connection)
     // Error: type "const SLNet::AddressOrGUID&" can not automatically bind
     // Connection* Network::GetConnection(const SLNet::AddressOrGUID& connection) const
@@ -13500,8 +13604,8 @@ template <class T> void RegisterMembers_Image(asIScriptEngine* engine, const cha
     // void Image::Clear(const Color& color)
     engine->RegisterObjectMethod(className, "void Clear(const Color&in)", AS_METHODPR(T, Clear, (const Color&), void), AS_CALL_THISCALL);
 
-    // void Image::ClearInt(unsigned uintColor)
-    engine->RegisterObjectMethod(className, "void ClearInt(uint)", AS_METHODPR(T, ClearInt, (unsigned), void), AS_CALL_THISCALL);
+    // void Image::Clear(color32 uintColor)
+    engine->RegisterObjectMethod(className, "void Clear(color32)", AS_METHODPR(T, Clear, (color32), void), AS_CALL_THISCALL);
 
     // SharedPtr<Image> Image::ConvertToRGBA() const
     engine->RegisterObjectMethod(className, "Image@+ ConvertToRGBA() const", AS_FUNCTION_OBJFIRST(Image_SharedPtrlesImagegre_ConvertToRGBA_void_template<Image>), AS_CALL_CDECL_OBJFIRST);
@@ -13739,9 +13843,9 @@ template <class T> void RegisterMembers_Material(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "const String& GetPixelShaderDefines() const", AS_METHODPR(T, GetPixelShaderDefines, () const, const String&), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_pixelShaderDefines() const", AS_METHODPR(T, GetPixelShaderDefines, () const, const String&), AS_CALL_THISCALL);
 
-    // unsigned char Material::GetRenderOrder() const
-    engine->RegisterObjectMethod(className, "uint8 GetRenderOrder() const", AS_METHODPR(T, GetRenderOrder, () const, unsigned char), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint8 get_renderOrder() const", AS_METHODPR(T, GetRenderOrder, () const, unsigned char), AS_CALL_THISCALL);
+    // i8 Material::GetRenderOrder() const
+    engine->RegisterObjectMethod(className, "int8 GetRenderOrder() const", AS_METHODPR(T, GetRenderOrder, () const, i8), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int8 get_renderOrder() const", AS_METHODPR(T, GetRenderOrder, () const, i8), AS_CALL_THISCALL);
 
     // Scene* Material::GetScene() const
     engine->RegisterObjectMethod(className, "Scene@+ GetScene() const", AS_METHODPR(T, GetScene, () const, Scene*), AS_CALL_THISCALL);
@@ -13760,8 +13864,8 @@ template <class T> void RegisterMembers_Material(asIScriptEngine* engine, const 
     // WrapMode Material::GetShaderParameterAnimationWrapMode(const String& name) const
     engine->RegisterObjectMethod(className, "WrapMode GetShaderParameterAnimationWrapMode(const String&in) const", AS_METHODPR(T, GetShaderParameterAnimationWrapMode, (const String&) const, WrapMode), AS_CALL_THISCALL);
 
-    // unsigned Material::GetShaderParameterHash() const
-    engine->RegisterObjectMethod(className, "uint GetShaderParameterHash() const", AS_METHODPR(T, GetShaderParameterHash, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 Material::GetShaderParameterHash() const
+    engine->RegisterObjectMethod(className, "hash32 GetShaderParameterHash() const", AS_METHODPR(T, GetShaderParameterHash, () const, hash32), AS_CALL_THISCALL);
 
     // CullMode Material::GetShadowCullMode() const
     engine->RegisterObjectMethod(className, "CullMode GetShadowCullMode() const", AS_METHODPR(T, GetShadowCullMode, () const, CullMode), AS_CALL_THISCALL);
@@ -13841,9 +13945,9 @@ template <class T> void RegisterMembers_Material(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetPixelShaderDefines(const String&in)", AS_METHODPR(T, SetPixelShaderDefines, (const String&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_pixelShaderDefines(const String&in)", AS_METHODPR(T, SetPixelShaderDefines, (const String&), void), AS_CALL_THISCALL);
 
-    // void Material::SetRenderOrder(unsigned char order)
-    engine->RegisterObjectMethod(className, "void SetRenderOrder(uint8)", AS_METHODPR(T, SetRenderOrder, (unsigned char), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_renderOrder(uint8)", AS_METHODPR(T, SetRenderOrder, (unsigned char), void), AS_CALL_THISCALL);
+    // void Material::SetRenderOrder(i8 order)
+    engine->RegisterObjectMethod(className, "void SetRenderOrder(int8)", AS_METHODPR(T, SetRenderOrder, (i8), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_renderOrder(int8)", AS_METHODPR(T, SetRenderOrder, (i8), void), AS_CALL_THISCALL);
 
     // void Material::SetScene(Scene* scene)
     engine->RegisterObjectMethod(className, "void SetScene(Scene@+)", AS_METHODPR(T, SetScene, (Scene*), void), AS_CALL_THISCALL);
@@ -15062,7 +15166,7 @@ template <class T> void RegisterMembers_Animation(asIScriptEngine* engine, const
 
     // const HashMap<StringHash, AnimationTrack>& Animation::GetTracks() const
     // Error: type "const HashMap<StringHash, AnimationTrack>&" can not automatically bind
-    // AnimationTriggerPoint* Animation::GetTrigger(unsigned index)
+    // AnimationTriggerPoint* Animation::GetTrigger(i32 index)
     // Error: type "AnimationTriggerPoint*" can not automatically bind
 
     // void Animation::AddTrigger(const AnimationTriggerPoint& trigger)
@@ -15088,16 +15192,16 @@ template <class T> void RegisterMembers_Animation(asIScriptEngine* engine, const
     engine->RegisterObjectMethod(className, "float GetLength() const", AS_METHODPR(T, GetLength, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_length() const", AS_METHODPR(T, GetLength, () const, float), AS_CALL_THISCALL);
 
-    // unsigned Animation::GetNumTracks() const
-    engine->RegisterObjectMethod(className, "uint GetNumTracks() const", AS_METHODPR(T, GetNumTracks, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numTracks() const", AS_METHODPR(T, GetNumTracks, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Animation::GetNumTracks() const
+    engine->RegisterObjectMethod(className, "int GetNumTracks() const", AS_METHODPR(T, GetNumTracks, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numTracks() const", AS_METHODPR(T, GetNumTracks, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Animation::GetNumTriggers() const
-    engine->RegisterObjectMethod(className, "uint GetNumTriggers() const", AS_METHODPR(T, GetNumTriggers, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numTriggers() const", AS_METHODPR(T, GetNumTriggers, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Animation::GetNumTriggers() const
+    engine->RegisterObjectMethod(className, "int GetNumTriggers() const", AS_METHODPR(T, GetNumTriggers, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numTriggers() const", AS_METHODPR(T, GetNumTriggers, () const, i32), AS_CALL_THISCALL);
 
-    // AnimationTrack* Animation::GetTrack(unsigned index)
-    engine->RegisterObjectMethod(className, "AnimationTrack@ GetTrack(uint)", AS_METHODPR(T, GetTrack, (unsigned), AnimationTrack*), AS_CALL_THISCALL);
+    // AnimationTrack* Animation::GetTrack(i32 index)
+    engine->RegisterObjectMethod(className, "AnimationTrack@ GetTrack(int)", AS_METHODPR(T, GetTrack, (i32), AnimationTrack*), AS_CALL_THISCALL);
 
     // AnimationTrack* Animation::GetTrack(const String& name)
     engine->RegisterObjectMethod(className, "AnimationTrack@ GetTrack(const String&in)", AS_METHODPR(T, GetTrack, (const String&), AnimationTrack*), AS_CALL_THISCALL);
@@ -15118,8 +15222,8 @@ template <class T> void RegisterMembers_Animation(asIScriptEngine* engine, const
     // bool Animation::RemoveTrack(const String& name)
     engine->RegisterObjectMethod(className, "bool RemoveTrack(const String&in)", AS_METHODPR(T, RemoveTrack, (const String&), bool), AS_CALL_THISCALL);
 
-    // void Animation::RemoveTrigger(unsigned index)
-    engine->RegisterObjectMethod(className, "void RemoveTrigger(uint)", AS_METHODPR(T, RemoveTrigger, (unsigned), void), AS_CALL_THISCALL);
+    // void Animation::RemoveTrigger(i32 index)
+    engine->RegisterObjectMethod(className, "void RemoveTrigger(int)", AS_METHODPR(T, RemoveTrigger, (i32), void), AS_CALL_THISCALL);
 
     // void Animation::SetAnimationName(const String& name)
     engine->RegisterObjectMethod(className, "void SetAnimationName(const String&in)", AS_METHODPR(T, SetAnimationName, (const String&), void), AS_CALL_THISCALL);
@@ -15129,13 +15233,13 @@ template <class T> void RegisterMembers_Animation(asIScriptEngine* engine, const
     engine->RegisterObjectMethod(className, "void SetLength(float)", AS_METHODPR(T, SetLength, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_length(float)", AS_METHODPR(T, SetLength, (float), void), AS_CALL_THISCALL);
 
-    // void Animation::SetNumTriggers(unsigned num)
-    engine->RegisterObjectMethod(className, "void SetNumTriggers(uint)", AS_METHODPR(T, SetNumTriggers, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_numTriggers(uint)", AS_METHODPR(T, SetNumTriggers, (unsigned), void), AS_CALL_THISCALL);
+    // void Animation::SetNumTriggers(i32 num)
+    engine->RegisterObjectMethod(className, "void SetNumTriggers(int)", AS_METHODPR(T, SetNumTriggers, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_numTriggers(int)", AS_METHODPR(T, SetNumTriggers, (i32), void), AS_CALL_THISCALL);
 
-    // void Animation::SetTrigger(unsigned index, const AnimationTriggerPoint& trigger)
-    engine->RegisterObjectMethod(className, "void SetTrigger(uint, const AnimationTriggerPoint&in)", AS_METHODPR(T, SetTrigger, (unsigned, const AnimationTriggerPoint&), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_triggers(uint, const AnimationTriggerPoint&in)", AS_METHODPR(T, SetTrigger, (unsigned, const AnimationTriggerPoint&), void), AS_CALL_THISCALL);
+    // void Animation::SetTrigger(i32 index, const AnimationTriggerPoint& trigger)
+    engine->RegisterObjectMethod(className, "void SetTrigger(int, const AnimationTriggerPoint&in)", AS_METHODPR(T, SetTrigger, (i32, const AnimationTriggerPoint&), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_triggers(int, const AnimationTriggerPoint&in)", AS_METHODPR(T, SetTrigger, (i32, const AnimationTriggerPoint&), void), AS_CALL_THISCALL);
 
     // static void Animation::RegisterObject(Context* context)
     // Not registered because have @nobind mark
@@ -15162,9 +15266,9 @@ template <class T> void RegisterMembers_Component(asIScriptEngine* engine, const
     // Component* Component::GetComponent(StringHash type) const
     engine->RegisterObjectMethod(className, "Component@+ GetComponent(StringHash) const", AS_METHODPR(T, GetComponent, (StringHash) const, Component*), AS_CALL_THISCALL);
 
-    // unsigned Component::GetID() const
-    engine->RegisterObjectMethod(className, "uint GetID() const", AS_METHODPR(T, GetID, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_id() const", AS_METHODPR(T, GetID, () const, unsigned), AS_CALL_THISCALL);
+    // ComponentId Component::GetID() const
+    engine->RegisterObjectMethod(className, "ComponentId GetID() const", AS_METHODPR(T, GetID, () const, ComponentId), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "ComponentId get_id() const", AS_METHODPR(T, GetID, () const, ComponentId), AS_CALL_THISCALL);
 
     // Node* Component::GetNode() const
     engine->RegisterObjectMethod(className, "Node@+ GetNode() const", AS_METHODPR(T, GetNode, () const, Node*), AS_CALL_THISCALL);
@@ -15258,12 +15362,12 @@ template <class T> void Model_void_SetMorphs_constspVectorlesModelMorphgreamp_te
     _ptr->SetMorphs(morphs);
 }
 
-// bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const Vector<unsigned>& morphRangeStarts, const Vector<unsigned>& morphRangeCounts)
-template <class T> bool Model_bool_SetVertexBuffers_constspVectorlesSharedPtrlesVertexBuffergregreamp_constspVectorlesunsignedgreamp_constspVectorlesunsignedgreamp_template(T* _ptr, CScriptArray* buffers_conv, CScriptArray* morphRangeStarts_conv, CScriptArray* morphRangeCounts_conv)
+// bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const Vector<i32>& morphRangeStarts, const Vector<i32>& morphRangeCounts)
+template <class T> bool Model_bool_SetVertexBuffers_constspVectorlesSharedPtrlesVertexBuffergregreamp_constspVectorlesi32greamp_constspVectorlesi32greamp_template(T* _ptr, CScriptArray* buffers_conv, CScriptArray* morphRangeStarts_conv, CScriptArray* morphRangeCounts_conv)
 {
     Vector<SharedPtr<VertexBuffer>> buffers = HandleArrayToVector<VertexBuffer>(buffers_conv);
-    Vector<unsigned> morphRangeStarts = ArrayToVector<unsigned>(morphRangeStarts_conv);
-    Vector<unsigned> morphRangeCounts = ArrayToVector<unsigned>(morphRangeCounts_conv);
+    Vector<i32> morphRangeStarts = ArrayToVector<i32>(morphRangeStarts_conv);
+    Vector<i32> morphRangeCounts = ArrayToVector<i32>(morphRangeCounts_conv);
     bool result = _ptr->SetVertexBuffers(buffers, morphRangeStarts, morphRangeCounts);
     return result;
 }
@@ -15275,16 +15379,16 @@ template <class T> void RegisterMembers_Model(asIScriptEngine* engine, const cha
 
     // const Vector<Vector<SharedPtr<Geometry>>>& Model::GetGeometries() const
     // Error: type "const Vector<Vector<SharedPtr<Geometry>>>&" can not automatically bind
-    // const Vector<Vector<unsigned>>& Model::GetGeometryBoneMappings() const
-    // Error: type "const Vector<Vector<unsigned>>&" can not automatically bind
-    // const ModelMorph* Model::GetMorph(unsigned index) const
+    // const Vector<Vector<i32>>& Model::GetGeometryBoneMappings() const
+    // Error: type "const Vector<Vector<i32>>&" can not automatically bind
+    // const ModelMorph* Model::GetMorph(i32 index) const
     // Error: type "const ModelMorph*" can not automatically bind
     // const ModelMorph* Model::GetMorph(const String& name) const
     // Error: type "const ModelMorph*" can not automatically bind
     // const ModelMorph* Model::GetMorph(StringHash nameHash) const
     // Error: type "const ModelMorph*" can not automatically bind
-    // void Model::SetGeometryBoneMappings(const Vector<Vector<unsigned>>& geometryBoneMappings)
-    // Error: type "const Vector<Vector<unsigned>>&" can not automatically bind
+    // void Model::SetGeometryBoneMappings(const Vector<Vector<i32>>& geometryBoneMappings)
+    // Error: type "const Vector<Vector<i32>>&" can not automatically bind
 
     // SharedPtr<Model> Model::Clone(const String& cloneName = String::EMPTY) const
     engine->RegisterObjectMethod(className, "Model@+ Clone(const String&in = String::EMPTY) const", AS_FUNCTION_OBJFIRST(Model_SharedPtrlesModelgre_Clone_constspStringamp_template<Model>), AS_CALL_CDECL_OBJFIRST);
@@ -15293,8 +15397,8 @@ template <class T> void RegisterMembers_Model(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "const BoundingBox& GetBoundingBox() const", AS_METHODPR(T, GetBoundingBox, () const, const BoundingBox&), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "const BoundingBox& get_boundingBox() const", AS_METHODPR(T, GetBoundingBox, () const, const BoundingBox&), AS_CALL_THISCALL);
 
-    // Geometry* Model::GetGeometry(unsigned index, unsigned lodLevel) const
-    engine->RegisterObjectMethod(className, "Geometry@+ GetGeometry(uint, uint) const", AS_METHODPR(T, GetGeometry, (unsigned, unsigned) const, Geometry*), AS_CALL_THISCALL);
+    // Geometry* Model::GetGeometry(i32 index, i32 lodLevel) const
+    engine->RegisterObjectMethod(className, "Geometry@+ GetGeometry(int, int) const", AS_METHODPR(T, GetGeometry, (i32, i32) const, Geometry*), AS_CALL_THISCALL);
 
     // const Vector3& Model::GetGeometryCenter(i32 index) const
     engine->RegisterObjectMethod(className, "const Vector3& GetGeometryCenter(int) const", AS_METHODPR(T, GetGeometryCenter, (i32) const, const Vector3&), AS_CALL_THISCALL);
@@ -15306,26 +15410,26 @@ template <class T> void RegisterMembers_Model(asIScriptEngine* engine, const cha
     // const Vector<SharedPtr<IndexBuffer>>& Model::GetIndexBuffers() const
     engine->RegisterObjectMethod(className, "Array<IndexBuffer@>@ GetIndexBuffers() const", AS_FUNCTION_OBJFIRST(Model_constspVectorlesSharedPtrlesIndexBuffergregreamp_GetIndexBuffers_void_template<Model>), AS_CALL_CDECL_OBJFIRST);
 
-    // unsigned Model::GetMorphRangeCount(unsigned bufferIndex) const
-    engine->RegisterObjectMethod(className, "uint GetMorphRangeCount(uint) const", AS_METHODPR(T, GetMorphRangeCount, (unsigned) const, unsigned), AS_CALL_THISCALL);
+    // i32 Model::GetMorphRangeCount(i32 bufferIndex) const
+    engine->RegisterObjectMethod(className, "int GetMorphRangeCount(int) const", AS_METHODPR(T, GetMorphRangeCount, (i32) const, i32), AS_CALL_THISCALL);
 
-    // unsigned Model::GetMorphRangeStart(unsigned bufferIndex) const
-    engine->RegisterObjectMethod(className, "uint GetMorphRangeStart(uint) const", AS_METHODPR(T, GetMorphRangeStart, (unsigned) const, unsigned), AS_CALL_THISCALL);
+    // i32 Model::GetMorphRangeStart(i32 bufferIndex) const
+    engine->RegisterObjectMethod(className, "int GetMorphRangeStart(int) const", AS_METHODPR(T, GetMorphRangeStart, (i32) const, i32), AS_CALL_THISCALL);
 
     // const Vector<ModelMorph>& Model::GetMorphs() const
     engine->RegisterObjectMethod(className, "Array<ModelMorph>@ GetMorphs() const", AS_FUNCTION_OBJFIRST(Model_constspVectorlesModelMorphgreamp_GetMorphs_void_template<Model>), AS_CALL_CDECL_OBJFIRST);
 
-    // unsigned Model::GetNumGeometries() const
-    engine->RegisterObjectMethod(className, "uint GetNumGeometries() const", AS_METHODPR(T, GetNumGeometries, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numGeometries() const", AS_METHODPR(T, GetNumGeometries, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Model::GetNumGeometries() const
+    engine->RegisterObjectMethod(className, "int GetNumGeometries() const", AS_METHODPR(T, GetNumGeometries, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numGeometries() const", AS_METHODPR(T, GetNumGeometries, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Model::GetNumGeometryLodLevels(unsigned index) const
-    engine->RegisterObjectMethod(className, "uint GetNumGeometryLodLevels(uint) const", AS_METHODPR(T, GetNumGeometryLodLevels, (unsigned) const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numGeometryLodLevels(uint) const", AS_METHODPR(T, GetNumGeometryLodLevels, (unsigned) const, unsigned), AS_CALL_THISCALL);
+    // i32 Model::GetNumGeometryLodLevels(i32 index) const
+    engine->RegisterObjectMethod(className, "int GetNumGeometryLodLevels(int) const", AS_METHODPR(T, GetNumGeometryLodLevels, (i32) const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numGeometryLodLevels(int) const", AS_METHODPR(T, GetNumGeometryLodLevels, (i32) const, i32), AS_CALL_THISCALL);
 
-    // unsigned Model::GetNumMorphs() const
-    engine->RegisterObjectMethod(className, "uint GetNumMorphs() const", AS_METHODPR(T, GetNumMorphs, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numMorphs() const", AS_METHODPR(T, GetNumMorphs, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Model::GetNumMorphs() const
+    engine->RegisterObjectMethod(className, "int GetNumMorphs() const", AS_METHODPR(T, GetNumMorphs, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numMorphs() const", AS_METHODPR(T, GetNumMorphs, () const, i32), AS_CALL_THISCALL);
 
     // Skeleton& Model::GetSkeleton()
     engine->RegisterObjectMethod(className, "Skeleton& GetSkeleton()", AS_METHODPR(T, GetSkeleton, (), Skeleton&), AS_CALL_THISCALL);
@@ -15338,12 +15442,12 @@ template <class T> void RegisterMembers_Model(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "void SetBoundingBox(const BoundingBox&in)", AS_METHODPR(T, SetBoundingBox, (const BoundingBox&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_boundingBox(const BoundingBox&in)", AS_METHODPR(T, SetBoundingBox, (const BoundingBox&), void), AS_CALL_THISCALL);
 
-    // bool Model::SetGeometry(unsigned index, unsigned lodLevel, Geometry* geometry)
-    engine->RegisterObjectMethod(className, "bool SetGeometry(uint, uint, Geometry@+)", AS_METHODPR(T, SetGeometry, (unsigned, unsigned, Geometry*), bool), AS_CALL_THISCALL);
+    // bool Model::SetGeometry(i32 index, i32 lodLevel, Geometry* geometry)
+    engine->RegisterObjectMethod(className, "bool SetGeometry(int, int, Geometry@+)", AS_METHODPR(T, SetGeometry, (i32, i32, Geometry*), bool), AS_CALL_THISCALL);
 
-    // bool Model::SetGeometryCenter(unsigned index, const Vector3& center)
-    engine->RegisterObjectMethod(className, "bool SetGeometryCenter(uint, const Vector3&in)", AS_METHODPR(T, SetGeometryCenter, (unsigned, const Vector3&), bool), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool set_geometryCenters(uint, const Vector3&in)", AS_METHODPR(T, SetGeometryCenter, (unsigned, const Vector3&), bool), AS_CALL_THISCALL);
+    // bool Model::SetGeometryCenter(i32 index, const Vector3& center)
+    engine->RegisterObjectMethod(className, "bool SetGeometryCenter(int, const Vector3&in)", AS_METHODPR(T, SetGeometryCenter, (i32, const Vector3&), bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool set_geometryCenters(int, const Vector3&in)", AS_METHODPR(T, SetGeometryCenter, (i32, const Vector3&), bool), AS_CALL_THISCALL);
 
     // bool Model::SetIndexBuffers(const Vector<SharedPtr<IndexBuffer>>& buffers)
     engine->RegisterObjectMethod(className, "bool SetIndexBuffers(Array<IndexBuffer@>@+)", AS_FUNCTION_OBJFIRST(Model_bool_SetIndexBuffers_constspVectorlesSharedPtrlesIndexBuffergregreamp_template<Model>), AS_CALL_CDECL_OBJFIRST);
@@ -15351,19 +15455,19 @@ template <class T> void RegisterMembers_Model(asIScriptEngine* engine, const cha
     // void Model::SetMorphs(const Vector<ModelMorph>& morphs)
     engine->RegisterObjectMethod(className, "void SetMorphs(Array<ModelMorph>@+)", AS_FUNCTION_OBJFIRST(Model_void_SetMorphs_constspVectorlesModelMorphgreamp_template<Model>), AS_CALL_CDECL_OBJFIRST);
 
-    // void Model::SetNumGeometries(unsigned num)
-    engine->RegisterObjectMethod(className, "void SetNumGeometries(uint)", AS_METHODPR(T, SetNumGeometries, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_numGeometries(uint)", AS_METHODPR(T, SetNumGeometries, (unsigned), void), AS_CALL_THISCALL);
+    // void Model::SetNumGeometries(i32 num)
+    engine->RegisterObjectMethod(className, "void SetNumGeometries(int)", AS_METHODPR(T, SetNumGeometries, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_numGeometries(int)", AS_METHODPR(T, SetNumGeometries, (i32), void), AS_CALL_THISCALL);
 
-    // bool Model::SetNumGeometryLodLevels(unsigned index, unsigned num)
-    engine->RegisterObjectMethod(className, "bool SetNumGeometryLodLevels(uint, uint)", AS_METHODPR(T, SetNumGeometryLodLevels, (unsigned, unsigned), bool), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool set_numGeometryLodLevels(uint, uint)", AS_METHODPR(T, SetNumGeometryLodLevels, (unsigned, unsigned), bool), AS_CALL_THISCALL);
+    // bool Model::SetNumGeometryLodLevels(i32 index, i32 num)
+    engine->RegisterObjectMethod(className, "bool SetNumGeometryLodLevels(int, int)", AS_METHODPR(T, SetNumGeometryLodLevels, (i32, i32), bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool set_numGeometryLodLevels(int, int)", AS_METHODPR(T, SetNumGeometryLodLevels, (i32, i32), bool), AS_CALL_THISCALL);
 
     // void Model::SetSkeleton(const Skeleton& skeleton)
     engine->RegisterObjectMethod(className, "void SetSkeleton(const Skeleton&in)", AS_METHODPR(T, SetSkeleton, (const Skeleton&), void), AS_CALL_THISCALL);
 
-    // bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const Vector<unsigned>& morphRangeStarts, const Vector<unsigned>& morphRangeCounts)
-    engine->RegisterObjectMethod(className, "bool SetVertexBuffers(Array<VertexBuffer@>@+, Array<uint>@+, Array<uint>@+)", AS_FUNCTION_OBJFIRST(Model_bool_SetVertexBuffers_constspVectorlesSharedPtrlesVertexBuffergregreamp_constspVectorlesunsignedgreamp_constspVectorlesunsignedgreamp_template<Model>), AS_CALL_CDECL_OBJFIRST);
+    // bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const Vector<i32>& morphRangeStarts, const Vector<i32>& morphRangeCounts)
+    engine->RegisterObjectMethod(className, "bool SetVertexBuffers(Array<VertexBuffer@>@+, Array<int>@+, Array<int>@+)", AS_FUNCTION_OBJFIRST(Model_bool_SetVertexBuffers_constspVectorlesSharedPtrlesVertexBuffergregreamp_constspVectorlesi32greamp_constspVectorlesi32greamp_template<Model>), AS_CALL_CDECL_OBJFIRST);
 
     // static void Model::RegisterObject(Context* context)
     // Not registered because have @nobind mark
@@ -15422,11 +15526,39 @@ template <class T> CScriptArray* Node_constspVectorlesNodestargreamp_GetDependen
     return VectorToHandleArray(result, "Array<Node@>");
 }
 
+// const Vector<byte>& Node::GetNetParentAttr() const
+template <class T> CScriptArray* Node_constspVectorlesbytegreamp_GetNetParentAttr_void_template(T* _ptr)
+{
+    const Vector<byte>& result = _ptr->GetNetParentAttr();
+    return VectorToArray(result, "Array<byte>");
+}
+
+// const Vector<byte>& Node::GetNetRotationAttr() const
+template <class T> CScriptArray* Node_constspVectorlesbytegreamp_GetNetRotationAttr_void_template(T* _ptr)
+{
+    const Vector<byte>& result = _ptr->GetNetRotationAttr();
+    return VectorToArray(result, "Array<byte>");
+}
+
 // const StringVector& Node::GetTags() const
 template <class T> CScriptArray* Node_constspStringVectoramp_GetTags_void_template(T* _ptr)
 {
     const StringVector& result = _ptr->GetTags();
     return VectorToArray<String>(result, "Array<String>");
+}
+
+// void Node::SetNetParentAttr(const Vector<byte>& value)
+template <class T> void Node_void_SetNetParentAttr_constspVectorlesbytegreamp_template(T* _ptr, CScriptArray* value_conv)
+{
+    Vector<byte> value = ArrayToVector<byte>(value_conv);
+    _ptr->SetNetParentAttr(value);
+}
+
+// void Node::SetNetRotationAttr(const Vector<byte>& value)
+template <class T> void Node_void_SetNetRotationAttr_constspVectorlesbytegreamp_template(T* _ptr, CScriptArray* value_conv)
+{
+    Vector<byte> value = ArrayToVector<byte>(value_conv);
+    _ptr->SetNetRotationAttr(value);
 }
 
 // void Node::SetTags(const StringVector& tags)
@@ -15457,10 +15589,6 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // Error: type "Vector<Component*>&" can not automatically bind
     // const Vector<WeakPtr<Component>> Node::GetListeners() const
     // Error: type "const Vector<WeakPtr<Component>>" can not automatically bind
-    // const Vector<unsigned char>& Node::GetNetParentAttr() const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
-    // const Vector<unsigned char>& Node::GetNetRotationAttr() const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // Connection* Node::GetOwner() const
     // Not registered because have @manualbind mark
     // bool Node::Load(Deserializer& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED)
@@ -15471,18 +15599,14 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // Can not be registered here bacause hidden in derived classes: Scene
     // void Node::MarkReplicationDirty()
     // Can not be registered here bacause hidden in derived classes: Scene
-    // void Node::SetNetParentAttr(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
-    // void Node::SetNetRotationAttr(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // void Node::SetOwner(Connection* owner)
     // Not registered because have @manualbind mark
 
     // void Node::AddChild(Node* node, i32 index = ENDPOS)
     engine->RegisterObjectMethod(className, "void AddChild(Node@+, int = ENDPOS)", AS_METHODPR(T, AddChild, (Node*, i32), void), AS_CALL_THISCALL);
 
-    // void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
-    engine->RegisterObjectMethod(className, "void AddComponent(Component@+, uint, CreateMode)", AS_METHODPR(T, AddComponent, (Component*, unsigned, CreateMode), void), AS_CALL_THISCALL);
+    // void Node::AddComponent(Component* component, ComponentId id, CreateMode mode)
+    engine->RegisterObjectMethod(className, "void AddComponent(Component@+, ComponentId, CreateMode)", AS_METHODPR(T, AddComponent, (Component*, ComponentId, CreateMode), void), AS_CALL_THISCALL);
 
     // void Node::AddListener(Component* component)
     engine->RegisterObjectMethod(className, "void AddListener(Component@+)", AS_METHODPR(T, AddListener, (Component*), void), AS_CALL_THISCALL);
@@ -15499,26 +15623,26 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // Node* Node::Clone(CreateMode mode = REPLICATED)
     engine->RegisterObjectMethod(className, "Node@+ Clone(CreateMode = REPLICATED)", AS_METHODPR(T, Clone, (CreateMode), Node*), AS_CALL_THISCALL);
 
-    // Component* Node::CloneComponent(Component* component, unsigned id = 0)
-    engine->RegisterObjectMethod(className, "Component@+ CloneComponent(Component@+, uint = 0)", AS_METHODPR(T, CloneComponent, (Component*, unsigned), Component*), AS_CALL_THISCALL);
+    // Component* Node::CloneComponent(Component* component, ComponentId id = 0)
+    engine->RegisterObjectMethod(className, "Component@+ CloneComponent(Component@+, ComponentId = 0)", AS_METHODPR(T, CloneComponent, (Component*, ComponentId), Component*), AS_CALL_THISCALL);
 
-    // Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned id = 0)
-    engine->RegisterObjectMethod(className, "Component@+ CloneComponent(Component@+, CreateMode, uint = 0)", AS_METHODPR(T, CloneComponent, (Component*, CreateMode, unsigned), Component*), AS_CALL_THISCALL);
+    // Component* Node::CloneComponent(Component* component, CreateMode mode, ComponentId id = 0)
+    engine->RegisterObjectMethod(className, "Component@+ CloneComponent(Component@+, CreateMode, ComponentId = 0)", AS_METHODPR(T, CloneComponent, (Component*, CreateMode, ComponentId), Component*), AS_CALL_THISCALL);
 
-    // Node* Node::CreateChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0, bool temporary = false)
-    engine->RegisterObjectMethod(className, "Node@+ CreateChild(const String&in = String::EMPTY, CreateMode = REPLICATED, uint = 0, bool = false)", AS_METHODPR(T, CreateChild, (const String&, CreateMode, unsigned, bool), Node*), AS_CALL_THISCALL);
+    // Node* Node::CreateChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, NodeId id = 0, bool temporary = false)
+    engine->RegisterObjectMethod(className, "Node@+ CreateChild(const String&in = String::EMPTY, CreateMode = REPLICATED, NodeId = 0, bool = false)", AS_METHODPR(T, CreateChild, (const String&, CreateMode, NodeId, bool), Node*), AS_CALL_THISCALL);
 
-    // Node* Node::CreateChild(unsigned id, CreateMode mode, bool temporary = false)
-    engine->RegisterObjectMethod(className, "Node@+ CreateChild(uint, CreateMode, bool = false)", AS_METHODPR(T, CreateChild, (unsigned, CreateMode, bool), Node*), AS_CALL_THISCALL);
+    // Node* Node::CreateChild(NodeId id, CreateMode mode, bool temporary = false)
+    engine->RegisterObjectMethod(className, "Node@+ CreateChild(NodeId, CreateMode, bool = false)", AS_METHODPR(T, CreateChild, (NodeId, CreateMode, bool), Node*), AS_CALL_THISCALL);
 
-    // Component* Node::CreateComponent(StringHash type, CreateMode mode = REPLICATED, unsigned id = 0)
-    engine->RegisterObjectMethod(className, "Component@+ CreateComponent(StringHash, CreateMode = REPLICATED, uint = 0)", AS_METHODPR(T, CreateComponent, (StringHash, CreateMode, unsigned), Component*), AS_CALL_THISCALL);
+    // Component* Node::CreateComponent(StringHash type, CreateMode mode = REPLICATED, ComponentId id = 0)
+    engine->RegisterObjectMethod(className, "Component@+ CreateComponent(StringHash, CreateMode = REPLICATED, ComponentId = 0)", AS_METHODPR(T, CreateComponent, (StringHash, CreateMode, ComponentId), Component*), AS_CALL_THISCALL);
 
-    // Node* Node::CreateTemporaryChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0)
-    engine->RegisterObjectMethod(className, "Node@+ CreateTemporaryChild(const String&in = String::EMPTY, CreateMode = REPLICATED, uint = 0)", AS_METHODPR(T, CreateTemporaryChild, (const String&, CreateMode, unsigned), Node*), AS_CALL_THISCALL);
+    // Node* Node::CreateTemporaryChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, NodeId id = 0)
+    engine->RegisterObjectMethod(className, "Node@+ CreateTemporaryChild(const String&in = String::EMPTY, CreateMode = REPLICATED, NodeId = 0)", AS_METHODPR(T, CreateTemporaryChild, (const String&, CreateMode, NodeId), Node*), AS_CALL_THISCALL);
 
-    // Node* Node::GetChild(unsigned index) const
-    engine->RegisterObjectMethod(className, "Node@+ GetChild(uint) const", AS_METHODPR(T, GetChild, (unsigned) const, Node*), AS_CALL_THISCALL);
+    // Node* Node::GetChild(i32 index) const
+    engine->RegisterObjectMethod(className, "Node@+ GetChild(int) const", AS_METHODPR(T, GetChild, (i32) const, Node*), AS_CALL_THISCALL);
 
     // Node* Node::GetChild(const String& name, bool recursive = false) const
     engine->RegisterObjectMethod(className, "Node@+ GetChild(const String&in, bool = false) const", AS_METHODPR(T, GetChild, (const String&, bool) const, Node*), AS_CALL_THISCALL);
@@ -15551,9 +15675,9 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     engine->RegisterObjectMethod(className, "Vector3 GetDirection() const", AS_METHODPR(T, GetDirection, () const, Vector3), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector3 get_direction() const", AS_METHODPR(T, GetDirection, () const, Vector3), AS_CALL_THISCALL);
 
-    // unsigned Node::GetID() const
-    engine->RegisterObjectMethod(className, "uint GetID() const", AS_METHODPR(T, GetID, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_id() const", AS_METHODPR(T, GetID, () const, unsigned), AS_CALL_THISCALL);
+    // NodeId Node::GetID() const
+    engine->RegisterObjectMethod(className, "NodeId GetID() const", AS_METHODPR(T, GetID, () const, NodeId), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "NodeId get_id() const", AS_METHODPR(T, GetID, () const, NodeId), AS_CALL_THISCALL);
 
     // const String& Node::GetName() const
     engine->RegisterObjectMethod(className, "const String& GetName() const", AS_METHODPR(T, GetName, () const, const String&), AS_CALL_THISCALL);
@@ -15562,27 +15686,33 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // StringHash Node::GetNameHash() const
     engine->RegisterObjectMethod(className, "StringHash GetNameHash() const", AS_METHODPR(T, GetNameHash, () const, StringHash), AS_CALL_THISCALL);
 
+    // const Vector<byte>& Node::GetNetParentAttr() const
+    engine->RegisterObjectMethod(className, "Array<byte>@ GetNetParentAttr() const", AS_FUNCTION_OBJFIRST(Node_constspVectorlesbytegreamp_GetNetParentAttr_void_template<Node>), AS_CALL_CDECL_OBJFIRST);
+
     // const Vector3& Node::GetNetPositionAttr() const
     engine->RegisterObjectMethod(className, "const Vector3& GetNetPositionAttr() const", AS_METHODPR(T, GetNetPositionAttr, () const, const Vector3&), AS_CALL_THISCALL);
 
-    // unsigned Node::GetNumChildren(bool recursive = false) const
-    engine->RegisterObjectMethod(className, "uint GetNumChildren(bool = false) const", AS_METHODPR(T, GetNumChildren, (bool) const, unsigned), AS_CALL_THISCALL);
+    // const Vector<byte>& Node::GetNetRotationAttr() const
+    engine->RegisterObjectMethod(className, "Array<byte>@ GetNetRotationAttr() const", AS_FUNCTION_OBJFIRST(Node_constspVectorlesbytegreamp_GetNetRotationAttr_void_template<Node>), AS_CALL_CDECL_OBJFIRST);
 
-    // unsigned Node::GetNumComponents() const
-    engine->RegisterObjectMethod(className, "uint GetNumComponents() const", AS_METHODPR(T, GetNumComponents, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numComponents() const", AS_METHODPR(T, GetNumComponents, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Node::GetNumChildren(bool recursive = false) const
+    engine->RegisterObjectMethod(className, "int GetNumChildren(bool = false) const", AS_METHODPR(T, GetNumChildren, (bool) const, i32), AS_CALL_THISCALL);
 
-    // unsigned Node::GetNumNetworkComponents() const
-    engine->RegisterObjectMethod(className, "uint GetNumNetworkComponents() const", AS_METHODPR(T, GetNumNetworkComponents, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Node::GetNumComponents() const
+    engine->RegisterObjectMethod(className, "int GetNumComponents() const", AS_METHODPR(T, GetNumComponents, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numComponents() const", AS_METHODPR(T, GetNumComponents, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Node::GetNumPersistentChildren() const
-    engine->RegisterObjectMethod(className, "uint GetNumPersistentChildren() const", AS_METHODPR(T, GetNumPersistentChildren, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Node::GetNumNetworkComponents() const
+    engine->RegisterObjectMethod(className, "int GetNumNetworkComponents() const", AS_METHODPR(T, GetNumNetworkComponents, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Node::GetNumPersistentComponents() const
-    engine->RegisterObjectMethod(className, "uint GetNumPersistentComponents() const", AS_METHODPR(T, GetNumPersistentComponents, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Node::GetNumPersistentChildren() const
+    engine->RegisterObjectMethod(className, "int GetNumPersistentChildren() const", AS_METHODPR(T, GetNumPersistentChildren, () const, i32), AS_CALL_THISCALL);
 
-    // Component* Node::GetOrCreateComponent(StringHash type, CreateMode mode = REPLICATED, unsigned id = 0)
-    engine->RegisterObjectMethod(className, "Component@+ GetOrCreateComponent(StringHash, CreateMode = REPLICATED, uint = 0)", AS_METHODPR(T, GetOrCreateComponent, (StringHash, CreateMode, unsigned), Component*), AS_CALL_THISCALL);
+    // i32 Node::GetNumPersistentComponents() const
+    engine->RegisterObjectMethod(className, "int GetNumPersistentComponents() const", AS_METHODPR(T, GetNumPersistentComponents, () const, i32), AS_CALL_THISCALL);
+
+    // Component* Node::GetOrCreateComponent(StringHash type, CreateMode mode = REPLICATED, ComponentId id = 0)
+    engine->RegisterObjectMethod(className, "Component@+ GetOrCreateComponent(StringHash, CreateMode = REPLICATED, ComponentId = 0)", AS_METHODPR(T, GetOrCreateComponent, (StringHash, CreateMode, ComponentId), Component*), AS_CALL_THISCALL);
 
     // Node* Node::GetParent() const
     engine->RegisterObjectMethod(className, "Node@+ GetParent() const", AS_METHODPR(T, GetParent, () const, Node*), AS_CALL_THISCALL);
@@ -15718,14 +15848,14 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // Vector2 Node::LocalToWorld2D(const Vector2& vector) const
     engine->RegisterObjectMethod(className, "Vector2 LocalToWorld2D(const Vector2&in) const", AS_METHODPR(T, LocalToWorld2D, (const Vector2&) const, Vector2), AS_CALL_THISCALL);
 
-    // bool Node::LookAt(const Vector3& target, const Vector3& up = Vector3::UP, TransformSpace space = TS_WORLD)
-    engine->RegisterObjectMethod(className, "bool LookAt(const Vector3&in, const Vector3&in = Vector3::UP, TransformSpace = TS_WORLD)", AS_METHODPR(T, LookAt, (const Vector3&, const Vector3&, TransformSpace), bool), AS_CALL_THISCALL);
+    // bool Node::LookAt(const Vector3& target, const Vector3& up = Vector3::UP, TransformSpace space = TransformSpace::World)
+    engine->RegisterObjectMethod(className, "bool LookAt(const Vector3&in, const Vector3&in = Vector3::UP, TransformSpace = TransformSpace::World)", AS_METHODPR(T, LookAt, (const Vector3&, const Vector3&, TransformSpace), bool), AS_CALL_THISCALL);
 
     // void Node::MarkDirty()
     engine->RegisterObjectMethod(className, "void MarkDirty()", AS_METHODPR(T, MarkDirty, (), void), AS_CALL_THISCALL);
 
-    // void Node::Pitch(float angle, TransformSpace space = TS_LOCAL)
-    engine->RegisterObjectMethod(className, "void Pitch(float, TransformSpace = TS_LOCAL)", AS_METHODPR(T, Pitch, (float, TransformSpace), void), AS_CALL_THISCALL);
+    // void Node::Pitch(float angle, TransformSpace space = TransformSpace::Local)
+    engine->RegisterObjectMethod(className, "void Pitch(float, TransformSpace = TransformSpace::Local)", AS_METHODPR(T, Pitch, (float, TransformSpace), void), AS_CALL_THISCALL);
 
     // void Node::PrepareNetworkUpdate()
     engine->RegisterObjectMethod(className, "void PrepareNetworkUpdate()", AS_METHODPR(T, PrepareNetworkUpdate, (), void), AS_CALL_THISCALL);
@@ -15766,8 +15896,8 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // bool Node::RemoveTag(const String& tag)
     engine->RegisterObjectMethod(className, "bool RemoveTag(const String&in)", AS_METHODPR(T, RemoveTag, (const String&), bool), AS_CALL_THISCALL);
 
-    // void Node::ReorderComponent(Component* component, unsigned index)
-    engine->RegisterObjectMethod(className, "void ReorderComponent(Component@+, uint)", AS_METHODPR(T, ReorderComponent, (Component*, unsigned), void), AS_CALL_THISCALL);
+    // void Node::ReorderComponent(Component* component, i32 index)
+    engine->RegisterObjectMethod(className, "void ReorderComponent(Component@+, int)", AS_METHODPR(T, ReorderComponent, (Component*, i32), void), AS_CALL_THISCALL);
 
     // void Node::ResetDeepEnabled()
     engine->RegisterObjectMethod(className, "void ResetDeepEnabled()", AS_METHODPR(T, ResetDeepEnabled, (), void), AS_CALL_THISCALL);
@@ -15775,20 +15905,20 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // void Node::ResetScene()
     engine->RegisterObjectMethod(className, "void ResetScene()", AS_METHODPR(T, ResetScene, (), void), AS_CALL_THISCALL);
 
-    // void Node::Roll(float angle, TransformSpace space = TS_LOCAL)
-    engine->RegisterObjectMethod(className, "void Roll(float, TransformSpace = TS_LOCAL)", AS_METHODPR(T, Roll, (float, TransformSpace), void), AS_CALL_THISCALL);
+    // void Node::Roll(float angle, TransformSpace space = TransformSpace::Local)
+    engine->RegisterObjectMethod(className, "void Roll(float, TransformSpace = TransformSpace::Local)", AS_METHODPR(T, Roll, (float, TransformSpace), void), AS_CALL_THISCALL);
 
-    // void Node::Rotate(const Quaternion& delta, TransformSpace space = TS_LOCAL)
-    engine->RegisterObjectMethod(className, "void Rotate(const Quaternion&in, TransformSpace = TS_LOCAL)", AS_METHODPR(T, Rotate, (const Quaternion&, TransformSpace), void), AS_CALL_THISCALL);
+    // void Node::Rotate(const Quaternion& delta, TransformSpace space = TransformSpace::Local)
+    engine->RegisterObjectMethod(className, "void Rotate(const Quaternion&in, TransformSpace = TransformSpace::Local)", AS_METHODPR(T, Rotate, (const Quaternion&, TransformSpace), void), AS_CALL_THISCALL);
 
-    // void Node::Rotate2D(float delta, TransformSpace space = TS_LOCAL)
-    engine->RegisterObjectMethod(className, "void Rotate2D(float, TransformSpace = TS_LOCAL)", AS_METHODPR(T, Rotate2D, (float, TransformSpace), void), AS_CALL_THISCALL);
+    // void Node::Rotate2D(float delta, TransformSpace space = TransformSpace::Local)
+    engine->RegisterObjectMethod(className, "void Rotate2D(float, TransformSpace = TransformSpace::Local)", AS_METHODPR(T, Rotate2D, (float, TransformSpace), void), AS_CALL_THISCALL);
 
-    // void Node::RotateAround(const Vector3& point, const Quaternion& delta, TransformSpace space = TS_LOCAL)
-    engine->RegisterObjectMethod(className, "void RotateAround(const Vector3&in, const Quaternion&in, TransformSpace = TS_LOCAL)", AS_METHODPR(T, RotateAround, (const Vector3&, const Quaternion&, TransformSpace), void), AS_CALL_THISCALL);
+    // void Node::RotateAround(const Vector3& point, const Quaternion& delta, TransformSpace space = TransformSpace::Local)
+    engine->RegisterObjectMethod(className, "void RotateAround(const Vector3&in, const Quaternion&in, TransformSpace = TransformSpace::Local)", AS_METHODPR(T, RotateAround, (const Vector3&, const Quaternion&, TransformSpace), void), AS_CALL_THISCALL);
 
-    // void Node::RotateAround2D(const Vector2& point, float delta, TransformSpace space = TS_LOCAL)
-    engine->RegisterObjectMethod(className, "void RotateAround2D(const Vector2&in, float, TransformSpace = TS_LOCAL)", AS_METHODPR(T, RotateAround2D, (const Vector2&, float, TransformSpace), void), AS_CALL_THISCALL);
+    // void Node::RotateAround2D(const Vector2& point, float delta, TransformSpace space = TransformSpace::Local)
+    engine->RegisterObjectMethod(className, "void RotateAround2D(const Vector2&in, float, TransformSpace = TransformSpace::Local)", AS_METHODPR(T, RotateAround2D, (const Vector2&, float, TransformSpace), void), AS_CALL_THISCALL);
 
     // bool Node::SaveJSON(Serializer& dest, const String& indentation = "\t") const
     engine->RegisterObjectMethod(className, "bool SaveJSON(Serializer&, const String&in = \"\t\") const", AS_METHODPR(T, SaveJSON, (Serializer&, const String&) const, bool), AS_CALL_THISCALL);
@@ -15819,16 +15949,22 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // void Node::SetEnabledRecursive(bool enable)
     engine->RegisterObjectMethod(className, "void SetEnabledRecursive(bool)", AS_METHODPR(T, SetEnabledRecursive, (bool), void), AS_CALL_THISCALL);
 
-    // void Node::SetID(unsigned id)
-    engine->RegisterObjectMethod(className, "void SetID(uint)", AS_METHODPR(T, SetID, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_id(uint)", AS_METHODPR(T, SetID, (unsigned), void), AS_CALL_THISCALL);
+    // void Node::SetID(NodeId id)
+    engine->RegisterObjectMethod(className, "void SetID(NodeId)", AS_METHODPR(T, SetID, (NodeId), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_id(NodeId)", AS_METHODPR(T, SetID, (NodeId), void), AS_CALL_THISCALL);
 
     // void Node::SetName(const String& name)
     engine->RegisterObjectMethod(className, "void SetName(const String&in)", AS_METHODPR(T, SetName, (const String&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_name(const String&in)", AS_METHODPR(T, SetName, (const String&), void), AS_CALL_THISCALL);
 
+    // void Node::SetNetParentAttr(const Vector<byte>& value)
+    engine->RegisterObjectMethod(className, "void SetNetParentAttr(Array<byte>@+)", AS_FUNCTION_OBJFIRST(Node_void_SetNetParentAttr_constspVectorlesbytegreamp_template<Node>), AS_CALL_CDECL_OBJFIRST);
+
     // void Node::SetNetPositionAttr(const Vector3& value)
     engine->RegisterObjectMethod(className, "void SetNetPositionAttr(const Vector3&in)", AS_METHODPR(T, SetNetPositionAttr, (const Vector3&), void), AS_CALL_THISCALL);
+
+    // void Node::SetNetRotationAttr(const Vector<byte>& value)
+    engine->RegisterObjectMethod(className, "void SetNetRotationAttr(Array<byte>@+)", AS_FUNCTION_OBJFIRST(Node_void_SetNetRotationAttr_constspVectorlesbytegreamp_template<Node>), AS_CALL_CDECL_OBJFIRST);
 
     // void Node::SetParent(Node* parent)
     engine->RegisterObjectMethod(className, "void SetParent(Node@+)", AS_METHODPR(T, SetParent, (Node*), void), AS_CALL_THISCALL);
@@ -15967,11 +16103,11 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // void Node::SetWorldTransform2D(const Vector2& position, float rotation, const Vector2& scale)
     engine->RegisterObjectMethod(className, "void SetWorldTransform2D(const Vector2&in, float, const Vector2&in)", AS_METHODPR(T, SetWorldTransform2D, (const Vector2&, float, const Vector2&), void), AS_CALL_THISCALL);
 
-    // void Node::Translate(const Vector3& delta, TransformSpace space = TS_LOCAL)
-    engine->RegisterObjectMethod(className, "void Translate(const Vector3&in, TransformSpace = TS_LOCAL)", AS_METHODPR(T, Translate, (const Vector3&, TransformSpace), void), AS_CALL_THISCALL);
+    // void Node::Translate(const Vector3& delta, TransformSpace space = TransformSpace::Local)
+    engine->RegisterObjectMethod(className, "void Translate(const Vector3&in, TransformSpace = TransformSpace::Local)", AS_METHODPR(T, Translate, (const Vector3&, TransformSpace), void), AS_CALL_THISCALL);
 
-    // void Node::Translate2D(const Vector2& delta, TransformSpace space = TS_LOCAL)
-    engine->RegisterObjectMethod(className, "void Translate2D(const Vector2&in, TransformSpace = TS_LOCAL)", AS_METHODPR(T, Translate2D, (const Vector2&, TransformSpace), void), AS_CALL_THISCALL);
+    // void Node::Translate2D(const Vector2& delta, TransformSpace space = TransformSpace::Local)
+    engine->RegisterObjectMethod(className, "void Translate2D(const Vector2&in, TransformSpace = TransformSpace::Local)", AS_METHODPR(T, Translate2D, (const Vector2&, TransformSpace), void), AS_CALL_THISCALL);
 
     // Vector3 Node::WorldToLocal(const Vector3& position) const
     engine->RegisterObjectMethod(className, "Vector3 WorldToLocal(const Vector3&in) const", AS_METHODPR(T, WorldToLocal, (const Vector3&) const, Vector3), AS_CALL_THISCALL);
@@ -15982,10 +16118,10 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // Vector2 Node::WorldToLocal2D(const Vector2& vector) const
     engine->RegisterObjectMethod(className, "Vector2 WorldToLocal2D(const Vector2&in) const", AS_METHODPR(T, WorldToLocal2D, (const Vector2&) const, Vector2), AS_CALL_THISCALL);
 
-    // void Node::Yaw(float angle, TransformSpace space = TS_LOCAL)
-    engine->RegisterObjectMethod(className, "void Yaw(float, TransformSpace = TS_LOCAL)", AS_METHODPR(T, Yaw, (float, TransformSpace), void), AS_CALL_THISCALL);
+    // void Node::Yaw(float angle, TransformSpace space = TransformSpace::Local)
+    engine->RegisterObjectMethod(className, "void Yaw(float, TransformSpace = TransformSpace::Local)", AS_METHODPR(T, Yaw, (float, TransformSpace), void), AS_CALL_THISCALL);
 
-    // template <class T> T* Node::CreateComponent(CreateMode mode = REPLICATED, unsigned id = 0)
+    // template <class T> T* Node::CreateComponent(CreateMode mode = REPLICATED, ComponentId id = 0)
     // Not registered because template
     // template <class T> void Node::GetChildrenWithComponent(Vector<Node*>& dest, bool recursive = false) const
     // Not registered because template
@@ -15997,7 +16133,7 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // Not registered because template
     // template <class T> void Node::GetDerivedComponents(Vector<T*>& dest, bool recursive = false, bool clearVector = true) const
     // Not registered because template
-    // template <class T> T* Node::GetOrCreateComponent(CreateMode mode = REPLICATED, unsigned id = 0)
+    // template <class T> T* Node::GetOrCreateComponent(CreateMode mode = REPLICATED, ComponentId id = 0)
     // Not registered because template
     // template <class T> T* Node::GetParentComponent(bool fullTraversal = false) const
     // Not registered because template
@@ -17065,6 +17201,20 @@ template <class T> void RegisterMembers_UIElement(asIScriptEngine* engine, const
     #endif
 }
 
+// const Vector<byte>& AnimationController::GetNetAnimationsAttr() const
+template <class T> CScriptArray* AnimationController_constspVectorlesbytegreamp_GetNetAnimationsAttr_void_template(T* _ptr)
+{
+    const Vector<byte>& result = _ptr->GetNetAnimationsAttr();
+    return VectorToArray(result, "Array<byte>");
+}
+
+// void AnimationController::SetNetAnimationsAttr(const Vector<byte>& value)
+template <class T> void AnimationController_void_SetNetAnimationsAttr_constspVectorlesbytegreamp_template(T* _ptr, CScriptArray* value_conv)
+{
+    Vector<byte> value = ArrayToVector<byte>(value_conv);
+    _ptr->SetNetAnimationsAttr(value);
+}
+
 // class AnimationController | File: ../Graphics/AnimationController.h
 template <class T> void RegisterMembers_AnimationController(asIScriptEngine* engine, const char* className)
 {
@@ -17074,14 +17224,10 @@ template <class T> void RegisterMembers_AnimationController(asIScriptEngine* eng
     // Not registered because have @nobind mark
     // VariantVector AnimationController::GetAnimationsAttr() const
     // Error: type "VariantVector" can not automatically bind
-    // const Vector<unsigned char>& AnimationController::GetNetAnimationsAttr() const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // VariantVector AnimationController::GetNodeAnimationStatesAttr() const
     // Error: type "VariantVector" can not automatically bind
     // void AnimationController::SetAnimationsAttr(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
-    // void AnimationController::SetNetAnimationsAttr(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // void AnimationController::SetNodeAnimationStatesAttr(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
 
@@ -17117,6 +17263,9 @@ template <class T> void RegisterMembers_AnimationController(asIScriptEngine* eng
 
     // float AnimationController::GetLength(const String& name) const
     engine->RegisterObjectMethod(className, "float GetLength(const String&in) const", AS_METHODPR(T, GetLength, (const String&) const, float), AS_CALL_THISCALL);
+
+    // const Vector<byte>& AnimationController::GetNetAnimationsAttr() const
+    engine->RegisterObjectMethod(className, "Array<byte>@ GetNetAnimationsAttr() const", AS_FUNCTION_OBJFIRST(AnimationController_constspVectorlesbytegreamp_GetNetAnimationsAttr_void_template<AnimationController>), AS_CALL_CDECL_OBJFIRST);
 
     // bool AnimationController::GetRemoveOnCompletion(const String& name) const
     engine->RegisterObjectMethod(className, "bool GetRemoveOnCompletion(const String&in) const", AS_METHODPR(T, GetRemoveOnCompletion, (const String&) const, bool), AS_CALL_THISCALL);
@@ -17171,6 +17320,9 @@ template <class T> void RegisterMembers_AnimationController(asIScriptEngine* eng
 
     // bool AnimationController::SetLooped(const String& name, bool enable)
     engine->RegisterObjectMethod(className, "bool SetLooped(const String&in, bool)", AS_METHODPR(T, SetLooped, (const String&, bool), bool), AS_CALL_THISCALL);
+
+    // void AnimationController::SetNetAnimationsAttr(const Vector<byte>& value)
+    engine->RegisterObjectMethod(className, "void SetNetAnimationsAttr(Array<byte>@+)", AS_FUNCTION_OBJFIRST(AnimationController_void_SetNetAnimationsAttr_constspVectorlesbytegreamp_template<AnimationController>), AS_CALL_CDECL_OBJFIRST);
 
     // bool AnimationController::SetRemoveOnCompletion(const String& name, bool removeOnCompletion)
     engine->RegisterObjectMethod(className, "bool SetRemoveOnCompletion(const String&in, bool)", AS_METHODPR(T, SetRemoveOnCompletion, (const String&, bool), bool), AS_CALL_THISCALL);
@@ -17726,8 +17878,8 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     // float Drawable::GetDistance() const
     engine->RegisterObjectMethod(className, "float GetDistance() const", AS_METHODPR(T, GetDistance, () const, float), AS_CALL_THISCALL);
 
-    // unsigned char Drawable::GetDrawableFlags() const
-    engine->RegisterObjectMethod(className, "uint8 GetDrawableFlags() const", AS_METHODPR(T, GetDrawableFlags, () const, unsigned char), AS_CALL_THISCALL);
+    // DrawableTypes Drawable::GetDrawableType() const
+    engine->RegisterObjectMethod(className, "DrawableTypes GetDrawableType() const", AS_METHODPR(T, GetDrawableType, () const, DrawableTypes), AS_CALL_THISCALL);
 
     // float Drawable::GetDrawDistance() const
     engine->RegisterObjectMethod(className, "float GetDrawDistance() const", AS_METHODPR(T, GetDrawDistance, () const, float), AS_CALL_THISCALL);
@@ -17736,9 +17888,9 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     // Light* Drawable::GetFirstLight() const
     engine->RegisterObjectMethod(className, "Light@+ GetFirstLight() const", AS_METHODPR(T, GetFirstLight, () const, Light*), AS_CALL_THISCALL);
 
-    // unsigned Drawable::GetLightMask() const
-    engine->RegisterObjectMethod(className, "uint GetLightMask() const", AS_METHODPR(T, GetLightMask, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_lightMask() const", AS_METHODPR(T, GetLightMask, () const, unsigned), AS_CALL_THISCALL);
+    // mask32 Drawable::GetLightMask() const
+    engine->RegisterObjectMethod(className, "mask32 GetLightMask() const", AS_METHODPR(T, GetLightMask, () const, mask32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "mask32 get_lightMask() const", AS_METHODPR(T, GetLightMask, () const, mask32), AS_CALL_THISCALL);
 
     // const Vector<Light*>& Drawable::GetLights() const
     engine->RegisterObjectMethod(className, "Array<Light@>@ GetLights() const", AS_FUNCTION_OBJFIRST(Drawable_constspVectorlesLightstargreamp_GetLights_void_template<Drawable>), AS_CALL_CDECL_OBJFIRST);
@@ -17750,12 +17902,12 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     // float Drawable::GetLodDistance() const
     engine->RegisterObjectMethod(className, "float GetLodDistance() const", AS_METHODPR(T, GetLodDistance, () const, float), AS_CALL_THISCALL);
 
-    // virtual Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level)
-    engine->RegisterObjectMethod(className, "Geometry@+ GetLodGeometry(uint, uint)", AS_METHODPR(T, GetLodGeometry, (unsigned, unsigned), Geometry*), AS_CALL_THISCALL);
+    // virtual Geometry* Drawable::GetLodGeometry(i32 batchIndex, i32 level)
+    engine->RegisterObjectMethod(className, "Geometry@+ GetLodGeometry(int, int)", AS_METHODPR(T, GetLodGeometry, (i32, i32), Geometry*), AS_CALL_THISCALL);
 
-    // unsigned Drawable::GetMaxLights() const
-    engine->RegisterObjectMethod(className, "uint GetMaxLights() const", AS_METHODPR(T, GetMaxLights, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_maxLights() const", AS_METHODPR(T, GetMaxLights, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Drawable::GetMaxLights() const
+    engine->RegisterObjectMethod(className, "int GetMaxLights() const", AS_METHODPR(T, GetMaxLights, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_maxLights() const", AS_METHODPR(T, GetMaxLights, () const, i32), AS_CALL_THISCALL);
 
     // float Drawable::GetMaxZ() const
     engine->RegisterObjectMethod(className, "float GetMaxZ() const", AS_METHODPR(T, GetMaxZ, () const, float), AS_CALL_THISCALL);
@@ -17763,16 +17915,16 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     // float Drawable::GetMinZ() const
     engine->RegisterObjectMethod(className, "float GetMinZ() const", AS_METHODPR(T, GetMinZ, () const, float), AS_CALL_THISCALL);
 
-    // virtual unsigned Drawable::GetNumOccluderTriangles()
-    engine->RegisterObjectMethod(className, "uint GetNumOccluderTriangles()", AS_METHODPR(T, GetNumOccluderTriangles, (), unsigned), AS_CALL_THISCALL);
+    // virtual i32 Drawable::GetNumOccluderTriangles()
+    engine->RegisterObjectMethod(className, "int GetNumOccluderTriangles()", AS_METHODPR(T, GetNumOccluderTriangles, (), i32), AS_CALL_THISCALL);
 
     // float Drawable::GetShadowDistance() const
     engine->RegisterObjectMethod(className, "float GetShadowDistance() const", AS_METHODPR(T, GetShadowDistance, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_shadowDistance() const", AS_METHODPR(T, GetShadowDistance, () const, float), AS_CALL_THISCALL);
 
-    // unsigned Drawable::GetShadowMask() const
-    engine->RegisterObjectMethod(className, "uint GetShadowMask() const", AS_METHODPR(T, GetShadowMask, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_shadowMask() const", AS_METHODPR(T, GetShadowMask, () const, unsigned), AS_CALL_THISCALL);
+    // mask32 Drawable::GetShadowMask() const
+    engine->RegisterObjectMethod(className, "mask32 GetShadowMask() const", AS_METHODPR(T, GetShadowMask, () const, mask32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "mask32 get_shadowMask() const", AS_METHODPR(T, GetShadowMask, () const, mask32), AS_CALL_THISCALL);
 
     // float Drawable::GetSortValue() const
     engine->RegisterObjectMethod(className, "float GetSortValue() const", AS_METHODPR(T, GetSortValue, () const, float), AS_CALL_THISCALL);
@@ -17783,9 +17935,9 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     // const Vector<Light*>& Drawable::GetVertexLights() const
     engine->RegisterObjectMethod(className, "Array<Light@>@ GetVertexLights() const", AS_FUNCTION_OBJFIRST(Drawable_constspVectorlesLightstargreamp_GetVertexLights_void_template<Drawable>), AS_CALL_CDECL_OBJFIRST);
 
-    // unsigned Drawable::GetViewMask() const
-    engine->RegisterObjectMethod(className, "uint GetViewMask() const", AS_METHODPR(T, GetViewMask, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_viewMask() const", AS_METHODPR(T, GetViewMask, () const, unsigned), AS_CALL_THISCALL);
+    // mask32 Drawable::GetViewMask() const
+    engine->RegisterObjectMethod(className, "mask32 GetViewMask() const", AS_METHODPR(T, GetViewMask, () const, mask32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "mask32 get_viewMask() const", AS_METHODPR(T, GetViewMask, () const, mask32), AS_CALL_THISCALL);
 
     // const BoundingBox& Drawable::GetWorldBoundingBox()
     engine->RegisterObjectMethod(className, "const BoundingBox& GetWorldBoundingBox()", AS_METHODPR(T, GetWorldBoundingBox, (), const BoundingBox&), AS_CALL_THISCALL);
@@ -17795,12 +17947,12 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "Zone@+ GetZone() const", AS_METHODPR(T, GetZone, () const, Zone*), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "Zone@+ get_zone() const", AS_METHODPR(T, GetZone, () const, Zone*), AS_CALL_THISCALL);
 
-    // unsigned Drawable::GetZoneMask() const
-    engine->RegisterObjectMethod(className, "uint GetZoneMask() const", AS_METHODPR(T, GetZoneMask, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_zoneMask() const", AS_METHODPR(T, GetZoneMask, () const, unsigned), AS_CALL_THISCALL);
+    // mask32 Drawable::GetZoneMask() const
+    engine->RegisterObjectMethod(className, "mask32 GetZoneMask() const", AS_METHODPR(T, GetZoneMask, () const, mask32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "mask32 get_zoneMask() const", AS_METHODPR(T, GetZoneMask, () const, mask32), AS_CALL_THISCALL);
 
-    // bool Drawable::HasBasePass(unsigned batchIndex) const
-    engine->RegisterObjectMethod(className, "bool HasBasePass(uint) const", AS_METHODPR(T, HasBasePass, (unsigned) const, bool), AS_CALL_THISCALL);
+    // bool Drawable::HasBasePass(i32 batchIndex) const
+    engine->RegisterObjectMethod(className, "bool HasBasePass(int) const", AS_METHODPR(T, HasBasePass, (i32) const, bool), AS_CALL_THISCALL);
 
     // bool Drawable::IsInView() const
     engine->RegisterObjectMethod(className, "bool IsInView() const", AS_METHODPR(T, IsInView, () const, bool), AS_CALL_THISCALL);
@@ -17838,8 +17990,8 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     // void Drawable::MarkInView(i32 frameNumber)
     engine->RegisterObjectMethod(className, "void MarkInView(int)", AS_METHODPR(T, MarkInView, (i32), void), AS_CALL_THISCALL);
 
-    // void Drawable::SetBasePass(unsigned batchIndex)
-    engine->RegisterObjectMethod(className, "void SetBasePass(uint)", AS_METHODPR(T, SetBasePass, (unsigned), void), AS_CALL_THISCALL);
+    // void Drawable::SetBasePass(i32 batchIndex)
+    engine->RegisterObjectMethod(className, "void SetBasePass(int)", AS_METHODPR(T, SetBasePass, (i32), void), AS_CALL_THISCALL);
 
     // void Drawable::SetCastShadows(bool enable)
     engine->RegisterObjectMethod(className, "void SetCastShadows(bool)", AS_METHODPR(T, SetCastShadows, (bool), void), AS_CALL_THISCALL);
@@ -17849,17 +18001,17 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetDrawDistance(float)", AS_METHODPR(T, SetDrawDistance, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_drawDistance(float)", AS_METHODPR(T, SetDrawDistance, (float), void), AS_CALL_THISCALL);
 
-    // void Drawable::SetLightMask(unsigned mask)
-    engine->RegisterObjectMethod(className, "void SetLightMask(uint)", AS_METHODPR(T, SetLightMask, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_lightMask(uint)", AS_METHODPR(T, SetLightMask, (unsigned), void), AS_CALL_THISCALL);
+    // void Drawable::SetLightMask(mask32 mask)
+    engine->RegisterObjectMethod(className, "void SetLightMask(mask32)", AS_METHODPR(T, SetLightMask, (mask32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_lightMask(mask32)", AS_METHODPR(T, SetLightMask, (mask32), void), AS_CALL_THISCALL);
 
     // void Drawable::SetLodBias(float bias)
     engine->RegisterObjectMethod(className, "void SetLodBias(float)", AS_METHODPR(T, SetLodBias, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_lodBias(float)", AS_METHODPR(T, SetLodBias, (float), void), AS_CALL_THISCALL);
 
-    // void Drawable::SetMaxLights(unsigned num)
-    engine->RegisterObjectMethod(className, "void SetMaxLights(uint)", AS_METHODPR(T, SetMaxLights, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_maxLights(uint)", AS_METHODPR(T, SetMaxLights, (unsigned), void), AS_CALL_THISCALL);
+    // void Drawable::SetMaxLights(i32 num)
+    engine->RegisterObjectMethod(className, "void SetMaxLights(int)", AS_METHODPR(T, SetMaxLights, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_maxLights(int)", AS_METHODPR(T, SetMaxLights, (i32), void), AS_CALL_THISCALL);
 
     // void Drawable::SetMinMaxZ(float minZ, float maxZ)
     engine->RegisterObjectMethod(className, "void SetMinMaxZ(float, float)", AS_METHODPR(T, SetMinMaxZ, (float, float), void), AS_CALL_THISCALL);
@@ -17876,23 +18028,23 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetShadowDistance(float)", AS_METHODPR(T, SetShadowDistance, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_shadowDistance(float)", AS_METHODPR(T, SetShadowDistance, (float), void), AS_CALL_THISCALL);
 
-    // void Drawable::SetShadowMask(unsigned mask)
-    engine->RegisterObjectMethod(className, "void SetShadowMask(uint)", AS_METHODPR(T, SetShadowMask, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_shadowMask(uint)", AS_METHODPR(T, SetShadowMask, (unsigned), void), AS_CALL_THISCALL);
+    // void Drawable::SetShadowMask(mask32 mask)
+    engine->RegisterObjectMethod(className, "void SetShadowMask(mask32)", AS_METHODPR(T, SetShadowMask, (mask32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_shadowMask(mask32)", AS_METHODPR(T, SetShadowMask, (mask32), void), AS_CALL_THISCALL);
 
     // void Drawable::SetSortValue(float value)
     engine->RegisterObjectMethod(className, "void SetSortValue(float)", AS_METHODPR(T, SetSortValue, (float), void), AS_CALL_THISCALL);
 
-    // void Drawable::SetViewMask(unsigned mask)
-    engine->RegisterObjectMethod(className, "void SetViewMask(uint)", AS_METHODPR(T, SetViewMask, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_viewMask(uint)", AS_METHODPR(T, SetViewMask, (unsigned), void), AS_CALL_THISCALL);
+    // void Drawable::SetViewMask(mask32 mask)
+    engine->RegisterObjectMethod(className, "void SetViewMask(mask32)", AS_METHODPR(T, SetViewMask, (mask32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_viewMask(mask32)", AS_METHODPR(T, SetViewMask, (mask32), void), AS_CALL_THISCALL);
 
     // void Drawable::SetZone(Zone* zone, bool temporary = false)
     engine->RegisterObjectMethod(className, "void SetZone(Zone@+, bool = false)", AS_METHODPR(T, SetZone, (Zone*, bool), void), AS_CALL_THISCALL);
 
-    // void Drawable::SetZoneMask(unsigned mask)
-    engine->RegisterObjectMethod(className, "void SetZoneMask(uint)", AS_METHODPR(T, SetZoneMask, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_zoneMask(uint)", AS_METHODPR(T, SetZoneMask, (unsigned), void), AS_CALL_THISCALL);
+    // void Drawable::SetZoneMask(mask32 mask)
+    engine->RegisterObjectMethod(className, "void SetZoneMask(mask32)", AS_METHODPR(T, SetZoneMask, (mask32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_zoneMask(mask32)", AS_METHODPR(T, SetZoneMask, (mask32), void), AS_CALL_THISCALL);
 
     // virtual void Drawable::UpdateBatches(const FrameInfo& frame)
     engine->RegisterObjectMethod(className, "void UpdateBatches(const FrameInfo&in)", AS_METHODPR(T, UpdateBatches, (const FrameInfo&), void), AS_CALL_THISCALL);
@@ -17922,8 +18074,8 @@ template <class T> void RegisterMembers_LogicComponent(asIScriptEngine* engine, 
     // virtual void LogicComponent::FixedUpdate(float timeStep)
     engine->RegisterObjectMethod(className, "void FixedUpdate(float)", AS_METHODPR(T, FixedUpdate, (float), void), AS_CALL_THISCALL);
 
-    // UpdateEventFlags LogicComponent::GetUpdateEventMask() const
-    engine->RegisterObjectMethod(className, "UpdateEventFlags GetUpdateEventMask() const", AS_METHODPR(T, GetUpdateEventMask, () const, UpdateEventFlags), AS_CALL_THISCALL);
+    // LogicComponentEvents LogicComponent::GetUpdateEventMask() const
+    engine->RegisterObjectMethod(className, "LogicComponentEvents GetUpdateEventMask() const", AS_METHODPR(T, GetUpdateEventMask, () const, LogicComponentEvents), AS_CALL_THISCALL);
 
     // bool LogicComponent::IsDelayedStartCalled() const
     engine->RegisterObjectMethod(className, "bool IsDelayedStartCalled() const", AS_METHODPR(T, IsDelayedStartCalled, () const, bool), AS_CALL_THISCALL);
@@ -17931,8 +18083,8 @@ template <class T> void RegisterMembers_LogicComponent(asIScriptEngine* engine, 
     // virtual void LogicComponent::PostUpdate(float timeStep)
     engine->RegisterObjectMethod(className, "void PostUpdate(float)", AS_METHODPR(T, PostUpdate, (float), void), AS_CALL_THISCALL);
 
-    // void LogicComponent::SetUpdateEventMask(UpdateEventFlags mask)
-    engine->RegisterObjectMethod(className, "void SetUpdateEventMask(UpdateEventFlags)", AS_METHODPR(T, SetUpdateEventMask, (UpdateEventFlags), void), AS_CALL_THISCALL);
+    // void LogicComponent::SetUpdateEventMask(LogicComponentEvents mask)
+    engine->RegisterObjectMethod(className, "void SetUpdateEventMask(LogicComponentEvents)", AS_METHODPR(T, SetUpdateEventMask, (LogicComponentEvents), void), AS_CALL_THISCALL);
 
     // virtual void LogicComponent::Start()
     engine->RegisterObjectMethod(className, "void Start()", AS_METHODPR(T, Start, (), void), AS_CALL_THISCALL);
@@ -18045,12 +18197,12 @@ template <class T> void RegisterMembers_Scene(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "float GetAsyncProgress() const", AS_METHODPR(T, GetAsyncProgress, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_asyncProgress() const", AS_METHODPR(T, GetAsyncProgress, () const, float), AS_CALL_THISCALL);
 
-    // unsigned Scene::GetChecksum() const
-    engine->RegisterObjectMethod(className, "uint GetChecksum() const", AS_METHODPR(T, GetChecksum, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_checksum() const", AS_METHODPR(T, GetChecksum, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 Scene::GetChecksum() const
+    engine->RegisterObjectMethod(className, "hash32 GetChecksum() const", AS_METHODPR(T, GetChecksum, () const, hash32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "hash32 get_checksum() const", AS_METHODPR(T, GetChecksum, () const, hash32), AS_CALL_THISCALL);
 
-    // Component* Scene::GetComponent(unsigned id) const
-    engine->RegisterObjectMethod(className, "Component@+ GetComponent(uint) const", AS_METHODPR(T, GetComponent, (unsigned) const, Component*), AS_CALL_THISCALL);
+    // Component* Scene::GetComponent(ComponentId id) const
+    engine->RegisterObjectMethod(className, "Component@+ GetComponent(ComponentId) const", AS_METHODPR(T, GetComponent, (ComponentId) const, Component*), AS_CALL_THISCALL);
 
     // float Scene::GetElapsedTime() const
     engine->RegisterObjectMethod(className, "float GetElapsedTime() const", AS_METHODPR(T, GetElapsedTime, () const, float), AS_CALL_THISCALL);
@@ -18060,14 +18212,14 @@ template <class T> void RegisterMembers_Scene(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "const String& GetFileName() const", AS_METHODPR(T, GetFileName, () const, const String&), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_fileName() const", AS_METHODPR(T, GetFileName, () const, const String&), AS_CALL_THISCALL);
 
-    // unsigned Scene::GetFreeComponentID(CreateMode mode)
-    engine->RegisterObjectMethod(className, "uint GetFreeComponentID(CreateMode)", AS_METHODPR(T, GetFreeComponentID, (CreateMode), unsigned), AS_CALL_THISCALL);
+    // ComponentId Scene::GetFreeComponentID(CreateMode mode)
+    engine->RegisterObjectMethod(className, "ComponentId GetFreeComponentID(CreateMode)", AS_METHODPR(T, GetFreeComponentID, (CreateMode), ComponentId), AS_CALL_THISCALL);
 
-    // unsigned Scene::GetFreeNodeID(CreateMode mode)
-    engine->RegisterObjectMethod(className, "uint GetFreeNodeID(CreateMode)", AS_METHODPR(T, GetFreeNodeID, (CreateMode), unsigned), AS_CALL_THISCALL);
+    // NodeId Scene::GetFreeNodeID(CreateMode mode)
+    engine->RegisterObjectMethod(className, "NodeId GetFreeNodeID(CreateMode)", AS_METHODPR(T, GetFreeNodeID, (CreateMode), NodeId), AS_CALL_THISCALL);
 
-    // Node* Scene::GetNode(unsigned id) const
-    engine->RegisterObjectMethod(className, "Node@+ GetNode(uint) const", AS_METHODPR(T, GetNode, (unsigned) const, Node*), AS_CALL_THISCALL);
+    // Node* Scene::GetNode(NodeId id) const
+    engine->RegisterObjectMethod(className, "Node@+ GetNode(NodeId) const", AS_METHODPR(T, GetNode, (NodeId) const, Node*), AS_CALL_THISCALL);
 
     // const Vector<SharedPtr<PackageFile>>& Scene::GetRequiredPackageFiles() const
     engine->RegisterObjectMethod(className, "Array<PackageFile@>@ GetRequiredPackageFiles() const", AS_FUNCTION_OBJFIRST(Scene_constspVectorlesSharedPtrlesPackageFilegregreamp_GetRequiredPackageFiles_void_template<Scene>), AS_CALL_CDECL_OBJFIRST);
@@ -18195,8 +18347,8 @@ template <class T> void RegisterMembers_Scene(asIScriptEngine* engine, const cha
     // void Scene::Update(float timeStep)
     engine->RegisterObjectMethod(className, "void Update(float)", AS_METHODPR(T, Update, (float), void), AS_CALL_THISCALL);
 
-    // static bool Scene::IsReplicatedID(unsigned id)
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("bool IsReplicatedID(uint)", AS_FUNCTIONPR(T::IsReplicatedID, (unsigned), bool), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+    // static bool Scene::IsReplicatedID(id32 id)
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("bool IsReplicatedID(id32)", AS_FUNCTIONPR(T::IsReplicatedID, (id32), bool), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Scene
         REGISTER_MEMBERS_MANUAL_PART_Scene();
@@ -18773,9 +18925,9 @@ template <class T> void RegisterMembers_Terrain(asIScriptEngine* engine, const c
     engine->RegisterObjectMethod(className, "const IntVector2& GetNumVertices() const", AS_METHODPR(T, GetNumVertices, () const, const IntVector2&), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntVector2& get_numVertices() const", AS_METHODPR(T, GetNumVertices, () const, const IntVector2&), AS_CALL_THISCALL);
 
-    // unsigned Terrain::GetOcclusionLodLevel() const
-    engine->RegisterObjectMethod(className, "uint GetOcclusionLodLevel() const", AS_METHODPR(T, GetOcclusionLodLevel, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_occlusionLodLevel() const", AS_METHODPR(T, GetOcclusionLodLevel, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Terrain::GetOcclusionLodLevel() const
+    engine->RegisterObjectMethod(className, "int GetOcclusionLodLevel() const", AS_METHODPR(T, GetOcclusionLodLevel, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_occlusionLodLevel() const", AS_METHODPR(T, GetOcclusionLodLevel, () const, i32), AS_CALL_THISCALL);
 
     // TerrainPatch* Terrain::GetPatch(i32 index) const
     engine->RegisterObjectMethod(className, "TerrainPatch@+ GetPatch(int) const", AS_METHODPR(T, GetPatch, (i32) const, TerrainPatch*), AS_CALL_THISCALL);
@@ -18894,12 +19046,12 @@ template <class T> void RegisterMembers_Terrain(asIScriptEngine* engine, const c
     engine->RegisterObjectMethod(className, "void SetOccluder(bool)", AS_METHODPR(T, SetOccluder, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_occluder(bool)", AS_METHODPR(T, SetOccluder, (bool), void), AS_CALL_THISCALL);
 
-    // void Terrain::SetOcclusionLodLevel(unsigned level)
-    engine->RegisterObjectMethod(className, "void SetOcclusionLodLevel(uint)", AS_METHODPR(T, SetOcclusionLodLevel, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_occlusionLodLevel(uint)", AS_METHODPR(T, SetOcclusionLodLevel, (unsigned), void), AS_CALL_THISCALL);
+    // void Terrain::SetOcclusionLodLevel(i32 level)
+    engine->RegisterObjectMethod(className, "void SetOcclusionLodLevel(int)", AS_METHODPR(T, SetOcclusionLodLevel, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_occlusionLodLevel(int)", AS_METHODPR(T, SetOcclusionLodLevel, (i32), void), AS_CALL_THISCALL);
 
-    // void Terrain::SetOcclusionLodLevelAttr(unsigned value)
-    engine->RegisterObjectMethod(className, "void SetOcclusionLodLevelAttr(uint)", AS_METHODPR(T, SetOcclusionLodLevelAttr, (unsigned), void), AS_CALL_THISCALL);
+    // void Terrain::SetOcclusionLodLevelAttr(i32 value)
+    engine->RegisterObjectMethod(className, "void SetOcclusionLodLevelAttr(int)", AS_METHODPR(T, SetOcclusionLodLevelAttr, (i32), void), AS_CALL_THISCALL);
 
     // void Terrain::SetPatchSize(int size)
     engine->RegisterObjectMethod(className, "void SetPatchSize(int)", AS_METHODPR(T, SetPatchSize, (int), void), AS_CALL_THISCALL);
@@ -19204,6 +19356,13 @@ template <class T> void RegisterMembers_UISelectable(asIScriptEngine* engine, co
     #endif
 }
 
+// const Vector<unsigned char>& UnknownComponent::GetBinaryAttributes() const
+template <class T> CScriptArray* UnknownComponent_constspVectorlesunsignedspchargreamp_GetBinaryAttributes_void_template(T* _ptr)
+{
+    const Vector<unsigned char>& result = _ptr->GetBinaryAttributes();
+    return VectorToArray(result, "Array<uint8>");
+}
+
 // const Vector<String>& UnknownComponent::GetXMLAttributes() const
 template <class T> CScriptArray* UnknownComponent_constspVectorlesStringgreamp_GetXMLAttributes_void_template(T* _ptr)
 {
@@ -19216,11 +19375,11 @@ template <class T> void RegisterMembers_UnknownComponent(asIScriptEngine* engine
 {
     RegisterMembers_Component<T>(engine, className);
 
-    // const Vector<unsigned char>& UnknownComponent::GetBinaryAttributes() const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
-
     // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     engine->RegisterObjectMethod(className, "void DrawDebugGeometry(DebugRenderer@+, bool)", AS_METHODPR(T, DrawDebugGeometry, (DebugRenderer*, bool), void), AS_CALL_THISCALL);
+
+    // const Vector<unsigned char>& UnknownComponent::GetBinaryAttributes() const
+    engine->RegisterObjectMethod(className, "Array<uint8>@ GetBinaryAttributes() const", AS_FUNCTION_OBJFIRST(UnknownComponent_constspVectorlesunsignedspchargreamp_GetBinaryAttributes_void_template<UnknownComponent>), AS_CALL_CDECL_OBJFIRST);
 
     // bool UnknownComponent::GetUseXML() const
     engine->RegisterObjectMethod(className, "bool GetUseXML() const", AS_METHODPR(T, GetUseXML, () const, bool), AS_CALL_THISCALL);
@@ -19709,9 +19868,9 @@ template <class T> void RegisterMembers_CrowdManager(asIScriptEngine* engine, co
     engine->RegisterObjectMethod(className, "float GetMaxAgentRadius() const", AS_METHODPR(T, GetMaxAgentRadius, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_maxAgentRadius() const", AS_METHODPR(T, GetMaxAgentRadius, () const, float), AS_CALL_THISCALL);
 
-    // unsigned CrowdManager::GetMaxAgents() const
-    engine->RegisterObjectMethod(className, "uint GetMaxAgents() const", AS_METHODPR(T, GetMaxAgents, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_maxAgents() const", AS_METHODPR(T, GetMaxAgents, () const, unsigned), AS_CALL_THISCALL);
+    // i32 CrowdManager::GetMaxAgents() const
+    engine->RegisterObjectMethod(className, "int GetMaxAgents() const", AS_METHODPR(T, GetMaxAgents, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_maxAgents() const", AS_METHODPR(T, GetMaxAgents, () const, i32), AS_CALL_THISCALL);
 
     // NavigationMesh* CrowdManager::GetNavigationMesh() const
     engine->RegisterObjectMethod(className, "NavigationMesh@+ GetNavigationMesh() const", AS_METHODPR(T, GetNavigationMesh, () const, NavigationMesh*), AS_CALL_THISCALL);
@@ -19757,9 +19916,9 @@ template <class T> void RegisterMembers_CrowdManager(asIScriptEngine* engine, co
     engine->RegisterObjectMethod(className, "void SetMaxAgentRadius(float)", AS_METHODPR(T, SetMaxAgentRadius, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_maxAgentRadius(float)", AS_METHODPR(T, SetMaxAgentRadius, (float), void), AS_CALL_THISCALL);
 
-    // void CrowdManager::SetMaxAgents(unsigned maxAgents)
-    engine->RegisterObjectMethod(className, "void SetMaxAgents(uint)", AS_METHODPR(T, SetMaxAgents, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_maxAgents(uint)", AS_METHODPR(T, SetMaxAgents, (unsigned), void), AS_CALL_THISCALL);
+    // void CrowdManager::SetMaxAgents(i32 maxAgents)
+    engine->RegisterObjectMethod(className, "void SetMaxAgents(int)", AS_METHODPR(T, SetMaxAgents, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_maxAgents(int)", AS_METHODPR(T, SetMaxAgents, (i32), void), AS_CALL_THISCALL);
 
     // void CrowdManager::SetNavigationMesh(NavigationMesh* navMesh)
     engine->RegisterObjectMethod(className, "void SetNavigationMesh(NavigationMesh@+)", AS_METHODPR(T, SetNavigationMesh, (NavigationMesh*), void), AS_CALL_THISCALL);
@@ -19827,13 +19986,33 @@ template <class T> void RegisterMembers_Navigable(asIScriptEngine* engine, const
     #endif
 }
 
+// virtual bool NavigationMesh::AddTile(const Vector<byte>& tileData)
+template <class T> bool NavigationMesh_bool_AddTile_constspVectorlesbytegreamp_template(T* _ptr, CScriptArray* tileData_conv)
+{
+    Vector<byte> tileData = ArrayToVector<byte>(tileData_conv);
+    bool result = _ptr->AddTile(tileData);
+    return result;
+}
+
+// virtual Vector<byte> NavigationMesh::GetNavigationDataAttr() const
+template <class T> CScriptArray* NavigationMesh_Vectorlesbytegre_GetNavigationDataAttr_void_template(T* _ptr)
+{
+    Vector<byte> result = _ptr->GetNavigationDataAttr();
+    return VectorToArray(result, "Array<byte>");
+}
+
+// virtual void NavigationMesh::SetNavigationDataAttr(const Vector<byte>& value)
+template <class T> void NavigationMesh_void_SetNavigationDataAttr_constspVectorlesbytegreamp_template(T* _ptr, CScriptArray* value_conv)
+{
+    Vector<byte> value = ArrayToVector<byte>(value_conv);
+    _ptr->SetNavigationDataAttr(value);
+}
+
 // class NavigationMesh | File: ../Navigation/NavigationMesh.h
 template <class T> void RegisterMembers_NavigationMesh(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_Component<T>(engine, className);
 
-    // virtual bool NavigationMesh::AddTile(const Vector<unsigned char>& tileData)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // Vector3 NavigationMesh::FindNearestPoint(const Vector3& point, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr, dtPolyRef* nearestRef = nullptr)
     // Error: type "const dtQueryFilter*" can not automatically bind
     // void NavigationMesh::FindPath(Vector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr)
@@ -19842,20 +20021,19 @@ template <class T> void RegisterMembers_NavigationMesh(asIScriptEngine* engine, 
     // Error: type "Vector<NavigationPathPoint>&" can not automatically bind
     // float NavigationMesh::GetDistanceToWall(const Vector3& point, float radius, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr, Vector3* hitPos = nullptr, Vector3* hitNormal = nullptr)
     // Error: type "const dtQueryFilter*" can not automatically bind
-    // virtual Vector<unsigned char> NavigationMesh::GetNavigationDataAttr() const
-    // Error: type "Vector<unsigned char>" can not automatically bind
     // Vector3 NavigationMesh::GetRandomPoint(const dtQueryFilter* filter = nullptr, dtPolyRef* randomRef = nullptr)
     // Error: type "const dtQueryFilter*" can not automatically bind
     // Vector3 NavigationMesh::GetRandomPointInCircle(const Vector3& center, float radius, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr, dtPolyRef* randomRef = nullptr)
     // Error: type "const dtQueryFilter*" can not automatically bind
-    // virtual Vector<unsigned char> NavigationMesh::GetTileData(const IntVector2& tile) const
-    // Error: type "Vector<unsigned char>" can not automatically bind
+    // virtual Vector<byte> NavigationMesh::GetTileData(const IntVector2& tile) const
+    // Not registered because have @manualbind mark
     // Vector3 NavigationMesh::MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, int maxVisited = 3, const dtQueryFilter* filter = nullptr)
     // Error: type "const dtQueryFilter*" can not automatically bind
     // Vector3 NavigationMesh::Raycast(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr, Vector3* hitNormal = nullptr)
     // Error: type "const dtQueryFilter*" can not automatically bind
-    // virtual void NavigationMesh::SetNavigationDataAttr(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
+
+    // virtual bool NavigationMesh::AddTile(const Vector<byte>& tileData)
+    engine->RegisterObjectMethod(className, "bool AddTile(Array<byte>@+)", AS_FUNCTION_OBJFIRST(NavigationMesh_bool_AddTile_constspVectorlesbytegreamp_template<NavigationMesh>), AS_CALL_CDECL_OBJFIRST);
 
     // virtual bool NavigationMesh::Allocate(const BoundingBox& boundingBox, unsigned maxTiles)
     engine->RegisterObjectMethod(className, "bool Allocate(const BoundingBox&in, uint)", AS_METHODPR(T, Allocate, (const BoundingBox&, unsigned), bool), AS_CALL_THISCALL);
@@ -19932,6 +20110,9 @@ template <class T> void RegisterMembers_NavigationMesh(asIScriptEngine* engine, 
 
     // String NavigationMesh::GetMeshName() const
     engine->RegisterObjectMethod(className, "String GetMeshName() const", AS_METHODPR(T, GetMeshName, () const, String), AS_CALL_THISCALL);
+
+    // virtual Vector<byte> NavigationMesh::GetNavigationDataAttr() const
+    engine->RegisterObjectMethod(className, "Array<byte>@ GetNavigationDataAttr() const", AS_FUNCTION_OBJFIRST(NavigationMesh_Vectorlesbytegre_GetNavigationDataAttr_void_template<NavigationMesh>), AS_CALL_CDECL_OBJFIRST);
 
     // IntVector2 NavigationMesh::GetNumTiles() const
     engine->RegisterObjectMethod(className, "IntVector2 GetNumTiles() const", AS_METHODPR(T, GetNumTiles, () const, IntVector2), AS_CALL_THISCALL);
@@ -20033,6 +20214,9 @@ template <class T> void RegisterMembers_NavigationMesh(asIScriptEngine* engine, 
 
     // void NavigationMesh::SetMeshName(const String& newName)
     engine->RegisterObjectMethod(className, "void SetMeshName(const String&in)", AS_METHODPR(T, SetMeshName, (const String&), void), AS_CALL_THISCALL);
+
+    // virtual void NavigationMesh::SetNavigationDataAttr(const Vector<byte>& value)
+    engine->RegisterObjectMethod(className, "void SetNavigationDataAttr(Array<byte>@+)", AS_FUNCTION_OBJFIRST(NavigationMesh_void_SetNavigationDataAttr_constspVectorlesbytegreamp_template<NavigationMesh>), AS_CALL_CDECL_OBJFIRST);
 
     // void NavigationMesh::SetPadding(const Vector3& padding)
     engine->RegisterObjectMethod(className, "void SetPadding(const Vector3&in)", AS_METHODPR(T, SetPadding, (const Vector3&), void), AS_CALL_THISCALL);
@@ -20659,6 +20843,20 @@ template <class T> void RegisterMembers_PhysicsWorld(asIScriptEngine* engine, co
     #endif
 }
 
+// const Vector<byte>& RigidBody::GetNetAngularVelocityAttr() const
+template <class T> CScriptArray* RigidBody_constspVectorlesbytegreamp_GetNetAngularVelocityAttr_void_template(T* _ptr)
+{
+    const Vector<byte>& result = _ptr->GetNetAngularVelocityAttr();
+    return VectorToArray(result, "Array<byte>");
+}
+
+// void RigidBody::SetNetAngularVelocityAttr(const Vector<byte>& value)
+template <class T> void RigidBody_void_SetNetAngularVelocityAttr_constspVectorlesbytegreamp_template(T* _ptr, CScriptArray* value_conv)
+{
+    Vector<byte> value = ArrayToVector<byte>(value_conv);
+    _ptr->SetNetAngularVelocityAttr(value);
+}
+
 // class RigidBody | File: ../Physics/RigidBody.h
 template <class T> void RegisterMembers_RigidBody(asIScriptEngine* engine, const char* className)
 {
@@ -20670,12 +20868,8 @@ template <class T> void RegisterMembers_RigidBody(asIScriptEngine* engine, const
     // Error: type "Vector<RigidBody*>&" can not automatically bind
     // btCompoundShape* RigidBody::GetCompoundShape() const
     // Error: type "btCompoundShape*" can not automatically bind
-    // const Vector<unsigned char>& RigidBody::GetNetAngularVelocityAttr() const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // void RigidBody::getWorldTransform(btTransform& worldTrans) const override
     // Not registered because have @nobind mark
-    // void RigidBody::SetNetAngularVelocityAttr(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // void RigidBody::setWorldTransform(const btTransform& worldTrans) override
     // Not registered because have @nobind mark
 
@@ -20790,6 +20984,9 @@ template <class T> void RegisterMembers_RigidBody(asIScriptEngine* engine, const
     // float RigidBody::GetMass() const
     engine->RegisterObjectMethod(className, "float GetMass() const", AS_METHODPR(T, GetMass, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_mass() const", AS_METHODPR(T, GetMass, () const, float), AS_CALL_THISCALL);
+
+    // const Vector<byte>& RigidBody::GetNetAngularVelocityAttr() const
+    engine->RegisterObjectMethod(className, "Array<byte>@ GetNetAngularVelocityAttr() const", AS_FUNCTION_OBJFIRST(RigidBody_constspVectorlesbytegreamp_GetNetAngularVelocityAttr_void_template<RigidBody>), AS_CALL_CDECL_OBJFIRST);
 
     // PhysicsWorld* RigidBody::GetPhysicsWorld() const
     engine->RegisterObjectMethod(className, "PhysicsWorld@+ GetPhysicsWorld() const", AS_METHODPR(T, GetPhysicsWorld, () const, PhysicsWorld*), AS_CALL_THISCALL);
@@ -20919,6 +21116,9 @@ template <class T> void RegisterMembers_RigidBody(asIScriptEngine* engine, const
     // void RigidBody::SetMass(float mass)
     engine->RegisterObjectMethod(className, "void SetMass(float)", AS_METHODPR(T, SetMass, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_mass(float)", AS_METHODPR(T, SetMass, (float), void), AS_CALL_THISCALL);
+
+    // void RigidBody::SetNetAngularVelocityAttr(const Vector<byte>& value)
+    engine->RegisterObjectMethod(className, "void SetNetAngularVelocityAttr(Array<byte>@+)", AS_FUNCTION_OBJFIRST(RigidBody_void_SetNetAngularVelocityAttr_constspVectorlesbytegreamp_template<RigidBody>), AS_CALL_CDECL_OBJFIRST);
 
     // void RigidBody::SetPosition(const Vector3& position)
     engine->RegisterObjectMethod(className, "void SetPosition(const Vector3&in)", AS_METHODPR(T, SetPosition, (const Vector3&), void), AS_CALL_THISCALL);
@@ -21589,6 +21789,20 @@ template <class T> void RegisterMembers_TileMapLayer2D(asIScriptEngine* engine, 
 
 #endif // def URHO3D_URHO2D
 
+// const Vector<byte>& BillboardSet::GetNetBillboardsAttr() const
+template <class T> CScriptArray* BillboardSet_constspVectorlesbytegreamp_GetNetBillboardsAttr_void_template(T* _ptr)
+{
+    const Vector<byte>& result = _ptr->GetNetBillboardsAttr();
+    return VectorToArray(result, "Array<byte>");
+}
+
+// void BillboardSet::SetNetBillboardsAttr(const Vector<byte>& value)
+template <class T> void BillboardSet_void_SetNetBillboardsAttr_constspVectorlesbytegreamp_template(T* _ptr, CScriptArray* value_conv)
+{
+    Vector<byte> value = ArrayToVector<byte>(value_conv);
+    _ptr->SetNetBillboardsAttr(value);
+}
+
 // class BillboardSet | File: ../Graphics/BillboardSet.h
 template <class T> void RegisterMembers_BillboardSet(asIScriptEngine* engine, const char* className)
 {
@@ -21598,12 +21812,8 @@ template <class T> void RegisterMembers_BillboardSet(asIScriptEngine* engine, co
     // Error: type "Vector<Billboard>&" can not automatically bind
     // VariantVector BillboardSet::GetBillboardsAttr() const
     // Error: type "VariantVector" can not automatically bind
-    // const Vector<unsigned char>& BillboardSet::GetNetBillboardsAttr() const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // void BillboardSet::SetBillboardsAttr(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
-    // void BillboardSet::SetNetBillboardsAttr(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
 
     // void BillboardSet::Commit()
     engine->RegisterObjectMethod(className, "void Commit()", AS_METHODPR(T, Commit, (), void), AS_CALL_THISCALL);
@@ -21612,9 +21822,9 @@ template <class T> void RegisterMembers_BillboardSet(asIScriptEngine* engine, co
     engine->RegisterObjectMethod(className, "float GetAnimationLodBias() const", AS_METHODPR(T, GetAnimationLodBias, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_animationLodBias() const", AS_METHODPR(T, GetAnimationLodBias, () const, float), AS_CALL_THISCALL);
 
-    // Billboard* BillboardSet::GetBillboard(unsigned index)
-    engine->RegisterObjectMethod(className, "Billboard@ GetBillboard(uint)", AS_METHODPR(T, GetBillboard, (unsigned), Billboard*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Billboard@ get_billboards(uint)", AS_METHODPR(T, GetBillboard, (unsigned), Billboard*), AS_CALL_THISCALL);
+    // Billboard* BillboardSet::GetBillboard(i32 index)
+    engine->RegisterObjectMethod(className, "Billboard@ GetBillboard(int)", AS_METHODPR(T, GetBillboard, (i32), Billboard*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Billboard@ get_billboards(int)", AS_METHODPR(T, GetBillboard, (i32), Billboard*), AS_CALL_THISCALL);
 
     // FaceCameraMode BillboardSet::GetFaceCameraMode() const
     engine->RegisterObjectMethod(className, "FaceCameraMode GetFaceCameraMode() const", AS_METHODPR(T, GetFaceCameraMode, () const, FaceCameraMode), AS_CALL_THISCALL);
@@ -21631,9 +21841,12 @@ template <class T> void RegisterMembers_BillboardSet(asIScriptEngine* engine, co
     engine->RegisterObjectMethod(className, "float GetMinAngle() const", AS_METHODPR(T, GetMinAngle, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_minAngle() const", AS_METHODPR(T, GetMinAngle, () const, float), AS_CALL_THISCALL);
 
-    // unsigned BillboardSet::GetNumBillboards() const
-    engine->RegisterObjectMethod(className, "uint GetNumBillboards() const", AS_METHODPR(T, GetNumBillboards, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numBillboards() const", AS_METHODPR(T, GetNumBillboards, () const, unsigned), AS_CALL_THISCALL);
+    // const Vector<byte>& BillboardSet::GetNetBillboardsAttr() const
+    engine->RegisterObjectMethod(className, "Array<byte>@ GetNetBillboardsAttr() const", AS_FUNCTION_OBJFIRST(BillboardSet_constspVectorlesbytegreamp_GetNetBillboardsAttr_void_template<BillboardSet>), AS_CALL_CDECL_OBJFIRST);
+
+    // i32 BillboardSet::GetNumBillboards() const
+    engine->RegisterObjectMethod(className, "int GetNumBillboards() const", AS_METHODPR(T, GetNumBillboards, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numBillboards() const", AS_METHODPR(T, GetNumBillboards, () const, i32), AS_CALL_THISCALL);
 
     // bool BillboardSet::IsFixedScreenSize() const
     engine->RegisterObjectMethod(className, "bool IsFixedScreenSize() const", AS_METHODPR(T, IsFixedScreenSize, () const, bool), AS_CALL_THISCALL);
@@ -21674,9 +21887,12 @@ template <class T> void RegisterMembers_BillboardSet(asIScriptEngine* engine, co
     engine->RegisterObjectMethod(className, "void SetMinAngle(float)", AS_METHODPR(T, SetMinAngle, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_minAngle(float)", AS_METHODPR(T, SetMinAngle, (float), void), AS_CALL_THISCALL);
 
-    // void BillboardSet::SetNumBillboards(unsigned num)
-    engine->RegisterObjectMethod(className, "void SetNumBillboards(uint)", AS_METHODPR(T, SetNumBillboards, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_numBillboards(uint)", AS_METHODPR(T, SetNumBillboards, (unsigned), void), AS_CALL_THISCALL);
+    // void BillboardSet::SetNetBillboardsAttr(const Vector<byte>& value)
+    engine->RegisterObjectMethod(className, "void SetNetBillboardsAttr(Array<byte>@+)", AS_FUNCTION_OBJFIRST(BillboardSet_void_SetNetBillboardsAttr_constspVectorlesbytegreamp_template<BillboardSet>), AS_CALL_CDECL_OBJFIRST);
+
+    // void BillboardSet::SetNumBillboards(i32 num)
+    engine->RegisterObjectMethod(className, "void SetNumBillboards(int)", AS_METHODPR(T, SetNumBillboards, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_numBillboards(int)", AS_METHODPR(T, SetNumBillboards, (i32), void), AS_CALL_THISCALL);
 
     // void BillboardSet::SetRelative(bool enable)
     engine->RegisterObjectMethod(className, "void SetRelative(bool)", AS_METHODPR(T, SetRelative, (bool), void), AS_CALL_THISCALL);
@@ -21825,17 +22041,27 @@ template <class T> void RegisterMembers_Cursor(asIScriptEngine* engine, const ch
     #endif
 }
 
+// Vector<byte> CustomGeometry::GetGeometryDataAttr() const
+template <class T> CScriptArray* CustomGeometry_Vectorlesbytegre_GetGeometryDataAttr_void_template(T* _ptr)
+{
+    Vector<byte> result = _ptr->GetGeometryDataAttr();
+    return VectorToArray(result, "Array<byte>");
+}
+
+// void CustomGeometry::SetGeometryDataAttr(const Vector<byte>& value)
+template <class T> void CustomGeometry_void_SetGeometryDataAttr_constspVectorlesbytegreamp_template(T* _ptr, CScriptArray* value_conv)
+{
+    Vector<byte> value = ArrayToVector<byte>(value_conv);
+    _ptr->SetGeometryDataAttr(value);
+}
+
 // class CustomGeometry | File: ../Graphics/CustomGeometry.h
 template <class T> void RegisterMembers_CustomGeometry(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_Drawable<T>(engine, className);
 
-    // Vector<unsigned char> CustomGeometry::GetGeometryDataAttr() const
-    // Error: type "Vector<unsigned char>" can not automatically bind
     // Vector<Vector<CustomGeometryVertex>>& CustomGeometry::GetVertices()
     // Error: type "Vector<Vector<CustomGeometryVertex>>&" can not automatically bind
-    // void CustomGeometry::SetGeometryDataAttr(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
 
     // void CustomGeometry::BeginGeometry(unsigned index, PrimitiveType type)
     engine->RegisterObjectMethod(className, "void BeginGeometry(uint, PrimitiveType)", AS_METHODPR(T, BeginGeometry, (unsigned, PrimitiveType), void), AS_CALL_THISCALL);
@@ -21864,6 +22090,9 @@ template <class T> void RegisterMembers_CustomGeometry(asIScriptEngine* engine, 
     // void CustomGeometry::DefineVertex(const Vector3& position)
     engine->RegisterObjectMethod(className, "void DefineVertex(const Vector3&in)", AS_METHODPR(T, DefineVertex, (const Vector3&), void), AS_CALL_THISCALL);
 
+    // Vector<byte> CustomGeometry::GetGeometryDataAttr() const
+    engine->RegisterObjectMethod(className, "Array<byte>@ GetGeometryDataAttr() const", AS_FUNCTION_OBJFIRST(CustomGeometry_Vectorlesbytegre_GetGeometryDataAttr_void_template<CustomGeometry>), AS_CALL_CDECL_OBJFIRST);
+
     // Material* CustomGeometry::GetMaterial(unsigned index = 0) const
     engine->RegisterObjectMethod(className, "Material@+ GetMaterial(uint = 0) const", AS_METHODPR(T, GetMaterial, (unsigned) const, Material*), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "Material@+ get_materials(uint = 0) const", AS_METHODPR(T, GetMaterial, (unsigned) const, Material*), AS_CALL_THISCALL);
@@ -21890,6 +22119,9 @@ template <class T> void RegisterMembers_CustomGeometry(asIScriptEngine* engine, 
     engine->RegisterObjectMethod(className, "void SetDynamic(bool)", AS_METHODPR(T, SetDynamic, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_dynamic(bool)", AS_METHODPR(T, SetDynamic, (bool), void), AS_CALL_THISCALL);
 
+    // void CustomGeometry::SetGeometryDataAttr(const Vector<byte>& value)
+    engine->RegisterObjectMethod(className, "void SetGeometryDataAttr(Array<byte>@+)", AS_FUNCTION_OBJFIRST(CustomGeometry_void_SetGeometryDataAttr_constspVectorlesbytegreamp_template<CustomGeometry>), AS_CALL_CDECL_OBJFIRST);
+
     // void CustomGeometry::SetMaterial(Material* material)
     engine->RegisterObjectMethod(className, "void SetMaterial(Material@+)", AS_METHODPR(T, SetMaterial, (Material*), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_material(Material@+)", AS_METHODPR(T, SetMaterial, (Material*), void), AS_CALL_THISCALL);
@@ -21913,18 +22145,30 @@ template <class T> void RegisterMembers_CustomGeometry(asIScriptEngine* engine, 
     #endif
 }
 
+// Vector<byte> DecalSet::GetDecalsAttr() const
+template <class T> CScriptArray* DecalSet_Vectorlesbytegre_GetDecalsAttr_void_template(T* _ptr)
+{
+    Vector<byte> result = _ptr->GetDecalsAttr();
+    return VectorToArray(result, "Array<byte>");
+}
+
+// void DecalSet::SetDecalsAttr(const Vector<byte>& value)
+template <class T> void DecalSet_void_SetDecalsAttr_constspVectorlesbytegreamp_template(T* _ptr, CScriptArray* value_conv)
+{
+    Vector<byte> value = ArrayToVector<byte>(value_conv);
+    _ptr->SetDecalsAttr(value);
+}
+
 // class DecalSet | File: ../Graphics/DecalSet.h
 template <class T> void RegisterMembers_DecalSet(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_Drawable<T>(engine, className);
 
-    // Vector<unsigned char> DecalSet::GetDecalsAttr() const
-    // Error: type "Vector<unsigned char>" can not automatically bind
-    // void DecalSet::SetDecalsAttr(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
-
     // bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive = 0.0f, float normalCutoff = 0.1f, unsigned subGeometry = M_MAX_UNSIGNED)
     engine->RegisterObjectMethod(className, "bool AddDecal(Drawable@+, const Vector3&in, const Quaternion&in, float, float, float, const Vector2&in, const Vector2&in, float = 0.0f, float = 0.1f, uint = M_MAX_UNSIGNED)", AS_METHODPR(T, AddDecal, (Drawable*, const Vector3&, const Quaternion&, float, float, float, const Vector2&, const Vector2&, float, float, unsigned), bool), AS_CALL_THISCALL);
+
+    // Vector<byte> DecalSet::GetDecalsAttr() const
+    engine->RegisterObjectMethod(className, "Array<byte>@ GetDecalsAttr() const", AS_FUNCTION_OBJFIRST(DecalSet_Vectorlesbytegre_GetDecalsAttr_void_template<DecalSet>), AS_CALL_CDECL_OBJFIRST);
 
     // Material* DecalSet::GetMaterial() const
     engine->RegisterObjectMethod(className, "Material@+ GetMaterial() const", AS_METHODPR(T, GetMaterial, () const, Material*), AS_CALL_THISCALL);
@@ -21962,6 +22206,9 @@ template <class T> void RegisterMembers_DecalSet(asIScriptEngine* engine, const 
 
     // void DecalSet::RemoveDecals(unsigned num)
     engine->RegisterObjectMethod(className, "void RemoveDecals(uint)", AS_METHODPR(T, RemoveDecals, (unsigned), void), AS_CALL_THISCALL);
+
+    // void DecalSet::SetDecalsAttr(const Vector<byte>& value)
+    engine->RegisterObjectMethod(className, "void SetDecalsAttr(Array<byte>@+)", AS_FUNCTION_OBJFIRST(DecalSet_void_SetDecalsAttr_constspVectorlesbytegreamp_template<DecalSet>), AS_CALL_CDECL_OBJFIRST);
 
     // void DecalSet::SetMaterial(Material* material)
     engine->RegisterObjectMethod(className, "void SetMaterial(Material@+)", AS_METHODPR(T, SetMaterial, (Material*), void), AS_CALL_THISCALL);
@@ -22047,9 +22294,9 @@ template <class T> void RegisterMembers_Light(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "LightType GetLightType() const", AS_METHODPR(T, GetLightType, () const, LightType), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "LightType get_lightType() const", AS_METHODPR(T, GetLightType, () const, LightType), AS_CALL_THISCALL);
 
-    // int Light::GetNumShadowSplits() const
-    engine->RegisterObjectMethod(className, "int GetNumShadowSplits() const", AS_METHODPR(T, GetNumShadowSplits, () const, int), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "int get_numShadowSplits() const", AS_METHODPR(T, GetNumShadowSplits, () const, int), AS_CALL_THISCALL);
+    // i32 Light::GetNumShadowSplits() const
+    engine->RegisterObjectMethod(className, "int GetNumShadowSplits() const", AS_METHODPR(T, GetNumShadowSplits, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numShadowSplits() const", AS_METHODPR(T, GetNumShadowSplits, () const, i32), AS_CALL_THISCALL);
 
     // bool Light::GetPerVertex() const
     engine->RegisterObjectMethod(className, "bool GetPerVertex() const", AS_METHODPR(T, GetPerVertex, () const, bool), AS_CALL_THISCALL);
@@ -22342,17 +22589,17 @@ template <class T> CScriptArray* ListView_VectorlesUIElementstargre_GetSelectedI
     return VectorToHandleArray(result, "Array<UIElement@>");
 }
 
-// const Vector<unsigned>& ListView::GetSelections() const
-template <class T> CScriptArray* ListView_constspVectorlesunsignedgreamp_GetSelections_void_template(T* _ptr)
+// const Vector<i32>& ListView::GetSelections() const
+template <class T> CScriptArray* ListView_constspVectorlesi32greamp_GetSelections_void_template(T* _ptr)
 {
-    const Vector<unsigned>& result = _ptr->GetSelections();
-    return VectorToArray(result, "Array<uint>");
+    const Vector<i32>& result = _ptr->GetSelections();
+    return VectorToArray(result, "Array<int>");
 }
 
-// void ListView::SetSelections(const Vector<unsigned>& indices)
-template <class T> void ListView_void_SetSelections_constspVectorlesunsignedgreamp_template(T* _ptr, CScriptArray* indices_conv)
+// void ListView::SetSelections(const Vector<i32>& indices)
+template <class T> void ListView_void_SetSelections_constspVectorlesi32greamp_template(T* _ptr, CScriptArray* indices_conv)
 {
-    Vector<unsigned> indices = ArrayToVector<unsigned>(indices_conv);
+    Vector<i32> indices = ArrayToVector<i32>(indices_conv);
     _ptr->SetSelections(indices);
 }
 
@@ -22364,8 +22611,8 @@ template <class T> void RegisterMembers_ListView(asIScriptEngine* engine, const 
     // void ListView::AddItem(UIElement* item)
     engine->RegisterObjectMethod(className, "void AddItem(UIElement@+)", AS_METHODPR(T, AddItem, (UIElement*), void), AS_CALL_THISCALL);
 
-    // void ListView::AddSelection(unsigned index)
-    engine->RegisterObjectMethod(className, "void AddSelection(uint)", AS_METHODPR(T, AddSelection, (unsigned), void), AS_CALL_THISCALL);
+    // void ListView::AddSelection(i32 index)
+    engine->RegisterObjectMethod(className, "void AddSelection(int)", AS_METHODPR(T, AddSelection, (i32), void), AS_CALL_THISCALL);
 
     // void ListView::ChangeSelection(int delta, bool additive = false)
     engine->RegisterObjectMethod(className, "void ChangeSelection(int, bool = false)", AS_METHODPR(T, ChangeSelection, (int, bool), void), AS_CALL_THISCALL);
@@ -22382,17 +22629,17 @@ template <class T> void RegisterMembers_ListView(asIScriptEngine* engine, const 
     // void ListView::EnableInternalLayoutUpdate()
     engine->RegisterObjectMethod(className, "void EnableInternalLayoutUpdate()", AS_METHODPR(T, EnableInternalLayoutUpdate, (), void), AS_CALL_THISCALL);
 
-    // void ListView::EnsureItemVisibility(unsigned index)
-    engine->RegisterObjectMethod(className, "void EnsureItemVisibility(uint)", AS_METHODPR(T, EnsureItemVisibility, (unsigned), void), AS_CALL_THISCALL);
+    // void ListView::EnsureItemVisibility(i32 index)
+    engine->RegisterObjectMethod(className, "void EnsureItemVisibility(int)", AS_METHODPR(T, EnsureItemVisibility, (i32), void), AS_CALL_THISCALL);
 
     // void ListView::EnsureItemVisibility(UIElement* item)
     engine->RegisterObjectMethod(className, "void EnsureItemVisibility(UIElement@+)", AS_METHODPR(T, EnsureItemVisibility, (UIElement*), void), AS_CALL_THISCALL);
 
-    // void ListView::Expand(unsigned index, bool enable, bool recursive = false)
-    engine->RegisterObjectMethod(className, "void Expand(uint, bool, bool = false)", AS_METHODPR(T, Expand, (unsigned, bool, bool), void), AS_CALL_THISCALL);
+    // void ListView::Expand(i32 index, bool enable, bool recursive = false)
+    engine->RegisterObjectMethod(className, "void Expand(int, bool, bool = false)", AS_METHODPR(T, Expand, (i32, bool, bool), void), AS_CALL_THISCALL);
 
-    // unsigned ListView::FindItem(UIElement* item) const
-    engine->RegisterObjectMethod(className, "uint FindItem(UIElement@+) const", AS_METHODPR(T, FindItem, (UIElement*) const, unsigned), AS_CALL_THISCALL);
+    // i32 ListView::FindItem(UIElement* item) const
+    engine->RegisterObjectMethod(className, "int FindItem(UIElement@+) const", AS_METHODPR(T, FindItem, (UIElement*) const, i32), AS_CALL_THISCALL);
 
     // int ListView::GetBaseIndent() const
     engine->RegisterObjectMethod(className, "int GetBaseIndent() const", AS_METHODPR(T, GetBaseIndent, () const, int), AS_CALL_THISCALL);
@@ -22410,9 +22657,9 @@ template <class T> void RegisterMembers_ListView(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "HighlightMode GetHighlightMode() const", AS_METHODPR(T, GetHighlightMode, () const, HighlightMode), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "HighlightMode get_highlightMode() const", AS_METHODPR(T, GetHighlightMode, () const, HighlightMode), AS_CALL_THISCALL);
 
-    // UIElement* ListView::GetItem(unsigned index) const
-    engine->RegisterObjectMethod(className, "UIElement@+ GetItem(uint) const", AS_METHODPR(T, GetItem, (unsigned) const, UIElement*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "UIElement@+ get_items(uint) const", AS_METHODPR(T, GetItem, (unsigned) const, UIElement*), AS_CALL_THISCALL);
+    // UIElement* ListView::GetItem(i32 index) const
+    engine->RegisterObjectMethod(className, "UIElement@+ GetItem(int) const", AS_METHODPR(T, GetItem, (i32) const, UIElement*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "UIElement@+ get_items(int) const", AS_METHODPR(T, GetItem, (i32) const, UIElement*), AS_CALL_THISCALL);
 
     // Vector<UIElement*> ListView::GetItems() const
     engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetItems() const", AS_FUNCTION_OBJFIRST(ListView_VectorlesUIElementstargre_GetItems_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
@@ -22421,9 +22668,9 @@ template <class T> void RegisterMembers_ListView(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "bool GetMultiselect() const", AS_METHODPR(T, GetMultiselect, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_multiselect() const", AS_METHODPR(T, GetMultiselect, () const, bool), AS_CALL_THISCALL);
 
-    // unsigned ListView::GetNumItems() const
-    engine->RegisterObjectMethod(className, "uint GetNumItems() const", AS_METHODPR(T, GetNumItems, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numItems() const", AS_METHODPR(T, GetNumItems, () const, unsigned), AS_CALL_THISCALL);
+    // i32 ListView::GetNumItems() const
+    engine->RegisterObjectMethod(className, "int GetNumItems() const", AS_METHODPR(T, GetNumItems, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numItems() const", AS_METHODPR(T, GetNumItems, () const, i32), AS_CALL_THISCALL);
 
     // UIElement* ListView::GetSelectedItem() const
     engine->RegisterObjectMethod(className, "UIElement@+ GetSelectedItem() const", AS_METHODPR(T, GetSelectedItem, () const, UIElement*), AS_CALL_THISCALL);
@@ -22433,13 +22680,13 @@ template <class T> void RegisterMembers_ListView(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetSelectedItems() const", AS_FUNCTION_OBJFIRST(ListView_VectorlesUIElementstargre_GetSelectedItems_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
     engine->RegisterObjectMethod(className, "Array<UIElement@>@ get_selectedItems() const", AS_FUNCTION_OBJFIRST(ListView_VectorlesUIElementstargre_GetSelectedItems_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
 
-    // unsigned ListView::GetSelection() const
-    engine->RegisterObjectMethod(className, "uint GetSelection() const", AS_METHODPR(T, GetSelection, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_selection() const", AS_METHODPR(T, GetSelection, () const, unsigned), AS_CALL_THISCALL);
+    // i32 ListView::GetSelection() const
+    engine->RegisterObjectMethod(className, "int GetSelection() const", AS_METHODPR(T, GetSelection, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_selection() const", AS_METHODPR(T, GetSelection, () const, i32), AS_CALL_THISCALL);
 
-    // const Vector<unsigned>& ListView::GetSelections() const
-    engine->RegisterObjectMethod(className, "Array<uint>@ GetSelections() const", AS_FUNCTION_OBJFIRST(ListView_constspVectorlesunsignedgreamp_GetSelections_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod(className, "Array<uint>@ get_selections() const", AS_FUNCTION_OBJFIRST(ListView_constspVectorlesunsignedgreamp_GetSelections_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
+    // const Vector<i32>& ListView::GetSelections() const
+    engine->RegisterObjectMethod(className, "Array<int>@ GetSelections() const", AS_FUNCTION_OBJFIRST(ListView_constspVectorlesi32greamp_GetSelections_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod(className, "Array<int>@ get_selections() const", AS_FUNCTION_OBJFIRST(ListView_constspVectorlesi32greamp_GetSelections_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
 
     // bool ListView::GetSelectOnClickEnd() const
     engine->RegisterObjectMethod(className, "bool GetSelectOnClickEnd() const", AS_METHODPR(T, GetSelectOnClickEnd, () const, bool), AS_CALL_THISCALL);
@@ -22448,23 +22695,23 @@ template <class T> void RegisterMembers_ListView(asIScriptEngine* engine, const 
     // void ListView::InsertItem(i32 index, UIElement* item, UIElement* parentItem = nullptr)
     engine->RegisterObjectMethod(className, "void InsertItem(int, UIElement@+, UIElement@+ = null)", AS_METHODPR(T, InsertItem, (i32, UIElement*, UIElement*), void), AS_CALL_THISCALL);
 
-    // bool ListView::IsExpanded(unsigned index) const
-    engine->RegisterObjectMethod(className, "bool IsExpanded(uint) const", AS_METHODPR(T, IsExpanded, (unsigned) const, bool), AS_CALL_THISCALL);
+    // bool ListView::IsExpanded(i32 index) const
+    engine->RegisterObjectMethod(className, "bool IsExpanded(int) const", AS_METHODPR(T, IsExpanded, (i32) const, bool), AS_CALL_THISCALL);
 
-    // bool ListView::IsSelected(unsigned index) const
-    engine->RegisterObjectMethod(className, "bool IsSelected(uint) const", AS_METHODPR(T, IsSelected, (unsigned) const, bool), AS_CALL_THISCALL);
+    // bool ListView::IsSelected(i32 index) const
+    engine->RegisterObjectMethod(className, "bool IsSelected(int) const", AS_METHODPR(T, IsSelected, (i32) const, bool), AS_CALL_THISCALL);
 
     // void ListView::RemoveAllItems()
     engine->RegisterObjectMethod(className, "void RemoveAllItems()", AS_METHODPR(T, RemoveAllItems, (), void), AS_CALL_THISCALL);
 
-    // void ListView::RemoveItem(UIElement* item, unsigned index = 0)
-    engine->RegisterObjectMethod(className, "void RemoveItem(UIElement@+, uint = 0)", AS_METHODPR(T, RemoveItem, (UIElement*, unsigned), void), AS_CALL_THISCALL);
+    // void ListView::RemoveItem(UIElement* item, i32 index = 0)
+    engine->RegisterObjectMethod(className, "void RemoveItem(UIElement@+, int = 0)", AS_METHODPR(T, RemoveItem, (UIElement*, i32), void), AS_CALL_THISCALL);
 
     // void ListView::RemoveItem(i32 index)
     engine->RegisterObjectMethod(className, "void RemoveItem(int)", AS_METHODPR(T, RemoveItem, (i32), void), AS_CALL_THISCALL);
 
-    // void ListView::RemoveSelection(unsigned index)
-    engine->RegisterObjectMethod(className, "void RemoveSelection(uint)", AS_METHODPR(T, RemoveSelection, (unsigned), void), AS_CALL_THISCALL);
+    // void ListView::RemoveSelection(i32 index)
+    engine->RegisterObjectMethod(className, "void RemoveSelection(int)", AS_METHODPR(T, RemoveSelection, (i32), void), AS_CALL_THISCALL);
 
     // void ListView::SetBaseIndent(int baseIndent)
     engine->RegisterObjectMethod(className, "void SetBaseIndent(int)", AS_METHODPR(T, SetBaseIndent, (int), void), AS_CALL_THISCALL);
@@ -22486,22 +22733,22 @@ template <class T> void RegisterMembers_ListView(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetMultiselect(bool)", AS_METHODPR(T, SetMultiselect, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_multiselect(bool)", AS_METHODPR(T, SetMultiselect, (bool), void), AS_CALL_THISCALL);
 
-    // void ListView::SetSelection(unsigned index)
-    engine->RegisterObjectMethod(className, "void SetSelection(uint)", AS_METHODPR(T, SetSelection, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_selection(uint)", AS_METHODPR(T, SetSelection, (unsigned), void), AS_CALL_THISCALL);
+    // void ListView::SetSelection(i32 index)
+    engine->RegisterObjectMethod(className, "void SetSelection(int)", AS_METHODPR(T, SetSelection, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_selection(int)", AS_METHODPR(T, SetSelection, (i32), void), AS_CALL_THISCALL);
 
-    // void ListView::SetSelections(const Vector<unsigned>& indices)
-    engine->RegisterObjectMethod(className, "void SetSelections(Array<uint>@+)", AS_FUNCTION_OBJFIRST(ListView_void_SetSelections_constspVectorlesunsignedgreamp_template<ListView>), AS_CALL_CDECL_OBJFIRST);
+    // void ListView::SetSelections(const Vector<i32>& indices)
+    engine->RegisterObjectMethod(className, "void SetSelections(Array<int>@+)", AS_FUNCTION_OBJFIRST(ListView_void_SetSelections_constspVectorlesi32greamp_template<ListView>), AS_CALL_CDECL_OBJFIRST);
 
     // void ListView::SetSelectOnClickEnd(bool enable)
     engine->RegisterObjectMethod(className, "void SetSelectOnClickEnd(bool)", AS_METHODPR(T, SetSelectOnClickEnd, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_selectOnClickEnd(bool)", AS_METHODPR(T, SetSelectOnClickEnd, (bool), void), AS_CALL_THISCALL);
 
-    // void ListView::ToggleExpand(unsigned index, bool recursive = false)
-    engine->RegisterObjectMethod(className, "void ToggleExpand(uint, bool = false)", AS_METHODPR(T, ToggleExpand, (unsigned, bool), void), AS_CALL_THISCALL);
+    // void ListView::ToggleExpand(i32 index, bool recursive = false)
+    engine->RegisterObjectMethod(className, "void ToggleExpand(int, bool = false)", AS_METHODPR(T, ToggleExpand, (i32, bool), void), AS_CALL_THISCALL);
 
-    // void ListView::ToggleSelection(unsigned index)
-    engine->RegisterObjectMethod(className, "void ToggleSelection(uint)", AS_METHODPR(T, ToggleSelection, (unsigned), void), AS_CALL_THISCALL);
+    // void ListView::ToggleSelection(i32 index)
+    engine->RegisterObjectMethod(className, "void ToggleSelection(int)", AS_METHODPR(T, ToggleSelection, (i32), void), AS_CALL_THISCALL);
 
     // void ListView::UpdateInternalLayout()
     engine->RegisterObjectMethod(className, "void UpdateInternalLayout()", AS_METHODPR(T, UpdateInternalLayout, (), void), AS_CALL_THISCALL);
@@ -22924,9 +23171,9 @@ template <class T> void RegisterMembers_StaticModel(asIScriptEngine* engine, con
     engine->RegisterObjectMethod(className, "uint GetNumGeometries() const", AS_METHODPR(T, GetNumGeometries, () const, unsigned), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_numGeometries() const", AS_METHODPR(T, GetNumGeometries, () const, unsigned), AS_CALL_THISCALL);
 
-    // unsigned StaticModel::GetOcclusionLodLevel() const
-    engine->RegisterObjectMethod(className, "uint GetOcclusionLodLevel() const", AS_METHODPR(T, GetOcclusionLodLevel, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_occlusionLodLevel() const", AS_METHODPR(T, GetOcclusionLodLevel, () const, unsigned), AS_CALL_THISCALL);
+    // i32 StaticModel::GetOcclusionLodLevel() const
+    engine->RegisterObjectMethod(className, "int GetOcclusionLodLevel() const", AS_METHODPR(T, GetOcclusionLodLevel, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_occlusionLodLevel() const", AS_METHODPR(T, GetOcclusionLodLevel, () const, i32), AS_CALL_THISCALL);
 
     // bool StaticModel::IsInside(const Vector3& point) const
     engine->RegisterObjectMethod(className, "bool IsInside(const Vector3&in) const", AS_METHODPR(T, IsInside, (const Vector3&) const, bool), AS_CALL_THISCALL);
@@ -22948,9 +23195,9 @@ template <class T> void RegisterMembers_StaticModel(asIScriptEngine* engine, con
     // void StaticModel::SetModelAttr(const ResourceRef& value)
     engine->RegisterObjectMethod(className, "void SetModelAttr(const ResourceRef&in)", AS_METHODPR(T, SetModelAttr, (const ResourceRef&), void), AS_CALL_THISCALL);
 
-    // void StaticModel::SetOcclusionLodLevel(unsigned level)
-    engine->RegisterObjectMethod(className, "void SetOcclusionLodLevel(uint)", AS_METHODPR(T, SetOcclusionLodLevel, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_occlusionLodLevel(uint)", AS_METHODPR(T, SetOcclusionLodLevel, (unsigned), void), AS_CALL_THISCALL);
+    // void StaticModel::SetOcclusionLodLevel(i32 level)
+    engine->RegisterObjectMethod(className, "void SetOcclusionLodLevel(int)", AS_METHODPR(T, SetOcclusionLodLevel, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_occlusionLodLevel(int)", AS_METHODPR(T, SetOcclusionLodLevel, (i32), void), AS_CALL_THISCALL);
 
     // virtual void Drawable::Update(const FrameInfo& frame)
     engine->RegisterObjectMethod(className, "void Update(const FrameInfo&in)", AS_METHODPR(T, Update, (const FrameInfo&), void), AS_CALL_THISCALL);
@@ -23931,11 +24178,11 @@ template <class T> CScriptArray* CollisionChain2D_constspVectorlesVector2greamp_
     return VectorToArray(result, "Array<Vector2>");
 }
 
-// Vector<u8> CollisionChain2D::GetVerticesAttr() const
-template <class T> CScriptArray* CollisionChain2D_Vectorlesu8gre_GetVerticesAttr_void_template(T* _ptr)
+// Vector<byte> CollisionChain2D::GetVerticesAttr() const
+template <class T> CScriptArray* CollisionChain2D_Vectorlesbytegre_GetVerticesAttr_void_template(T* _ptr)
 {
-    Vector<u8> result = _ptr->GetVerticesAttr();
-    return VectorToArray(result, "Array<uint8>");
+    Vector<byte> result = _ptr->GetVerticesAttr();
+    return VectorToArray(result, "Array<byte>");
 }
 
 // void CollisionChain2D::SetVertices(const Vector<Vector2>& vertices)
@@ -23945,10 +24192,10 @@ template <class T> void CollisionChain2D_void_SetVertices_constspVectorlesVector
     _ptr->SetVertices(vertices);
 }
 
-// void CollisionChain2D::SetVerticesAttr(const Vector<u8>& value)
-template <class T> void CollisionChain2D_void_SetVerticesAttr_constspVectorlesu8greamp_template(T* _ptr, CScriptArray* value_conv)
+// void CollisionChain2D::SetVerticesAttr(const Vector<byte>& value)
+template <class T> void CollisionChain2D_void_SetVerticesAttr_constspVectorlesbytegreamp_template(T* _ptr, CScriptArray* value_conv)
 {
-    Vector<u8> value = ArrayToVector<u8>(value_conv);
+    Vector<byte> value = ArrayToVector<byte>(value_conv);
     _ptr->SetVerticesAttr(value);
 }
 
@@ -23971,8 +24218,8 @@ template <class T> void RegisterMembers_CollisionChain2D(asIScriptEngine* engine
     // const Vector<Vector2>& CollisionChain2D::GetVertices() const
     engine->RegisterObjectMethod(className, "Array<Vector2>@ GetVertices() const", AS_FUNCTION_OBJFIRST(CollisionChain2D_constspVectorlesVector2greamp_GetVertices_void_template<CollisionChain2D>), AS_CALL_CDECL_OBJFIRST);
 
-    // Vector<u8> CollisionChain2D::GetVerticesAttr() const
-    engine->RegisterObjectMethod(className, "Array<uint8>@ GetVerticesAttr() const", AS_FUNCTION_OBJFIRST(CollisionChain2D_Vectorlesu8gre_GetVerticesAttr_void_template<CollisionChain2D>), AS_CALL_CDECL_OBJFIRST);
+    // Vector<byte> CollisionChain2D::GetVerticesAttr() const
+    engine->RegisterObjectMethod(className, "Array<byte>@ GetVerticesAttr() const", AS_FUNCTION_OBJFIRST(CollisionChain2D_Vectorlesbytegre_GetVerticesAttr_void_template<CollisionChain2D>), AS_CALL_CDECL_OBJFIRST);
 
     // void CollisionChain2D::SetLoop(bool loop)
     engine->RegisterObjectMethod(className, "void SetLoop(bool)", AS_METHODPR(T, SetLoop, (bool), void), AS_CALL_THISCALL);
@@ -23988,8 +24235,8 @@ template <class T> void RegisterMembers_CollisionChain2D(asIScriptEngine* engine
     // void CollisionChain2D::SetVertices(const Vector<Vector2>& vertices)
     engine->RegisterObjectMethod(className, "void SetVertices(Array<Vector2>@+)", AS_FUNCTION_OBJFIRST(CollisionChain2D_void_SetVertices_constspVectorlesVector2greamp_template<CollisionChain2D>), AS_CALL_CDECL_OBJFIRST);
 
-    // void CollisionChain2D::SetVerticesAttr(const Vector<u8>& value)
-    engine->RegisterObjectMethod(className, "void SetVerticesAttr(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(CollisionChain2D_void_SetVerticesAttr_constspVectorlesu8greamp_template<CollisionChain2D>), AS_CALL_CDECL_OBJFIRST);
+    // void CollisionChain2D::SetVerticesAttr(const Vector<byte>& value)
+    engine->RegisterObjectMethod(className, "void SetVerticesAttr(Array<byte>@+)", AS_FUNCTION_OBJFIRST(CollisionChain2D_void_SetVerticesAttr_constspVectorlesbytegreamp_template<CollisionChain2D>), AS_CALL_CDECL_OBJFIRST);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CollisionChain2D
         REGISTER_MEMBERS_MANUAL_PART_CollisionChain2D();
@@ -24061,11 +24308,11 @@ template <class T> CScriptArray* CollisionPolygon2D_constspVectorlesVector2gream
     return VectorToArray(result, "Array<Vector2>");
 }
 
-// Vector<u8> CollisionPolygon2D::GetVerticesAttr() const
-template <class T> CScriptArray* CollisionPolygon2D_Vectorlesu8gre_GetVerticesAttr_void_template(T* _ptr)
+// Vector<byte> CollisionPolygon2D::GetVerticesAttr() const
+template <class T> CScriptArray* CollisionPolygon2D_Vectorlesbytegre_GetVerticesAttr_void_template(T* _ptr)
 {
-    Vector<u8> result = _ptr->GetVerticesAttr();
-    return VectorToArray(result, "Array<uint8>");
+    Vector<byte> result = _ptr->GetVerticesAttr();
+    return VectorToArray(result, "Array<byte>");
 }
 
 // void CollisionPolygon2D::SetVertices(const Vector<Vector2>& vertices)
@@ -24075,10 +24322,10 @@ template <class T> void CollisionPolygon2D_void_SetVertices_constspVectorlesVect
     _ptr->SetVertices(vertices);
 }
 
-// void CollisionPolygon2D::SetVerticesAttr(const Vector<u8>& value)
-template <class T> void CollisionPolygon2D_void_SetVerticesAttr_constspVectorlesu8greamp_template(T* _ptr, CScriptArray* value_conv)
+// void CollisionPolygon2D::SetVerticesAttr(const Vector<byte>& value)
+template <class T> void CollisionPolygon2D_void_SetVerticesAttr_constspVectorlesbytegreamp_template(T* _ptr, CScriptArray* value_conv)
 {
-    Vector<u8> value = ArrayToVector<u8>(value_conv);
+    Vector<byte> value = ArrayToVector<byte>(value_conv);
     _ptr->SetVerticesAttr(value);
 }
 
@@ -24097,8 +24344,8 @@ template <class T> void RegisterMembers_CollisionPolygon2D(asIScriptEngine* engi
     // const Vector<Vector2>& CollisionPolygon2D::GetVertices() const
     engine->RegisterObjectMethod(className, "Array<Vector2>@ GetVertices() const", AS_FUNCTION_OBJFIRST(CollisionPolygon2D_constspVectorlesVector2greamp_GetVertices_void_template<CollisionPolygon2D>), AS_CALL_CDECL_OBJFIRST);
 
-    // Vector<u8> CollisionPolygon2D::GetVerticesAttr() const
-    engine->RegisterObjectMethod(className, "Array<uint8>@ GetVerticesAttr() const", AS_FUNCTION_OBJFIRST(CollisionPolygon2D_Vectorlesu8gre_GetVerticesAttr_void_template<CollisionPolygon2D>), AS_CALL_CDECL_OBJFIRST);
+    // Vector<byte> CollisionPolygon2D::GetVerticesAttr() const
+    engine->RegisterObjectMethod(className, "Array<byte>@ GetVerticesAttr() const", AS_FUNCTION_OBJFIRST(CollisionPolygon2D_Vectorlesbytegre_GetVerticesAttr_void_template<CollisionPolygon2D>), AS_CALL_CDECL_OBJFIRST);
 
     // void CollisionPolygon2D::SetVertex(i32 index, const Vector2& vertex)
     engine->RegisterObjectMethod(className, "void SetVertex(int, const Vector2&in)", AS_METHODPR(T, SetVertex, (i32, const Vector2&), void), AS_CALL_THISCALL);
@@ -24110,8 +24357,8 @@ template <class T> void RegisterMembers_CollisionPolygon2D(asIScriptEngine* engi
     // void CollisionPolygon2D::SetVertices(const Vector<Vector2>& vertices)
     engine->RegisterObjectMethod(className, "void SetVertices(Array<Vector2>@+)", AS_FUNCTION_OBJFIRST(CollisionPolygon2D_void_SetVertices_constspVectorlesVector2greamp_template<CollisionPolygon2D>), AS_CALL_CDECL_OBJFIRST);
 
-    // void CollisionPolygon2D::SetVerticesAttr(const Vector<u8>& value)
-    engine->RegisterObjectMethod(className, "void SetVerticesAttr(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(CollisionPolygon2D_void_SetVerticesAttr_constspVectorlesu8greamp_template<CollisionPolygon2D>), AS_CALL_CDECL_OBJFIRST);
+    // void CollisionPolygon2D::SetVerticesAttr(const Vector<byte>& value)
+    engine->RegisterObjectMethod(className, "void SetVerticesAttr(Array<byte>@+)", AS_FUNCTION_OBJFIRST(CollisionPolygon2D_void_SetVerticesAttr_constspVectorlesbytegreamp_template<CollisionPolygon2D>), AS_CALL_CDECL_OBJFIRST);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CollisionPolygon2D
         REGISTER_MEMBERS_MANUAL_PART_CollisionPolygon2D();
@@ -24751,11 +24998,25 @@ template <class T> CScriptArray* AnimatedModel_constspVectorlesModelMorphgreamp_
     return VectorToArray(result, "Array<ModelMorph>");
 }
 
+// const Vector<byte>& AnimatedModel::GetMorphsAttr() const
+template <class T> CScriptArray* AnimatedModel_constspVectorlesbytegreamp_GetMorphsAttr_void_template(T* _ptr)
+{
+    const Vector<byte>& result = _ptr->GetMorphsAttr();
+    return VectorToArray(result, "Array<byte>");
+}
+
 // const Vector<SharedPtr<VertexBuffer>>& AnimatedModel::GetMorphVertexBuffers() const
 template <class T> CScriptArray* AnimatedModel_constspVectorlesSharedPtrlesVertexBuffergregreamp_GetMorphVertexBuffers_void_template(T* _ptr)
 {
     const Vector<SharedPtr<VertexBuffer>>& result = _ptr->GetMorphVertexBuffers();
     return VectorToHandleArray(result, "Array<VertexBuffer@>");
+}
+
+// void AnimatedModel::SetMorphsAttr(const Vector<byte>& value)
+template <class T> void AnimatedModel_void_SetMorphsAttr_constspVectorlesbytegreamp_template(T* _ptr, CScriptArray* value_conv)
+{
+    Vector<byte> value = ArrayToVector<byte>(value_conv);
+    _ptr->SetMorphsAttr(value);
 }
 
 // class AnimatedModel | File: ../Graphics/AnimatedModel.h
@@ -24767,18 +25028,14 @@ template <class T> void RegisterMembers_AnimatedModel(asIScriptEngine* engine, c
     // Error: type "VariantVector" can not automatically bind
     // VariantVector AnimatedModel::GetBonesEnabledAttr() const
     // Error: type "VariantVector" can not automatically bind
-    // const Vector<Vector<unsigned>>& AnimatedModel::GetGeometryBoneMappings() const
-    // Error: type "const Vector<Vector<unsigned>>&" can not automatically bind
+    // const Vector<Vector<i32>>& AnimatedModel::GetGeometryBoneMappings() const
+    // Error: type "const Vector<Vector<i32>>&" can not automatically bind
     // const Vector<Vector<Matrix3x4>>& AnimatedModel::GetGeometrySkinMatrices() const
     // Error: type "const Vector<Vector<Matrix3x4>>&" can not automatically bind
-    // const Vector<unsigned char>& AnimatedModel::GetMorphsAttr() const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // void AnimatedModel::SetAnimationStatesAttr(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
     // void AnimatedModel::SetBonesEnabledAttr(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
-    // void AnimatedModel::SetMorphsAttr(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
 
     // AnimationState* AnimatedModel::AddAnimationState(Animation* animation)
     engine->RegisterObjectMethod(className, "AnimationState@+ AddAnimationState(Animation@+)", AS_METHODPR(T, AddAnimationState, (Animation*), AnimationState*), AS_CALL_THISCALL);
@@ -24800,8 +25057,8 @@ template <class T> void RegisterMembers_AnimatedModel(asIScriptEngine* engine, c
     // AnimationState* AnimatedModel::GetAnimationState(StringHash animationNameHash) const
     engine->RegisterObjectMethod(className, "AnimationState@+ GetAnimationState(StringHash) const", AS_METHODPR(T, GetAnimationState, (StringHash) const, AnimationState*), AS_CALL_THISCALL);
 
-    // AnimationState* AnimatedModel::GetAnimationState(unsigned index) const
-    engine->RegisterObjectMethod(className, "AnimationState@+ GetAnimationState(uint) const", AS_METHODPR(T, GetAnimationState, (unsigned) const, AnimationState*), AS_CALL_THISCALL);
+    // AnimationState* AnimatedModel::GetAnimationState(i32 index) const
+    engine->RegisterObjectMethod(className, "AnimationState@+ GetAnimationState(int) const", AS_METHODPR(T, GetAnimationState, (i32) const, AnimationState*), AS_CALL_THISCALL);
 
     // const Vector<SharedPtr<AnimationState>>& AnimatedModel::GetAnimationStates() const
     engine->RegisterObjectMethod(className, "Array<AnimationState@>@ GetAnimationStates() const", AS_FUNCTION_OBJFIRST(AnimatedModel_constspVectorlesSharedPtrlesAnimationStategregreamp_GetAnimationStates_void_template<AnimatedModel>), AS_CALL_CDECL_OBJFIRST);
@@ -24809,11 +25066,14 @@ template <class T> void RegisterMembers_AnimatedModel(asIScriptEngine* engine, c
     // const Vector<ModelMorph>& AnimatedModel::GetMorphs() const
     engine->RegisterObjectMethod(className, "Array<ModelMorph>@ GetMorphs() const", AS_FUNCTION_OBJFIRST(AnimatedModel_constspVectorlesModelMorphgreamp_GetMorphs_void_template<AnimatedModel>), AS_CALL_CDECL_OBJFIRST);
 
+    // const Vector<byte>& AnimatedModel::GetMorphsAttr() const
+    engine->RegisterObjectMethod(className, "Array<byte>@ GetMorphsAttr() const", AS_FUNCTION_OBJFIRST(AnimatedModel_constspVectorlesbytegreamp_GetMorphsAttr_void_template<AnimatedModel>), AS_CALL_CDECL_OBJFIRST);
+
     // const Vector<SharedPtr<VertexBuffer>>& AnimatedModel::GetMorphVertexBuffers() const
     engine->RegisterObjectMethod(className, "Array<VertexBuffer@>@ GetMorphVertexBuffers() const", AS_FUNCTION_OBJFIRST(AnimatedModel_constspVectorlesSharedPtrlesVertexBuffergregreamp_GetMorphVertexBuffers_void_template<AnimatedModel>), AS_CALL_CDECL_OBJFIRST);
 
-    // float AnimatedModel::GetMorphWeight(unsigned index) const
-    engine->RegisterObjectMethod(className, "float GetMorphWeight(uint) const", AS_METHODPR(T, GetMorphWeight, (unsigned) const, float), AS_CALL_THISCALL);
+    // float AnimatedModel::GetMorphWeight(i32 index) const
+    engine->RegisterObjectMethod(className, "float GetMorphWeight(int) const", AS_METHODPR(T, GetMorphWeight, (i32) const, float), AS_CALL_THISCALL);
 
     // float AnimatedModel::GetMorphWeight(const String& name) const
     engine->RegisterObjectMethod(className, "float GetMorphWeight(const String&in) const", AS_METHODPR(T, GetMorphWeight, (const String&) const, float), AS_CALL_THISCALL);
@@ -24822,13 +25082,13 @@ template <class T> void RegisterMembers_AnimatedModel(asIScriptEngine* engine, c
     // float AnimatedModel::GetMorphWeight(StringHash nameHash) const
     engine->RegisterObjectMethod(className, "float GetMorphWeight(StringHash) const", AS_METHODPR(T, GetMorphWeight, (StringHash) const, float), AS_CALL_THISCALL);
 
-    // unsigned AnimatedModel::GetNumAnimationStates() const
-    engine->RegisterObjectMethod(className, "uint GetNumAnimationStates() const", AS_METHODPR(T, GetNumAnimationStates, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numAnimationStates() const", AS_METHODPR(T, GetNumAnimationStates, () const, unsigned), AS_CALL_THISCALL);
+    // i32 AnimatedModel::GetNumAnimationStates() const
+    engine->RegisterObjectMethod(className, "int GetNumAnimationStates() const", AS_METHODPR(T, GetNumAnimationStates, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numAnimationStates() const", AS_METHODPR(T, GetNumAnimationStates, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned AnimatedModel::GetNumMorphs() const
-    engine->RegisterObjectMethod(className, "uint GetNumMorphs() const", AS_METHODPR(T, GetNumMorphs, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numMorphs() const", AS_METHODPR(T, GetNumMorphs, () const, unsigned), AS_CALL_THISCALL);
+    // i32 AnimatedModel::GetNumMorphs() const
+    engine->RegisterObjectMethod(className, "int GetNumMorphs() const", AS_METHODPR(T, GetNumMorphs, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numMorphs() const", AS_METHODPR(T, GetNumMorphs, () const, i32), AS_CALL_THISCALL);
 
     // Skeleton& AnimatedModel::GetSkeleton()
     engine->RegisterObjectMethod(className, "Skeleton& GetSkeleton()", AS_METHODPR(T, GetSkeleton, (), Skeleton&), AS_CALL_THISCALL);
@@ -24856,8 +25116,8 @@ template <class T> void RegisterMembers_AnimatedModel(asIScriptEngine* engine, c
     // void AnimatedModel::RemoveAnimationState(AnimationState* state)
     engine->RegisterObjectMethod(className, "void RemoveAnimationState(AnimationState@+)", AS_METHODPR(T, RemoveAnimationState, (AnimationState*), void), AS_CALL_THISCALL);
 
-    // void AnimatedModel::RemoveAnimationState(unsigned index)
-    engine->RegisterObjectMethod(className, "void RemoveAnimationState(uint)", AS_METHODPR(T, RemoveAnimationState, (unsigned), void), AS_CALL_THISCALL);
+    // void AnimatedModel::RemoveAnimationState(i32 index)
+    engine->RegisterObjectMethod(className, "void RemoveAnimationState(int)", AS_METHODPR(T, RemoveAnimationState, (i32), void), AS_CALL_THISCALL);
 
     // void AnimatedModel::ResetMorphWeights()
     engine->RegisterObjectMethod(className, "void ResetMorphWeights()", AS_METHODPR(T, ResetMorphWeights, (), void), AS_CALL_THISCALL);
@@ -24869,8 +25129,11 @@ template <class T> void RegisterMembers_AnimatedModel(asIScriptEngine* engine, c
     // void AnimatedModel::SetModel(Model* model, bool createBones = true)
     engine->RegisterObjectMethod(className, "void SetModel(Model@+, bool = true)", AS_METHODPR(T, SetModel, (Model*, bool), void), AS_CALL_THISCALL);
 
-    // void AnimatedModel::SetMorphWeight(unsigned index, float weight)
-    engine->RegisterObjectMethod(className, "void SetMorphWeight(uint, float)", AS_METHODPR(T, SetMorphWeight, (unsigned, float), void), AS_CALL_THISCALL);
+    // void AnimatedModel::SetMorphsAttr(const Vector<byte>& value)
+    engine->RegisterObjectMethod(className, "void SetMorphsAttr(Array<byte>@+)", AS_FUNCTION_OBJFIRST(AnimatedModel_void_SetMorphsAttr_constspVectorlesbytegreamp_template<AnimatedModel>), AS_CALL_CDECL_OBJFIRST);
+
+    // void AnimatedModel::SetMorphWeight(i32 index, float weight)
+    engine->RegisterObjectMethod(className, "void SetMorphWeight(int, float)", AS_METHODPR(T, SetMorphWeight, (i32, float), void), AS_CALL_THISCALL);
 
     // void AnimatedModel::SetMorphWeight(const String& name, float weight)
     engine->RegisterObjectMethod(className, "void SetMorphWeight(const String&in, float)", AS_METHODPR(T, SetMorphWeight, (const String&, float), void), AS_CALL_THISCALL);
@@ -25338,9 +25601,9 @@ template <class T> void RegisterMembers_DropDownList(asIScriptEngine* engine, co
     // void DropDownList::AddItem(UIElement* item)
     engine->RegisterObjectMethod(className, "void AddItem(UIElement@+)", AS_METHODPR(T, AddItem, (UIElement*), void), AS_CALL_THISCALL);
 
-    // UIElement* DropDownList::GetItem(unsigned index) const
-    engine->RegisterObjectMethod(className, "UIElement@+ GetItem(uint) const", AS_METHODPR(T, GetItem, (unsigned) const, UIElement*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "UIElement@+ get_items(uint) const", AS_METHODPR(T, GetItem, (unsigned) const, UIElement*), AS_CALL_THISCALL);
+    // UIElement* DropDownList::GetItem(i32 index) const
+    engine->RegisterObjectMethod(className, "UIElement@+ GetItem(int) const", AS_METHODPR(T, GetItem, (i32) const, UIElement*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "UIElement@+ get_items(int) const", AS_METHODPR(T, GetItem, (i32) const, UIElement*), AS_CALL_THISCALL);
 
     // Vector<UIElement*> DropDownList::GetItems() const
     engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetItems() const", AS_FUNCTION_OBJFIRST(DropDownList_VectorlesUIElementstargre_GetItems_void_template<DropDownList>), AS_CALL_CDECL_OBJFIRST);
@@ -25349,9 +25612,9 @@ template <class T> void RegisterMembers_DropDownList(asIScriptEngine* engine, co
     engine->RegisterObjectMethod(className, "ListView@+ GetListView() const", AS_METHODPR(T, GetListView, () const, ListView*), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "ListView@+ get_listView() const", AS_METHODPR(T, GetListView, () const, ListView*), AS_CALL_THISCALL);
 
-    // unsigned DropDownList::GetNumItems() const
-    engine->RegisterObjectMethod(className, "uint GetNumItems() const", AS_METHODPR(T, GetNumItems, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numItems() const", AS_METHODPR(T, GetNumItems, () const, unsigned), AS_CALL_THISCALL);
+    // i32 DropDownList::GetNumItems() const
+    engine->RegisterObjectMethod(className, "int GetNumItems() const", AS_METHODPR(T, GetNumItems, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numItems() const", AS_METHODPR(T, GetNumItems, () const, i32), AS_CALL_THISCALL);
 
     // UIElement* DropDownList::GetPlaceholder() const
     engine->RegisterObjectMethod(className, "UIElement@+ GetPlaceholder() const", AS_METHODPR(T, GetPlaceholder, () const, UIElement*), AS_CALL_THISCALL);
@@ -25369,12 +25632,12 @@ template <class T> void RegisterMembers_DropDownList(asIScriptEngine* engine, co
     engine->RegisterObjectMethod(className, "UIElement@+ GetSelectedItem() const", AS_METHODPR(T, GetSelectedItem, () const, UIElement*), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ get_selectedItem() const", AS_METHODPR(T, GetSelectedItem, () const, UIElement*), AS_CALL_THISCALL);
 
-    // unsigned DropDownList::GetSelection() const
-    engine->RegisterObjectMethod(className, "uint GetSelection() const", AS_METHODPR(T, GetSelection, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_selection() const", AS_METHODPR(T, GetSelection, () const, unsigned), AS_CALL_THISCALL);
+    // i32 DropDownList::GetSelection() const
+    engine->RegisterObjectMethod(className, "int GetSelection() const", AS_METHODPR(T, GetSelection, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_selection() const", AS_METHODPR(T, GetSelection, () const, i32), AS_CALL_THISCALL);
 
-    // void DropDownList::InsertItem(unsigned index, UIElement* item)
-    engine->RegisterObjectMethod(className, "void InsertItem(uint, UIElement@+)", AS_METHODPR(T, InsertItem, (unsigned, UIElement*), void), AS_CALL_THISCALL);
+    // void DropDownList::InsertItem(i32 index, UIElement* item)
+    engine->RegisterObjectMethod(className, "void InsertItem(int, UIElement@+)", AS_METHODPR(T, InsertItem, (i32, UIElement*), void), AS_CALL_THISCALL);
 
     // void DropDownList::RemoveAllItems()
     engine->RegisterObjectMethod(className, "void RemoveAllItems()", AS_METHODPR(T, RemoveAllItems, (), void), AS_CALL_THISCALL);
@@ -25382,8 +25645,8 @@ template <class T> void RegisterMembers_DropDownList(asIScriptEngine* engine, co
     // void DropDownList::RemoveItem(UIElement* item)
     engine->RegisterObjectMethod(className, "void RemoveItem(UIElement@+)", AS_METHODPR(T, RemoveItem, (UIElement*), void), AS_CALL_THISCALL);
 
-    // void DropDownList::RemoveItem(unsigned index)
-    engine->RegisterObjectMethod(className, "void RemoveItem(uint)", AS_METHODPR(T, RemoveItem, (unsigned), void), AS_CALL_THISCALL);
+    // void DropDownList::RemoveItem(i32 index)
+    engine->RegisterObjectMethod(className, "void RemoveItem(int)", AS_METHODPR(T, RemoveItem, (i32), void), AS_CALL_THISCALL);
 
     // void DropDownList::SetPlaceholderText(const String& text)
     engine->RegisterObjectMethod(className, "void SetPlaceholderText(const String&in)", AS_METHODPR(T, SetPlaceholderText, (const String&), void), AS_CALL_THISCALL);
@@ -25393,12 +25656,12 @@ template <class T> void RegisterMembers_DropDownList(asIScriptEngine* engine, co
     engine->RegisterObjectMethod(className, "void SetResizePopup(bool)", AS_METHODPR(T, SetResizePopup, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_resizePopup(bool)", AS_METHODPR(T, SetResizePopup, (bool), void), AS_CALL_THISCALL);
 
-    // void DropDownList::SetSelection(unsigned index)
-    engine->RegisterObjectMethod(className, "void SetSelection(uint)", AS_METHODPR(T, SetSelection, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_selection(uint)", AS_METHODPR(T, SetSelection, (unsigned), void), AS_CALL_THISCALL);
+    // void DropDownList::SetSelection(i32 index)
+    engine->RegisterObjectMethod(className, "void SetSelection(int)", AS_METHODPR(T, SetSelection, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_selection(int)", AS_METHODPR(T, SetSelection, (i32), void), AS_CALL_THISCALL);
 
-    // void DropDownList::SetSelectionAttr(unsigned index)
-    engine->RegisterObjectMethod(className, "void SetSelectionAttr(uint)", AS_METHODPR(T, SetSelectionAttr, (unsigned), void), AS_CALL_THISCALL);
+    // void DropDownList::SetSelectionAttr(i32 index)
+    engine->RegisterObjectMethod(className, "void SetSelectionAttr(int)", AS_METHODPR(T, SetSelectionAttr, (i32), void), AS_CALL_THISCALL);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_DropDownList
         REGISTER_MEMBERS_MANUAL_PART_DropDownList();

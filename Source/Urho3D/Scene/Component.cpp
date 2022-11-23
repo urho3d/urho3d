@@ -44,7 +44,7 @@ bool Component::Save(Serializer& dest) const
     // Write type and ID
     if (!dest.WriteStringHash(GetType()))
         return false;
-    if (!dest.WriteUInt(id_))
+    if (!dest.WriteU32(id_))
         return false;
 
     // Write attributes
@@ -56,7 +56,7 @@ bool Component::SaveXML(XMLElement& dest) const
     // Write type and ID
     if (!dest.SetString("type", GetTypeName()))
         return false;
-    if (!dest.SetUInt("id", id_))
+    if (!dest.SetU32("id", id_))
         return false;
 
     // Write attributes
@@ -228,7 +228,7 @@ void Component::OnNodeSetEnabled(Node* node)
 {
 }
 
-void Component::SetID(unsigned id)
+void Component::SetID(ComponentId id)
 {
     id_ = id;
 }

@@ -49,25 +49,41 @@ static void ProcessEnum(const EnumAnalyzer& analyzer)
 
     string enumTypeName = analyzer.GetTypeName();
     string cppEnumBaseType = analyzer.GetBaseType();
+    string asEnumBaseType = CppPrimitiveTypeToAS(cppEnumBaseType);
 
-    if (cppEnumBaseType == "int") // Enums in AngelScript can be only int
+    if (analyzer.IsClass()) // Scoped enumerations
     {
-        processedEnum.registration_.push_back("engine->RegisterEnum(\"" + enumTypeName + "\");");
+        processedEnum.registration_.push_back("engine->RegisterTypedef(\"" + enumTypeName + "\", \"" + asEnumBaseType + "\");");
+        processedEnum.registration_.push_back("engine->SetDefaultNamespace(\"" + enumTypeName + "\");");
 
         for (const string& value : analyzer.GetEnumerators())
-            processedEnum.registration_.push_back("engine->RegisterEnumValue(\"" + enumTypeName + "\", \"" + value + "\", " + value + ");");
-    }
-    else // If enum is not int then register as typedef. But this type can not be used in switch
-    {
-        string asEnumBaseType = CppPrimitiveTypeToAS(cppEnumBaseType);
-
-        processedEnum.registration_.push_back("engine->RegisterTypedef(\"" + enumTypeName + "\", \"" + asEnumBaseType + "\");");
-
-        for (const string& enumerator : analyzer.GetEnumerators())
         {
-            string constName = enumTypeName + "_" + enumerator;
-            processedEnum.glue_.push_back("static const " + cppEnumBaseType + " " + constName + " = " + enumerator + ";");
-            processedEnum.registration_.push_back("engine->RegisterGlobalProperty(\"const " + asEnumBaseType + " " + enumerator + "\", (void*)&" + constName + ");");
+            string constName = enumTypeName + "_" + value;
+            processedEnum.glue_.push_back("static const " + cppEnumBaseType + " " + constName + " = static_cast<" + cppEnumBaseType + ">(" + enumTypeName + "::" + value + ");");
+            processedEnum.registration_.push_back("engine->RegisterGlobalProperty(\"const " + asEnumBaseType + " " + value + "\", (void*)&" + constName + ");");
+        }
+
+        processedEnum.registration_.push_back("engine->SetDefaultNamespace(\"\");");
+    }
+    else // Unscoped enumerations
+    {
+        if (cppEnumBaseType == "int") // Enums in AngelScript can be only int
+        {
+            processedEnum.registration_.push_back("engine->RegisterEnum(\"" + enumTypeName + "\");");
+
+            for (const string& value : analyzer.GetEnumerators())
+                processedEnum.registration_.push_back("engine->RegisterEnumValue(\"" + enumTypeName + "\", \"" + value + "\", " + value + ");");
+        }
+        else // If enum is not int then register as typedef. But this type can not be used in switch
+        {
+            processedEnum.registration_.push_back("engine->RegisterTypedef(\"" + enumTypeName + "\", \"" + asEnumBaseType + "\");");
+
+            for (const string& enumerator : analyzer.GetEnumerators())
+            {
+                string constName = enumTypeName + "_" + enumerator;
+                processedEnum.glue_.push_back("static const " + cppEnumBaseType + " " + constName + " = " + enumerator + ";");
+                processedEnum.registration_.push_back("engine->RegisterGlobalProperty(\"const " + asEnumBaseType + " " + enumerator + "\", (void*)&" + constName + ");");
+            }
         }
     }
 

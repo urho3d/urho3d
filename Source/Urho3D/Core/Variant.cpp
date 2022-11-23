@@ -12,7 +12,7 @@ namespace Urho3D
 {
 
 const Variant Variant::EMPTY { };
-const Vector<unsigned char> Variant::emptyBuffer { };
+const Vector<byte> Variant::emptyBuffer { };
 const ResourceRef Variant::emptyResourceRef { };
 const ResourceRefList Variant::emptyResourceRefList { };
 const VariantMap Variant::emptyVariantMap;
@@ -216,10 +216,10 @@ bool Variant::operator ==(const Variant& rhs) const
     }
 }
 
-bool Variant::operator ==(const Vector<unsigned char>& rhs) const
+bool Variant::operator ==(const Vector<byte>& rhs) const
 {
-    // Use strncmp() instead of Vector<unsigned char>::operator ==()
-    const Vector<unsigned char>& buffer = value_.buffer_;
+    // Use strncmp() instead of Vector<byte>::operator ==()
+    const Vector<byte>& buffer = value_.buffer_;
     return type_ == VAR_BUFFER && buffer.Size() == rhs.Size() ?
         strncmp(reinterpret_cast<const char*>(&buffer[0]), reinterpret_cast<const char*>(&rhs[0]), buffer.Size()) == 0 :
         false;
@@ -227,7 +227,7 @@ bool Variant::operator ==(const Vector<unsigned char>& rhs) const
 
 bool Variant::operator ==(const VectorBuffer& rhs) const
 {
-    const Vector<unsigned char>& buffer = value_.buffer_;
+    const Vector<byte>& buffer = value_.buffer_;
     return type_ == VAR_BUFFER && buffer.Size() == rhs.GetSize() ?
         strncmp(reinterpret_cast<const char*>(&buffer[0]), reinterpret_cast<const char*>(rhs.GetData()), buffer.Size()) == 0 :
         false;
@@ -253,11 +253,11 @@ void Variant::FromString(VariantType type, const char* value)
     switch (type)
     {
     case VAR_INT:
-        *this = ToInt(value);
+        *this = ToI32(value);
         break;
 
     case VAR_INT64:
-        *this = ToInt64(value);
+        *this = ToI64(value);
         break;
 
     case VAR_BOOL:
@@ -376,7 +376,7 @@ void Variant::SetBuffer(const void* data, unsigned size)
         size = 0;
 
     SetType(VAR_BUFFER);
-    Vector<unsigned char>& buffer = value_.buffer_;
+    Vector<byte>& buffer = value_.buffer_;
     buffer.Resize(size);
     if (size)
         memcpy(&buffer[0], data, size);
@@ -454,7 +454,7 @@ String Variant::ToString() const
 
     case VAR_BUFFER:
         {
-            const Vector<unsigned char>& buffer = value_.buffer_;
+            const Vector<byte>& buffer = value_.buffer_;
             String ret;
             BufferToString(ret, buffer.Begin().ptr_, buffer.Size());
             return ret;
@@ -613,7 +613,7 @@ void Variant::SetType(VariantType newType)
         break;
 
     case VAR_BUFFER:
-        value_.buffer_.~Vector<unsigned char>();
+        value_.buffer_.~Vector<byte>();
         break;
 
     case VAR_RESOURCEREF:
@@ -673,7 +673,7 @@ void Variant::SetType(VariantType newType)
         break;
 
     case VAR_BUFFER:
-        new(&value_.buffer_) Vector<unsigned char>();
+        new(&value_.buffer_) Vector<byte>();
         break;
 
     case VAR_RESOURCEREF:
@@ -727,24 +727,29 @@ void Variant::SetType(VariantType newType)
     }
 }
 
-template <> int Variant::Get<int>() const
+template <> i32 Variant::Get<i32>() const
 {
-    return GetInt();
+    return GetI32();
 }
 
-template <> unsigned Variant::Get<unsigned>() const
+template <> u32 Variant::Get<u32>() const
 {
-    return GetUInt();
+    return GetU32();
 }
 
-template <> long long Variant::Get<long long>() const
+template <> c32 Variant::Get<c32>() const
 {
-    return GetInt64();
+    return GetC32();
 }
 
-template <> unsigned long long Variant::Get<unsigned long long>() const
+template <> i64 Variant::Get<i64>() const
 {
-    return GetUInt64();
+    return GetI64();
+}
+
+template <> u64 Variant::Get<u64>() const
+{
+    return GetU64();
 }
 
 template <> StringHash Variant::Get<StringHash>() const
@@ -817,7 +822,7 @@ template <> const IntVector3& Variant::Get<const IntVector3&>() const
     return GetIntVector3();
 }
 
-template <> const Vector<unsigned char>& Variant::Get<const Vector<unsigned char>&>() const
+template <> const Vector<byte>& Variant::Get<const Vector<byte>&>() const
 {
     return GetBuffer();
 }
@@ -922,7 +927,7 @@ template <> IntVector3 Variant::Get<IntVector3>() const
     return GetIntVector3();
 }
 
-template <> Vector<unsigned char> Variant::Get<Vector<unsigned char>>() const
+template <> Vector<byte> Variant::Get<Vector<byte>>() const
 {
     return GetBuffer();
 }

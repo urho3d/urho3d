@@ -63,15 +63,15 @@ void ScrollBar::RegisterObject(Context* context)
 
     URHO3D_COPY_BASE_ATTRIBUTES(BorderImage);
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
-    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Orientation", GetOrientation, SetOrientation, Orientation, orientations, O_HORIZONTAL, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Range", GetRange, SetRange, float, 1.0f, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Value", GetValue, SetValue, float, 0.0f, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Scroll Step", GetScrollStep, SetScrollStep, float, DEFAULT_SCROLL_STEP, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Step Factor", GetStepFactor, SetStepFactor, float, 1.0f, AM_FILE);
-    URHO3D_ATTRIBUTE("Left Image Rect", IntRect, leftRect_, IntRect::ZERO, AM_FILE);
-    URHO3D_ATTRIBUTE("Right Image Rect", IntRect, rightRect_, IntRect::ZERO, AM_FILE);
-    URHO3D_ATTRIBUTE("Up Image Rect", IntRect, upRect_, IntRect::ZERO, AM_FILE);
-    URHO3D_ATTRIBUTE("Down Image Rect", IntRect, downRect_, IntRect::ZERO, AM_FILE);
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Orientation", GetOrientation, SetOrientation, orientations, O_HORIZONTAL, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Range", GetRange, SetRange, 1.0f, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Value", GetValue, SetValue, 0.0f, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Scroll Step", GetScrollStep, SetScrollStep, DEFAULT_SCROLL_STEP, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Step Factor", GetStepFactor, SetStepFactor, 1.0f, AM_FILE);
+    URHO3D_ATTRIBUTE("Left Image Rect", leftRect_, IntRect::ZERO, AM_FILE);
+    URHO3D_ATTRIBUTE("Right Image Rect", rightRect_, IntRect::ZERO, AM_FILE);
+    URHO3D_ATTRIBUTE("Up Image Rect", upRect_, IntRect::ZERO, AM_FILE);
+    URHO3D_ATTRIBUTE("Down Image Rect", downRect_, IntRect::ZERO, AM_FILE);
 }
 
 void ScrollBar::ApplyAttributes()
@@ -278,7 +278,7 @@ void ScrollBar::HandleSliderPaged(StringHash eventType, VariantMap& eventData)
     using namespace SliderPaged;
 
     // Synthesize hover event to the forward/back buttons
-    if (eventData[P_OFFSET].GetInt() < 0)
+    if (eventData[P_OFFSET].GetI32() < 0)
         backButton_->OnHover(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), MOUSEB_NONE, QUAL_NONE, nullptr);
     else
         forwardButton_->OnHover(IntVector2::ZERO, forwardButton_->ElementToScreen(IntVector2::ZERO), MOUSEB_NONE, QUAL_NONE, nullptr);
@@ -286,7 +286,7 @@ void ScrollBar::HandleSliderPaged(StringHash eventType, VariantMap& eventData)
     // Synthesize click / release events to the buttons
     if (eventData[P_PRESSED].GetBool())
     {
-        if (eventData[P_OFFSET].GetInt() < 0)
+        if (eventData[P_OFFSET].GetI32() < 0)
             backButton_->OnClickBegin(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO),
                 MOUSEB_LEFT, MOUSEB_LEFT, QUAL_NONE, nullptr);
         else
@@ -295,7 +295,7 @@ void ScrollBar::HandleSliderPaged(StringHash eventType, VariantMap& eventData)
     }
     else
     {
-        if (eventData[P_OFFSET].GetInt() < 0)
+        if (eventData[P_OFFSET].GetI32() < 0)
             backButton_->OnClickEnd(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO),
                 MOUSEB_LEFT, MOUSEB_NONE, QUAL_NONE, nullptr, backButton_);
         else

@@ -13,14 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: What changed
         id: whatchanged
         run: |
           git fetch --deepen=1
-          echo ::set-output name=skip::$(git log --raw --no-merges -1 |grep -cq 'website/'; echo $?)
+          echo "name=skip::$(git log --raw --no-merges -1 |grep -cq 'website/'; echo $?)" >> $GITHUB_OUTPUT
       - name: Dispatch
-        uses: peter-evans/repository-dispatch@v1.1.3
+        uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.DISPATCHER_TOKEN }}
           repository: weitjong/urho3d-website

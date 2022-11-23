@@ -2,6 +2,8 @@
 
 # Urho3D
 
+Игровой движок, ориентированный на русскоязычное сообщество. Последняя англоязычная версия доступна [тут](https://github.com/urho3d/Urho3D/releases/tag/1.9.0).
+
 [![CI/CD](https://github.com/urho3d/Urho3D/workflows/CI/CD/badge.svg)](https://github.com/urho3d/Urho3D/actions?query=workflow%3ACI%2FCD)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/4954/badge.svg)](https://scan.coverity.com/projects/urho3d-urho3d)
 
@@ -10,7 +12,7 @@
 Main website: [https://urho3d.io/](https://urho3d.io/)
 
 ## License
-Licensed under the MIT license, see [LICENSE](https://github.com/urho3d/Urho3D/blob/master/LICENSE) for details.
+Licensed under the MIT license, see [LICENSE](licenses/urho3d/LICENSE) for details.
 
 ## Contributing
 Before making pull requests, please read the [Contribution checklist](https://urho3d.io/documentation/HEAD/_contribution_checklist.html) and [Coding conventions](https://urho3d.io/documentation/HEAD/_coding_conventions.html) pages from the documentation.
@@ -52,11 +54,10 @@ Urho3D uses the following third-party libraries:
 - Lua 5.1 (https://www.lua.org)
 - LuaJIT 2.1.0+ (http://www.luajit.org)
 - LZ4 1.7.5 (https://github.com/lz4/lz4)
-- MojoShader (https://icculus.org/mojoshader)
 - Mustache 1.0 (https://mustache.github.io, https://github.com/kainjow/Mustache)
 - nanodbc 2.12.4+ (https://lexicalunit.github.io/nanodbc)
 - Open Asset Import Library 4.1.0 (http://assimp.sourceforge.net)
-- pugixml 1.10+ (http://pugixml.org)
+- pugixml 1.12+ (http://pugixml.org)
 - RapidJSON 1.1.0+ (https://github.com/Tencent/rapidjson)
 - Recast/Detour (https://github.com/recastnavigation/recastnavigation)
 - SDL 2.0.10+ (https://www.libsdl.org)

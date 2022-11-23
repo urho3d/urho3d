@@ -118,6 +118,7 @@ static void LoadXml(const string& fullPath)
         {
             string definition = ExtractDefinition(memberdef);
 
+            // TODO: using can be typedef https://github.com/doxygen/doxygen/issues/9654
             if (StartsWith(definition, "using "))
                 SourceData::usings_.push_back(memberdef);
         }

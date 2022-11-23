@@ -70,6 +70,36 @@ string CppPrimitiveTypeToAS(const string& cppType)
     if (cppType == "c32")
         return "c32";
 
+    if (cppType == "byte")
+        return "byte";
+
+    if (cppType == "hash16")
+        return "hash16";
+
+    if (cppType == "hash32")
+        return "hash32";
+
+    if (cppType == "hash64")
+        return "hash64";
+
+    if (cppType == "id32")
+        return "id32";
+
+    if (cppType == "NodeId")
+        return "NodeId";
+
+    if (cppType == "ComponentId")
+        return "ComponentId";
+
+    if (cppType == "mask32")
+        return "mask32";
+
+    if (cppType == "flagset32")
+        return "flagset32";
+
+    if (cppType == "color32")
+        return "color32";
+
     throw Exception(cppType + " not a primitive type");
 }
 
@@ -142,6 +172,8 @@ shared_ptr<EnumAnalyzer> FindEnum(const string& name)
     return shared_ptr<EnumAnalyzer>();
 }
 
+// TODO: Not all usings detect as using https://github.com/doxygen/doxygen/issues/9654
+// id32, hash32 never checked because not detected as using because not in Urho3D namespace and not parsed
 static bool IsUsing(const string& identifier)
 {
     for (xml_node memberdef : SourceData::usings_)
@@ -151,6 +183,25 @@ static bool IsUsing(const string& identifier)
         if (usingAnalyzer.GetName() == identifier)
             return true;
     }
+
+    return false;
+}
+
+// TODO: Not all usings detect as using https://github.com/doxygen/doxygen/issues/9654
+static bool IsKnownUsing(const string& identifier)
+{
+    if (!IsUsing(identifier))
+        return false;
+
+    if (identifier == "VariantMap"
+        || identifier == "color32"
+        || identifier == "NodeId" // Never checked https://github.com/doxygen/doxygen/issues/9654
+        || identifier == "ComponentId") // Never checked https://github.com/doxygen/doxygen/issues/9654
+    {
+        return true;
+    }
+
+    // id32, hash32 never checked because not detected as using because not in Urho3D namespace and not parsed
 
     return false;
 }
@@ -402,7 +453,7 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
         throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
     }
 
-    regex_match(cppTypeName, match, regex("Vector<(\\w+)>"));
+    regex_match(cppTypeName, match, regex("Vector<([\\w ]+)>"));
     if (!match.empty())
     {
         string cppSubtypeName = match[1].str();
@@ -418,7 +469,7 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
             asSubtypeName = cppSubtypeName;
         }
 
-        if (usage == VariableUsage::FunctionReturn && type.IsConst() == type.IsReference())
+        if (usage == VariableUsage::FunctionReturn && type.IsConst() == type.IsReference() && !type.IsPointer())
         {
             result.asDeclaration_ = "Array<" + asSubtypeName + ">@";
             result.cppDeclaration_ = "CScriptArray*";
@@ -458,7 +509,8 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
     // TODO add to type info "IsUsing"
     // TODO add description to TypeAnalyzer::GetClass()
 
-    if (IsUsing(cppTypeName) && cppTypeName != "VariantMap")
+    // TODO: Not all usings detect as using https://github.com/doxygen/doxygen/issues/9654
+    if (IsUsing(cppTypeName) && !IsKnownUsing(cppTypeName))
         throw Exception("Using \"" + cppTypeName + "\" can not automatically bind");
 
     string asTypeName;
@@ -563,7 +615,8 @@ string CppTypeToAS(const TypeAnalyzer& type, TypeUsage typeUsage)
     // TODO add to type info "IsUsing"
     // TODO add description to TypeAnalyzer::GetClass()
 
-    if (IsUsing(cppTypeName) && cppTypeName != "VariantMap")
+    // TODO: Not all usings detect as using https://github.com/doxygen/doxygen/issues/9654
+    if (IsUsing(cppTypeName) && !IsKnownUsing(cppTypeName))
         throw Exception("Using \"" + cppTypeName + "\" can not automatically bind");
 
     string asTypeName;

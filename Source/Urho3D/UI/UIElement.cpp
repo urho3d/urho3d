@@ -94,47 +94,47 @@ void UIElement::RegisterObject(Context* context)
 {
     context->RegisterFactory<UIElement>(UI_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Name", GetName, SetName, String, String::EMPTY, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Position", GetPosition, SetPosition, IntVector2, IntVector2::ZERO, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Size", GetSize, SetSize, IntVector2, IntVector2::ZERO, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Min Size", GetMinSize, SetMinSize, IntVector2, IntVector2::ZERO, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Max Size", GetMaxSize, SetMaxSize, IntVector2, IntVector2(M_MAX_INT, M_MAX_INT), AM_FILE);
-    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment,
+    URHO3D_ACCESSOR_ATTRIBUTE("Name", GetName, SetName, String::EMPTY, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Position", GetPosition, SetPosition, IntVector2::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Size", GetSize, SetSize, IntVector2::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Min Size", GetMinSize, SetMinSize, IntVector2::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Max Size", GetMaxSize, SetMaxSize, IntVector2(M_MAX_INT, M_MAX_INT), AM_FILE);
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment,
         horizontalAlignments, HA_LEFT, AM_FILEREADONLY);
-    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments,
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, verticalAlignments,
         VA_TOP, AM_FILEREADONLY);
-    URHO3D_ACCESSOR_ATTRIBUTE("Min Anchor", GetMinAnchor, SetMinAnchor, Vector2, Vector2::ZERO, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Max Anchor", GetMaxAnchor, SetMaxAnchor, Vector2, Vector2::ZERO, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Min Offset", GetMinOffset, SetMinOffset, IntVector2, IntVector2::ZERO, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Max Offset", GetMaxOffset, SetMaxOffset, IntVector2, IntVector2::ZERO, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Pivot", GetPivot, SetPivot, Vector2, Vector2(std::numeric_limits<float>::max(), std::numeric_limits<float>::max()), AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Enable Anchor", GetEnableAnchor, SetEnableAnchor, bool, false, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Clip Border", GetClipBorder, SetClipBorder, IntRect, IntRect::ZERO, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Priority", GetPriority, SetPriority, int, 0, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Opacity", GetOpacity, SetOpacity, float, 1.0f, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Color", GetColorAttr, SetColor, Color, Color::WHITE, AM_FILE);
-    URHO3D_ATTRIBUTE("Top Left Color", Color, colors_[0], Color::WHITE, AM_FILE);
-    URHO3D_ATTRIBUTE("Top Right Color", Color, colors_[1], Color::WHITE, AM_FILE);
-    URHO3D_ATTRIBUTE("Bottom Left Color", Color, colors_[2], Color::WHITE, AM_FILE);
-    URHO3D_ATTRIBUTE("Bottom Right Color", Color, colors_[3], Color::WHITE, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, false, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Editable", IsEditable, SetEditable, bool, true, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Selected", IsSelected, SetSelected, bool, false, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Visible", IsVisible, SetVisible, bool, true, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Bring To Front", GetBringToFront, SetBringToFront, bool, false, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Bring To Back", GetBringToBack, SetBringToBack, bool, true, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Clip Children", GetClipChildren, SetClipChildren, bool, false, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Use Derived Opacity", GetUseDerivedOpacity, SetUseDerivedOpacity, bool, true, AM_FILE);
-    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Focus Mode", GetFocusMode, SetFocusMode, FocusMode, focusModes, FM_NOTFOCUSABLE, AM_FILE);
-    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Drag And Drop Mode", GetDragDropMode, SetDragDropMode, DragAndDropModeFlags, dragDropModes, DD_DISABLED, AM_FILE);
-    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Layout Mode", GetLayoutMode, SetLayoutMode, LayoutMode, layoutModes, LM_FREE, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Layout Spacing", GetLayoutSpacing, SetLayoutSpacing, int, 0, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Layout Border", GetLayoutBorder, SetLayoutBorder, IntRect, IntRect::ZERO, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Layout Flex Scale", GetLayoutFlexScale, SetLayoutFlexScale, Vector2, Vector2::ONE, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Indent", GetIndent, SetIndent, int, 0, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Indent Spacing", GetIndentSpacing, SetIndentSpacing, int, 16, AM_FILE);
-    URHO3D_ATTRIBUTE("Variables", VariantMap, vars_, Variant::emptyVariantMap, AM_FILE);
-    URHO3D_ATTRIBUTE("Tags", StringVector, tags_, Variant::emptyStringVector, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Min Anchor", GetMinAnchor, SetMinAnchor, Vector2::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Max Anchor", GetMaxAnchor, SetMaxAnchor, Vector2::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Min Offset", GetMinOffset, SetMinOffset, IntVector2::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Max Offset", GetMaxOffset, SetMaxOffset, IntVector2::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Pivot", GetPivot, SetPivot, Vector2(std::numeric_limits<float>::max(), std::numeric_limits<float>::max()), AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Enable Anchor", GetEnableAnchor, SetEnableAnchor, false, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Clip Border", GetClipBorder, SetClipBorder, IntRect::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Priority", GetPriority, SetPriority, 0, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Opacity", GetOpacity, SetOpacity, 1.0f, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Color", GetColorAttr, SetColor, Color::WHITE, AM_FILE);
+    URHO3D_ATTRIBUTE("Top Left Color", colors_[0], Color::WHITE, AM_FILE);
+    URHO3D_ATTRIBUTE("Top Right Color", colors_[1], Color::WHITE, AM_FILE);
+    URHO3D_ATTRIBUTE("Bottom Left Color", colors_[2], Color::WHITE, AM_FILE);
+    URHO3D_ATTRIBUTE("Bottom Right Color", colors_[3], Color::WHITE, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, false, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Editable", IsEditable, SetEditable, true, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Selected", IsSelected, SetSelected, false, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Visible", IsVisible, SetVisible, true, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Bring To Front", GetBringToFront, SetBringToFront, false, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Bring To Back", GetBringToBack, SetBringToBack, true, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Clip Children", GetClipChildren, SetClipChildren, false, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Use Derived Opacity", GetUseDerivedOpacity, SetUseDerivedOpacity, true, AM_FILE);
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Focus Mode", GetFocusMode, SetFocusMode, focusModes, FM_NOTFOCUSABLE, AM_FILE);
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Drag And Drop Mode", GetDragDropMode, SetDragDropMode, dragDropModes, DD_DISABLED, AM_FILE);
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Layout Mode", GetLayoutMode, SetLayoutMode, layoutModes, LM_FREE, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Layout Spacing", GetLayoutSpacing, SetLayoutSpacing, 0, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Layout Border", GetLayoutBorder, SetLayoutBorder, IntRect::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Layout Flex Scale", GetLayoutFlexScale, SetLayoutFlexScale, Vector2::ONE, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Indent", GetIndent, SetIndent, 0, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Indent Spacing", GetIndentSpacing, SetIndentSpacing, 16, AM_FILE);
+    URHO3D_ATTRIBUTE("Variables", vars_, Variant::emptyVariantMap, AM_FILE);
+    URHO3D_ATTRIBUTE("Tags", tags_, Variant::emptyStringVector, AM_FILE);
 }
 
 void UIElement::ApplyAttributes()
@@ -142,7 +142,7 @@ void UIElement::ApplyAttributes()
     colorGradient_ = false;
     derivedColorDirty_ = true;
 
-    for (unsigned i = 1; i < MAX_UIELEMENT_CORNERS; ++i)
+    for (i32 i = 1; i < MAX_UIELEMENT_CORNERS; ++i)
     {
         if (colors_[i] != colors_[0])
             colorGradient_ = true;
@@ -190,7 +190,7 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile)
     if (!Animatable::LoadXML(source))
         return false;
 
-    unsigned nextInternalChild = 0;
+    i32 nextInternalChild = 0;
 
     // Load child elements. Internal elements are not to be created as they already exist
     XMLElement childElem = source.GetChild("element");
@@ -200,7 +200,7 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile)
         String typeName = childElem.GetAttribute("type");
         if (typeName.Empty())
             typeName = "UIElement";
-        i32 index = childElem.HasAttribute("index") ? childElem.GetInt("index") : ENDPOS;
+        i32 index = childElem.HasAttribute("index") ? childElem.GetI32("index") : ENDPOS;
         UIElement* child = nullptr;
 
         if (!internalElem)
@@ -209,7 +209,7 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile)
         }
         else
         {
-            for (unsigned i = nextInternalChild; i < children_.Size(); ++i)
+            for (i32 i = nextInternalChild; i < children_.Size(); ++i)
             {
                 if (children_[i]->IsInternal() && children_[i]->GetTypeName() == typeName)
                 {
@@ -254,7 +254,7 @@ UIElement* UIElement::LoadChildXML(const XMLElement& childElem, XMLFile* styleFi
     String typeName = childElem.GetAttribute("type");
     if (typeName.Empty())
         typeName = "UIElement";
-    i32 index = childElem.HasAttribute("index") ? childElem.GetUInt("index") : ENDPOS;
+    i32 index = childElem.HasAttribute("index") ? childElem.GetU32("index") : ENDPOS;
     UIElement* child = CreateChild(typeName, String::EMPTY, index);
 
     if (child)
@@ -304,9 +304,8 @@ bool UIElement::SaveXML(XMLElement& dest) const
         return false;
 
     // Write child elements
-    for (unsigned i = 0; i < children_.Size(); ++i)
+    for (const SharedPtr<UIElement>& element : children_)
     {
-        UIElement* element = children_[i];
         if (element->IsTemporary())
             continue;
 
@@ -804,7 +803,7 @@ void UIElement::SetClipBorder(const IntRect& rect)
 
 void UIElement::SetColor(const Color& color)
 {
-    for (auto& cornerColor : colors_)
+    for (Color& cornerColor : colors_)
         cornerColor = color;
     colorGradient_ = false;
     derivedColorDirty_ = true;
@@ -816,7 +815,7 @@ void UIElement::SetColor(Corner corner, const Color& color)
     colorGradient_ = false;
     derivedColorDirty_ = true;
 
-    for (unsigned i = 0; i < MAX_UIELEMENT_CORNERS; ++i)
+    for (i32 i = 0; i < MAX_UIELEMENT_CORNERS; ++i)
     {
         if (i != corner && colors_[i] != colors_[corner])
             colorGradient_ = true;
@@ -915,7 +914,7 @@ void UIElement::SetFocus(bool enable)
     if (focusMode_ < FM_FOCUSABLE || !IsVisibleEffective())
         enable = false;
 
-    auto* ui = GetSubsystem<UI>();
+    UI* ui = GetSubsystem<UI>();
     // Can be null at exit time; no-op in that case
     if (!ui)
         return;
@@ -939,7 +938,7 @@ void UIElement::SetSelected(bool enable)
 
 void UIElement::SetVisible(bool enable)
 {
-    auto* ui = GetSubsystem<UI>();
+    UI* ui = GetSubsystem<UI>();
     // Can be null at exit time; no-op in that case
     if (!ui)
         return;
@@ -1095,17 +1094,18 @@ void UIElement::UpdateLayout()
     {
         int minChildHeight = 0;
 
-        for (unsigned i = 0; i < children_.Size(); ++i)
+        for (const SharedPtr<UIElement>& child : children_)
         {
-            if (!children_[i]->IsVisible())
+            if (!child->IsVisible())
                 continue;
+
             positions.Push(baseIndentWidth);
-            auto indent = (unsigned)children_[i]->GetIndentWidth();
-            sizes.Push(children_[i]->GetWidth() + indent);
-            minSizes.Push(children_[i]->GetEffectiveMinSize().x_ + indent);
-            maxSizes.Push(children_[i]->GetMaxWidth() + indent);
-            flexScales.Push(children_[i]->GetLayoutFlexScale().x_);
-            minChildHeight = Max(minChildHeight, children_[i]->GetEffectiveMinSize().y_);
+            i32 indent = child->GetIndentWidth();
+            sizes.Push(child->GetWidth() + indent);
+            minSizes.Push(child->GetEffectiveMinSize().x_ + indent);
+            maxSizes.Push(child->GetMaxWidth() + indent);
+            flexScales.Push(child->GetLayoutFlexScale().x_);
+            minChildHeight = Max(minChildHeight, child->GetEffectiveMinSize().y_);
         }
 
         CalculateLayout(positions, sizes, minSizes, maxSizes, flexScales, GetWidth(), layoutBorder_.left_, layoutBorder_.right_,
@@ -1121,13 +1121,14 @@ void UIElement::UpdateLayout()
         width = size_.x_;
         height = size_.y_;
 
-        unsigned j = 0;
-        for (unsigned i = 0; i < children_.Size(); ++i)
+        i32 j = 0;
+        for (const SharedPtr<UIElement>& child : children_)
         {
-            if (!children_[i]->IsVisible())
+            if (!child->IsVisible())
                 continue;
-            children_[i]->SetPosition(positions[j], GetLayoutChildPosition(children_[i]).y_);
-            children_[i]->SetSize(sizes[j], height - layoutBorder_.top_ - layoutBorder_.bottom_);
+
+            child->SetPosition(positions[j], GetLayoutChildPosition(child).y_);
+            child->SetSize(sizes[j], height - layoutBorder_.top_ - layoutBorder_.bottom_);
             ++j;
         }
     }
@@ -1135,16 +1136,17 @@ void UIElement::UpdateLayout()
     {
         int minChildWidth = 0;
 
-        for (unsigned i = 0; i < children_.Size(); ++i)
+        for (const SharedPtr<UIElement>& child : children_)
         {
-            if (!children_[i]->IsVisible())
+            if (!child->IsVisible())
                 continue;
+
             positions.Push(0);
-            sizes.Push(children_[i]->GetHeight());
-            minSizes.Push(children_[i]->GetEffectiveMinSize().y_);
-            maxSizes.Push(children_[i]->GetMaxHeight());
-            flexScales.Push(children_[i]->GetLayoutFlexScale().y_);
-            minChildWidth = Max(minChildWidth, children_[i]->GetEffectiveMinSize().x_ + children_[i]->GetIndentWidth());
+            sizes.Push(child->GetHeight());
+            minSizes.Push(child->GetEffectiveMinSize().y_);
+            maxSizes.Push(child->GetMaxHeight());
+            flexScales.Push(child->GetLayoutFlexScale().y_);
+            minChildWidth = Max(minChildWidth, child->GetEffectiveMinSize().x_ + child->GetIndentWidth());
         }
 
         CalculateLayout(positions, sizes, minSizes, maxSizes, flexScales, GetHeight(), layoutBorder_.top_, layoutBorder_.bottom_,
@@ -1159,22 +1161,23 @@ void UIElement::UpdateLayout()
         width = size_.x_;
         height = size_.y_;
 
-        unsigned j = 0;
-        for (unsigned i = 0; i < children_.Size(); ++i)
+        i32 j = 0;
+        for (const SharedPtr<UIElement>& child : children_)
         {
-            if (!children_[i]->IsVisible())
+            if (!child->IsVisible())
                 continue;
-            children_[i]->SetPosition(GetLayoutChildPosition(children_[i]).x_ + baseIndentWidth, positions[j]);
-            children_[i]->SetSize(width - layoutBorder_.left_ - layoutBorder_.right_, sizes[j]);
+
+            child->SetPosition(GetLayoutChildPosition(child).x_ + baseIndentWidth, positions[j]);
+            child->SetSize(width - layoutBorder_.left_ - layoutBorder_.right_, sizes[j]);
             ++j;
         }
     }
     else
     {
-        for (unsigned i = 0; i < children_.Size(); ++i)
+        for (const SharedPtr<UIElement>& child : children_)
         {
-            if (children_[i]->GetEnableAnchor())
-                children_[i]->UpdateAnchoring();
+            if (child->GetEnableAnchor())
+                child->UpdateAnchoring();
         }
     }
 
@@ -1475,8 +1478,8 @@ void UIElement::AddTags(const String& tags, char separator)
 
 void UIElement::AddTags(const StringVector& tags)
 {
-    for (unsigned i = 0; i < tags.Size(); ++i)
-        AddTag(tags[i]);
+    for (const String& tag : tags)
+        AddTag(tag);
 }
 
 bool UIElement::RemoveTag(const String& tag)
@@ -1537,7 +1540,7 @@ float UIElement::GetDerivedOpacity() const
 
 bool UIElement::HasFocus() const
 {
-    auto* ui = GetSubsystem<UI>();
+    UI* ui = GetSubsystem<UI>();
     return ui ? ui->GetFocusElement() == this : false;
 }
 
@@ -1833,10 +1836,10 @@ void UIElement::GetBatchesWithOffset(IntVector2& offset, Vector<UIBatch>& batche
     IntRect currentScissor)
 {
     Vector2 floatOffset((float)offset.x_, (float)offset.y_);
-    unsigned initialSize = vertexData.Size();
+    i32 initialSize = vertexData.Size();
 
     GetBatches(batches, vertexData, currentScissor);
-    for (unsigned i = initialSize; i < vertexData.Size(); i += 6)
+    for (i32 i = initialSize; i < vertexData.Size(); i += 6)
     {
         vertexData[i] += floatOffset.x_;
         vertexData[i + 1] += floatOffset.y_;
@@ -1852,7 +1855,7 @@ void UIElement::GetBatchesWithOffset(IntVector2& offset, Vector<UIBatch>& batche
 
 UIElement* UIElement::GetElementEventSender() const
 {
-    auto* element = const_cast<UIElement*>(this);
+    UIElement* element = const_cast<UIElement*>(this);
     if (elementEventSender_)
         return element;
 
@@ -1900,7 +1903,7 @@ Animatable* UIElement::FindAttributeAnimationTarget(const String& name, String& 
     {
         // Name must in following format: "#0/#1/attribute"
         UIElement* element = this;
-        for (unsigned i = 0; i < names.Size() - 1; ++i)
+        for (i32 i = 0; i < names.Size() - 1; ++i)
         {
             if (names[i].Front() != '#')
             {
@@ -1912,7 +1915,7 @@ Animatable* UIElement::FindAttributeAnimationTarget(const String& name, String& 
             char s = name.Front();
             if (s >= '0' && s <= '9')
             {
-                unsigned index = ToUInt(name);
+                i32 index = ToI32(name);
                 element = element->GetChild(index);
             }
             else
@@ -2080,12 +2083,12 @@ int UIElement::CalculateLayoutParentSize(const Vector<int>& sizes, int begin, in
     if (sizes.Empty())
         return width;
 
-    for (unsigned i = 0; i < sizes.Size(); ++i)
+    for (i32 size : sizes)
     {
         // If calculating maximum size, and the default is specified, do not overflow it
-        if (sizes[i] == M_MAX_INT)
+        if (size == M_MAX_INT)
             return M_MAX_INT;
-        width += sizes[i] + spacing;
+        width += size + spacing;
     }
     // The last spacing is not needed
     return width - spacing;
@@ -2094,7 +2097,7 @@ int UIElement::CalculateLayoutParentSize(const Vector<int>& sizes, int begin, in
 void UIElement::CalculateLayout(Vector<int>& positions, Vector<int>& sizes, const Vector<int>& minSizes,
     const Vector<int>& maxSizes, const Vector<float>& flexScales, int targetSize, int begin, int end, int spacing)
 {
-    unsigned numChildren = sizes.Size();
+    i32 numChildren = sizes.Size();
     if (!numChildren)
         return;
     int targetTotalSize = targetSize - begin - end - (numChildren - 1) * spacing;
@@ -2106,9 +2109,9 @@ void UIElement::CalculateLayout(Vector<int>& positions, Vector<int>& sizes, cons
     float acc = 0.0f;
 
     // Initial pass
-    for (unsigned i = 0; i < numChildren; ++i)
+    for (i32 i = 0; i < numChildren; ++i)
     {
-        auto targetSize = (int)(targetChildSize * flexScales[i]);
+        i32 targetSize = (i32)(targetChildSize * flexScales[i]);
         if (remainder)
         {
             acc += add;
@@ -2126,7 +2129,7 @@ void UIElement::CalculateLayout(Vector<int>& positions, Vector<int>& sizes, cons
     for (;;)
     {
         int actualTotalSize = 0;
-        for (unsigned i = 0; i < numChildren; ++i)
+        for (i32 i = 0; i < numChildren; ++i)
             actualTotalSize += sizes[i];
         int error = targetTotalSize - actualTotalSize;
         // Break if no error
@@ -2134,8 +2137,8 @@ void UIElement::CalculateLayout(Vector<int>& positions, Vector<int>& sizes, cons
             break;
 
         // Check which of the children can be resized to correct the error. If none, must break
-        Vector<unsigned> resizable;
-        for (unsigned i = 0; i < numChildren; ++i)
+        Vector<i32> resizable;
+        for (i32 i = 0; i < numChildren; ++i)
         {
             if (error < 0 && sizes[i] > minSizes[i])
                 resizable.Push(i);
@@ -2153,7 +2156,7 @@ void UIElement::CalculateLayout(Vector<int>& positions, Vector<int>& sizes, cons
 
         for (int i = 0; i < numResizable; ++i)
         {
-            unsigned index = resizable[i];
+            i32 index = resizable[i];
             int targetSize = sizes[index] + errorPerChild;
             if (remainder)
             {
@@ -2173,7 +2176,7 @@ void UIElement::CalculateLayout(Vector<int>& positions, Vector<int>& sizes, cons
     // Calculate final positions and store the maximum child element size for optimizations
     layoutElementMaxSize_ = 0;
     int position = begin;
-    for (unsigned i = 0; i < numChildren; ++i)
+    for (i32 i = 0; i < numChildren; ++i)
     {
         positions[i] = position;
         position += sizes[i] + spacing;
@@ -2244,7 +2247,7 @@ void UIElement::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 
 void UIElement::SetRenderTexture(Texture2D* texture)
 {
-    if (auto* ui = GetSubsystem<UI>())
+    if (UI* ui = GetSubsystem<UI>())
         ui->SetElementRenderTexture(this, texture);
 }
 

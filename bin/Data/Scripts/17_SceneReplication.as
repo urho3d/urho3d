@@ -217,7 +217,7 @@ Node@ CreateControllableObject()
 {
     // Create the scene node & visual representation. This will be a replicated object
     Node@ ballNode = scene_.CreateChild("Ball");
-    ballNode.position = Vector3(Random(40.0f) - 20.0f, 5.0f, Random(40.0f) - 20.0f);
+    ballNode.position = Vector3(Random(40.0f) - 20.0f, 5.0f, -Random(40.0f) + 20.0f);
     ballNode.SetScale(0.5f);
     StaticModel@ ballObject = ballNode.CreateComponent("StaticModel");
     ballObject.model = cache.GetResource("Model", "Models/Sphere.mdl");
@@ -434,7 +434,7 @@ void HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
 
 void HandleClientObjectID(StringHash eventType, VariantMap& eventData)
 {
-    clientObjectID = eventData["ID"].GetUInt();
+    clientObjectID = eventData["ID"].GetU32();
 }
 
 // Create XML patch instructions for screen joystick layout specific to this sample app

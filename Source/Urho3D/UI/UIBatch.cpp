@@ -12,8 +12,6 @@
 namespace Urho3D
 {
 
-Vector3 UIBatch::posAdjust(0.0f, 0.0f, 0.0f);
-
 UIBatch::UIBatch()
 {
     SetDefaultColor();
@@ -39,14 +37,14 @@ void UIBatch::SetColor(const Color& color, bool overrideAlpha)
 
     useGradient_ = false;
     color_ =
-        overrideAlpha ? color.ToUInt() : Color(color.r_, color.g_, color.b_, color.a_ * element_->GetDerivedOpacity()).ToUInt();
+        overrideAlpha ? color.ToU32() : Color(color.r_, color.g_, color.b_, color.a_ * element_->GetDerivedOpacity()).ToU32();
 }
 
 void UIBatch::SetDefaultColor()
 {
     if (element_)
     {
-        color_ = element_->GetDerivedColor().ToUInt();
+        color_ = element_->GetDerivedColor().ToU32();
         useGradient_ = element_->HasColorGradient();
     }
     else
@@ -81,9 +79,9 @@ void UIBatch::AddQuad(float x, float y, float width, float height, int texOffset
 
     const IntVector2& screenPos = element_->GetScreenPosition();
 
-    float left = x + screenPos.x_ - posAdjust.x_;
+    float left = x + screenPos.x_;
     float right = left + width;
-    float top = y + screenPos.y_ - posAdjust.x_;
+    float top = y + screenPos.y_;
     float bottom = top + height;
 
     float leftUV = texOffsetX * invTextureSize_.x_;
@@ -163,10 +161,10 @@ void UIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int h
         bottomRightColor = GetInterpolatedColor(x + width, y + height);
     }
 
-    Vector3 v1 = (transform * Vector3((float)x, (float)y, 0.0f)) - posAdjust;
-    Vector3 v2 = (transform * Vector3((float)x + (float)width, (float)y, 0.0f)) - posAdjust;
-    Vector3 v3 = (transform * Vector3((float)x, (float)y + (float)height, 0.0f)) - posAdjust;
-    Vector3 v4 = (transform * Vector3((float)x + (float)width, (float)y + (float)height, 0.0f)) - posAdjust;
+    Vector3 v1 = (transform * Vector3((float)x, (float)y, 0.0f));
+    Vector3 v2 = (transform * Vector3((float)x + (float)width, (float)y, 0.0f));
+    Vector3 v3 = (transform * Vector3((float)x, (float)y + (float)height, 0.0f));
+    Vector3 v4 = (transform * Vector3((float)x + (float)width, (float)y + (float)height, 0.0f));
 
     float leftUV = ((float)texOffsetX) * invTextureSize_.x_;
     float topUV = ((float)texOffsetY) * invTextureSize_.y_;
@@ -223,7 +221,7 @@ void UIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int h
 
 void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, bool tiled)
 {
-    if (!(element_->HasColorGradient() || element_->GetDerivedColor().ToUInt() & 0xff000000))
+    if (!(element_->HasColorGradient() || element_->GetDerivedColor().ToU32() & 0xff000000))
         return; // No gradient and alpha is 0, so do not add the quad
 
     if (!tiled)
@@ -258,10 +256,10 @@ void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int t
 void UIBatch::AddQuad(const Matrix3x4& transform, const IntVector2& a, const IntVector2& b, const IntVector2& c, const IntVector2& d,
     const IntVector2& texA, const IntVector2& texB, const IntVector2& texC, const IntVector2& texD)
 {
-    Vector3 v1 = (transform * Vector3((float)a.x_, (float)a.y_, 0.0f)) - posAdjust;
-    Vector3 v2 = (transform * Vector3((float)b.x_, (float)b.y_, 0.0f)) - posAdjust;
-    Vector3 v3 = (transform * Vector3((float)c.x_, (float)c.y_, 0.0f)) - posAdjust;
-    Vector3 v4 = (transform * Vector3((float)d.x_, (float)d.y_, 0.0f)) - posAdjust;
+    Vector3 v1 = (transform * Vector3((float)a.x_, (float)a.y_, 0.0f));
+    Vector3 v2 = (transform * Vector3((float)b.x_, (float)b.y_, 0.0f));
+    Vector3 v3 = (transform * Vector3((float)c.x_, (float)c.y_, 0.0f));
+    Vector3 v4 = (transform * Vector3((float)d.x_, (float)d.y_, 0.0f));
 
     Vector2 uv1((float)texA.x_ * invTextureSize_.x_, (float)texA.y_ * invTextureSize_.y_);
     Vector2 uv2((float)texB.x_ * invTextureSize_.x_, (float)texB.y_ * invTextureSize_.y_);
@@ -320,20 +318,20 @@ void UIBatch::AddQuad(const Matrix3x4& transform, const IntVector2& a, const Int
     const IntVector2& texA, const IntVector2& texB, const IntVector2& texC, const IntVector2& texD, const Color& colA,
     const Color& colB, const Color& colC, const Color& colD)
 {
-    Vector3 v1 = (transform * Vector3((float)a.x_, (float)a.y_, 0.0f)) - posAdjust;
-    Vector3 v2 = (transform * Vector3((float)b.x_, (float)b.y_, 0.0f)) - posAdjust;
-    Vector3 v3 = (transform * Vector3((float)c.x_, (float)c.y_, 0.0f)) - posAdjust;
-    Vector3 v4 = (transform * Vector3((float)d.x_, (float)d.y_, 0.0f)) - posAdjust;
+    Vector3 v1 = (transform * Vector3((float)a.x_, (float)a.y_, 0.0f));
+    Vector3 v2 = (transform * Vector3((float)b.x_, (float)b.y_, 0.0f));
+    Vector3 v3 = (transform * Vector3((float)c.x_, (float)c.y_, 0.0f));
+    Vector3 v4 = (transform * Vector3((float)d.x_, (float)d.y_, 0.0f));
 
     Vector2 uv1((float)texA.x_ * invTextureSize_.x_, (float)texA.y_ * invTextureSize_.y_);
     Vector2 uv2((float)texB.x_ * invTextureSize_.x_, (float)texB.y_ * invTextureSize_.y_);
     Vector2 uv3((float)texC.x_ * invTextureSize_.x_, (float)texC.y_ * invTextureSize_.y_);
     Vector2 uv4((float)texD.x_ * invTextureSize_.x_, (float)texD.y_ * invTextureSize_.y_);
 
-    unsigned c1 = colA.ToUInt();
-    unsigned c2 = colB.ToUInt();
-    unsigned c3 = colC.ToUInt();
-    unsigned c4 = colD.ToUInt();
+    color32 c1 = colA.ToU32();
+    color32 c2 = colB.ToU32();
+    color32 c3 = colC.ToU32();
+    color32 c4 = colD.ToU32();
 
     unsigned begin = vertexData_->Size();
     vertexData_->Resize(begin + 6 * UI_VERTEX_SIZE);
@@ -343,35 +341,35 @@ void UIBatch::AddQuad(const Matrix3x4& transform, const IntVector2& a, const Int
     dest[0] = v1.x_;
     dest[1] = v1.y_;
     dest[2] = 0.0f;
-    ((unsigned&)dest[3]) = c1;
+    ((color32&)dest[3]) = c1;
     dest[4] = uv1.x_;
     dest[5] = uv1.y_;
 
     dest[6] = v2.x_;
     dest[7] = v2.y_;
     dest[8] = 0.0f;
-    ((unsigned&)dest[9]) = c2;
+    ((color32&)dest[9]) = c2;
     dest[10] = uv2.x_;
     dest[11] = uv2.y_;
 
     dest[12] = v3.x_;
     dest[13] = v3.y_;
     dest[14] = 0.0f;
-    ((unsigned&)dest[15]) = c3;
+    ((color32&)dest[15]) = c3;
     dest[16] = uv3.x_;
     dest[17] = uv3.y_;
 
     dest[18] = v1.x_;
     dest[19] = v1.y_;
     dest[20] = 0.0f;
-    ((unsigned&)dest[21]) = c1;
+    ((color32&)dest[21]) = c1;
     dest[22] = uv1.x_;
     dest[23] = uv1.y_;
 
     dest[24] = v3.x_;
     dest[25] = v3.y_;
     dest[26] = 0.0f;
-    ((unsigned&)dest[27]) = c3;
+    ((color32&)dest[27]) = c3;
     dest[28] = uv3.x_;
     dest[29] = uv3.y_;
 
@@ -409,13 +407,13 @@ unsigned UIBatch::GetInterpolatedColor(float x, float y)
         Color bottomColor = element_->GetColor(C_BOTTOMLEFT).Lerp(element_->GetColor(C_BOTTOMRIGHT), cLerpX);
         Color color = topColor.Lerp(bottomColor, cLerpY);
         color.a_ *= element_->GetDerivedOpacity();
-        return color.ToUInt();
+        return color.ToU32();
     }
     else
     {
         Color color = element_->GetColor(C_TOPLEFT);
         color.a_ *= element_->GetDerivedOpacity();
-        return color.ToUInt();
+        return color.ToU32();
     }
 }
 

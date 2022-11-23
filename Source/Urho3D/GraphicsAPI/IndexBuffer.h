@@ -66,10 +66,10 @@ public:
     bool GetUsedVertexRange(i32 start, i32 count, i32& minVertex, i32& vertexCount);
 
     /// Return CPU memory shadow data.
-    u8* GetShadowData() const { return shadowData_.Get(); }
+    byte* GetShadowData() const { return shadowData_.Get(); }
 
     /// Return shared array pointer to the CPU memory shadow data.
-    SharedArrayPtr<u8> GetShadowDataShared() const { return shadowData_; }
+    SharedArrayPtr<byte> GetShadowDataShared() const { return shadowData_; }
 
 private:
     /// Create buffer.
@@ -95,20 +95,6 @@ private:
     void UnmapBuffer_OGL();
 #endif // def URHO3D_OPENGL
 
-#ifdef URHO3D_D3D9
-    void OnDeviceLost_D3D9();
-    void OnDeviceReset_D3D9();
-    void Release_D3D9();
-    bool SetData_D3D9(const void* data);
-    bool SetDataRange_D3D9(const void* data, i32 start, i32 count, bool discard = false);
-    void* Lock_D3D9(i32 start, i32 count, bool discard);
-    void Unlock_D3D9();
-    bool Create_D3D9();
-    bool UpdateToGPU_D3D9();
-    void* MapBuffer_D3D9(i32 start, i32 count, bool discard);
-    void UnmapBuffer_D3D9();
-#endif // def URHO3D_D3D9
-
 #ifdef URHO3D_D3D11
     void OnDeviceLost_D3D11();
     void OnDeviceReset_D3D11();
@@ -124,7 +110,7 @@ private:
 #endif // def URHO3D_D3D11
 
     /// Shadow data.
-    SharedArrayPtr<u8> shadowData_;
+    SharedArrayPtr<byte> shadowData_;
     /// Number of indices.
     i32 indexCount_;
     /// Index size.

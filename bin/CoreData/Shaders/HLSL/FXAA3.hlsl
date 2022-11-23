@@ -297,15 +297,9 @@ float CalcLuma(float3 rgb)
 
 /*--------------------------------------------------------------------------*/
 
-#ifndef D3D11
-#define FxaaTexTop(tex, p) float4(tex2Dlod(s##tex, float4(p, 0.0, 0.0)).rgb, 1.0)
-#define LumaTop(tex, p) CalcLuma(tex2Dlod(s##tex, float4(p, 0.0, 0.0)).rgb)
-#define LumaOff(tex, p, o, r) CalcLuma(tex2Dlod(s##tex, float4(p + (o * r), 0, 0)).rgb)
-#else
 #define FxaaTexTop(tex, p) float4(t##tex.SampleLevel(s##tex, p, 0.0).rgb, 1.0)
 #define LumaTop(tex, p) CalcLuma(t##tex.SampleLevel(s##tex, p, 0.0).rgb)
 #define LumaOff(tex, p, o, r) CalcLuma(t##tex.SampleLevel(s##tex, p + (o * r), 0.0).rgb)
-#endif
 
 /*============================================================================
 

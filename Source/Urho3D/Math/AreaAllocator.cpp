@@ -15,17 +15,17 @@ AreaAllocator::AreaAllocator()
     Reset(0, 0);
 }
 
-AreaAllocator::AreaAllocator(int width, int height, bool fastMode)
+AreaAllocator::AreaAllocator(i32 width, i32 height, bool fastMode)
 {
     Reset(width, height, width, height, fastMode);
 }
 
-AreaAllocator::AreaAllocator(int width, int height, int maxWidth, int maxHeight, bool fastMode)
+AreaAllocator::AreaAllocator(i32 width, i32 height, i32 maxWidth, i32 maxHeight, bool fastMode)
 {
     Reset(width, height, maxWidth, maxHeight, fastMode);
 }
 
-void AreaAllocator::Reset(int width, int height, int maxWidth, int maxHeight, bool fastMode)
+void AreaAllocator::Reset(i32 width, i32 height, i32 maxWidth, i32 maxHeight, bool fastMode)
 {
     doubleWidth_ = true;
     size_ = IntVector2(width, height);
@@ -37,7 +37,7 @@ void AreaAllocator::Reset(int width, int height, int maxWidth, int maxHeight, bo
     freeAreas_.Push(initialArea);
 }
 
-bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
+bool AreaAllocator::Allocate(i32 width, i32 height, i32& x, i32& y)
 {
     if (width < 0)
         width = 0;
@@ -45,7 +45,7 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
         height = 0;
 
     Vector<IntRect>::Iterator best;
-    int bestFreeArea;
+    i32 bestFreeArea;
 
     for (;;)
     {
@@ -53,13 +53,13 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
         bestFreeArea = M_MAX_INT;
         for (Vector<IntRect>::Iterator i = freeAreas_.Begin(); i != freeAreas_.End(); ++i)
         {
-            int freeWidth = i->Width();
-            int freeHeight = i->Height();
+            i32 freeWidth = i->Width();
+            i32 freeHeight = i->Height();
 
             if (freeWidth >= width && freeHeight >= height)
             {
                 // Calculate rank for free area. Lower is better
-                int freeArea = freeWidth * freeHeight;
+                i32 freeArea = freeWidth * freeHeight;
 
                 if (freeArea < bestFreeArea)
                 {
@@ -73,7 +73,7 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
         {
             if (doubleWidth_ && size_.x_ < maxSize_.x_)
             {
-                int oldWidth = size_.x_;
+                i32 oldWidth = size_.x_;
                 size_.x_ <<= 1;
                 // If no allocations yet, simply expand the single free area
                 IntRect& first = freeAreas_.Front();
@@ -88,7 +88,7 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
             }
             else if (!doubleWidth_ && size_.y_ < maxSize_.y_)
             {
-                int oldHeight = size_.y_;
+                i32 oldHeight = size_.y_;
                 size_.y_ <<= 1;
                 // If no allocations yet, simply expand the single free area
                 IntRect& first = freeAreas_.Front();
@@ -128,7 +128,7 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
     else
     {
         // Remove the reserved area from all free areas
-        for (unsigned i = 0; i < freeAreas_.Size();)
+        for (i32 i = 0; i < freeAreas_.Size();)
         {
             if (SplitRect(i, reserved))
                 freeAreas_.Erase(i);
@@ -142,8 +142,10 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
     return true;
 }
 
-bool AreaAllocator::SplitRect(unsigned freeAreaIndex, const IntRect& reserve)
+bool AreaAllocator::SplitRect(i32 freeAreaIndex, const IntRect& reserve)
 {
+    assert(freeAreaIndex >= 0);
+
     // Make a copy, as the vector will be modified
     IntRect original = freeAreas_[freeAreaIndex];
 
@@ -188,10 +190,10 @@ bool AreaAllocator::SplitRect(unsigned freeAreaIndex, const IntRect& reserve)
 void AreaAllocator::Cleanup()
 {
     // Remove rects which are contained within another rect
-    for (unsigned i = 0; i < freeAreas_.Size();)
+    for (i32 i = 0; i < freeAreas_.Size();)
     {
         bool erased = false;
-        for (unsigned j = i + 1; j < freeAreas_.Size();)
+        for (i32 j = i + 1; j < freeAreas_.Size();)
         {
             if ((freeAreas_[i].left_ >= freeAreas_[j].left_) &&
                 (freeAreas_[i].top_ >= freeAreas_[j].top_) &&

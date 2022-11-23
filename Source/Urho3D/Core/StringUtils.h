@@ -21,21 +21,21 @@ URHO3D_API double ToDouble(const String& source);
 /// Parse a double from a C string.
 URHO3D_API double ToDouble(const char* source);
 /// Parse an integer from a string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
-URHO3D_API int ToInt(const String& source, int base = 10);
+URHO3D_API i32 ToI32(const String& source, i32 base = 10);
 /// Parse an integer from a C string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
-URHO3D_API int ToInt(const char* source, int base = 10);
+URHO3D_API i32 ToI32(const char* source, i32 base = 10);
 /// Parse an unsigned integer from a string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
-URHO3D_API unsigned ToUInt(const String& source, int base = 10);
+URHO3D_API u32 ToU32(const String& source, i32 base = 10);
 /// Parse an unsigned integer from a C string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
-URHO3D_API unsigned ToUInt(const char* source, int base = 10);
+URHO3D_API u32 ToU32(const char* source, i32 base = 10);
 /// Parse an 64 bit integer from a string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
-URHO3D_API long long ToInt64(const String& source, int base = 10);
+URHO3D_API i64 ToI64(const String& source, i32 base = 10);
 /// Parse an 64 bit integer from a C string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
-URHO3D_API long long ToInt64(const char* source, int base = 10);
+URHO3D_API i64 ToI64(const char* source, i32 base = 10);
 /// Parse an unsigned 64 bit integer from a string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
-URHO3D_API unsigned long long ToUInt64(const String& source, int base = 10);
+URHO3D_API u64 ToU64(const String& source, i32 base = 10);
 /// Parse an unsigned 64 bit integer from a C string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
-URHO3D_API unsigned long long ToUInt64(const char* source, int base = 10);
+URHO3D_API u64 ToU64(const char* source, i32 base = 10);
 /// Parse a Color from a string.
 URHO3D_API Color ToColor(const String& source);
 /// Parse a Color from a C string.
@@ -95,9 +95,9 @@ URHO3D_API String ToStringHex(unsigned value);
 /// Convert a byte buffer to a string.
 URHO3D_API void BufferToString(String& dest, const void* data, unsigned size);
 /// Convert a string to a byte buffer.
-URHO3D_API void StringToBuffer(Vector<unsigned char>& dest, const String& source);
+URHO3D_API void StringToBuffer(Vector<byte>& dest, const String& source);
 /// Convert a C string to a byte buffer.
-URHO3D_API void StringToBuffer(Vector<unsigned char>& dest, const char* source);
+URHO3D_API void StringToBuffer(Vector<byte>& dest, const char* source);
 /// Return an index to a string list corresponding to the given string, or a default value if not found. The string list must be empty-terminated.
 URHO3D_API i32 GetStringListIndex(const String& value, const String* strings, i32 defaultIndex, bool caseSensitive = false);
 /// Return an index to a string list corresponding to the given C string, or a default value if not found. The string list must be empty-terminated.
@@ -117,7 +117,7 @@ URHO3D_API unsigned ToLower(unsigned ch);
 /// Convert a memory size into a formatted size string, of the style "1.5 Mb".
 URHO3D_API String GetFileSizeString(unsigned long long memorySize);
 /// Decode a base64-encoded string into buffer.
-URHO3D_API Vector<unsigned char> DecodeBase64(String encodedString);
+URHO3D_API Vector<unsigned char> DecodeBase64(const String& encodedString);
 /// Parse type from a C string.
 template <class T> T FromString(const char* source);
 
@@ -126,8 +126,8 @@ template <> inline String FromString<String>(const char* source) { return source
 template <> inline bool FromString<bool>(const char* source) { return ToBool(source); }
 template <> inline float FromString<float>(const char* source) { return ToFloat(source); }
 template <> inline double FromString<double>(const char* source) { return ToDouble(source); }
-template <> inline int FromString<int>(const char* source) { return ToInt(source); }
-template <> inline unsigned FromString<unsigned>(const char* source) { return ToUInt(source); }
+template <> inline i32 FromString<i32>(const char* source) { return ToI32(source); }
+template <> inline u32 FromString<u32>(const char* source) { return ToU32(source); }
 template <> inline Color FromString<Color>(const char* source) { return ToColor(source); }
 template <> inline IntRect FromString<IntRect>(const char* source) { return ToIntRect(source); }
 template <> inline IntVector2 FromString<IntVector2>(const char* source) { return ToIntVector2(source); }

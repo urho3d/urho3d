@@ -51,7 +51,7 @@ static const unsigned MAX_ANIMATION_STATES = 256;
 AnimatedModel::AnimatedModel(Context* context) :
     StaticModel(context),
     animationLodFrameNumber_(0),
-    morphElementMask_(0),
+    morphElementMask_(VertexElements::None),
     animationLodBias_(1.0f),
     animationLodTimer_(-1.0f),
     animationLodDistance_(0.0f),
@@ -84,25 +84,25 @@ void AnimatedModel::RegisterObject(Context* context)
 {
     context->RegisterFactory<AnimatedModel>(GEOMETRY_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Material", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()),
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Model", GetModelAttr, SetModelAttr, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Material", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList(Material::GetTypeStatic()),
         AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Is Occluder", bool, occluder_, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Cast Shadows", bool, castShadows_, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Update When Invisible", GetUpdateInvisible, SetUpdateInvisible, bool, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Is Occluder", occluder_, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, true, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Cast Shadows", castShadows_, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Update When Invisible", GetUpdateInvisible, SetUpdateInvisible, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, 1.0f, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr, VariantVector,
+    URHO3D_ACCESSOR_ATTRIBUTE("Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr,
         Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr,
-        VariantVector, Variant::emptyVariantVector, AM_FILE)
+    URHO3D_ACCESSOR_ATTRIBUTE("Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr,
+        Variant::emptyVariantVector, AM_FILE)
         .SetMetadata(AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, animationStatesStructureElementNames);
-    URHO3D_ACCESSOR_ATTRIBUTE("Morphs", GetMorphsAttr, SetMorphsAttr, Vector<unsigned char>, Variant::emptyBuffer,
+    URHO3D_ACCESSOR_ATTRIBUTE("Morphs", GetMorphsAttr, SetMorphsAttr, Variant::emptyBuffer,
         AM_DEFAULT | AM_NOEDIT);
 }
 
@@ -344,7 +344,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
         }
 
         // Copy geometry bone mappings
-        const Vector<Vector<unsigned>>& geometryBoneMappings = model->GetGeometryBoneMappings();
+        const Vector<Vector<i32>>& geometryBoneMappings = model->GetGeometryBoneMappings();
         geometryBoneMappings_.Clear();
         geometryBoneMappings_.Reserve(geometryBoneMappings.Size());
         for (unsigned i = 0; i < geometryBoneMappings.Size(); ++i)
@@ -355,7 +355,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
         morphs_.Clear();
         const Vector<ModelMorph>& morphs = model->GetMorphs();
         morphs_.Reserve(morphs.Size());
-        morphElementMask_ = MASK_NONE;
+        morphElementMask_ = VertexElements::None;
         for (unsigned i = 0; i < morphs.Size(); ++i)
         {
             ModelMorph newMorph;
@@ -363,7 +363,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
             newMorph.nameHash_ = morphs[i].nameHash_;
             newMorph.weight_ = 0.0f;
             newMorph.buffers_ = morphs[i].buffers_;
-            for (HashMap<unsigned, VertexBufferMorph>::ConstIterator j = morphs[i].buffers_.Begin();
+            for (HashMap<i32, VertexBufferMorph>::ConstIterator j = morphs[i].buffers_.Begin();
                  j != morphs[i].buffers_.End(); ++j)
                 morphElementMask_ |= j->second_.elementMask_;
             morphs_.Push(newMorph);
@@ -415,7 +415,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
         geometryBoneMappings_.Clear();
         morphVertexBuffers_.Clear();
         morphs_.Clear();
-        morphElementMask_ = MASK_NONE;
+        morphElementMask_ = VertexElements::None;
         SetBoundingBox(BoundingBox());
         SetSkeleton(Skeleton(), false);
     }
@@ -501,8 +501,10 @@ void AnimatedModel::RemoveAnimationState(AnimationState* state)
     }
 }
 
-void AnimatedModel::RemoveAnimationState(unsigned index)
+void AnimatedModel::RemoveAnimationState(i32 index)
 {
+    assert(index >= 0);
+
     if (index < animationStates_.Size())
     {
         animationStates_.Erase(index);
@@ -532,8 +534,10 @@ void AnimatedModel::SetUpdateInvisible(bool enable)
 }
 
 
-void AnimatedModel::SetMorphWeight(unsigned index, float weight)
+void AnimatedModel::SetMorphWeight(i32 index, float weight)
 {
+    assert(index >= 0);
+
     if (index >= morphs_.Size())
         return;
 
@@ -610,8 +614,9 @@ void AnimatedModel::ResetMorphWeights()
     MarkNetworkUpdate();
 }
 
-float AnimatedModel::GetMorphWeight(unsigned index) const
+float AnimatedModel::GetMorphWeight(i32 index) const
 {
+    assert(index >= 0);
     return index < morphs_.Size() ? morphs_[index].weight_ : 0.0f;
 }
 
@@ -669,8 +674,9 @@ AnimationState* AnimatedModel::GetAnimationState(StringHash animationNameHash) c
     return nullptr;
 }
 
-AnimationState* AnimatedModel::GetAnimationState(unsigned index) const
+AnimationState* AnimatedModel::GetAnimationState(i32 index) const
 {
+    assert(index >= 0);
     return index < animationStates_.Size() ? animationStates_[index].Get() : nullptr;
 }
 
@@ -798,7 +804,7 @@ void AnimatedModel::SetAnimationStatesAttr(const VariantVector& value)
     auto* cache = GetSubsystem<ResourceCache>();
     RemoveAllAnimationStates();
     unsigned index = 0;
-    unsigned numStates = index < value.Size() ? value[index++].GetUInt() : 0;
+    unsigned numStates = index < value.Size() ? value[index++].GetU32() : 0;
     // Prevent negative or overly large value being assigned from the editor
     if (numStates > M_MAX_INT)
         numStates = 0;
@@ -819,7 +825,7 @@ void AnimatedModel::SetAnimationStatesAttr(const VariantVector& value)
             newState->SetLooped(value[index++].GetBool());
             newState->SetWeight(value[index++].GetFloat());
             newState->SetTime(value[index++].GetFloat());
-            newState->SetLayer((unsigned char)value[index++].GetInt());
+            newState->SetLayer((unsigned char)value[index++].GetI32());
         }
         else
         {
@@ -836,7 +842,7 @@ void AnimatedModel::SetAnimationStatesAttr(const VariantVector& value)
     }
 }
 
-void AnimatedModel::SetMorphsAttr(const Vector<unsigned char>& value)
+void AnimatedModel::SetMorphsAttr(const Vector<byte>& value)
 {
     for (unsigned index = 0; index < value.Size(); ++index)
         SetMorphWeight(index, (float)value[index] / 255.0f);
@@ -877,11 +883,11 @@ VariantVector AnimatedModel::GetAnimationStatesAttr() const
     return ret;
 }
 
-const Vector<unsigned char>& AnimatedModel::GetMorphsAttr() const
+const Vector<byte>& AnimatedModel::GetMorphsAttr() const
 {
     attrBuffer_.Clear();
     for (Vector<ModelMorph>::ConstIterator i = morphs_.Begin(); i != morphs_.End(); ++i)
-        attrBuffer_.WriteUByte((unsigned char)(i->weight_ * 255.0f));
+        attrBuffer_.WriteU8((unsigned char)(i->weight_ * 255.0f));
 
     return attrBuffer_.GetBuffer();
 }
@@ -1161,10 +1167,12 @@ void AnimatedModel::CloneGeometries()
     MarkMorphsDirty();
 }
 
-void AnimatedModel::CopyMorphVertices(void* destVertexData, void* srcVertexData, unsigned vertexCount, VertexBuffer* destBuffer,
+void AnimatedModel::CopyMorphVertices(void* destVertexData, void* srcVertexData, i32 vertexCount, VertexBuffer* destBuffer,
     VertexBuffer* srcBuffer)
 {
-    unsigned mask = destBuffer->GetElementMask() & srcBuffer->GetElementMask();
+    assert(vertexCount >= 0);
+
+    VertexElements mask = destBuffer->GetElementMask() & srcBuffer->GetElementMask();
     unsigned normalOffset = srcBuffer->GetElementOffset(SEM_NORMAL);
     unsigned tangentOffset = srcBuffer->GetElementOffset(SEM_TANGENT);
     unsigned vertexSize = srcBuffer->GetVertexSize();
@@ -1173,7 +1181,7 @@ void AnimatedModel::CopyMorphVertices(void* destVertexData, void* srcVertexData,
 
     while (vertexCount--)
     {
-        if (mask & MASK_POSITION)
+        if (!!(mask & VertexElements::Position))
         {
             auto* posSrc = (float*)src;
             dest[0] = posSrc[0];
@@ -1181,7 +1189,7 @@ void AnimatedModel::CopyMorphVertices(void* destVertexData, void* srcVertexData,
             dest[2] = posSrc[2];
             dest += 3;
         }
-        if (mask & MASK_NORMAL)
+        if (!!(mask & VertexElements::Normal))
         {
             auto* normalSrc = (float*)(src + normalOffset);
             dest[0] = normalSrc[0];
@@ -1189,7 +1197,7 @@ void AnimatedModel::CopyMorphVertices(void* destVertexData, void* srcVertexData,
             dest[2] = normalSrc[2];
             dest += 3;
         }
-        if (mask & MASK_TANGENT)
+        if (!!(mask & VertexElements::Tangent))
         {
             auto* tangentSrc = (float*)(src + tangentOffset);
             dest[0] = tangentSrc[0];
@@ -1351,7 +1359,7 @@ void AnimatedModel::UpdateMorphs()
                     {
                         if (morphs_[j].weight_ != 0.0f)
                         {
-                            HashMap<unsigned, VertexBufferMorph>::Iterator k = morphs_[j].buffers_.Find(i);
+                            HashMap<i32, VertexBufferMorph>::Iterator k = morphs_[j].buffers_.Find(i);
                             if (k != morphs_[j].buffers_.End())
                                 ApplyMorph(buffer, dest, morphStart, k->second_, morphs_[j].weight_);
                         }
@@ -1366,24 +1374,26 @@ void AnimatedModel::UpdateMorphs()
     morphsDirty_ = false;
 }
 
-void AnimatedModel::ApplyMorph(VertexBuffer* buffer, void* destVertexData, unsigned morphRangeStart, const VertexBufferMorph& morph,
+void AnimatedModel::ApplyMorph(VertexBuffer* buffer, void* destVertexData, i32 morphRangeStart, const VertexBufferMorph& morph,
     float weight)
 {
-    const VertexMaskFlags elementMask = morph.elementMask_ & buffer->GetElementMask();
+    assert(morphRangeStart >= 0);
+
+    const VertexElements elementMask = morph.elementMask_ & buffer->GetElementMask();
     unsigned vertexCount = morph.vertexCount_;
     unsigned normalOffset = buffer->GetElementOffset(SEM_NORMAL);
     unsigned tangentOffset = buffer->GetElementOffset(SEM_TANGENT);
     unsigned vertexSize = buffer->GetVertexSize();
 
-    unsigned char* srcData = morph.morphData_;
-    auto* destData = (unsigned char*)destVertexData;
+    byte* srcData = morph.morphData_;
+    byte* destData = (byte*)destVertexData;
 
     while (vertexCount--)
     {
         unsigned vertexIndex = *((unsigned*)srcData) - morphRangeStart;
         srcData += sizeof(unsigned);
 
-        if (elementMask & MASK_POSITION)
+        if (!!(elementMask & VertexElements::Position))
         {
             auto* dest = (float*)(destData + vertexIndex * vertexSize);
             auto* src = (float*)srcData;
@@ -1392,7 +1402,7 @@ void AnimatedModel::ApplyMorph(VertexBuffer* buffer, void* destVertexData, unsig
             dest[2] += src[2] * weight;
             srcData += 3 * sizeof(float);
         }
-        if (elementMask & MASK_NORMAL)
+        if (!!(elementMask & VertexElements::Normal))
         {
             auto* dest = (float*)(destData + vertexIndex * vertexSize + normalOffset);
             auto* src = (float*)srcData;
@@ -1401,7 +1411,7 @@ void AnimatedModel::ApplyMorph(VertexBuffer* buffer, void* destVertexData, unsig
             dest[2] += src[2] * weight;
             srcData += 3 * sizeof(float);
         }
-        if (elementMask & MASK_TANGENT)
+        if (!!(elementMask & VertexElements::Tangent))
         {
             auto* dest = (float*)(destData + vertexIndex * vertexSize + tangentOffset);
             auto* src = (float*)srcData;

@@ -8,6 +8,7 @@
 
 #include <cstddef>
 #include <memory>
+#include <type_traits>
 
 namespace Urho3D
 {
@@ -216,6 +217,10 @@ namespace AttributeMetadata
     static const StringHash P_VECTOR_STRUCT_ELEMENTS("VectorStructElements");
 }
 
+/// Get result type of a class member function with zero args.
+#define URHO3D_GETTER_RETURN_TYPE(getFunction) \
+    std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<decltype(&ClassName::getFunction), ClassName>>>
+
 // The following macros need to be used within a class member function such as ClassName::RegisterObject().
 // A variable called "context" needs to exist in the current scope and point to a valid Context object.
 
@@ -227,13 +232,27 @@ namespace AttributeMetadata
 #define URHO3D_REMOVE_ATTRIBUTE(name) context->RemoveAttribute<ClassName>(name)
 
 /// Define an object member attribute.
-#define URHO3D_ATTRIBUTE(name, typeName, variable, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
+#define URHO3D_ATTRIBUTE(name, variable, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
+    Urho3D::GetVariantType<std::remove_reference_t<decltype(variable)>>(), name, URHO3D_MAKE_MEMBER_ATTRIBUTE_ACCESSOR(std::remove_reference_t<decltype(variable)>, variable), nullptr, defaultValue, mode))
+
+/// Define an object member attribute with forced type. Allows use custom type convertible to variant type (e.g. serialize u8 as int).
+#define URHO3D_ATTRIBUTE_FORCE_TYPE(name, typeName, variable, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
     Urho3D::GetVariantType<typeName>(), name, URHO3D_MAKE_MEMBER_ATTRIBUTE_ACCESSOR(typeName, variable), nullptr, defaultValue, mode))
+
 /// Define an object member attribute. Post-set member function callback is called when attribute set.
-#define URHO3D_ATTRIBUTE_EX(name, typeName, variable, postSetCallback, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
+#define URHO3D_ATTRIBUTE_EX(name, variable, postSetCallback, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
+    Urho3D::GetVariantType<std::remove_reference_t<decltype(variable)>>(), name, URHO3D_MAKE_MEMBER_ATTRIBUTE_ACCESSOR_EX(std::remove_reference_t<decltype(variable)>, variable, postSetCallback), nullptr, defaultValue, mode))
+
+/// Define an object member attribute with forced type. Allows use custom type convertible to variant type (e.g. serialize u8 as int). Post-set member function callback is called when attribute set.
+#define URHO3D_ATTRIBUTE_FORCE_TYPE_EX(name, typeName, variable, postSetCallback, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
     Urho3D::GetVariantType<typeName>(), name, URHO3D_MAKE_MEMBER_ATTRIBUTE_ACCESSOR_EX(typeName, variable, postSetCallback), nullptr, defaultValue, mode))
+
 /// Define an attribute that uses get and set functions.
-#define URHO3D_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
+#define URHO3D_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
+    Urho3D::GetVariantType<URHO3D_GETTER_RETURN_TYPE(getFunction)>(), name, URHO3D_MAKE_GET_SET_ATTRIBUTE_ACCESSOR(getFunction, setFunction, URHO3D_GETTER_RETURN_TYPE(getFunction)), nullptr, defaultValue, mode))
+
+/// Define an attribute that uses get and set functions with forced type.
+#define URHO3D_ACCESSOR_ATTRIBUTE_FORCE_TYPE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
     Urho3D::GetVariantType<typeName>(), name, URHO3D_MAKE_GET_SET_ATTRIBUTE_ACCESSOR(getFunction, setFunction, typeName), nullptr, defaultValue, mode))
 
 /// Define an object member attribute. Zero-based enum values are mapped to names through an array of C string pointers.
@@ -242,8 +261,13 @@ namespace AttributeMetadata
 /// Define an object member attribute. Zero-based enum values are mapped to names through an array of C string pointers. Post-set member function callback is called when attribute set.
 #define URHO3D_ENUM_ATTRIBUTE_EX(name, variable, postSetCallback, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
     Urho3D::VAR_INT, name, URHO3D_MAKE_MEMBER_ENUM_ATTRIBUTE_ACCESSOR_EX(variable, postSetCallback), enumNames, static_cast<int>(defaultValue), mode))
+
 /// Define an attribute that uses get and set functions. Zero-based enum values are mapped to names through an array of C string pointers.
-#define URHO3D_ENUM_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
+#define URHO3D_ENUM_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
+    Urho3D::VAR_INT, name, URHO3D_MAKE_GET_SET_ENUM_ATTRIBUTE_ACCESSOR(getFunction, setFunction, URHO3D_GETTER_RETURN_TYPE(getFunction)), enumNames, static_cast<int>(defaultValue), mode))
+
+/// Define an attribute that uses get and set functions with forced type. Zero-based enum values are mapped to names through an array of C string pointers.
+#define URHO3D_ENUM_ACCESSOR_ATTRIBUTE_FORCE_TYPE(name, getFunction, setFunction, typeName, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
     Urho3D::VAR_INT, name, URHO3D_MAKE_GET_SET_ENUM_ATTRIBUTE_ACCESSOR(getFunction, setFunction, typeName), enumNames, static_cast<int>(defaultValue), mode))
 
 /// Define an attribute with custom setter and getter.
@@ -252,8 +276,5 @@ namespace AttributeMetadata
 /// Define an enum attribute with custom setter and getter. Zero-based enum values are mapped to names through an array of C string pointers.
 #define URHO3D_CUSTOM_ENUM_ATTRIBUTE(name, getFunction, setFunction, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
     Urho3D::VAR_INT, name, Urho3D::MakeVariantAttributeAccessor<ClassName>(getFunction, setFunction), enumNames, static_cast<int>(defaultValue), mode))
-
-/// Deprecated. Use URHO3D_ACCESSOR_ATTRIBUTE instead.
-#define URHO3D_MIXED_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) URHO3D_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode)
 
 }

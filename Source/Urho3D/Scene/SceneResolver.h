@@ -12,6 +12,9 @@ namespace Urho3D
 class Component;
 class Node;
 
+using ComponentId = id32;
+using NodeId = id32;
+
 /// Utility class that resolves node & component IDs after a scene or partial scene load.
 class URHO3D_API SceneResolver
 {
@@ -24,17 +27,17 @@ public:
     /// Reset. Clear all remembered nodes and components.
     void Reset();
     /// Remember a created node.
-    void AddNode(unsigned oldID, Node* node);
+    void AddNode(NodeId oldID, Node* node);
     /// Remember a created component.
-    void AddComponent(unsigned oldID, Component* component);
+    void AddComponent(ComponentId oldID, Component* component);
     /// Resolve component and node ID attributes and reset.
     void Resolve();
 
 private:
     /// Nodes.
-    HashMap<unsigned, WeakPtr<Node>> nodes_;
+    HashMap<NodeId, WeakPtr<Node>> nodes_;
     /// Components.
-    HashMap<unsigned, WeakPtr<Component>> components_;
+    HashMap<ComponentId, WeakPtr<Component>> components_;
 };
 
 }

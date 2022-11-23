@@ -37,14 +37,14 @@ void SplinePath::RegisterObject(Context* context)
 {
     context->RegisterFactory<SplinePath>(LOGIC_CATEGORY);
 
-    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Interpolation Mode", GetInterpolationMode, SetInterpolationMode, InterpolationMode,
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Interpolation Mode", GetInterpolationMode, SetInterpolationMode,
         interpolationModeNames, BEZIER_CURVE, AM_FILE);
-    URHO3D_ATTRIBUTE("Speed", float, speed_, 1.f, AM_FILE);
-    URHO3D_ATTRIBUTE("Traveled", float, traveled_, 0.f, AM_FILE | AM_NOEDIT);
-    URHO3D_ATTRIBUTE("Elapsed Time", float, elapsedTime_, 0.f, AM_FILE | AM_NOEDIT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Controlled", GetControlledIdAttr, SetControlledIdAttr, unsigned, 0, AM_FILE | AM_NODEID);
+    URHO3D_ATTRIBUTE("Speed", speed_, 1.f, AM_FILE);
+    URHO3D_ATTRIBUTE("Traveled", traveled_, 0.f, AM_FILE | AM_NOEDIT);
+    URHO3D_ATTRIBUTE("Elapsed Time", elapsedTime_, 0.f, AM_FILE | AM_NOEDIT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Controlled", GetControlledIdAttr, SetControlledIdAttr, 0, AM_FILE | AM_NODEID);
     URHO3D_ACCESSOR_ATTRIBUTE("Control Points", GetControlPointIdsAttr, SetControlPointIdsAttr,
-        VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NODEIDVECTOR)
+        Variant::emptyVariantVector, AM_FILE | AM_NODEIDVECTOR)
         .SetMetadata(AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, controlPointsStructureElementNames);
 }
 
@@ -72,7 +72,7 @@ void SplinePath::ApplyAttributes()
         // The first index stores the number of IDs redundantly. This is for editing
         for (unsigned i = 1; i < controlPointIdsAttr_.Size(); ++i)
         {
-            Node* node = scene->GetNode(controlPointIdsAttr_[i].GetUInt());
+            Node* node = scene->GetNode(controlPointIdsAttr_[i].GetU32());
             if (node)
             {
                 WeakPtr<Node> controlPoint(node);
@@ -229,7 +229,7 @@ void SplinePath::SetControlPointIdsAttr(const VariantVector& value)
         controlPointIdsAttr_.Clear();
 
         unsigned index = 0;
-        unsigned numInstances = value[index++].GetUInt();
+        unsigned numInstances = value[index++].GetU32();
         // Prevent crash on entering negative value in the editor
         if (numInstances > M_MAX_INT)
             numInstances = 0;
@@ -239,7 +239,7 @@ void SplinePath::SetControlPointIdsAttr(const VariantVector& value)
         {
             // If vector contains less IDs than should, fill the rest with zeros
             if (index < value.Size())
-                controlPointIdsAttr_.Push(value[index++].GetUInt());
+                controlPointIdsAttr_.Push(value[index++].GetU32());
             else
                 controlPointIdsAttr_.Push(0);
         }

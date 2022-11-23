@@ -127,8 +127,8 @@ void Urho2DParticle::HandleMouseMove(StringHash eventType, VariantMap& eventData
     if (particleNode_)
     {
         using namespace MouseMove;
-        auto x = (float)eventData[P_X].GetInt();
-        auto y = (float)eventData[P_Y].GetInt();
+        auto x = (float)eventData[P_X].GetI32();
+        auto y = (float)eventData[P_Y].GetI32();
         auto* graphics = GetSubsystem<Graphics>();
         auto* camera = cameraNode_->GetComponent<Camera>();
         particleNode_->SetPosition(camera->ScreenToWorldPoint(Vector3(x / graphics->GetWidth(), y / graphics->GetHeight(), 10.0f)));

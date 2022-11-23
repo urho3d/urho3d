@@ -2,15 +2,6 @@
 #include "Samplers.hlsl"
 #include "Transform.hlsl"
 
-#ifndef D3D11
-
-// D3D9 uniforms
-uniform float2 cShadowOffset;
-uniform float4 cShadowColor;
-uniform float4 cStrokeColor;
-
-#else
-
 #ifdef COMPILEPS
 // D3D11 constant buffers
 cbuffer CustomPS : register(b6)
@@ -19,8 +10,6 @@ cbuffer CustomPS : register(b6)
     float4 cShadowColor;
     float4 cStrokeColor;
 }
-#endif
-
 #endif
 
 void VS(float4 iPos : POSITION,

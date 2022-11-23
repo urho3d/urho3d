@@ -23,7 +23,7 @@ extern "C" unsigned SDL_TVOS_GetActiveProcessorCount();
 #endif
 
 #if defined(_WIN32)
-#include <windows.h>
+#include "../Engine/WinWrapped.h"
 #include <io.h>
 #if defined(_MSC_VER)
 #include <float.h>
@@ -240,11 +240,11 @@ const Vector<String>& ParseArguments(const String& cmdLine, bool skipFirstArgume
 {
     arguments.Clear();
 
-    unsigned cmdStart = 0, cmdEnd = 0;
+    i32 cmdStart = 0, cmdEnd = 0;
     bool inCmd = false;
     bool inQuote = false;
 
-    for (unsigned i = 0; i < cmdLine.Length(); ++i)
+    for (i32 i = 0; i < cmdLine.Length(); ++i)
     {
         if (cmdLine[i] == '\"')
             inQuote = !inQuote;
@@ -621,8 +621,8 @@ String GetOSVersion()
     {
         Vector<String> kernel_version = String(kernel_r).Split('.');
         String version = "macOS/Mac OS X ";
-        int major = ToInt(kernel_version[0]);
-        int minor = ToInt(kernel_version[1]);
+        int major = ToI32(kernel_version[0]);
+        int minor = ToI32(kernel_version[1]);
 
         // https://en.wikipedia.org/wiki/Darwin_(operating_system)
         if (major == 18) // macOS Mojave

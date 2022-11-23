@@ -4,17 +4,6 @@
 #include "ScreenPos.hlsl"
 #include "Fog.hlsl"
 
-#ifndef D3D11
-
-// D3D9 uniforms
-uniform float2 cNoiseSpeed;
-uniform float cNoiseTiling;
-uniform float cNoiseStrength;
-uniform float cFresnelPower;
-uniform float3 cWaterTint;
-
-#else
-
 // D3D11 constant buffers
 #ifdef COMPILEVS
 cbuffer CustomVS : register(b6)
@@ -31,8 +20,6 @@ cbuffer CustomPS : register(b6)
 }
 #endif
 
-#endif
-
 void VS(float4 iPos : POSITION,
     float3 iNormal: NORMAL,
     float2 iTexCoord : TEXCOORD0,
@@ -44,7 +31,7 @@ void VS(float4 iPos : POSITION,
     out float2 oWaterUV : TEXCOORD2,
     out float3 oNormal : TEXCOORD3,
     out float4 oEyeVec : TEXCOORD4,
-    #if defined(D3D11) && defined(CLIPPLANE)
+    #if defined(CLIPPLANE)
         out float oClip : SV_CLIPDISTANCE0,
     #endif
     out float4 oPos : OUTPOSITION)
@@ -61,7 +48,7 @@ void VS(float4 iPos : POSITION,
     oNormal = GetWorldNormal(modelMatrix);
     oEyeVec = float4(cCameraPos - worldPos, GetDepth(oPos));
 
-    #if defined(D3D11) && defined(CLIPPLANE)
+    #if defined(CLIPPLANE)
         oClip = dot(oPos, cClipPlane);
     #endif
 }
@@ -72,7 +59,7 @@ void PS(
     float2 iWaterUV : TEXCOORD2,
     float3 iNormal : TEXCOORD3,
     float4 iEyeVec : TEXCOORD4,
-    #if defined(D3D11) && defined(CLIPPLANE)
+    #if defined(CLIPPLANE)
         float iClip : SV_CLIPDISTANCE0,
     #endif
     out float4 oColor : OUTCOLOR0)

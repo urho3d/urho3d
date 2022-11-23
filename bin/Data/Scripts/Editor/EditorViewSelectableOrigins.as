@@ -57,7 +57,7 @@ void HandleOriginToggled(StringHash eventType, VariantMap& eventData)
 
     if (IsSceneOrigin(origin))
     {
-        int nodeID = origin.vars[ORIGIN_NODEID_VAR].GetInt();
+        int nodeID = origin.vars[ORIGIN_NODEID_VAR].GetI32();
         if (editorScene !is null) 
         {
             bool goBackAndSelectNodeParent = input.qualifierDown[QUAL_CTRL];
@@ -411,7 +411,7 @@ void HandleOriginsHoverBegin(StringHash eventType, VariantMap& eventData)
         VariantMap data;
         data["Element"] = originsIcons[originHoveredIndex];
         data["Id"] = originHoveredIndex;
-        data["NodeId"] = originsIcons[originHoveredIndex].vars[ORIGIN_NODEID_VAR].GetInt();
+        data["NodeId"] = originsIcons[originHoveredIndex].vars[ORIGIN_NODEID_VAR].GetI32();
         SendEvent(EDITOR_EVENT_ORIGIN_START_HOVER, data);
         isOriginsHovered = true;
     }
@@ -428,7 +428,7 @@ void HandleOriginsHoverEnd(StringHash eventType, VariantMap& eventData)
         VariantMap data;
         data["Element"] = originsIcons[originHoveredIndex];
         data["Id"] = originHoveredIndex;
-        data["NodeId"] = originsIcons[originHoveredIndex].vars[ORIGIN_NODEID_VAR].GetInt();
+        data["NodeId"] = originsIcons[originHoveredIndex].vars[ORIGIN_NODEID_VAR].GetI32();
         SendEvent(EDITOR_EVENT_ORIGIN_END_HOVER, data);
         isOriginsHovered = false;
     }

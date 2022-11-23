@@ -26,7 +26,6 @@ enum GAPI
 {
     GAPI_NONE = 0,
     GAPI_OPENGL,
-    GAPI_D3D9,
     GAPI_D3D11
 };
 
@@ -457,26 +456,26 @@ enum ClearTarget : u32
 };
 URHO3D_FLAGSET(ClearTarget, ClearTargetFlags);
 
-// Legacy vertex element bitmasks.
-enum VertexMask : u32
+/// Legacy vertex element bitmasks.
+enum class VertexElements : u32
 {
-    MASK_NONE = 0x0,
-    MASK_POSITION = 0x1,
-    MASK_NORMAL = 0x2,
-    MASK_COLOR = 0x4,
-    MASK_TEXCOORD1 = 0x8,
-    MASK_TEXCOORD2 = 0x10,
-    MASK_CUBETEXCOORD1 = 0x20,
-    MASK_CUBETEXCOORD2 = 0x40,
-    MASK_TANGENT = 0x80,
-    MASK_BLENDWEIGHTS = 0x100,
-    MASK_BLENDINDICES = 0x200,
-    MASK_INSTANCEMATRIX1 = 0x400,
-    MASK_INSTANCEMATRIX2 = 0x800,
-    MASK_INSTANCEMATRIX3 = 0x1000,
-    MASK_OBJECTINDEX = 0x2000,
+    None            = 0,
+    Position        = 1 << 0,
+    Normal          = 1 << 1,
+    Color           = 1 << 2,
+    TexCoord1       = 1 << 3,
+    TexCoord2       = 1 << 4,
+    CubeTexCoord1   = 1 << 5,
+    CubeTexCoord2   = 1 << 6,
+    Tangent         = 1 << 7,
+    BlendWeights    = 1 << 8,
+    BlendIndices    = 1 << 9,
+    InstanceMatrix1 = 1 << 10,
+    InstanceMatrix2 = 1 << 11,
+    InstanceMatrix3 = 1 << 12,
+    ObjectIndex     = 1 << 13
 };
-URHO3D_FLAGSET(VertexMask, VertexMaskFlags);
+URHO3D_FLAGS(VertexElements);
 
 inline constexpr i32 MAX_RENDERTARGETS = 4;
 inline constexpr i32 MAX_VERTEX_STREAMS = 4;

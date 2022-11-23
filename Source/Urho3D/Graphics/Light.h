@@ -24,13 +24,13 @@ enum LightType
     LIGHT_POINT
 };
 
-static const float SHADOW_MIN_QUANTIZE = 0.1f;
-static const float SHADOW_MIN_VIEW = 1.0f;
-static const int MAX_LIGHT_SPLITS = 6;
+inline constexpr float SHADOW_MIN_QUANTIZE = 0.1f;
+inline constexpr float SHADOW_MIN_VIEW = 1.0f;
+inline constexpr i32 MAX_LIGHT_SPLITS = 6;
 #ifdef DESKTOP_GRAPHICS
-static const unsigned MAX_CASCADE_SPLITS = 4;
+inline constexpr i32 MAX_CASCADE_SPLITS = 4;
 #else
-static const unsigned MAX_CASCADE_SPLITS = 1;
+inline constexpr i32 MAX_CASCADE_SPLITS = 1;
 #endif
 
 /// Depth bias parameters. Used both by lights (for shadow mapping) and materials.
@@ -332,7 +332,7 @@ public:
 
     /// Return number of shadow map cascade splits for a directional light, considering also graphics API limitations.
     /// @property
-    int GetNumShadowSplits() const;
+    i32 GetNumShadowSplits() const;
 
     /// Return whether light has negative (darkening) color.
     /// @property

@@ -9,7 +9,7 @@
 #include <Urho3D/IO/PackageFile.h>
 
 #ifdef WIN32
-#include <windows.h>
+#include <Urho3D/Engine/WinWrapped.h>
 #endif
 
 #include <LZ4/lz4.h>
@@ -26,14 +26,14 @@ struct FileEntry
     String name_;
     unsigned offset_{};
     unsigned size_{};
-    unsigned checksum_{};
+    hash32 checksum_{};
 };
 
 SharedPtr<Context> context_(new Context());
 SharedPtr<FileSystem> fileSystem_(new FileSystem(context_));
 String basePath_;
 Vector<FileEntry> entries_;
-unsigned checksum_ = 0;
+hash32 checksum_ = 0;
 bool compress_ = false;
 bool quiet_ = false;
 unsigned blockSize_ = COMPRESSED_BLOCK_SIZE;
@@ -302,9 +302,9 @@ void WritePackageFile(const String& fileName, const String& rootDir)
     {
         // Write entry (correct offset is still unknown, will be filled in later)
         dest.WriteString(basePath_ + entries_[i].name_);
-        dest.WriteUInt(entries_[i].offset_);
-        dest.WriteUInt(entries_[i].size_);
-        dest.WriteUInt(entries_[i].checksum_);
+        dest.WriteU32(entries_[i].offset_);
+        dest.WriteU32(entries_[i].size_);
+        dest.WriteU32(entries_[i].checksum_);
     }
 
     unsigned totalDataSize = 0;
@@ -322,7 +322,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
 
         unsigned dataSize = entries_[i].size_;
         totalDataSize += dataSize;
-        SharedArrayPtr<unsigned char> buffer(new unsigned char[dataSize]);
+        SharedArrayPtr<u8> buffer(new u8[dataSize]);
 
         if (srcFile.Read(&buffer[0], dataSize) != dataSize)
             ErrorExit("Could not read file " + fileFullPath);
@@ -342,7 +342,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
         }
         else // Compress 
         {
-            SharedArrayPtr<unsigned char> compressBuffer(new unsigned char[LZ4_compressBound(blockSize_)]);
+            SharedArrayPtr<u8> compressBuffer(new u8[LZ4_compressBound(blockSize_)]);
 
             unsigned pos = 0;
 
@@ -356,8 +356,8 @@ void WritePackageFile(const String& fileName, const String& rootDir)
                 if (!packedSize)
                     ErrorExit("LZ4 compression failed for file " + entries_[i].name_ + " at offset " + String(pos));
 
-                dest.WriteUShort((unsigned short)unpackedSize);
-                dest.WriteUShort((unsigned short)packedSize);
+                dest.WriteU16((unsigned short)unpackedSize);
+                dest.WriteU16((unsigned short)packedSize);
                 dest.Write(compressBuffer.Get(), packedSize);
 
                 pos += unpackedSize;
@@ -376,7 +376,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
 
     // Write package size to the end of file to allow finding it linked to an executable file
     unsigned currentSize = dest.GetSize();
-    dest.WriteUInt(currentSize + sizeof(unsigned));
+    dest.WriteU32(currentSize + sizeof(unsigned));
 
     // Write header again with correct offsets & checksums
     dest.Seek(0);
@@ -385,9 +385,9 @@ void WritePackageFile(const String& fileName, const String& rootDir)
     for (unsigned i = 0; i < entries_.Size(); ++i)
     {
         dest.WriteString(basePath_ + entries_[i].name_);
-        dest.WriteUInt(entries_[i].offset_);
-        dest.WriteUInt(entries_[i].size_);
-        dest.WriteUInt(entries_[i].checksum_);
+        dest.WriteU32(entries_[i].offset_);
+        dest.WriteU32(entries_[i].size_);
+        dest.WriteU32(entries_[i].checksum_);
     }
 
     if (!quiet_)
@@ -406,6 +406,6 @@ void WriteHeader(File& dest)
         dest.WriteFileID("UPAK");
     else
         dest.WriteFileID("ULZ4");
-    dest.WriteUInt(entries_.Size());
-    dest.WriteUInt(checksum_);
+    dest.WriteU32(entries_.Size());
+    dest.WriteU32(checksum_);
 }

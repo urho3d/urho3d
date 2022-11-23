@@ -133,7 +133,7 @@ void LANDiscovery::HandleNetworkHostDiscovered(StringHash eventType, VariantMap&
     URHO3D_LOGINFO("Server discovered!");
     String text = serverList_->GetText();
     VariantMap data = eventData[P_BEACON].GetVariantMap();
-    text += "\n" + data["Name"].GetString() + "(" + String(data["Players"].GetInt()) + ")" + eventData[P_ADDRESS].GetString() + ":" + String(eventData[P_PORT].GetInt());
+    text += "\n" + data["Name"].GetString() + "(" + String(data["Players"].GetI32()) + ")" + eventData[P_ADDRESS].GetString() + ":" + String(eventData[P_PORT].GetI32());
     serverList_->SetText(text);
 }
 

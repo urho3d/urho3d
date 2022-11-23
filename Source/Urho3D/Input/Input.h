@@ -32,7 +32,7 @@ class Serializer;
 class UIElement;
 class XMLFile;
 
-const IntVector2 MOUSE_POSITION_OFFSCREEN = IntVector2(M_MIN_INT, M_MIN_INT);
+inline const IntVector2 MOUSE_POSITION_OFFSCREEN = IntVector2(M_MIN_INT, M_MIN_INT);
 
 /// %Input state for a finger touch.
 /// @nocount
@@ -217,7 +217,7 @@ public:
     /// Save a specific in-memory touch gesture to a file. Return true if successful.
     bool SaveGesture(Serializer& dest, unsigned gestureID);
     /// Load touch gestures from a file. Return number of loaded gestures, or 0 on failure.
-    unsigned LoadGestures(Deserializer& source);
+    i32 LoadGestures(Deserializer& source);
     /// Remove an in-memory gesture by ID. Return true if was found.
     bool RemoveGesture(unsigned gestureID);
     /// Remove all in-memory gestures.
@@ -288,20 +288,20 @@ public:
 
     /// Return number of active finger touches.
     /// @property
-    unsigned GetNumTouches() const { return touches_.Size(); }
+    i32 GetNumTouches() const { return touches_.Size(); }
     /// Return active finger touch by index.
     /// @property{get_touches}
-    TouchState* GetTouch(unsigned index) const;
+    TouchState* GetTouch(i32 index) const;
 
     /// Return number of connected joysticks.
     /// @property
-    unsigned GetNumJoysticks() const { return joysticks_.Size(); }
+    i32 GetNumJoysticks() const { return joysticks_.Size(); }
     /// Return joystick state by ID, or null if does not exist.
     /// @property{get_joysticks}
     JoystickState* GetJoystick(SDL_JoystickID id);
     /// Return joystick state by index, or null if does not exist. 0 = first connected joystick.
     /// @property{get_joysticksByIndex}
-    JoystickState* GetJoystickByIndex(unsigned index);
+    JoystickState* GetJoystickByIndex(i32 index);
     /// Return joystick state by name, or null if does not exist.
     /// @property{get_joysticksByName}
     JoystickState* GetJoystickByName(const String& name);
@@ -350,7 +350,7 @@ private:
     /// Initialize when screen mode initially set.
     void Initialize();
     /// Open a joystick and return its ID. Return -1 if no joystick.
-    SDL_JoystickID OpenJoystick(unsigned index);
+    SDL_JoystickID OpenJoystick(i32 index);
     /// Setup internal joystick structures.
     void ResetJoysticks();
     /// Prepare input state for application gaining input focus.
@@ -364,9 +364,9 @@ private:
     /// Reset input accumulation.
     void ResetInputAccumulation();
     /// Get the index of a touch based on the touch ID.
-    unsigned GetTouchIndexFromID(int touchID);
+    i32 GetTouchIndexFromID(int touchID);
     /// Used internally to return and remove the next available touch index.
-    unsigned PopTouchIndex();
+    i32 PopTouchIndex();
     /// Push a touch index back into the list of available when finished with it.
     void PushTouchIndex(int touchID);
     /// Send an input focus or window minimization change event.

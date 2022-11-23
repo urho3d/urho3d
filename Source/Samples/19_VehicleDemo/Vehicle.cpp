@@ -19,22 +19,22 @@ Vehicle::Vehicle(Context* context) :
     LogicComponent(context)
 {
     // Only the physics update event is needed: unsubscribe from the rest for optimization
-    SetUpdateEventMask(USE_FIXEDUPDATE);
+    SetUpdateEventMask(LogicComponentEvents::FixedUpdate);
 }
 
 void Vehicle::RegisterObject(Context* context)
 {
     context->RegisterFactory<Vehicle>();
 
-    URHO3D_ATTRIBUTE("Controls Yaw", float, controls_.yaw_, 0.0f, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Controls Pitch", float, controls_.pitch_, 0.0f, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Steering", float, steering_, 0.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Controls Yaw", controls_.yaw_, 0.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Controls Pitch", controls_.pitch_, 0.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Steering", steering_, 0.0f, AM_DEFAULT);
     // Register wheel node IDs as attributes so that the wheel nodes can be reaquired on deserialization. They need to be tagged
     // as node ID's so that the deserialization code knows to rewrite the IDs in case they are different on load than on save
-    URHO3D_ATTRIBUTE("Front Left Node", unsigned, frontLeftID_, 0, AM_DEFAULT | AM_NODEID);
-    URHO3D_ATTRIBUTE("Front Right Node", unsigned, frontRightID_, 0, AM_DEFAULT | AM_NODEID);
-    URHO3D_ATTRIBUTE("Rear Left Node", unsigned, rearLeftID_, 0, AM_DEFAULT | AM_NODEID);
-    URHO3D_ATTRIBUTE("Rear Right Node", unsigned, rearRightID_, 0, AM_DEFAULT | AM_NODEID);
+    URHO3D_ATTRIBUTE("Front Left Node", frontLeftID_, 0, AM_DEFAULT | AM_NODEID);
+    URHO3D_ATTRIBUTE("Front Right Node", frontRightID_, 0, AM_DEFAULT | AM_NODEID);
+    URHO3D_ATTRIBUTE("Rear Left Node", rearLeftID_, 0, AM_DEFAULT | AM_NODEID);
+    URHO3D_ATTRIBUTE("Rear Right Node", rearRightID_, 0, AM_DEFAULT | AM_NODEID);
 }
 
 void Vehicle::ApplyAttributes()

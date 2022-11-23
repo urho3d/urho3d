@@ -36,9 +36,9 @@ public:
     void ThreadFunction() override;
 
     /// Read response data from the HTTP connection and return number of bytes actually read. While the connection is open, will block while trying to read the specified size. To avoid blocking, only read up to as many bytes as GetAvailableSize() returns.
-    unsigned Read(void* dest, unsigned size) override;
+    i32 Read(void* dest, i32 size) override;
     /// Set position from the beginning of the stream. Not supported.
-    unsigned Seek(unsigned position) override;
+    i64 Seek(i64 position) override;
     /// Return whether all response data has been read.
     bool IsEof() const override;
 
@@ -58,7 +58,7 @@ public:
     HttpRequestState GetState() const;
     /// Return amount of bytes in the read buffer.
     /// @property
-    unsigned GetAvailableSize() const;
+    i32 GetAvailableSize() const;
 
     /// Return whether connection is in the open state.
     /// @property
@@ -66,7 +66,7 @@ public:
 
 private:
     /// Check for available read data in buffer and whether end has been reached. Must only be called when the mutex is held by the main thread.
-    Pair<unsigned, bool> CheckAvailableSizeAndEof() const;
+    Pair<i32, bool> CheckAvailableSizeAndEof() const;
 
     /// URL.
     String url_;
@@ -83,13 +83,13 @@ private:
     /// Mutex for synchronizing the worker and the main thread.
     mutable Mutex mutex_;
     /// Read buffer for the worker thread.
-    SharedArrayPtr<unsigned char> httpReadBuffer_;
+    SharedArrayPtr<u8> httpReadBuffer_;
     /// Read buffer for the main thread.
-    SharedArrayPtr<unsigned char> readBuffer_;
+    SharedArrayPtr<u8> readBuffer_;
     /// Read buffer read cursor.
-    unsigned readPosition_;
+    i32 readPosition_;
     /// Read buffer write cursor.
-    unsigned writePosition_;
+    i32 writePosition_;
 };
 
 }

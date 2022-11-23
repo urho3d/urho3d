@@ -9,7 +9,7 @@
 #include <Urho3D/Core/StringUtils.h>
 
 #ifdef WIN32
-#include <windows.h>
+#include <Urho3D/Engine/WinWrapped.h>
 #endif
 
 #include <STB/stb_image_write.h>
@@ -62,13 +62,13 @@ void Run(const Vector<String>& arguments)
     {
         String inputFile = arguments[0];
         String ouputFile = arguments[1];
-        int width = ToInt(arguments[2]);
+        int width = ToI32(arguments[2]);
         int dim = 1;
         if (arguments.Size() > 3)
-            dim = ToInt(arguments[3]);
+            dim = ToI32(arguments[3]);
         int blurLevel = 0;
         if (arguments.Size() > 4)
-            blurLevel = ToInt(arguments[4]);
+            blurLevel = ToI32(arguments[4]);
 
         const int height = dim == 2 ? width : 1;
 
@@ -91,12 +91,12 @@ void Run(const Vector<String>& arguments)
     }
     else // Generate a regular power based ramp
     {
-        int width = ToInt(arguments[1]);
+        int width = ToI32(arguments[1]);
         float power = ToFloat(arguments[2]);
 
         int dimensions = 1;
         if (arguments.Size() > 3)
-            dimensions = ToInt(arguments[3]);
+            dimensions = ToI32(arguments[3]);
 
         if (width < 2)
             ErrorExit("Width must be at least 2");
@@ -209,7 +209,7 @@ int PopFirstInt(Vector<String>& words)
 {
     if (words.Size() > 0)
     {
-        int ret = ToInt(words[0]);
+        int ret = ToI32(words[0]);
         words.Erase(0);
         return ret;
     }

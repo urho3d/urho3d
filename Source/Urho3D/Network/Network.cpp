@@ -496,15 +496,15 @@ void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const Vec
     BroadcastMessage(msgID, reliable, inOrder, msg.GetData(), msg.GetSize(), contentID);
 }
 
-void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes,
+void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const byte* data, unsigned numBytes,
     unsigned contentID)
 {
     if (!rakPeer_)
         return;
 
     VectorBuffer msgData;
-    msgData.WriteUByte((unsigned char)ID_USER_PACKET_ENUM);
-    msgData.WriteUInt((unsigned int)msgID);
+    msgData.WriteU8((unsigned char)ID_USER_PACKET_ENUM);
+    msgData.WriteU32((unsigned int)msgID);
     msgData.Write(data, numBytes);
 
     if (isServer_)

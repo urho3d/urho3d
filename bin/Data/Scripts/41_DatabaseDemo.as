@@ -94,7 +94,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 void HandleEscKeyDown(StringHash eventType, VariantMap& eventData)
 {
     // Unlike the other samples, exiting the engine when ESC is pressed instead of just closing the console
-    if (eventData["Key"].GetInt() == KEY_ESCAPE)
+    if (eventData["Key"].GetI32() == KEY_ESCAPE)
         engine.Exit();
 }
 
@@ -102,7 +102,7 @@ void HandleDbCursor(StringHash eventType, VariantMap& eventData)
 {
     // In a real application the P_SQL can be used to do the logic branching in a shared event handler
     // However, this is not required in this sample demo
-    uint numCols = eventData["NumCols"].GetUInt();
+    uint numCols = eventData["NumCols"].GetU32();
     Array<Variant>@ colValues = eventData["ColValues"].GetVariantVector();
     Array<String>@ colHeaders = eventData["ColHeaders"].GetStringVector();
 
@@ -131,7 +131,7 @@ void HandleInput(const String&in input)
         if (input.StartsWith("set") && tokens.length > 1)
         {
             if (setting == "maxrows")
-                maxRows = Max(tokens[1].ToUInt(), 1);
+                maxRows = Max(tokens[1].ToU32(), 1);
             else if (setting == "connstr") {
                 String newConnectionString(input.Substring(input.Find(" ", input.Find("connstr")) + 1));
                 DbConnection@ newConnection = database.Connect(newConnectionString);

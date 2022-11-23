@@ -455,9 +455,9 @@ public:
     String SubstringUTF8(i32 pos, i32 length) const;
 
     /// Return hash value for HashSet & HashMap.
-    unsigned ToHash() const
+    hash32 ToHash() const
     {
-        unsigned hash = 0;
+        hash32 hash = 0;
         const char* ptr = GetBuffer();
         while (*ptr)
         {

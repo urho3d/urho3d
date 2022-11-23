@@ -95,7 +95,7 @@ TextureUnit ParseTextureUnitName(String name)
             unit = TU_ENVIRONMENT;
         // Finally check for specifying the texture unit directly as a number
         else if (name.Length() < 3)
-            unit = (TextureUnit)Clamp(ToInt(name), 0, MAX_TEXTURE_UNITS - 1);
+            unit = (TextureUnit)Clamp(ToI32(name), 0, MAX_TEXTURE_UNITS - 1);
     }
 
     if (unit == MAX_TEXTURE_UNITS)
@@ -403,7 +403,7 @@ bool Material::Load(const XMLElement& source)
             TechniqueEntry newTechnique;
             newTechnique.technique_ = newTechnique.original_ = tech;
             if (techniqueElem.HasAttribute("quality"))
-                newTechnique.qualityLevel_ = (MaterialQuality)techniqueElem.GetInt("quality");
+                newTechnique.qualityLevel_ = (MaterialQuality)techniqueElem.GetI32("quality");
             if (techniqueElem.HasAttribute("loddistance"))
                 newTechnique.lodDistance_ = techniqueElem.GetFloat("loddistance");
             techniques_.Push(newTechnique);
@@ -513,7 +513,7 @@ bool Material::Load(const XMLElement& source)
 
     XMLElement renderOrderElem = source.GetChild("renderorder");
     if (renderOrderElem)
-        SetRenderOrder((unsigned char)renderOrderElem.GetUInt("value"));
+        SetRenderOrder((i8)renderOrderElem.GetI32("value"));
 
     XMLElement occlusionElem = source.GetChild("occlusion");
     if (occlusionElem)
@@ -557,7 +557,7 @@ bool Material::Load(const JSONValue& source)
             newTechnique.technique_ = newTechnique.original_ = tech;
             JSONValue qualityVal = techVal.Get("quality");
             if (!qualityVal.IsNull())
-                newTechnique.qualityLevel_ = (MaterialQuality)qualityVal.GetInt();
+                newTechnique.qualityLevel_ = (MaterialQuality)qualityVal.GetI32();
             JSONValue lodDistanceVal = techVal.Get("loddistance");
             if (!lodDistanceVal.IsNull())
                 newTechnique.lodDistance_ = lodDistanceVal.GetFloat();
@@ -673,7 +673,7 @@ bool Material::Load(const JSONValue& source)
 
     JSONValue renderOrderVal = source.Get("renderorder");
     if (!renderOrderVal.IsNull())
-        SetRenderOrder((unsigned char)renderOrderVal.GetUInt());
+        SetRenderOrder((i8)renderOrderVal.GetI32());
 
     JSONValue occlusionVal = source.Get("occlusion");
     if (!occlusionVal.IsNull())
@@ -700,7 +700,7 @@ bool Material::Save(XMLElement& dest) const
 
         XMLElement techniqueElem = dest.CreateChild("technique");
         techniqueElem.SetString("name", entry.technique_->GetName());
-        techniqueElem.SetInt("quality", entry.qualityLevel_);
+        techniqueElem.SetI32("quality", entry.qualityLevel_);
         techniqueElem.SetFloat("loddistance", entry.lodDistance_);
     }
 
@@ -781,7 +781,7 @@ bool Material::Save(XMLElement& dest) const
 
     // Write render order
     XMLElement renderOrderElem = dest.CreateChild("renderorder");
-    renderOrderElem.SetUInt("value", renderOrder_);
+    renderOrderElem.SetI32("value", renderOrder_);
 
     // Write occlusion
     XMLElement occlusionElem = dest.CreateChild("occlusion");
@@ -882,7 +882,7 @@ bool Material::Save(JSONValue& dest) const
     dest.Set("lineantialias", lineAntiAlias_);
 
     // Write render order
-    dest.Set("renderorder", (unsigned) renderOrder_);
+    dest.Set("renderorder", renderOrder_);
 
     // Write occlusion
     dest.Set("occlusion", occlusion_);
@@ -1082,7 +1082,7 @@ void Material::SetLineAntiAlias(bool enable)
     lineAntiAlias_ = enable;
 }
 
-void Material::SetRenderOrder(unsigned char order)
+void Material::SetRenderOrder(i8 order)
 {
     renderOrder_ = order;
 }
@@ -1279,7 +1279,7 @@ void Material::RefreshShaderParameterHash()
     }
 
     shaderParameterHash_ = 0;
-    const unsigned char* data = temp.GetData();
+    const byte* data = temp.GetData();
     unsigned dataSize = temp.GetSize();
     for (unsigned i = 0; i < dataSize; ++i)
         shaderParameterHash_ = SDBMHash(shaderParameterHash_, data[i]);

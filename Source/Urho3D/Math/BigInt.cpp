@@ -27,7 +27,7 @@ static bool FirstIsLess(const Vector<BigInt::Digit>& first, const Vector<BigInt:
     if (first.Size() != second.Size())
         return first.Size() < second.Size();
 
-    for (i32 i = (i32)first.Size() - 1; i >= 0; --i)
+    for (i32 i = first.Size() - 1; i >= 0; --i)
     {
         if (first[i] != second[i])
             return first[i] < second[i];
@@ -41,10 +41,10 @@ static Vector<BigInt::Digit> SumMagnitudes(const Vector<BigInt::Digit>& a, const
 {
     Vector<BigInt::Digit> ret;
 
-    u32 maxSize = Max(a.Size(), b.Size());
+    i32 maxSize = Max(a.Size(), b.Size());
     ret.Resize(maxSize, 0);
 
-    for (u32 i = 0; i < maxSize; ++i)
+    for (i32 i = 0; i < maxSize; ++i)
     {
         BigInt::Digit a_element = i < a.Size() ? a[i] : 0;
         BigInt::Digit b_element = i < b.Size() ? b[i] : 0;
@@ -72,7 +72,7 @@ static Vector<BigInt::Digit> DiffMagnitudes(const Vector<BigInt::Digit>& a, cons
     Vector<BigInt::Digit> ret;
     ret.Resize(a.Size(), 0);
 
-    for (u32 i = 0; i < a.Size(); ++i)
+    for (i32 i = 0; i < a.Size(); ++i)
     {
         BigInt::Digit a_element = a[i];
         BigInt::Digit b_element = i < b.Size() ? b[i] : 0;
@@ -205,11 +205,11 @@ BigInt::BigInt(const String& str)
     for (; i > firstDigitPos; i -= BASE_DIGITS)
     {
         String chunk = str.Substring(i, BASE_DIGITS);
-        magnitude_.Push(ToInt64(chunk)); // To Digit
+        magnitude_.Push(ToI64(chunk)); // To Digit
     }
 
     String lastChunk = str.Substring(firstDigitPos, BASE_DIGITS + i - firstDigitPos);
-    magnitude_.Push(ToInt64(lastChunk)); // To Digit
+    magnitude_.Push(ToI64(lastChunk)); // To Digit
 }
 
 BigInt::BigInt(i32 value)
@@ -391,13 +391,13 @@ BigInt BigInt::operator *(const BigInt& rhs) const
     else
         ret.positive_ = false;
 
-    for (u32 this_index = 0; this_index < magnitude_.Size(); ++this_index)
+    for (i32 this_index = 0; this_index < magnitude_.Size(); ++this_index)
     {
-        for (u32 rhs_index = 0; rhs_index < rhs.magnitude_.Size(); ++rhs_index)
+        for (i32 rhs_index = 0; rhs_index < rhs.magnitude_.Size(); ++rhs_index)
             ret.magnitude_[this_index + rhs_index] += magnitude_[this_index] * rhs.magnitude_[rhs_index];
     }
 
-    for (u32 i = 0; i < ret.magnitude_.Size() - 1; ++i)
+    for (i32 i = 0; i < ret.magnitude_.Size() - 1; ++i)
     {
         ret.magnitude_[i + 1] += ret.magnitude_[i] / BASE;
         ret.magnitude_[i] %= BASE;

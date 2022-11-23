@@ -268,7 +268,7 @@ Node* SceneReplication::CreateControllableObject()
 
     // Create the scene node & visual representation. This will be a replicated object
     Node* ballNode = scene_->CreateChild("Ball");
-    ballNode->SetPosition(Vector3(Random(40.0f) - 20.0f, 5.0f, Random(40.0f) - 20.0f));
+    ballNode->SetPosition(Vector3(Random(40.0f) - 20.0f, 5.0f, -Random(40.0f) + 20.0f));
     ballNode->SetScale(0.5f);
     auto* ballObject = ballNode->CreateComponent<StaticModel>();
     ballObject->SetModel(cache->GetResource<Model>("Models/Sphere.mdl"));
@@ -510,5 +510,5 @@ void SceneReplication::HandleClientDisconnected(StringHash eventType, VariantMap
 
 void SceneReplication::HandleClientObjectID(StringHash eventType, VariantMap& eventData)
 {
-    clientObjectID_ = eventData[P_ID].GetUInt();
+    clientObjectID_ = eventData[P_ID].GetU32();
 }

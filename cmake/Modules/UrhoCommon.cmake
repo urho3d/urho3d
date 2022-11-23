@@ -163,7 +163,6 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     cmake_dependent_option (URHO3D_OPENGL "Use OpenGL (Windows platform only)" "${DEFAULT_OPENGL}" WIN32 TRUE)
     # On Windows platform Direct3D11 can be optionally chosen
     # Using Direct3D11 on non-MSVC compiler may require copying and renaming Microsoft official libraries (.lib to .a), else link failures or non-functioning graphics may result
-    cmake_dependent_option (URHO3D_D3D9 "Use Direct3D9 (Windows platform only)" TRUE "WIN32" FALSE)
     cmake_dependent_option (URHO3D_D3D11 "Use Direct3D11 (Windows platform only)" TRUE "WIN32" FALSE)
     if (X86 OR E2K OR WEB)
         # TODO: Rename URHO3D_SSE to URHO3D_SIMD
@@ -341,7 +340,6 @@ if (RPI)
     set (RPI_ABI ${RPI_ABI} CACHE STRING "Specify target ABI (RPI platform only), possible values are RPI0, RPI1, RPI2, RPI3, RPI4" FORCE)
 endif ()
 if (EMSCRIPTEN)     # CMAKE_CROSSCOMPILING is always true for Emscripten
-    set (EMSCRIPTEN_ROOT_PATH "" CACHE PATH "Root path to Emscripten cross-compiler tools (Emscripten only)")
     set (EMSCRIPTEN_SYSROOT "" CACHE PATH "Path to Emscripten system root (Emscripten only)")
     option (EMSCRIPTEN_AUTO_SHELL "Auto adding a default HTML shell-file when it is not explicitly specified (Emscripten only)" TRUE)
     option (EMSCRIPTEN_ALLOW_MEMORY_GROWTH "Enable memory growing based on application demand, default to true as there should be little or no overhead (Emscripten only)" TRUE)
@@ -359,14 +357,6 @@ endif ()
 if (RPI)
     set_property (CACHE RPI_ABI PROPERTY STRINGS ${RPI_SUPPORTED_ABIS})
 endif ()
-# Handle mutually exclusive options and implied options
-#if (URHO3D_D3D11)
-#    set (URHO3D_OPENGL 0)
-#    unset (URHO3D_OPENGL CACHE)
-#endif ()
-#if (NOT URHO3D_OPENGL AND NOT URHO3D_D3D11)
-#    set (URHO3D_D3D9 1) # TODO: Make option
-#endif ()
 if (URHO3D_DATABASE_ODBC)
     set (URHO3D_DATABASE_SQLITE 0)
     unset (URHO3D_DATABASE_SQLITE CACHE)
@@ -488,10 +478,6 @@ if (WIN32 AND NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-)
     set (DIRECTX_OPTIONAL_COMPONENTS DInput DSound XInput)
     if (URHO3D_D3D11)
         list (APPEND DIRECTX_REQUIRED_COMPONENTS D3D11)
-    endif ()
-
-    if (URHO3D_D3D9)
-        list (APPEND DIRECTX_REQUIRED_COMPONENTS D3D)
     endif ()
 
     find_package (DirectX REQUIRED ${DIRECTX_REQUIRED_COMPONENTS} OPTIONAL_COMPONENTS ${DIRECTX_OPTIONAL_COMPONENTS})
@@ -1125,6 +1111,7 @@ macro (define_resource_dirs)
                             get_filename_component (NAME ${FILE} NAME)
                             list (APPEND PAK_NAMES ${NAME})
                         endforeach ()
+                        set (EMPACKAGER "${EMSCRIPTEN_ROOT_PATH}/tools/file_packager")
                         add_custom_command (OUTPUT ${SHARED_RESOURCE_JS} ${SHARED_RESOURCE_JS}.data
                             COMMAND ${EMPACKAGER} ${SHARED_RESOURCE_JS}.data --preload ${PAK_NAMES} --js-output=${SHARED_RESOURCE_JS} --use-preload-cache
                             DEPENDS RESOURCE_CHECK ${RESOURCE_PAKS}

@@ -706,7 +706,7 @@ bool ScenePaste(bool pasteRoot = false, bool duplication = false)
             else
             {
                 // If we are duplicating or have the original node selected, paste into the selected nodes parent
-                if (duplication || editNode is null || editNode.id == rootElem.GetUInt("id"))
+                if (duplication || editNode is null || editNode.id == rootElem.GetU32("id"))
                 {
                     if (editNode !is null && editNode.parent !is null)
                         newNode = editNode.parent.CreateChild("", rootElem.GetBool("local") ? LOCAL : REPLICATED);
@@ -901,7 +901,7 @@ bool SceneSmartDuplicateNode()
     Node@ newInstance = parent.children[parent.numChildren-1];
     SelectNode(newInstance, false);
     newInstance.worldPosition = lastInstancePosition;
-    newInstance.Translate(offset, TS_WORLD);
+    newInstance.Translate(offset, TransformSpace::World);
     newInstance.name = parent.name + "Instance" + String(parent.numChildren-1);
 
     lastOffsetForSmartDuplicate = offset;
@@ -1244,7 +1244,7 @@ bool SceneSelectAll()
 {
     BeginSelectionModify();
     Array<Node@> rootLevelNodes = editorScene.GetChildren();
-    Array<uint> indices;
+    Array<int> indices;
     for (uint i = 0; i < rootLevelNodes.length; ++i)
         indices.Push(GetListIndex(rootLevelNodes[i]));
     hierarchyList.SetSelections(indices);

@@ -72,7 +72,7 @@ Terrain::Terrain(Context* context) :
     lastPatchSize_(0),
     numLodLevels_(1),
     maxLodLevels_(MAX_LOD_LEVELS),
-    occlusionLodLevel_(M_MAX_UNSIGNED),
+    occlusionLodLevel_(NINDEX),
     smoothing_(false),
     visible_(true),
     castShadows_(false),
@@ -102,31 +102,31 @@ void Terrain::RegisterObject(Context* context)
 {
     context->RegisterFactory<Terrain>(GEOMETRY_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Height Map", GetHeightMapAttr, SetHeightMapAttr, ResourceRef, ResourceRef(Image::GetTypeStatic()),
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Height Map", GetHeightMapAttr, SetHeightMapAttr, ResourceRef(Image::GetTypeStatic()),
         AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()),
+    URHO3D_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef(Material::GetTypeStatic()),
         AM_DEFAULT);
-    URHO3D_ATTRIBUTE_EX("North Neighbor NodeID", unsigned, northID_, MarkNeighborsDirty, 0, AM_DEFAULT | AM_NODEID);
-    URHO3D_ATTRIBUTE_EX("South Neighbor NodeID", unsigned, southID_, MarkNeighborsDirty, 0, AM_DEFAULT | AM_NODEID);
-    URHO3D_ATTRIBUTE_EX("West Neighbor NodeID", unsigned, westID_, MarkNeighborsDirty, 0, AM_DEFAULT | AM_NODEID);
-    URHO3D_ATTRIBUTE_EX("East Neighbor NodeID", unsigned, eastID_, MarkNeighborsDirty, 0, AM_DEFAULT | AM_NODEID);
-    URHO3D_ATTRIBUTE_EX("Vertex Spacing", Vector3, spacing_, MarkTerrainDirty, DEFAULT_SPACING, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Patch Size", GetPatchSize, SetPatchSizeAttr, int, DEFAULT_PATCH_SIZE, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Max LOD Levels", GetMaxLodLevels, SetMaxLodLevelsAttr, unsigned, MAX_LOD_LEVELS, AM_DEFAULT);
-    URHO3D_ATTRIBUTE_EX("Smooth Height Map", bool, smoothing_, MarkTerrainDirty, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Occluder", IsOccluder, SetOccluder, bool, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Cast Shadows", GetCastShadows, SetCastShadows, bool, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Max Lights", GetMaxLights, SetMaxLights, unsigned, 0, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("View Mask", GetViewMask, SetViewMask, unsigned, DEFAULT_VIEWMASK, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Light Mask", GetLightMask, SetLightMask, unsigned, DEFAULT_LIGHTMASK, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Mask", GetShadowMask, SetShadowMask, unsigned, DEFAULT_SHADOWMASK, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Occlusion LOD level", GetOcclusionLodLevel, SetOcclusionLodLevelAttr, unsigned, M_MAX_UNSIGNED, AM_DEFAULT);
+    URHO3D_ATTRIBUTE_EX("North Neighbor NodeID", northID_, MarkNeighborsDirty, 0, AM_DEFAULT | AM_NODEID);
+    URHO3D_ATTRIBUTE_EX("South Neighbor NodeID", southID_, MarkNeighborsDirty, 0, AM_DEFAULT | AM_NODEID);
+    URHO3D_ATTRIBUTE_EX("West Neighbor NodeID", westID_, MarkNeighborsDirty, 0, AM_DEFAULT | AM_NODEID);
+    URHO3D_ATTRIBUTE_EX("East Neighbor NodeID", eastID_, MarkNeighborsDirty, 0, AM_DEFAULT | AM_NODEID);
+    URHO3D_ATTRIBUTE_EX("Vertex Spacing", spacing_, MarkTerrainDirty, DEFAULT_SPACING, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Patch Size", GetPatchSize, SetPatchSizeAttr, DEFAULT_PATCH_SIZE, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Max LOD Levels", GetMaxLodLevels, SetMaxLodLevelsAttr, MAX_LOD_LEVELS, AM_DEFAULT);
+    URHO3D_ATTRIBUTE_EX("Smooth Height Map", smoothing_, MarkTerrainDirty, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Occluder", IsOccluder, SetOccluder, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Cast Shadows", GetCastShadows, SetCastShadows, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Max Lights", GetMaxLights, SetMaxLights, 0, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("View Mask", GetViewMask, SetViewMask, DEFAULT_VIEWMASK, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Light Mask", GetLightMask, SetLightMask, DEFAULT_LIGHTMASK, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Mask", GetShadowMask, SetShadowMask, DEFAULT_SHADOWMASK, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, DEFAULT_ZONEMASK, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Occlusion LOD level", GetOcclusionLodLevel, SetOcclusionLodLevelAttr, NINDEX, AM_DEFAULT);
 }
 
 void Terrain::ApplyAttributes()
@@ -199,8 +199,10 @@ void Terrain::SetMaxLodLevels(unsigned levels)
     }
 }
 
-void Terrain::SetOcclusionLodLevel(unsigned level)
+void Terrain::SetOcclusionLodLevel(i32 level)
 {
+    assert(level >= 0 || level == NINDEX);
+
     if (level != occlusionLodLevel_)
     {
         occlusionLodLevel_ = level;
@@ -653,18 +655,21 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
     Geometry* occlusionGeometry = patch->GetOcclusionGeometry();
 
     if (vertexBuffer->GetVertexCount() != row * row)
-        vertexBuffer->SetSize(row * row, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
+    {
+        vertexBuffer->SetSize(row * row, VertexElements::Position | VertexElements::Normal
+                                         | VertexElements::TexCoord1 | VertexElements::Tangent);
+    }
 
-    SharedArrayPtr<unsigned char> cpuVertexData(new unsigned char[row * row * sizeof(Vector3)]);
-    SharedArrayPtr<unsigned char> occlusionCpuVertexData(new unsigned char[row * row * sizeof(Vector3)]);
+    SharedArrayPtr<byte> cpuVertexData(new byte[row * row * sizeof(Vector3)]);
+    SharedArrayPtr<byte> occlusionCpuVertexData(new byte[row * row * sizeof(Vector3)]);
 
     auto* vertexData = (float*)vertexBuffer->Lock(0, vertexBuffer->GetVertexCount());
     auto* positionData = (float*)cpuVertexData.Get();
     auto* occlusionData = (float*)occlusionCpuVertexData.Get();
     BoundingBox box;
 
-    unsigned occlusionLevel = occlusionLodLevel_;
-    if (occlusionLevel > numLodLevels_ - 1)
+    i32 occlusionLevel = occlusionLodLevel_;
+    if (occlusionLevel > numLodLevels_ - 1 || occlusionLevel == NINDEX)
         occlusionLevel = numLodLevels_ - 1;
 
     if (vertexData)
@@ -742,13 +747,13 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
 
         geometry->SetIndexBuffer(indexBuffer_);
         geometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[0].first_, drawRanges_[0].second_, false);
-        geometry->SetRawVertexData(cpuVertexData, MASK_POSITION);
+        geometry->SetRawVertexData(cpuVertexData, VertexElements::Position);
         maxLodGeometry->SetIndexBuffer(indexBuffer_);
         maxLodGeometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[0].first_, drawRanges_[0].second_, false);
-        maxLodGeometry->SetRawVertexData(cpuVertexData, MASK_POSITION);
+        maxLodGeometry->SetRawVertexData(cpuVertexData, VertexElements::Position);
         occlusionGeometry->SetIndexBuffer(indexBuffer_);
         occlusionGeometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[occlusionDrawRange].first_, drawRanges_[occlusionDrawRange].second_, false);
-        occlusionGeometry->SetRawVertexData(occlusionCpuVertexData, MASK_POSITION);
+        occlusionGeometry->SetRawVertexData(occlusionCpuVertexData, VertexElements::Position);
     }
 
     patch->ResetLod();
@@ -819,8 +824,10 @@ void Terrain::SetMaxLodLevelsAttr(unsigned value)
     }
 }
 
-void Terrain::SetOcclusionLodLevelAttr(unsigned value)
+void Terrain::SetOcclusionLodLevelAttr(i32 value)
 {
+    assert(value >= 0 || value == NINDEX);
+
     if (value != occlusionLodLevel_)
     {
         occlusionLodLevel_ = value;
@@ -912,8 +919,8 @@ void Terrain::CreateGeometry()
             Vector<String> coords = (*i)->GetName().Substring(6).Split('_');
             if (coords.Size() == 2)
             {
-                int x = ToInt(coords[0]);
-                int z = ToInt(coords[1]);
+                int x = ToI32(coords[0]);
+                int z = ToI32(coords[1]);
                 if (x < numPatches_.x_ && z < numPatches_.y_)
                     nodeOk = true;
             }

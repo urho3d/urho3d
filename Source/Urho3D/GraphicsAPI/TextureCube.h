@@ -72,17 +72,6 @@ private:
     bool Create_OGL();
 #endif // def URHO3D_OPENGL
 
-#ifdef URHO3D_D3D9
-    void OnDeviceLost_D3D9();
-    void OnDeviceReset_D3D9();
-    void Release_D3D9();
-    bool SetData_D3D9(CubeMapFace face, unsigned level, int x, int y, int width, int height, const void* data);
-    bool SetData_D3D9(CubeMapFace face, Deserializer& source);
-    bool SetData_D3D9(CubeMapFace face, Image* image, bool useAlpha = false);
-    bool GetData_D3D9(CubeMapFace face, unsigned level, void* dest) const;
-    bool Create_D3D9();
-#endif // def URHO3D_D3D9
-
 #ifdef URHO3D_D3D11
     void OnDeviceLost_D3D11();
     void OnDeviceReset_D3D11();

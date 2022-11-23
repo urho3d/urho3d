@@ -170,11 +170,6 @@ void Texture3D::OnDeviceLost()
         return OnDeviceLost_OGL();
 #endif
 
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return OnDeviceLost_D3D9();
-#endif
-
 #ifdef URHO3D_D3D11
     if (gapi == GAPI_D3D11)
         return OnDeviceLost_D3D11();
@@ -188,11 +183,6 @@ void Texture3D::OnDeviceReset()
 #ifdef URHO3D_OPENGL
     if (gapi == GAPI_OPENGL)
         return OnDeviceReset_OGL();
-#endif
-
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return OnDeviceReset_D3D9();
 #endif
 
 #ifdef URHO3D_D3D11
@@ -210,11 +200,6 @@ void Texture3D::Release()
         return Release_OGL();
 #endif
 
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return Release_D3D9();
-#endif
-
 #ifdef URHO3D_D3D11
     if (gapi == GAPI_D3D11)
         return Release_D3D11();
@@ -228,11 +213,6 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
 #ifdef URHO3D_OPENGL
     if (gapi == GAPI_OPENGL)
         return SetData_OGL(level, x, y, z, width, height, depth, data);
-#endif
-
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return SetData_D3D9(level, x, y, z, width, height, depth, data);
 #endif
 
 #ifdef URHO3D_D3D11
@@ -252,11 +232,6 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
         return SetData_OGL(image, useAlpha);
 #endif
 
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return SetData_D3D9(image, useAlpha);
-#endif
-
 #ifdef URHO3D_D3D11
     if (gapi == GAPI_D3D11)
         return SetData_D3D11(image, useAlpha);
@@ -274,11 +249,6 @@ bool Texture3D::GetData(unsigned level, void* dest) const
         return GetData_OGL(level, dest);
 #endif
 
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return GetData_D3D9(level, dest);
-#endif
-
 #ifdef URHO3D_D3D11
     if (gapi == GAPI_D3D11)
         return GetData_D3D11(level, dest);
@@ -294,11 +264,6 @@ bool Texture3D::Create()
 #ifdef URHO3D_OPENGL
     if (gapi == GAPI_OPENGL)
         return Create_OGL();
-#endif
-
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return Create_D3D9();
 #endif
 
 #ifdef URHO3D_D3D11

@@ -185,7 +185,7 @@ void CreateScene()
         ib.SetSize(numVertices, false);
         temp.Clear();
         for (uint i = 0; i < numVertices; ++i)
-            temp.WriteUShort(indexData[i]);
+            temp.WriteU16(indexData[i]);
         ib.SetData(temp);
 
         geom.SetVertexBuffer(0, vb);

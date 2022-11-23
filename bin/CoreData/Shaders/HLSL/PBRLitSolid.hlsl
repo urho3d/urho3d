@@ -65,7 +65,7 @@ void VS(float4 iPos : POSITION,
     #ifdef VERTEXCOLOR
         out float4 oColor : COLOR0,
     #endif
-    #if defined(D3D11) && defined(CLIPPLANE)
+    #if defined(CLIPPLANE)
         out float oClip : SV_CLIPDISTANCE0,
     #endif
     out float4 oPos : OUTPOSITION)
@@ -81,7 +81,7 @@ void VS(float4 iPos : POSITION,
     oNormal = GetWorldNormal(modelMatrix);
     oWorldPos = float4(worldPos, GetDepth(oPos));
 
-    #if defined(D3D11) && defined(CLIPPLANE)
+    #if defined(CLIPPLANE)
         oClip = dot(oPos, cClipPlane);
     #endif
 
@@ -173,7 +173,7 @@ void PS(
     #ifdef VERTEXCOLOR
         float4 iColor : COLOR0,
     #endif
-    #if defined(D3D11) && defined(CLIPPLANE)
+    #if defined(CLIPPLANE)
         float iClip : SV_CLIPDISTANCE0,
     #endif
     #ifdef PREPASS
@@ -183,11 +183,7 @@ void PS(
         out float4 oAlbedo : OUTCOLOR1,
         out float4 oNormal : OUTCOLOR2,
         out float4 oDepth : OUTCOLOR3,
-        #ifndef D3D11
-            float2 iFragPos : VPOS,
-        #else
-            float4 iFragPos : SV_Position,
-        #endif
+        float4 iFragPos : SV_Position,
     #endif
     out float4 oColor : OUTCOLOR0)
 {

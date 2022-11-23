@@ -14,14 +14,14 @@
 namespace Urho3D
 {
 
-enum AnimationChannel : unsigned char
+enum class AnimationChannels : u8
 {
-    CHANNEL_NONE = 0x0,
-    CHANNEL_POSITION = 0x1,
-    CHANNEL_ROTATION = 0x2,
-    CHANNEL_SCALE = 0x4,
+    None     = 0,
+    Position = 1 << 0,
+    Rotation = 1 << 1,
+    Scale    = 1 << 2,
 };
-URHO3D_FLAGSET(AnimationChannel, AnimationChannelFlags);
+URHO3D_FLAGS(AnimationChannels);
 
 /// Skeletal animation keyframe.
 struct AnimationKeyFrame
@@ -54,30 +54,30 @@ struct URHO3D_API AnimationTrack
 
     /// Assign keyframe at index.
     /// @property{set_keyFrames}
-    void SetKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame);
+    void SetKeyFrame(i32 index, const AnimationKeyFrame& keyFrame);
     /// Add a keyframe at the end.
     void AddKeyFrame(const AnimationKeyFrame& keyFrame);
     /// Insert a keyframe at index.
-    void InsertKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame);
+    void InsertKeyFrame(i32 index, const AnimationKeyFrame& keyFrame);
     /// Remove a keyframe at index.
-    void RemoveKeyFrame(unsigned index);
+    void RemoveKeyFrame(i32 index);
     /// Remove all keyframes.
     void RemoveAllKeyFrames();
 
     /// Return keyframe at index, or null if not found.
-    AnimationKeyFrame* GetKeyFrame(unsigned index);
+    AnimationKeyFrame* GetKeyFrame(i32 index);
     /// Return number of keyframes.
     /// @property
-    unsigned GetNumKeyFrames() const { return keyFrames_.Size(); }
+    i32 GetNumKeyFrames() const { return keyFrames_.Size(); }
     /// Return keyframe index based on time and previous index. Return false if animation is empty.
-    bool GetKeyFrameIndex(float time, unsigned& index) const;
+    bool GetKeyFrameIndex(float time, i32& index) const;
 
     /// Bone or scene node name.
     String name_;
     /// Name hash.
     StringHash nameHash_;
     /// Bitmask of included data (position, rotation, scale).
-    AnimationChannelFlags channelMask_{};
+    AnimationChannels channelMask_{};
     /// Keyframes.
     Vector<AnimationKeyFrame> keyFrames_;
 };
@@ -130,18 +130,18 @@ public:
     void RemoveAllTracks();
     /// Set a trigger point at index.
     /// @property{set_triggers}
-    void SetTrigger(unsigned index, const AnimationTriggerPoint& trigger);
+    void SetTrigger(i32 index, const AnimationTriggerPoint& trigger);
     /// Add a trigger point.
     void AddTrigger(const AnimationTriggerPoint& trigger);
     /// Add a trigger point.
     void AddTrigger(float time, bool timeIsNormalized, const Variant& data);
     /// Remove a trigger point by index.
-    void RemoveTrigger(unsigned index);
+    void RemoveTrigger(i32 index);
     /// Remove all trigger points.
     void RemoveAllTriggers();
     /// Resize trigger point vector.
     /// @property
-    void SetNumTriggers(unsigned num);
+    void SetNumTriggers(i32 num);
     /// Clone the animation.
     SharedPtr<Animation> Clone(const String& cloneName = String::EMPTY) const;
 
@@ -161,10 +161,10 @@ public:
 
     /// Return number of animation tracks.
     /// @property
-    unsigned GetNumTracks() const { return tracks_.Size(); }
+    i32 GetNumTracks() const { return tracks_.Size(); }
 
     /// Return animation track by index.
-    AnimationTrack *GetTrack(unsigned index);
+    AnimationTrack *GetTrack(i32 index);
 
     /// Return animation track by name.
     /// @property{get_tracks}
@@ -177,10 +177,10 @@ public:
 
     /// Return number of animation trigger points.
     /// @property
-    unsigned GetNumTriggers() const { return triggers_.Size(); }
+    i32 GetNumTriggers() const { return triggers_.Size(); }
 
     /// Return a trigger point by index.
-    AnimationTriggerPoint* GetTrigger(unsigned index);
+    AnimationTriggerPoint* GetTrigger(i32 index);
 
 private:
     /// Animation name.

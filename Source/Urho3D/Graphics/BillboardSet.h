@@ -67,7 +67,7 @@ public:
     void SetMaterial(Material* material);
     /// Set number of billboards.
     /// @property
-    void SetNumBillboards(unsigned num);
+    void SetNumBillboards(i32 num);
     /// Set whether billboards are relative to the scene node. Default true.
     /// @property
     void SetRelative(bool enable);
@@ -98,14 +98,14 @@ public:
 
     /// Return number of billboards.
     /// @property
-    unsigned GetNumBillboards() const { return billboards_.Size(); }
+    i32 GetNumBillboards() const { return billboards_.Size(); }
 
     /// Return all billboards.
     Vector<Billboard>& GetBillboards() { return billboards_; }
 
     /// Return billboard by index.
     /// @property{get_billboards}
-    Billboard* GetBillboard(unsigned index);
+    Billboard* GetBillboard(i32 index);
 
     /// Return whether billboards are relative to the scene node.
     /// @property
@@ -140,13 +140,13 @@ public:
     /// Set billboards attribute.
     void SetBillboardsAttr(const VariantVector& value);
     /// Set billboards attribute for network replication.
-    void SetNetBillboardsAttr(const Vector<unsigned char>& value);
+    void SetNetBillboardsAttr(const Vector<byte>& value);
     /// Return material attribute.
     ResourceRef GetMaterialAttr() const;
     /// Return billboards attribute.
     VariantVector GetBillboardsAttr() const;
     /// Return billboards attribute for network replication.
-    const Vector<unsigned char>& GetNetBillboardsAttr() const;
+    const Vector<byte>& GetNetBillboardsAttr() const;
 
 protected:
     /// Recalculate the world-space bounding box.

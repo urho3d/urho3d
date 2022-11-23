@@ -399,7 +399,7 @@ void JSONValue::SetVariantValue(const Variant& variant, Context* context)
         return;
 
     case VAR_INT:
-        *this = variant.GetInt();
+        *this = variant.GetI32();
         return;
 
     case VAR_FLOAT:
@@ -445,10 +445,10 @@ void JSONValue::SetVariantValue(const Variant& variant, Context* context)
 
             const ResourceRefList& refList = variant.GetResourceRefList();
             String str(context->GetTypeName(refList.type_));
-            for (unsigned i = 0; i < refList.names_.Size(); ++i)
+            for (const String& name : refList.names_)
             {
                 str += ";";
-                str += refList.names_[i];
+                str += name;
             }
             *this = str;
         }
@@ -458,7 +458,7 @@ void JSONValue::SetVariantValue(const Variant& variant, Context* context)
         {
             const StringVector& vector = variant.GetStringVector();
             Resize(vector.Size());
-            for (unsigned i = 0; i < vector.Size(); ++i)
+            for (i32 i = 0; i < vector.Size(); ++i)
                 (*this)[i] = vector[i];
         }
         return;
@@ -478,7 +478,7 @@ Variant JSONValue::GetVariantValue(VariantType type) const
         break;
 
     case VAR_INT:
-        variant = GetInt();
+        variant = GetI32();
         break;
 
     case VAR_FLOAT:
@@ -522,7 +522,7 @@ Variant JSONValue::GetVariantValue(VariantType type) const
             {
                 refList.type_ = values[0];
                 refList.names_.Resize(values.Size() - 1);
-                for (unsigned i = 1; i < values.Size(); ++i)
+                for (i32 i = 1; i < values.Size(); ++i)
                     refList.names_[i - 1] = values[i];
             }
             variant = refList;
@@ -564,7 +564,7 @@ VariantMap JSONValue::GetVariantMap() const
     for (ConstJSONObjectIterator i = Begin(); i != End(); ++i)
     {
         /// \todo Ideally this should allow any strings, but for now the convention is that the keys need to be hexadecimal StringHashes
-        StringHash key(ToUInt(i->first_, 16));
+        StringHash key(ToU32(i->first_, 16));
         Variant variant = i->second_.GetVariant();
         variantMap[key] = variant;
     }
@@ -576,10 +576,10 @@ void JSONValue::SetVariantVector(const VariantVector& variantVector, Context* co
 {
     SetType(JSON_ARRAY);
     arrayValue_->Reserve(variantVector.Size());
-    for (unsigned i = 0; i < variantVector.Size(); ++i)
+    for (const Variant& var : variantVector)
     {
         JSONValue val;
-        val.SetVariant(variantVector[i], context);
+        val.SetVariant(var, context);
         arrayValue_->Push(val);
     }
 }

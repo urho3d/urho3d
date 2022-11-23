@@ -119,7 +119,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 // Handle the mouse click event
 void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 {
-    MouseButton button = eventData["Button"].GetUInt();
+    MouseButton button = eventData["Button"].GetU32();
     
     if (button == MOUSEB_RIGHT)
     {

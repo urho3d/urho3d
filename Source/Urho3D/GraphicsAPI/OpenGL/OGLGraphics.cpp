@@ -289,7 +289,6 @@ void Graphics::Constructor_OGL()
     apiName_ = "GLES2";
 #endif
 
-    Graphics::pixelUVOffset = Vector2(0.0f, 0.0f);
     Graphics::gl3Support = false;
 
     SetTextureUnitMappings_OGL();
@@ -2333,7 +2332,7 @@ void Graphics::CleanupRenderSurface_OGL(RenderSurface* surface)
     unsigned currentFBO = impl->boundFBO_;
 
     // Go through all FBOs and clean up the surface from them
-    for (HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl->frameBuffers_.Begin();
+    for (HashMap<hash64, FrameBufferObject>::Iterator i = impl->frameBuffers_.Begin();
          i != impl->frameBuffers_.End(); ++i)
     {
         for (unsigned j = 0; j < MAX_RENDERTARGETS; ++j)
@@ -2988,8 +2987,8 @@ void Graphics::PrepareDraw_OGL()
         else if (depthStencil_)
             format = depthStencil_->GetParentTexture()->GetFormat();
 
-        auto fboKey = (unsigned long long)format << 32u | rtSize.x_ << 16u | rtSize.y_;
-        HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl->frameBuffers_.Find(fboKey);
+        hash64 fboKey = (hash64)format << 32u | rtSize.x_ << 16u | rtSize.y_;
+        HashMap<hash64, FrameBufferObject>::Iterator i = impl->frameBuffers_.Find(fboKey);
         if (i == impl->frameBuffers_.End())
         {
             FrameBufferObject newFbo;
@@ -3254,7 +3253,7 @@ void Graphics::CleanupFramebuffers_OGL()
         impl->boundFBO_ = impl->systemFBO_;
         impl->fboDirty_ = true;
 
-        for (HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl->frameBuffers_.Begin();
+        for (HashMap<hash64, FrameBufferObject>::Iterator i = impl->frameBuffers_.Begin();
              i != impl->frameBuffers_.End(); ++i)
             DeleteFramebuffer_OGL(i->second_.fbo_);
 

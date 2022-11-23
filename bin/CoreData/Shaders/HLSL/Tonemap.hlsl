@@ -4,14 +4,6 @@
 #include "ScreenPos.hlsl"
 #include "PostProcess.hlsl"
 
-#ifndef D3D11
-
-// D3D9 uniforms
-uniform float cTonemapExposureBias;
-uniform float cTonemapMaxWhite;
-
-#else
-
 #ifdef COMPILEPS
 // D3D11 constant buffers
 cbuffer CustomPS : register(b6)
@@ -19,8 +11,6 @@ cbuffer CustomPS : register(b6)
     float cTonemapExposureBias;
     float cTonemapMaxWhite;
 }
-#endif
-
 #endif
 
 void VS(float4 iPos : POSITION,

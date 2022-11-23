@@ -209,7 +209,7 @@ QT_AUTOBRIEF           = NO
 # not recognized any more.
 # The default value is: NO.
 
-MULTILINE_CPP_IS_BRIEF = NO
+MULTILINE_CPP_IS_BRIEF = YES
 
 # If the INHERIT_DOCS tag is set to YES then an undocumented member inherits the
 # documentation from any documented member that it re-implements.
@@ -852,9 +852,11 @@ EXCLUDE_SYMLINKS       = NO
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = */*API*.cpp \
-                         */*API*.h \
+EXCLUDE_PATTERNS       = "@CMAKE_SOURCE_DIR@/Source/Urho3D/AngelScript/*" \
+                         "@CMAKE_SOURCE_DIR@/Source/Urho3D/LuaScript/*" \
                          "@CMAKE_CURRENT_SOURCE_DIR@/*API.dox" \
+                         "@CMAKE_SOURCE_DIR@/Docs/AngelScriptAPI.h" \
+                         "@CMAKE_BINARY_DIR@/Docs/generated/AngelScriptAPI.h" \
                          */@EXCLUDE_GRAPHICS_API@/* \
                          */@EXCLUDE_GRAPHICS_API2@/* \
                          "@CMAKE_SOURCE_DIR@/Source/Urho3D/Database/ODBC/*" # https://github.com/doxygen/doxygen/issues/8805
@@ -2476,3 +2478,7 @@ ALIASES += alias{1}=""
 ALIASES += specialization{1}=""
 ALIASES += specialization{2}=""
 ALIASES += specialization{3}=""
+
+# For Doxygen 1.9.5
+HTML_DYNAMIC_MENUS = NO
+HTML_COLORSTYLE = LIGHT

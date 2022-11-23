@@ -36,13 +36,14 @@ XMLElement::XMLElement(XMLFile* file, pugi::xml_node_struct* node) :
 }
 
 XMLElement::XMLElement(XMLFile* file, const XPathResultSet* resultSet, const pugi::xpath_node* xpathNode,
-    unsigned xpathResultIndex) :
+    i32 xpathResultIndex) :
     file_(file),
     node_(nullptr),
     xpathResultSet_(resultSet),
     xpathNode_(resultSet ? xpathNode : (xpathNode ? new pugi::xpath_node(*xpathNode) : nullptr)),
     xpathResultIndex_(xpathResultIndex)
 {
+    assert(xpathResultIndex >= 0);
 }
 
 XMLElement::XMLElement(const XMLElement& rhs) :
@@ -211,7 +212,7 @@ XMLElement XMLElement::SelectSingle(const String& query, pugi::xpath_variable_se
         return XMLElement();
 
     const pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
-    pugi::xpath_node result = node.select_single_node(query.CString(), variables);
+    pugi::xpath_node result = node.select_node(query.CString(), variables);
     return XMLElement(file_, nullptr, &result, 0);
 }
 
@@ -221,7 +222,7 @@ XMLElement XMLElement::SelectSinglePrepared(const XPathQuery& query) const
         return XMLElement();
 
     const pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
-    pugi::xpath_node result = node.select_single_node(*query.GetXPathQuery());
+    pugi::xpath_node result = node.select_node(*query.GetXPathQuery());
     return XMLElement(file_, nullptr, &result, 0);
 }
 
@@ -312,8 +313,9 @@ bool XMLElement::SetBoundingBox(const BoundingBox& value)
     return SetVector3("max", value.max_);
 }
 
-bool XMLElement::SetBuffer(const String& name, const void* data, unsigned size)
+bool XMLElement::SetBuffer(const String& name, const void* data, i32 size)
 {
+    assert(size >= 0);
     String dataStr;
     BufferToString(dataStr, data, size);
     return SetAttribute(name, dataStr);
@@ -342,22 +344,22 @@ bool XMLElement::SetDouble(const String& name, double value)
     return SetAttribute(name, String(value));
 }
 
-bool XMLElement::SetUInt(const String& name, unsigned value)
+bool XMLElement::SetU32(const String& name, u32 value)
 {
     return SetAttribute(name, String(value));
 }
 
-bool XMLElement::SetInt(const String& name, int value)
+bool XMLElement::SetI32(const String& name, i32 value)
 {
     return SetAttribute(name, String(value));
 }
 
-bool XMLElement::SetUInt64(const String& name, unsigned long long value)
+bool XMLElement::SetU64(const String& name, u64 value)
 {
     return SetAttribute(name, String(value));
 }
 
-bool XMLElement::SetInt64(const String& name, long long value)
+bool XMLElement::SetI64(const String& name, i64 value)
 {
     return SetAttribute(name, String(value));
 }
@@ -444,10 +446,10 @@ bool XMLElement::SetResourceRefList(const ResourceRefList& value)
     Context* context = file_->GetContext();
 
     String str(context->GetTypeName(value.type_));
-    for (unsigned i = 0; i < value.names_.Size(); ++i)
+    for (const String& name : value.names_)
     {
         str += ";";
-        str += value.names_[i];
+        str += name;
     }
 
     return SetAttribute("value", str.CString());
@@ -496,7 +498,7 @@ bool XMLElement::SetVariantMap(const VariantMap& value)
         XMLElement variantElem = CreateChild("variant");
         if (!variantElem)
             return false;
-        variantElem.SetUInt("hash", i->first_.Value());
+        variantElem.SetU32("hash", i->first_.Value());
         variantElem.SetVariant(i->second_);
     }
 
@@ -628,13 +630,13 @@ XMLElement XMLElement::GetParent() const
     return XMLElement(file_, node.parent().internal_object());
 }
 
-unsigned XMLElement::GetNumAttributes() const
+i32 XMLElement::GetNumAttributes() const
 {
     if (!file_ || (!node_ && !xpathNode_))
         return 0;
 
     const pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
-    unsigned ret = 0;
+    i32 ret = 0;
 
     pugi::xml_attribute attr = node.first_attribute();
     while (!attr.empty())
@@ -748,22 +750,22 @@ BoundingBox XMLElement::GetBoundingBox() const
     return ret;
 }
 
-Vector<unsigned char> XMLElement::GetBuffer(const String& name) const
+Vector<byte> XMLElement::GetBuffer(const String& name) const
 {
-    Vector<unsigned char> ret;
+    Vector<byte> ret;
     StringToBuffer(ret, GetAttribute(name));
     return ret;
 }
 
-bool XMLElement::GetBuffer(const String& name, void* dest, unsigned size) const
+bool XMLElement::GetBuffer(const String& name, void* dest, i32 size) const
 {
     Vector<String> bytes = GetAttribute(name).Split(' ');
     if (size < bytes.Size())
         return false;
 
-    auto* destBytes = (unsigned char*)dest;
-    for (unsigned i = 0; i < bytes.Size(); ++i)
-        destBytes[i] = (unsigned char)ToInt(bytes[i]);
+    byte* destBytes = (byte*)dest;
+    for (i32 i = 0; i < bytes.Size(); ++i)
+        destBytes[i] = static_cast<byte>(ToI32(bytes[i]));
     return true;
 }
 
@@ -782,24 +784,24 @@ double XMLElement::GetDouble(const String& name) const
     return ToDouble(GetAttribute(name));
 }
 
-unsigned XMLElement::GetUInt(const String& name) const
+u32 XMLElement::GetU32(const String& name) const
 {
-    return ToUInt(GetAttribute(name));
+    return ToU32(GetAttribute(name));
 }
 
-int XMLElement::GetInt(const String& name) const
+i32 XMLElement::GetI32(const String& name) const
 {
-    return ToInt(GetAttribute(name));
+    return ToI32(GetAttribute(name));
 }
 
-unsigned long long XMLElement::GetUInt64(const String& name) const
+u64 XMLElement::GetU64(const String& name) const
 {
-    return ToUInt64(GetAttribute(name));
+    return ToU64(GetAttribute(name));
 }
 
-long long XMLElement::GetInt64(const String& name) const
+i64 XMLElement::GetI64(const String& name) const
 {
-    return ToInt64(GetAttribute(name));
+    return ToI64(GetAttribute(name));
 }
 
 IntRect XMLElement::GetIntRect(const String& name) const
@@ -876,7 +878,7 @@ ResourceRefList XMLElement::GetResourceRefList() const
     {
         ret.type_ = values[0];
         ret.names_.Resize(values.Size() - 1);
-        for (unsigned i = 1; i < values.Size(); ++i)
+        for (i32 i = 1; i < values.Size(); ++i)
             ret.names_[i - 1] = values[i];
     }
 
@@ -922,7 +924,7 @@ VariantMap XMLElement::GetVariantMap() const
         if (variantElem.HasAttribute("name"))
             ret[StringHash(variantElem.GetAttribute("name"))] = variantElem.GetVariant();
         else if (variantElem.HasAttribute("hash"))
-            ret[StringHash(variantElem.GetUInt("hash"))] = variantElem.GetVariant();
+            ret[StringHash(variantElem.GetU32("hash"))] = variantElem.GetVariant();
 
         variantElem = variantElem.GetNext("variant");
     }
@@ -1016,8 +1018,10 @@ XPathResultSet& XPathResultSet::operator =(const XPathResultSet& rhs)
     return *this;
 }
 
-XMLElement XPathResultSet::operator [](unsigned index) const
+XMLElement XPathResultSet::operator [](i32 index) const
 {
+    assert(index >= 0);
+
     if (!resultSet_)
         URHO3D_LOGERRORF(
             "Could not return result at index: %u. Most probably this is caused by the XPathResultSet not being stored in a lhs variable.",
@@ -1031,9 +1035,9 @@ XMLElement XPathResultSet::FirstResult()
     return operator [](0);
 }
 
-unsigned XPathResultSet::Size() const
+i32 XPathResultSet::Size() const
 {
-    return resultSet_ ? (unsigned)resultSet_->size() : 0;
+    return resultSet_ ? (i32)resultSet_->size() : 0;
 }
 
 bool XPathResultSet::Empty() const
@@ -1171,7 +1175,7 @@ String XPathQuery::EvaluateToString(const XMLElement& element) const
     const pugi::xml_node& node = element.GetXPathNode() ? element.GetXPathNode()->node() : pugi::xml_node(element.GetNode());
     String result;
     // First call get the size
-    result.Reserve((unsigned)query_->evaluate_string(nullptr, 0, node));
+    result.Reserve((i32)query_->evaluate_string(nullptr, 0, node));
     // Second call get the actual string
     query_->evaluate_string(const_cast<pugi::char_t*>(result.CString()), result.Capacity(), node);
     return result;

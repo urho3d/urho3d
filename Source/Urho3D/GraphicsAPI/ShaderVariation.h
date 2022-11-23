@@ -101,7 +101,7 @@ public:
     const HashMap<StringHash, ShaderParameter>& GetParameters() const { return parameters_; }
 
     /// Return vertex element hash.
-    unsigned long long GetElementHash() const { return elementHash_; }
+    hash64 GetElementHash() const { return elementHash_; }
 
     /// Return shader bytecode. Stored persistently on Direct3D11 only.
     const Vector<unsigned char>& GetByteCode() const { return byteCode_; }
@@ -127,20 +127,6 @@ public:
 private:
 
     // Internal functions
-
-#ifdef URHO3D_D3D9
-    /// Load bytecode from a file. Return true if successful.
-    bool LoadByteCode_D3D9(const String& binaryShaderName);
-
-    /// Compile from source. Return true if successful.
-    bool Compile_D3D9();
-
-    /// Inspect the constant parameters and input layout (if applicable) from the shader bytecode.
-    void ParseParameters_D3D9(unsigned char* bufData, unsigned bufSize);
-
-    /// Save bytecode to a file.
-    void SaveByteCode_D3D9(const String& binaryShaderName);
-#endif // def URHO3D_D3D9
 
 #ifdef URHO3D_D3D11
     /// Load bytecode from a file. Return true if successful.
@@ -168,13 +154,6 @@ private:
     void SetDefines_OGL(const String& defines);
 #endif // def URHO3D_OPENGL
 
-#ifdef URHO3D_D3D9
-    void OnDeviceLost_D3D9();
-    void Release_D3D9();
-    bool Create_D3D9();
-    void SetDefines_D3D9(const String& defines);
-#endif // def URHO3D_D3D9
-
 #ifdef URHO3D_D3D11
     void OnDeviceLost_D3D11();
     void Release_D3D11();
@@ -187,7 +166,7 @@ private:
     /// Shader type.
     ShaderType type_;
     /// Vertex element hash for vertex shaders. Zero for pixel shaders. Note that hashing is different than vertex buffers.
-    unsigned long long elementHash_{};
+    hash64 elementHash_{};
     /// Shader parameters.
     HashMap<StringHash, ShaderParameter> parameters_;
     /// Texture unit use flags.

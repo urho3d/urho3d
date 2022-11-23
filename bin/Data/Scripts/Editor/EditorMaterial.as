@@ -343,7 +343,7 @@ void RefreshMaterialMiscParameters()
     attrEdit = materialWindow.GetChild("SlopeBiasEdit", true);
     attrEdit.text = String(bias.slopeScaledBias);
     attrEdit = materialWindow.GetChild("RenderOrderEdit", true);
-    attrEdit.text = String(uint(editMaterial.renderOrder));
+    attrEdit.text = String(int(editMaterial.renderOrder));
     attrEdit = materialWindow.GetChild("VSDefinesEdit", true);
     attrEdit.text = editMaterial.vertexShaderDefines;
     attrEdit = materialWindow.GetChild("PSDefinesEdit", true);
@@ -368,8 +368,8 @@ void RefreshMaterialMiscParameters()
 
 void RotateMaterialPreview(StringHash eventType, VariantMap& eventData)
 {
-    int elemX = eventData["ElementX"].GetInt();
-    int elemY = eventData["ElementY"].GetInt();
+    int elemX = eventData["ElementX"].GetI32();
+    int elemY = eventData["ElementY"].GetI32();
     
     if (materialPreview.height > 0 && materialPreview.width > 0)
     {
@@ -570,7 +570,7 @@ void EditShaderParameter(StringHash eventType, VariantMap& eventData)
         return;
 
     LineEdit@ attrEdit = eventData["Element"].GetPtr();
-    uint coordinate = attrEdit.vars["Coordinate"].GetUInt();
+    uint coordinate = attrEdit.vars["Coordinate"].GetU32();
 
     String name = attrEdit.vars["Name"].GetString();
 
@@ -661,7 +661,7 @@ void PickMaterialTexture(StringHash eventType, VariantMap& eventData)
         return;
 
     UIElement@ button = eventData["Element"].GetPtr();
-    resourcePickIndex = button.vars["Index"].GetUInt();
+    resourcePickIndex = button.vars["Index"].GetU32();
 
     @resourcePicker = GetResourcePicker(StringHash("Texture2D"));
     if (resourcePicker is null)
@@ -707,7 +707,7 @@ void EditMaterialTexture(StringHash eventType, VariantMap& eventData)
 
     LineEdit@ attrEdit = eventData["Element"].GetPtr();
     String textureName = attrEdit.text.Trimmed();
-    uint index = attrEdit.vars["Index"].GetUInt();
+    uint index = attrEdit.vars["Index"].GetU32();
 
     BeginMaterialEdit();
 
@@ -752,7 +752,7 @@ void PickMaterialTechnique(StringHash eventType, VariantMap& eventData)
         return;
 
     UIElement@ button = eventData["Element"].GetPtr();
-    resourcePickIndex = button.vars["Index"].GetUInt();
+    resourcePickIndex = button.vars["Index"].GetU32();
 
     @resourcePicker = GetResourcePicker(StringHash("Technique"));
     if (resourcePicker is null)
@@ -799,7 +799,7 @@ void EditMaterialTechnique(StringHash eventType, VariantMap& eventData)
 
     LineEdit@ attrEdit = eventData["Element"].GetPtr();
     String techniqueName = attrEdit.text.Trimmed();
-    uint index = attrEdit.vars["Index"].GetUInt();
+    uint index = attrEdit.vars["Index"].GetU32();
 
     BeginMaterialEdit();
 
@@ -819,8 +819,8 @@ void EditTechniqueQuality(StringHash eventType, VariantMap& eventData)
         return;
 
     LineEdit@ attrEdit = eventData["Element"].GetPtr();
-    uint newQualityLevel = attrEdit.text.ToUInt();
-    uint index = attrEdit.vars["Index"].GetUInt();
+    uint newQualityLevel = attrEdit.text.ToU32();
+    uint index = attrEdit.vars["Index"].GetU32();
 
     BeginMaterialEdit();
     TechniqueEntry entry = editMaterial.techniqueEntries[index];
@@ -835,7 +835,7 @@ void EditTechniqueLodDistance(StringHash eventType, VariantMap& eventData)
 
     LineEdit@ attrEdit = eventData["Element"].GetPtr();
     float newLodDistance = attrEdit.text.ToFloat();
-    uint index = attrEdit.vars["Index"].GetUInt();
+    uint index = attrEdit.vars["Index"].GetU32();
 
     BeginMaterialEdit();
     TechniqueEntry entry = editMaterial.techniqueEntries[index];
@@ -893,7 +893,7 @@ void EditRenderOrder(StringHash eventType, VariantMap& eventData)
     BeginMaterialEdit();
 
     LineEdit@ attrEdit = eventData["Element"].GetPtr();
-    editMaterial.renderOrder = attrEdit.text.ToUInt();
+    editMaterial.renderOrder = attrEdit.text.ToI32();
 
     EndMaterialEdit();
 }

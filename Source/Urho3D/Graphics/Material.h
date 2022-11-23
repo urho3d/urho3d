@@ -22,7 +22,7 @@ class TextureCube;
 class ValueAnimationInfo;
 class JSONFile;
 
-static const unsigned char DEFAULT_RENDER_ORDER = 128;
+static constexpr i8 DEFAULT_RENDER_ORDER = 0;
 
 /// %Material's shader parameter definition.
 struct MaterialShaderParameter
@@ -78,9 +78,9 @@ private:
 };
 
 /// TextureUnit hash function.
-template <> inline unsigned MakeHash(const TextureUnit& value)
+template <> inline hash32 MakeHash(const TextureUnit& value)
 {
-    return (unsigned)value;
+    return (hash32)value;
 }
 
 /// Describes how to render 3D geometries.
@@ -162,9 +162,9 @@ public:
     /// Set line antialiasing on/off. Has effect only on models that consist of line lists.
     /// @property
     void SetLineAntiAlias(bool enable);
-    /// Set 8-bit render order within pass. Default 128. Lower values will render earlier and higher values later, taking precedence over e.g. state and distance sorting.
+    /// Set 8-bit render order within pass. Default 0. Lower values will render earlier and higher values later, taking precedence over e.g. state and distance sorting.
     /// @property
-    void SetRenderOrder(unsigned char order);
+    void SetRenderOrder(i8 order);
     /// Set whether to use in occlusion rendering. Default true.
     /// @property
     void SetOcclusion(bool enable);
@@ -249,7 +249,7 @@ public:
 
     /// Return render order.
     /// @property
-    unsigned char GetRenderOrder() const { return renderOrder_; }
+    i8 GetRenderOrder() const { return renderOrder_; }
 
     /// Return last auxiliary view rendered frame number.
     i32 GetAuxViewFrameNumber() const { return auxViewFrameNumber_; }
@@ -266,7 +266,7 @@ public:
     Scene* GetScene() const;
 
     /// Return shader parameter hash value. Used as an optimization to avoid setting shader parameters unnecessarily.
-    unsigned GetShaderParameterHash() const { return shaderParameterHash_; }
+    hash32 GetShaderParameterHash() const { return shaderParameterHash_; }
 
     /// Return name for texture unit.
     static String GetTextureUnitName(TextureUnit unit);
@@ -315,11 +315,11 @@ private:
     /// Depth bias parameters.
     BiasParameters depthBias_{};
     /// Render order value.
-    unsigned char renderOrder_{};
+    i8 renderOrder_{};
     /// Last auxiliary view rendered frame number.
     i32 auxViewFrameNumber_{};
     /// Shader parameter hash value.
-    unsigned shaderParameterHash_{};
+    hash32 shaderParameterHash_{};
     /// Alpha-to-coverage flag.
     bool alphaToCoverage_{};
     /// Line antialiasing flag.

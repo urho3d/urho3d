@@ -14,6 +14,11 @@
 
 #include <d3dcompiler.h>
 
+// https://github.com/urho3d/Urho3D/issues/2887
+#if defined(__MINGW32__) && !defined(D3D_COMPILER_VERSION)
+#error Please update MinGW
+#endif
+
 #include "../../DebugNew.h"
 
 namespace Urho3D
@@ -166,33 +171,33 @@ bool ShaderVariation::LoadByteCode_D3D11(const String& binaryShaderName)
     }
 
     /// \todo Check that shader type and model match
-    /*unsigned short shaderType = */file->ReadUShort();
-    /*unsigned short shaderModel = */file->ReadUShort();
-    elementHash_ = file->ReadUInt();
+    /*unsigned short shaderType = */file->ReadU16();
+    /*unsigned short shaderModel = */file->ReadU16();
+    elementHash_ = file->ReadU32();
     elementHash_ <<= 32;
 
-    unsigned numParameters = file->ReadUInt();
+    unsigned numParameters = file->ReadU32();
     for (unsigned i = 0; i < numParameters; ++i)
     {
         String name = file->ReadString();
-        unsigned buffer = file->ReadUByte();
-        unsigned offset = file->ReadUInt();
-        unsigned size = file->ReadUInt();
+        unsigned buffer = file->ReadU8();
+        unsigned offset = file->ReadU32();
+        unsigned size = file->ReadU32();
 
         parameters_[StringHash(name)] = ShaderParameter{type_, name, offset, size, buffer};
     }
 
-    unsigned numTextureUnits = file->ReadUInt();
+    unsigned numTextureUnits = file->ReadU32();
     for (unsigned i = 0; i < numTextureUnits; ++i)
     {
         /*String unitName = */file->ReadString();
-        unsigned reg = file->ReadUByte();
+        unsigned reg = file->ReadU8();
 
         if (reg < MAX_TEXTURE_UNITS)
             useTextureUnits_[reg] = true;
     }
 
-    unsigned byteCodeSize = file->ReadUInt();
+    unsigned byteCodeSize = file->ReadU32();
     if (byteCodeSize)
     {
         byteCode_.Resize(byteCodeSize);
@@ -408,17 +413,17 @@ void ShaderVariation::SaveByteCode_D3D11(const String& binaryShaderName)
         return;
 
     file->WriteFileID("USHD");
-    file->WriteShort((unsigned short)type_);
-    file->WriteShort(4);
-    file->WriteUInt(elementHash_ >> 32);
+    file->WriteI16((unsigned short)type_);
+    file->WriteI16(4);
+    file->WriteU32(elementHash_ >> 32);
 
-    file->WriteUInt(parameters_.Size());
+    file->WriteU32(parameters_.Size());
     for (HashMap<StringHash, ShaderParameter>::ConstIterator i = parameters_.Begin(); i != parameters_.End(); ++i)
     {
         file->WriteString(i->second_.name_);
-        file->WriteUByte((unsigned char)i->second_.buffer_);
-        file->WriteUInt(i->second_.offset_);
-        file->WriteUInt(i->second_.size_);
+        file->WriteU8((unsigned char)i->second_.buffer_);
+        file->WriteU32(i->second_.offset_);
+        file->WriteU32(i->second_.size_);
     }
 
     unsigned usedTextureUnits = 0;
@@ -427,17 +432,17 @@ void ShaderVariation::SaveByteCode_D3D11(const String& binaryShaderName)
         if (useTextureUnits_[i])
             ++usedTextureUnits;
     }
-    file->WriteUInt(usedTextureUnits);
+    file->WriteU32(usedTextureUnits);
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
         if (useTextureUnits_[i])
         {
             file->WriteString(graphics_->GetTextureUnitName((TextureUnit)i));
-            file->WriteUByte((unsigned char)i);
+            file->WriteU8((unsigned char)i);
         }
     }
 
-    file->WriteUInt(byteCode_.Size());
+    file->WriteU32(byteCode_.Size());
     if (byteCode_.Size())
         file->Write(&byteCode_[0], byteCode_.Size());
 }

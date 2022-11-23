@@ -159,11 +159,11 @@ public:
     /// Set material attribute.
     void SetMaterialAttr(const ResourceRef& value);
     /// Set decals attribute.
-    void SetDecalsAttr(const Vector<unsigned char>& value);
+    void SetDecalsAttr(const Vector<byte>& value);
     /// Return material attribute.
     ResourceRef GetMaterialAttr() const;
     /// Return decals attribute.
-    Vector<unsigned char> GetDecalsAttr() const;
+    Vector<byte> GetDecalsAttr() const;
 
 protected:
     /// Recalculate the world-space bounding box.
@@ -178,7 +178,7 @@ private:
     /// Get triangle face from the target geometry.
     void GetFace
         (Vector<Vector<DecalVertex>>& faces, Drawable* target, unsigned batchIndex, unsigned i0, unsigned i1, unsigned i2,
-            const unsigned char* positionData, const unsigned char* normalData, const unsigned char* skinningData,
+            const byte* positionData, const byte* normalData, const byte* skinningData,
             unsigned positionStride, unsigned normalStride, unsigned skinningStride, const Frustum& frustum,
             const Vector3& decalNormal, float normalCutoff);
     /// Get bones referenced by skinning data and remap the skinning indices. Return true if successful.

@@ -78,15 +78,15 @@ void ScriptInstance::RegisterObject(Context* context)
 {
     context->RegisterFactory<ScriptInstance>(LOGIC_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Delayed Method Calls", GetDelayedCallsAttr, SetDelayedCallsAttr, Vector<unsigned char>,
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Delayed Method Calls", GetDelayedCallsAttr, SetDelayedCallsAttr,
         Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef,
+    URHO3D_ACCESSOR_ATTRIBUTE("Script File", GetScriptFileAttr, SetScriptFileAttr,
         ResourceRef(ScriptFile::GetTypeStatic()), AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Class Name", GetClassName, SetClassName, String, String::EMPTY, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script Data", GetScriptDataAttr, SetScriptDataAttr, Vector<unsigned char>, Variant::emptyBuffer,
+    URHO3D_ACCESSOR_ATTRIBUTE("Class Name", GetClassName, SetClassName, String::EMPTY, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Script Data", GetScriptDataAttr, SetScriptDataAttr, Variant::emptyBuffer,
         AM_FILE | AM_NOEDIT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, Vector<unsigned char>,
+    URHO3D_ACCESSOR_ATTRIBUTE("Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr,
         Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
 
@@ -105,7 +105,7 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
         // The component / node to which the ID refers to may not be in the scene yet, and furthermore the ID must go through the
         // SceneResolver first. Delay searching for the object to ApplyAttributes
         auto* attrPtr = const_cast<AttributeInfo*>(&attr);
-        idAttributes_[attrPtr] = src.GetUInt();
+        idAttributes_[attrPtr] = src.GetU32();
     }
     else if (attr.type_ == VAR_RESOURCEREF && attr.ptr_)
     {
@@ -443,7 +443,7 @@ void ScriptInstance::SetScriptFileAttr(const ResourceRef& value)
     SetScriptFile(cache->GetResource<ScriptFile>(value.name_));
 }
 
-void ScriptInstance::SetDelayedCallsAttr(const Vector<unsigned char>& value)
+void ScriptInstance::SetDelayedCallsAttr(const Vector<byte>& value)
 {
     MemoryBuffer buf(value);
     delayedCalls_.Resize(buf.ReadVLE());
@@ -460,7 +460,7 @@ void ScriptInstance::SetDelayedCallsAttr(const Vector<unsigned char>& value)
         UpdateEventSubscription();
 }
 
-void ScriptInstance::SetScriptDataAttr(const Vector<unsigned char>& data)
+void ScriptInstance::SetScriptDataAttr(const Vector<byte>& data)
 {
     if (scriptObject_ && methods_[METHOD_LOAD])
     {
@@ -471,7 +471,7 @@ void ScriptInstance::SetScriptDataAttr(const Vector<unsigned char>& data)
     }
 }
 
-void ScriptInstance::SetScriptNetworkDataAttr(const Vector<unsigned char>& data)
+void ScriptInstance::SetScriptNetworkDataAttr(const Vector<byte>& data)
 {
     if (scriptObject_ && methods_[METHOD_READNETWORKUPDATE])
     {
@@ -487,7 +487,7 @@ ResourceRef ScriptInstance::GetScriptFileAttr() const
     return GetResourceRef(scriptFile_, ScriptFile::GetTypeStatic());
 }
 
-Vector<unsigned char> ScriptInstance::GetDelayedCallsAttr() const
+Vector<byte> ScriptInstance::GetDelayedCallsAttr() const
 {
     VectorBuffer buf;
     buf.WriteVLE(delayedCalls_.Size());
@@ -502,10 +502,10 @@ Vector<unsigned char> ScriptInstance::GetDelayedCallsAttr() const
     return buf.GetBuffer();
 }
 
-Vector<unsigned char> ScriptInstance::GetScriptDataAttr() const
+Vector<byte> ScriptInstance::GetScriptDataAttr() const
 {
     if (!scriptObject_ || !methods_[METHOD_SAVE])
-        return Vector<unsigned char>();
+        return Vector<byte>();
     else
     {
         VectorBuffer buf;
@@ -516,10 +516,10 @@ Vector<unsigned char> ScriptInstance::GetScriptDataAttr() const
     }
 }
 
-Vector<unsigned char> ScriptInstance::GetScriptNetworkDataAttr() const
+Vector<byte> ScriptInstance::GetScriptNetworkDataAttr() const
 {
     if (!scriptObject_ || !methods_[METHOD_WRITENETWORKUPDATE])
-        return Vector<unsigned char>();
+        return Vector<byte>();
     else
     {
         VectorBuffer buf;

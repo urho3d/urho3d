@@ -89,12 +89,12 @@ bool ToBool(const char* source)
     return false;
 }
 
-int ToInt(const String& source, int base)
+i32 ToI32(const String& source, i32 base)
 {
-    return ToInt(source.CString(), base);
+    return ToI32(source.CString(), base);
 }
 
-int ToInt(const char* source, int base)
+i32 ToI32(const char* source, i32 base)
 {
     if (!source)
         return 0;
@@ -103,10 +103,10 @@ int ToInt(const char* source, int base)
     if (base < 2 || base > 36)
         base = 0;
 
-    return (int)strtol(source, nullptr, base);
+    return (i32)strtol(source, nullptr, base);
 }
 
-long long ToInt64(const char* source, int base)
+i64 ToI64(const char* source, i32 base)
 {
     if (!source)
         return 0;
@@ -118,17 +118,17 @@ long long ToInt64(const char* source, int base)
     return strtoll(source, nullptr, base);
 }
 
-long long ToInt64(const String& source, int base)
+i64 ToI64(const String& source, i32 base)
 {
-    return ToInt64(source.CString(), base);
+    return ToI64(source.CString(), base);
 }
 
-unsigned ToUInt(const String& source, int base)
+u32 ToU32(const String& source, i32 base)
 {
-    return ToUInt(source.CString(), base);
+    return ToU32(source.CString(), base);
 }
 
-unsigned long long ToUInt64(const char* source, int base)
+u64 ToU64(const char* source, i32 base)
 {
     if (!source)
         return 0;
@@ -140,12 +140,12 @@ unsigned long long ToUInt64(const char* source, int base)
     return strtoull(source, nullptr, base);
 }
 
-unsigned long long ToUInt64(const String& source, int base)
+u64 ToU64(const String& source, i32 base)
 {
-    return ToUInt64(source.CString(), base);
+    return ToU64(source.CString(), base);
 }
 
-unsigned ToUInt(const char* source, int base)
+u32 ToU32(const char* source, i32 base)
 {
     if (!source)
         return 0;
@@ -153,7 +153,7 @@ unsigned ToUInt(const char* source, int base)
     if (base < 2 || base > 36)
         base = 0;
 
-    return (unsigned)strtoul(source, nullptr, base);
+    return (u32)strtoul(source, nullptr, base);
 }
 
 float ToFloat(const String& source)
@@ -603,12 +603,12 @@ void BufferToString(String& dest, const void* data, unsigned size)
     }
 }
 
-void StringToBuffer(Vector<unsigned char>& dest, const String& source)
+void StringToBuffer(Vector<byte>& dest, const String& source)
 {
     StringToBuffer(dest, source.CString());
 }
 
-void StringToBuffer(Vector<unsigned char>& dest, const char* source)
+void StringToBuffer(Vector<byte>& dest, const char* source)
 {
     if (!source)
     {
@@ -639,7 +639,7 @@ void StringToBuffer(Vector<unsigned char>& dest, const char* source)
         }
         else if (!inSpace && *ptr == ' ')
         {
-            dest[index++] = (unsigned char)value;
+            dest[index++] = (byte)value;
             inSpace = true;
         }
 
@@ -648,7 +648,7 @@ void StringToBuffer(Vector<unsigned char>& dest, const char* source)
 
     // Write the final value
     if (!inSpace && index < size)
-        dest[index] = (unsigned char)value;
+        dest[index] = (byte)value;
 }
 
 i32 GetStringListIndex(const String& value, const String* strings, i32 defaultIndex, bool caseSensitive)
@@ -773,7 +773,7 @@ static inline bool IsBase64(char c) {
     return (isalnum(c) || (c == '+') || (c == '/'));
 }
 
-Vector<unsigned char> DecodeBase64(String encodedString)
+Vector<unsigned char> DecodeBase64(const String& encodedString)
 {
     int inLen = encodedString.Length();
     int i = 0;

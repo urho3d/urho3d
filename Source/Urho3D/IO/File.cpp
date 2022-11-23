@@ -42,9 +42,27 @@ static const char* openMode[] =
 
 #ifdef __ANDROID__
 const char* APK = "/apk/";
-static const unsigned READ_BUFFER_SIZE = 32768;
+static constexpr i32 READ_BUFFER_SIZE = 32768;
 #endif
-static const unsigned SKIP_BUFFER_SIZE = 1024;
+static constexpr i32 SKIP_BUFFER_SIZE = 1024;
+
+static i32 FSeek64(FILE* stream, i64 offset, i32 origin)
+{
+#ifdef _MSC_VER
+    return _fseeki64(stream, offset, origin);
+#else
+    return fseeko64(stream, offset, origin);
+#endif
+}
+
+static i64 FTell64(FILE* stream)
+{
+#ifdef _MSC_VER
+    return _ftelli64(stream);
+#else
+    return ftello64(stream);
+#endif
+}
 
 File::File(Context* context) :
     Object(context),
@@ -136,8 +154,10 @@ bool File::Open(PackageFile* package, const String& fileName)
     return true;
 }
 
-unsigned File::Read(void* dest, unsigned size)
+i32 File::Read(void* dest, i32 size)
 {
+    assert(size >= 0);
+
     if (!IsOpen())
     {
         // If file not open, do not log the error further here to prevent spamming the stderr stream
@@ -161,13 +181,13 @@ unsigned File::Read(void* dest, unsigned size)
         // If not using a compressed package file, buffer file reads on Android for better performance
         if (!readBuffer_)
         {
-            readBuffer_ = new unsigned char[READ_BUFFER_SIZE];
+            readBuffer_ = new u8[READ_BUFFER_SIZE];
             readBufferOffset_ = 0;
             readBufferSize_ = 0;
         }
 
-        unsigned sizeLeft = size;
-        unsigned char* destPtr = (unsigned char*)dest;
+        i32 sizeLeft = size;
+        u8* destPtr = (u8*)dest;
 
         while (sizeLeft)
         {
@@ -178,7 +198,7 @@ unsigned File::Read(void* dest, unsigned size)
                 ReadInternal(readBuffer_.Get(), readBufferSize_);
             }
 
-            unsigned copySize = Min((readBufferSize_ - readBufferOffset_), sizeLeft);
+            i32 copySize = Min((readBufferSize_ - readBufferOffset_), sizeLeft);
             memcpy(destPtr, readBuffer_.Get() + readBufferOffset_, copySize);
             destPtr += copySize;
             sizeLeft -= copySize;
@@ -192,24 +212,24 @@ unsigned File::Read(void* dest, unsigned size)
 
     if (compressed_)
     {
-        unsigned sizeLeft = size;
-        auto* destPtr = (unsigned char*)dest;
+        i32 sizeLeft = size;
+        u8* destPtr = (u8*)dest;
 
         while (sizeLeft)
         {
             if (!readBuffer_ || readBufferOffset_ >= readBufferSize_)
             {
-                unsigned char blockHeaderBytes[4];
+                u8 blockHeaderBytes[4];
                 ReadInternal(blockHeaderBytes, sizeof blockHeaderBytes);
 
                 MemoryBuffer blockHeader(&blockHeaderBytes[0], sizeof blockHeaderBytes);
-                unsigned unpackedSize = blockHeader.ReadUShort();
-                unsigned packedSize = blockHeader.ReadUShort();
+                i32 unpackedSize = blockHeader.ReadU16();
+                i32 packedSize = blockHeader.ReadU16();
 
                 if (!readBuffer_)
                 {
-                    readBuffer_ = new unsigned char[unpackedSize];
-                    inputBuffer_ = new unsigned char[LZ4_compressBound(unpackedSize)];
+                    readBuffer_ = new u8[unpackedSize];
+                    inputBuffer_ = new u8[LZ4_compressBound(unpackedSize)];
                 }
 
                 /// \todo Handle errors
@@ -220,7 +240,7 @@ unsigned File::Read(void* dest, unsigned size)
                 readBufferOffset_ = 0;
             }
 
-            unsigned copySize = Min((readBufferSize_ - readBufferOffset_), sizeLeft);
+            i32 copySize = Min((readBufferSize_ - readBufferOffset_), sizeLeft);
             memcpy(destPtr, readBuffer_.Get() + readBufferOffset_, copySize);
             destPtr += copySize;
             sizeLeft -= copySize;
@@ -251,8 +271,10 @@ unsigned File::Read(void* dest, unsigned size)
     return size;
 }
 
-unsigned File::Seek(unsigned position)
+i64 File::Seek(i64 position)
 {
+    assert(position >= 0);
+
     if (!IsOpen())
     {
         // If file not open, do not log the error further here to prevent spamming the stderr stream
@@ -276,7 +298,7 @@ unsigned File::Seek(unsigned position)
         // Skip bytes
         else if (position >= position_)
         {
-            unsigned char skipBuffer[SKIP_BUFFER_SIZE];
+            u8 skipBuffer[SKIP_BUFFER_SIZE];
             while (position > position_)
                 Read(skipBuffer, Min(position - position_, SKIP_BUFFER_SIZE));
         }
@@ -293,8 +315,10 @@ unsigned File::Seek(unsigned position)
     return position_;
 }
 
-unsigned File::Write(const void* data, unsigned size)
+i32 File::Write(const void* data, i32 size)
 {
+    assert(size >= 0);
+
     if (!IsOpen())
     {
         // If file not open, do not log the error further here to prevent spamming the stderr stream
@@ -313,14 +337,14 @@ unsigned File::Write(const void* data, unsigned size)
     // Need to reassign the position due to internal buffering when transitioning from reading to writing
     if (writeSyncNeeded_)
     {
-        fseek((FILE*)handle_, (long)position_ + offset_, SEEK_SET);
+        FSeek64((FILE*)handle_, position_ + offset_, SEEK_SET);
         writeSyncNeeded_ = false;
     }
 
     if (fwrite(data, size, 1, (FILE*)handle_) != 1)
     {
         // Return to the position where the write began
-        fseek((FILE*)handle_, (long)position_ + offset_, SEEK_SET);
+        FSeek64((FILE*)handle_, position_ + offset_, SEEK_SET);
         URHO3D_LOGERROR("Error while writing to file " + GetName());
         return 0;
     }
@@ -333,7 +357,7 @@ unsigned File::Write(const void* data, unsigned size)
     return size;
 }
 
-unsigned File::GetChecksum()
+hash32 File::GetChecksum()
 {
     if (offset_ || checksum_)
         return checksum_;
@@ -346,15 +370,15 @@ unsigned File::GetChecksum()
 
     URHO3D_PROFILE(CalculateFileChecksum);
 
-    unsigned oldPos = position_;
+    i64 oldPos = position_;
     checksum_ = 0;
 
     Seek(0);
     while (!IsEof())
     {
-        unsigned char block[1024];
-        unsigned readBytes = Read(block, 1024);
-        for (unsigned i = 0; i < readBytes; ++i)
+        u8 block[1024];
+        i32 readBytes = Read(block, 1024);
+        for (i32 i = 0; i < readBytes; ++i)
             checksum_ = SDBMHash(checksum_, block[i]);
     }
 
@@ -456,7 +480,7 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
 #ifdef _WIN32
     handle_ = _wfopen(GetWideNativePath(fileName).CString(), openMode[mode]);
 #else
-    handle_ = fopen(GetNativePath(fileName).CString(), openMode[mode]);
+    handle_ = fopen64(GetNativePath(fileName).CString(), openMode[mode]);
 #endif
 
     // If file did not exist in readwrite mode, retry with write-update mode
@@ -465,7 +489,7 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
 #ifdef _WIN32
         handle_ = _wfopen(GetWideNativePath(fileName).CString(), openMode[mode + 1]);
 #else
-        handle_ = fopen(GetNativePath(fileName).CString(), openMode[mode + 1]);
+        handle_ = fopen64(GetNativePath(fileName).CString(), openMode[mode + 1]);
 #endif
     }
 
@@ -477,9 +501,9 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
 
     if (!fromPackage)
     {
-        fseek((FILE*)handle_, 0, SEEK_END);
-        long size = ftell((FILE*)handle_); // 64 bit on Unix 64
-        fseek((FILE*)handle_, 0, SEEK_SET);
+        FSeek64((FILE*)handle_, 0, SEEK_END);
+        i64 size = FTell64((FILE*)handle_);
+        FSeek64((FILE*)handle_, 0, SEEK_SET);
         if (size > M_MAX_UNSIGNED)
         {
             URHO3D_LOGERRORF("Could not open file %s which is larger than 4GB", fileName.CString());
@@ -499,8 +523,10 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
     return true;
 }
 
-bool File::ReadInternal(void* dest, unsigned size)
+bool File::ReadInternal(void* dest, i32 size)
 {
+    assert(size >= 0);
+
 #ifdef __ANDROID__
     if (assetHandle_)
     {
@@ -511,8 +537,10 @@ bool File::ReadInternal(void* dest, unsigned size)
         return fread(dest, size, 1, (FILE*)handle_) == 1;
 }
 
-void File::SeekInternal(unsigned newPosition)
+void File::SeekInternal(i64 newPosition)
 {
+    assert(newPosition >= 0);
+
 #ifdef __ANDROID__
     if (assetHandle_)
     {
@@ -523,7 +551,9 @@ void File::SeekInternal(unsigned newPosition)
     }
     else
 #endif
-        fseek((FILE*)handle_, newPosition, SEEK_SET);
+    {
+        FSeek64((FILE*)handle_, newPosition, SEEK_SET);
+    }
 }
 
 }

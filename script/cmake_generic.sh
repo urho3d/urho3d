@@ -30,6 +30,7 @@ for a in $@; do
             OPTS=(-D CMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/MinGW.cmake)
             ;;
         WEB=1)
+            TOOLCHAINS=(${EMSCRIPTEN_ROOT_PATH}/tools/cmake/Modules/Platform)
             OPTS=(-D CMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/Emscripten.cmake)
             ;;
     esac

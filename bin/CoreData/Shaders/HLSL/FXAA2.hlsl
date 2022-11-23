@@ -11,21 +11,12 @@
 #include "Transform.hlsl"
 #include "ScreenPos.hlsl"
 
-#ifndef D3D11
-
-// D3D9 uniforms
-uniform float4 cFXAAParams;
-
-#else
-
 // D3D11 constant buffers
 #ifdef COMPILEPS
 cbuffer CustomPS : register(b6)
 {
     float4 cFXAAParams;
 }
-#endif
-
 #endif
 
 void VS(float4 iPos : POSITION,

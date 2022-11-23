@@ -39,7 +39,7 @@ void VertexBuffer::SetShadowed(bool enable)
     if (enable != shadowed_)
     {
         if (enable && vertexSize_ && vertexCount_)
-            shadowData_ = new u8[(size_t)vertexCount_ * vertexSize_];
+            shadowData_ = new byte[(size_t)vertexCount_ * vertexSize_];
         else
             shadowData_.Reset();
 
@@ -47,7 +47,7 @@ void VertexBuffer::SetShadowed(bool enable)
     }
 }
 
-bool VertexBuffer::SetSize(i32 vertexCount, unsigned elementMask, bool dynamic)
+bool VertexBuffer::SetSize(i32 vertexCount, VertexElements elementMask, bool dynamic)
 {
     assert(vertexCount >= 0);
     return SetSize(vertexCount, GetElements(elementMask), dynamic);
@@ -65,7 +65,7 @@ bool VertexBuffer::SetSize(i32 vertexCount, const Vector<VertexElement>& element
     UpdateOffsets();
 
     if (shadowed_ && vertexCount_ && vertexSize_)
-        shadowData_ = new u8[(size_t)vertexCount_ * vertexSize_];
+        shadowData_ = new byte[(size_t)vertexCount_ * vertexSize_];
     else
         shadowData_.Reset();
 
@@ -76,7 +76,7 @@ void VertexBuffer::UpdateOffsets()
 {
     i32 elementOffset = 0;
     elementHash_ = 0;
-    elementMask_ = MASK_NONE;
+    elementMask_ = VertexElements::None;
 
     for (VertexElement& element : elements_)
     {
@@ -89,7 +89,7 @@ void VertexBuffer::UpdateOffsets()
         {
             const VertexElement& legacy = LEGACY_VERTEXELEMENTS[j];
             if (element.type_ == legacy.type_ && element.semantic_ == legacy.semantic_ && element.index_ == legacy.index_)
-                elementMask_ |= VertexMaskFlags(1u << j);
+                elementMask_ |= VertexElements{1u << j};
         }
     }
 
@@ -148,13 +148,13 @@ i32 VertexBuffer::GetElementOffset(const Vector<VertexElement>& elements, Vertex
     return element ? element->offset_ : NINDEX;
 }
 
-Vector<VertexElement> VertexBuffer::GetElements(unsigned elementMask)
+Vector<VertexElement> VertexBuffer::GetElements(VertexElements elementMask)
 {
     Vector<VertexElement> ret;
 
     for (i32 i = 0; i < MAX_LEGACY_VERTEX_ELEMENTS; ++i)
     {
-        if (elementMask & (1u << i))
+        if (!!(elementMask & VertexElements{1u << i}))
             ret.Push(LEGACY_VERTEXELEMENTS[i]);
     }
 
@@ -171,13 +171,13 @@ i32 VertexBuffer::GetVertexSize(const Vector<VertexElement>& elements)
     return size;
 }
 
-i32 VertexBuffer::GetVertexSize(unsigned elementMask)
+i32 VertexBuffer::GetVertexSize(VertexElements elementMask)
 {
     i32 size = 0;
 
     for (i32 i = 0; i < MAX_LEGACY_VERTEX_ELEMENTS; ++i)
     {
-        if (elementMask & (1u << i))
+        if (!!(elementMask & VertexElements{1u << i}))
             size += ELEMENT_TYPESIZES[LEGACY_VERTEXELEMENTS[i].type_];
     }
 
@@ -204,11 +204,6 @@ void VertexBuffer::OnDeviceLost()
         return OnDeviceLost_OGL();
 #endif
 
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return OnDeviceLost_D3D9();
-#endif
-
 #ifdef URHO3D_D3D11
     if (gapi == GAPI_D3D11)
         return OnDeviceLost_D3D11();
@@ -222,11 +217,6 @@ void VertexBuffer::OnDeviceReset()
 #ifdef URHO3D_OPENGL
     if (gapi == GAPI_OPENGL)
         return OnDeviceReset_OGL();
-#endif
-
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return OnDeviceReset_D3D9();
 #endif
 
 #ifdef URHO3D_D3D11
@@ -244,11 +234,6 @@ void VertexBuffer::Release()
         return Release_OGL();
 #endif
 
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return Release_D3D9();
-#endif
-
 #ifdef URHO3D_D3D11
     if (gapi == GAPI_D3D11)
         return Release_D3D11();
@@ -262,11 +247,6 @@ bool VertexBuffer::SetData(const void* data)
 #ifdef URHO3D_OPENGL
     if (gapi == GAPI_OPENGL)
         return SetData_OGL(data);
-#endif
-
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return SetData_D3D9(data);
 #endif
 
 #ifdef URHO3D_D3D11
@@ -287,11 +267,6 @@ bool VertexBuffer::SetDataRange(const void* data, i32 start, i32 count, bool dis
         return SetDataRange_OGL(data, start, count, discard);
 #endif
 
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return SetDataRange_D3D9(data, start, count, discard);
-#endif
-
 #ifdef URHO3D_D3D11
     if (gapi == GAPI_D3D11)
         return SetDataRange_D3D11(data, start, count, discard);
@@ -308,11 +283,6 @@ void* VertexBuffer::Lock(i32 start, i32 count, bool discard)
 #ifdef URHO3D_OPENGL
     if (gapi == GAPI_OPENGL)
         return Lock_OGL(start, count, discard);
-#endif
-
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return Lock_D3D9(start, count, discard);
 #endif
 
 #ifdef URHO3D_D3D11
@@ -332,11 +302,6 @@ void VertexBuffer::Unlock()
         return Unlock_OGL();
 #endif
 
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return Unlock_D3D9();
-#endif
-
 #ifdef URHO3D_D3D11
     if (gapi == GAPI_D3D11)
         return Unlock_D3D11();
@@ -350,11 +315,6 @@ bool VertexBuffer::Create()
 #ifdef URHO3D_OPENGL
     if (gapi == GAPI_OPENGL)
         return Create_OGL();
-#endif
-
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return Create_D3D9();
 #endif
 
 #ifdef URHO3D_D3D11
@@ -372,11 +332,6 @@ bool VertexBuffer::UpdateToGPU()
 #ifdef URHO3D_OPENGL
     if (gapi == GAPI_OPENGL)
         return UpdateToGPU_OGL();
-#endif
-
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return UpdateToGPU_D3D9();
 #endif
 
 #ifdef URHO3D_D3D11
@@ -397,11 +352,6 @@ void* VertexBuffer::MapBuffer(i32 start, i32 count, bool discard)
         return MapBuffer_OGL(start, count, discard);
 #endif
 
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return MapBuffer_D3D9(start, count, discard);
-#endif
-
 #ifdef URHO3D_D3D11
     if (gapi == GAPI_D3D11)
         return MapBuffer_D3D11(start, count, discard);
@@ -417,11 +367,6 @@ void VertexBuffer::UnmapBuffer()
 #ifdef URHO3D_OPENGL
     if (gapi == GAPI_OPENGL)
         return UnmapBuffer_OGL();
-#endif
-
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return UnmapBuffer_D3D9();
 #endif
 
 #ifdef URHO3D_D3D11

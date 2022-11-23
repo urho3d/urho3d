@@ -12,7 +12,7 @@
 #include <Urho3D/Resource/XMLFile.h>
 
 #ifdef WIN32
-#include <windows.h>
+#include <Urho3D/Engine/WinWrapped.h>
 #endif
 
 #define STBRP_LARGE_RECTS
@@ -117,12 +117,12 @@ void Run(Vector<String>& arguments)
 
         if (arg.StartsWith("-"))
         {
-            if (arg == "-px")      { padX = ToUInt(arguments[0]); arguments.Erase(0); }
-            else if (arg == "-py") { padY = ToUInt(arguments[0]); arguments.Erase(0); }
-            else if (arg == "-ox") { offsetX = ToUInt(arguments[0]); arguments.Erase(0); }
-            else if (arg == "-oy") { offsetY = ToUInt(arguments[0]); arguments.Erase(0); }
-            else if (arg == "-frameWidth") { frameWidth = ToUInt(arguments[0]); arguments.Erase(0); }
-            else if (arg == "-frameHeight") { frameHeight = ToUInt(arguments[0]); arguments.Erase(0); }
+            if (arg == "-px")      { padX = ToU32(arguments[0]); arguments.Erase(0); }
+            else if (arg == "-py") { padY = ToU32(arguments[0]); arguments.Erase(0); }
+            else if (arg == "-ox") { offsetX = ToU32(arguments[0]); arguments.Erase(0); }
+            else if (arg == "-oy") { offsetY = ToU32(arguments[0]); arguments.Erase(0); }
+            else if (arg == "-frameWidth") { frameWidth = ToU32(arguments[0]); arguments.Erase(0); }
+            else if (arg == "-frameHeight") { frameHeight = ToU32(arguments[0]); arguments.Erase(0); }
             else if (arg == "-trim") { trim = true; }
             else if (arg == "-xml")  { spriteSheetFileName = arguments[0]; arguments.Erase(0); }
             else if (arg == "-h")  { help = true; break; }
@@ -311,17 +311,17 @@ void Run(Vector<String>& arguments)
     {
         XMLElement subTexture = root.CreateChild("SubTexture");
         subTexture.SetString("name", packerInfo->name);
-        subTexture.SetInt("x", packerInfo->x + offsetX);
-        subTexture.SetInt("y", packerInfo->y + offsetY);
-        subTexture.SetInt("width", packerInfo->width);
-        subTexture.SetInt("height", packerInfo->height);
+        subTexture.SetI32("x", packerInfo->x + offsetX);
+        subTexture.SetI32("y", packerInfo->y + offsetY);
+        subTexture.SetI32("width", packerInfo->width);
+        subTexture.SetI32("height", packerInfo->height);
 
         if (packerInfo->frameWidth || packerInfo->frameHeight)
         {
-            subTexture.SetInt("frameWidth", packerInfo->frameWidth);
-            subTexture.SetInt("frameHeight", packerInfo->frameHeight);
-            subTexture.SetInt("offsetX", packerInfo->offsetX);
-            subTexture.SetInt("offsetY", packerInfo->offsetY);
+            subTexture.SetI32("frameWidth", packerInfo->frameWidth);
+            subTexture.SetI32("frameHeight", packerInfo->frameHeight);
+            subTexture.SetI32("offsetX", packerInfo->offsetX);
+            subTexture.SetI32("offsetY", packerInfo->offsetY);
         }
 
         URHO3D_LOGINFO("Transferring " + packerInfo->path + " to sprite sheet.");
@@ -345,8 +345,8 @@ void Run(Vector<String>& arguments)
 
     if (debug)
     {
-        unsigned OUTER_BOUNDS_DEBUG_COLOR = Color::BLUE.ToUInt();
-        unsigned INNER_BOUNDS_DEBUG_COLOR = Color::GREEN.ToUInt();
+        unsigned OUTER_BOUNDS_DEBUG_COLOR = Color::BLUE.ToU32();
+        unsigned INNER_BOUNDS_DEBUG_COLOR = Color::GREEN.ToU32();
 
         URHO3D_LOGINFO("Drawing debug information.");
         for (const SharedPtr<PackerInfo>& packerInfo : packerInfos)

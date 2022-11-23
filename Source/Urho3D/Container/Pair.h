@@ -49,7 +49,7 @@ public:
     }
 
     /// Return hash value for HashSet & HashMap.
-    unsigned ToHash() const { return (MakeHash(first_) & 0xffff) | (MakeHash(second_) << 16); }
+    hash32 ToHash() const { return (MakeHash(first_) & 0xffff) | (MakeHash(second_) << 16); }
 
     /// First value.
     T first_;

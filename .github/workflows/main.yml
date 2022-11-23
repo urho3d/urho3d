@@ -16,15 +16,15 @@ jobs:
       skip: ${{ steps.whatchanged.outputs.skip }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: What changed
         id: whatchanged
         run: |
           git fetch --deepen=1
           git log --raw --no-merges -1 |grep '^:' >/tmp/whatchanged
-          echo ::set-output name=skip::$(grep -cqv 'website/' /tmp/whatchanged; echo $?)
-  linux:
-    name: 🐧
+          echo "name=skip::$(grep -cqv 'website/' /tmp/whatchanged; echo $?)" >> $GITHUB_OUTPUT
+  linux-old:
+    name: 🐧-old
     runs-on: ubuntu-latest
     needs: init
     if: needs.init.outputs.skip == '0'
@@ -32,9 +32,6 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - linux-gcc
-          - linux-clang
-          - mingw
           - rpi
           - arm
         lib-type:
@@ -46,11 +43,6 @@ jobs:
         build-type:
           - rel
           - dbg
-        include:
-          - { platform: web, lib-type: static, architecture: wasm, build-type: rel }
-          - { platform: web, lib-type: static, architecture: wasm, build-type: dbg }
-          - { platform: android, lib-type: static, architecture: all, build-type: both }
-          - { platform: android, lib-type: shared, architecture: all, build-type: both }
     env:
       HOST: ${{ github.job }}
       PLATFORM: ${{ matrix.platform }}
@@ -60,7 +52,7 @@ jobs:
       DBE_TAG: master
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with: { fetch-depth: 0 }
       - name: Free up space
         run: |
@@ -72,7 +64,7 @@ jobs:
         id: source_checksum
         run: rake source_checksum
       - name: Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             build/cache/.ccache
@@ -97,8 +89,8 @@ jobs:
       - name: Test
         run: script/dockerized.sh ${PLATFORM/-*} rake test
         if: startsWith(matrix.platform, 'linux') || matrix.platform == 'android'
-      - name: Documentation
-        run: script/dockerized.sh ${PLATFORM/-*} rake doc
+      #- name: Documentation
+      #  run: script/dockerized.sh ${PLATFORM/-*} rake doc
       - name: Install
         run: |
           script/dockerized.sh ${PLATFORM/-*} rake install
@@ -126,7 +118,7 @@ jobs:
         run: script/dockerized.sh ${PLATFORM/-*} rake package
         if: github.event_name == 'push' && matrix.platform != 'android'
       - name: Upload
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ matrix.build-type }}
           path: |
@@ -153,9 +145,9 @@ jobs:
         continue-on-error: ${{ !startsWith(github.ref, 'refs/tags/') }}
   macOS:
     name: 🍏
-    runs-on: macos-10.15
+    runs-on: latest
     needs: init
-    if: needs.init.outputs.skip == '0' && github.event_name != 'repository_dispatch'
+    if: false && needs.init.outputs.skip == '0' && github.event_name != 'repository_dispatch'
     strategy:
       fail-fast: false
       matrix:
@@ -173,7 +165,7 @@ jobs:
       LIB_TYPE: ${{ matrix.lib-type }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with: { fetch-depth: 0 }
       - name: Select xcode
         run: sudo xcode-select -s '/Applications/Xcode_12.app'
@@ -211,7 +203,7 @@ jobs:
         run: rake package
         if: github.event_name == 'push'
       - name: Upload
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.platform }}-${{ matrix.lib-type }}-all-rel
           path: build/ci/*.tar.gz
@@ -232,26 +224,25 @@ jobs:
           - shared
         graphics-api:
           - DX11
-          - DX9
           - OpenGL
     env:
       HOST: ${{ github.job }}
       PLATFORM: ${{ matrix.platform }}
       LIB_TYPE: ${{ matrix.lib-type }}
       GRAPHICS_API: ${{ matrix.graphics-api }}
+      URHO3D_GENERATEBINDINGS: 1
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with: { fetch-depth: 0 }
       - name: Install dependencies
         id: install_dependencies
         shell: bash {0} # Allow catching errors
         run: |
-          # Temporary use old version of Doxygen https://github.com/urho3d/Urho3D/issues/2757
           # Server may reject connection, so try several times
           for (( i = 0; i < 4; ++i ))
           do
-            choco install --no-progress doxygen.install --version 1.8.20
+            choco install --no-progress doxygen.install
             if (( $? == 0 )) # Exit code of the previous command
             then
               break
@@ -277,7 +268,17 @@ jobs:
       - name: CMake
         run: rake cmake
       - name: Build
-        run: rake build
+        shell: bash
+        run: |
+          rake build
+
+          # If there are changes in repository, then generated bindings are different from existing ones
+          cd D:/a/Urho3D/Urho3D
+          if [[ `git status --porcelain` ]]; then
+            echo "!!!!! ERROR: Generated bindings are different from existing ones"
+            exit -1 # Exit from the script with error code
+          fi
+
       - name: Test tools
         shell: bash
         run: D:/a/Urho3D/Urho3D/script/test_tools.sh D:/a/Urho3D/Urho3D D:/a/Urho3D/Urho3D/build/ci
@@ -305,11 +306,390 @@ jobs:
         run: rake package
         if: github.event_name == 'push'
       - name: Upload
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.platform }}-${{ matrix.lib-type }}-64-${{ matrix.graphics-api }}-rel
           path: build/ci/*.zip
         if: github.event_name == 'push'
+
+  Web:
+    name: ⚡ Emscripten
+    runs-on: ubuntu-latest
+    needs: init
+    #if: false
+
+    strategy:
+      fail-fast: false
+      matrix:
+        build-type:
+        - Release
+        - Debug
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with: { path: "engine_repo" }
+
+    - name: Build
+      run: |
+        set -x # Echo commands
+        echo "Current dir: $PWD"
+        git clone --depth 1 https://github.com/emscripten-core/emsdk.git
+        ./emsdk/emsdk install 3.1.17
+        ./emsdk/emsdk activate 3.1.17
+        chmod +x ./emsdk/emsdk_env.sh
+        ./emsdk/emsdk_env.sh
+        TOOLCHAIN=$PWD/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
+        cmake engine_repo -B engine_build -G "Unix Makefiles" \
+          -D WEB=1 -D CMAKE_TOOLCHAIN_FILE=${TOOLCHAIN} \
+          -D EMSCRIPTEN_SHARE_DATA=1 -D URHO3D_DATABASE_SQLITE=1 \
+          -D CMAKE_BUILD_TYPE=${{ matrix.build-type }}
+        cmake --build engine_build
+
+    - name: Upload samples to site
+
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PUBLISHER_NAME: ${{ secrets.PUBLISHER_NAME }}
+        PUBLISHER_EMAIL: ${{ secrets.PUBLISHER_EMAIL }}
+        PUBLISHER_TOKEN: ${{ secrets.PUBLISHER_TOKEN }}
+        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+        BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
+      run: |
+        echo "Current dir: $PWD" # $GITHUB_WORKSPACE
+        cd engine_repo
+        rake ci_publish_web
+      if: | # If not PR
+        github.event_name == 'push' && matrix.build-type == 'Release' &&
+          (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/'))
+      continue-on-error: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+  Linux_Native:
+    runs-on: ubuntu-latest
+    needs: init
+    if: needs.init.outputs.skip == '0'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        COMPILER:
+        - {
+            ID: gcc,
+            C: gcc,
+            CXX: g++,
+          }
+        - {
+            ID: clang,
+            C: clang,
+            CXX: clang++,
+          }
+        BITS:
+        - 64
+        - 32
+        LIB_TYPE:
+        - {
+            ID: shared,
+            VALUE: SHARED,
+          }
+        - {
+            ID: static,
+            VALUE: STATIC,
+          }
+        BUILD_TYPE:
+        - {
+            ID: rel,
+            VALUE: Release,
+          }
+        - {
+            ID: dbg,
+            VALUE: Debug,
+          }
+
+    name: 🐧-${{ matrix.COMPILER.ID }}-${{ matrix.BITS }}-${{ matrix.LIB_TYPE.ID }}-${{ matrix.BUILD_TYPE.ID }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with: { path: "engine_repo" }
+
+    - name: Install dependencies
+      run: |
+        if [ "${{ matrix.BITS }}" == "32" ]; then
+          sudo dpkg --add-architecture i386
+          sudo apt update
+          sudo apt install gcc-multilib g++-multilib libxext-dev:i386 libgl1-mesa-dev:i386
+        else
+          sudo apt install libgl1-mesa-dev
+        fi
+
+        # Ubuntu repository contains obsolete Doxygen 1.9.1. Download own build
+        mkdir $HOME/programs
+        cd $HOME/programs
+        wget -q -O tmp.zip https://github.com/rurho3d/doxygen-builder/raw/main/doxygen_linux64.zip && unzip tmp.zip && rm tmp.zip
+        echo "$HOME/programs" >> $GITHUB_PATH
+
+    - name: Cache
+      uses: actions/cache@v3
+      with:
+        path: engine_build
+        key: linux-${{ matrix.COMPILER.ID }}-${{ matrix.BITS }}-${{ matrix.LIB_TYPE.ID }}-${{ matrix.BUILD_TYPE.ID }}-${{ github.sha }}
+        restore-keys: linux-${{ matrix.COMPILER.ID }}-${{ matrix.BITS }}-${{ matrix.LIB_TYPE.ID }}-${{ matrix.BUILD_TYPE.ID }}
+
+    - name: Build
+      run: |
+        #set -x # Echo commands
+        echo "Current dir: $PWD"
+
+        if [ "${{ matrix.BITS }}" == "32" ]
+        then
+          BITS64=0
+        else
+          BITS64=1
+        fi
+
+        cmake engine_repo -B engine_build -G "Unix Makefiles" \
+          -D CMAKE_C_COMPILER=${{ matrix.COMPILER.C }} -D CMAKE_CXX_COMPILER=${{ matrix.COMPILER.CXX }} \
+          -D URHO3D_DATABASE_SQLITE=1 -D URHO3D_TESTING=1 -D CMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE.VALUE }} \
+          -D URHO3D_64BIT=$BITS64 -D URHO3D_LIB_TYPE=${{ matrix.LIB_TYPE.VALUE }} -D URHO3D_GENERATEBINDINGS=1
+
+        cmake --build engine_build
+
+        # If there are changes in repository, then generated bindings are different from existing ones
+        cd engine_repo
+        if [[ `git status --porcelain` ]]; then
+          echo "!!!!! ERROR: Generated bindings are different from existing ones"
+          exit -1 # Exit from the script with error code
+        fi
+        cd ..
+
+    - name: CTest
+      shell: bash {0} # Allow catching errors
+      run: |
+        xvfb-run ctest --test-dir engine_build
+        EXIT_CODE=$? # Exit code of the previous command
+
+        if (( $EXIT_CODE != 0 )) 
+        then
+          echo "$(cat ~/.local/share/urho3d/logs/HelloWorld.log)"
+          exit $EXIT_CODE
+        fi
+
+    - name: Test tools
+      run: $GITHUB_WORKSPACE/engine_repo/script/test_tools.sh $GITHUB_WORKSPACE/engine_repo $GITHUB_WORKSPACE/engine_build
+
+    - name: Test app
+      run: |
+        #cmake --install engine_build --prefix=$HOME/installed_engine # Not works
+        #URHO3D_HOME=$HOME/installed_engine # Not works (add export?)
+        #URHO3D_HOME=$GITHUB_WORKSPACE/engine_build # Not works
+        sudo cmake --build engine_build --target install
+        cd engine_repo
+        rake new
+        cd ..
+
+        if [ "${{ matrix.BITS }}" == "32" ]
+        then
+          BITS64=0
+        else
+          BITS64=1
+        fi
+
+        cmake $HOME/projects/UrhoApp -B $HOME/projects/UrhoApp_build -G "Unix Makefiles" \
+          -D CMAKE_C_COMPILER=${{ matrix.COMPILER.C }} -D CMAKE_CXX_COMPILER=${{ matrix.COMPILER.CXX }} \
+          -D URHO3D_DATABASE_SQLITE=1 -D URHO3D_TESTING=1 -D CMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE.VALUE }} \
+          -D URHO3D_64BIT=$BITS64 -D URHO3D_LIB_TYPE=${{ matrix.LIB_TYPE.VALUE }}
+
+        cmake --build $HOME/projects/UrhoApp_build
+        xvfb-run ctest --test-dir $HOME/projects/UrhoApp_build
+
+  Linux_MinGW:
+    runs-on: ubuntu-22.04
+    needs: init
+    if: needs.init.outputs.skip == '0'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        BITS:
+        - 64
+        - 32
+        LIB_TYPE:
+        - {
+            ID: shared,
+            VALUE: SHARED,
+          }
+        - {
+            ID: static,
+            VALUE: STATIC,
+          }
+        BUILD_TYPE:
+        - {
+            ID: rel,
+            VALUE: Release,
+          }
+        - {
+            ID: dbg,
+            VALUE: Debug,
+          }
+
+    name: 🐧-mingw-${{ matrix.BITS }}-${{ matrix.LIB_TYPE.ID }}-${{ matrix.BUILD_TYPE.ID }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with: { path: "engine_repo" }
+
+    - name: Install dependencies
+      run: sudo apt install mingw-w64
+
+    - name: Cache
+      uses: actions/cache@v3
+      with:
+        path: engine_build
+        key: linux-mingw-${{ matrix.BITS }}-${{ matrix.LIB_TYPE.ID }}-${{ matrix.BUILD_TYPE.ID }}-${{ github.sha }}
+        restore-keys: linux-mingw-${{ matrix.BITS }}-${{ matrix.LIB_TYPE.ID }}-${{ matrix.BUILD_TYPE.ID }}
+
+    - name: Build
+      run: |
+        #set -x # Echo commands
+        echo "Current dir: $PWD" # $GITHUB_WORKSPACE
+
+        if [ "${{ matrix.BITS }}" == "32" ]
+        then
+          export MINGW_PREFIX=/usr/bin/i686-w64-mingw32
+          BITS64=0
+          DX_INC=/usr/i686-w64-mingw32/include
+          DX_LIB=/usr/i686-w64-mingw32/lib
+        else
+          export MINGW_PREFIX=/usr/bin/x86_64-w64-mingw32
+          BITS64=1
+          DX_INC=/usr/x86_64-w64-mingw32/include
+          DX_LIB=/usr/x86_64-w64-mingw32/lib
+        fi
+
+        TOOLCHAIN=$GITHUB_WORKSPACE/engine_repo/cmake/Toolchains/MinGW.cmake
+
+        cmake engine_repo -B engine_build -D CMAKE_TOOLCHAIN_FILE=${TOOLCHAIN} -D MINGW=1 \
+          -D URHO3D_EXTRAS=1 -D URHO3D_OPENGL=1 -D URHO3D_D3D11=1 \
+          -D DIRECTX_INC_SEARCH_PATHS=$DX_INC -D DIRECTX_LIB_SEARCH_PATHS=$DX_LIB \
+          -D URHO3D_DATABASE_SQLITE=1 -D CMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE.VALUE }} \
+          -D URHO3D_64BIT=$BITS64 -D URHO3D_LIB_TYPE=${{ matrix.LIB_TYPE.VALUE }}
+
+        cmake --build engine_build
+
+    - name: Test app
+      run: |
+        #sudo cmake --build engine_build --target install
+        export URHO3D_HOME=$GITHUB_WORKSPACE/engine_build
+
+        cd engine_repo
+        rake new
+        cd ..
+
+        if [ "${{ matrix.BITS }}" == "32" ]
+        then
+          export MINGW_PREFIX=/usr/bin/i686-w64-mingw32
+          BITS64=0
+          DX_INC=/usr/i686-w64-mingw32/include
+          DX_LIB=/usr/i686-w64-mingw32/lib
+        else
+          export MINGW_PREFIX=/usr/bin/x86_64-w64-mingw32
+          BITS64=1
+          DX_INC=/usr/x86_64-w64-mingw32/include
+          DX_LIB=/usr/x86_64-w64-mingw32/lib
+        fi
+
+        TOOLCHAIN=$GITHUB_WORKSPACE/engine_repo/cmake/Toolchains/MinGW.cmake
+
+        cmake $HOME/projects/UrhoApp -B $HOME/projects/UrhoApp_build -D CMAKE_TOOLCHAIN_FILE=${TOOLCHAIN} -D MINGW=1 \
+          -D URHO3D_EXTRAS=1 -D URHO3D_OPENGL=1 -D URHO3D_D3D11=1 \
+          -D DIRECTX_INC_SEARCH_PATHS=$DX_INC -D DIRECTX_LIB_SEARCH_PATHS=$DX_LIB \
+          -D URHO3D_DATABASE_SQLITE=1 -D CMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE.VALUE }} \
+          -D URHO3D_64BIT=$BITS64 -D URHO3D_LIB_TYPE=${{ matrix.LIB_TYPE.VALUE }}
+
+        cmake --build $HOME/projects/UrhoApp_build
+
+  Android:
+    name: 🤖 Android
+    runs-on: ubuntu-latest
+    needs: init
+    #if: false
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with: { path: "engine_repo" }
+
+    - name: Free up space
+      run: |
+        echo "Current user: $USER"
+        echo "Current dir: $PWD"
+        echo "!df -h"; df -h # Disks usage
+        echo "!df -h ~"; df -h ~ # Home physical device
+        echo "!du -sh /usr/share/*/ | sort -rh"; du -sh /usr/share/*/ | sort -rh # Sort subdirs by size
+        echo "!du -sh /usr/local/share/*/ | sort -rh"; du -sh /usr/local/share/*/ | sort -rh
+        echo "!du -sh /opt/*/ | sort -rh"; du -sh /opt/*/ | sort -rh
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /usr/share/swift
+        sudo rm -rf /usr/share/miniconda
+        sudo rm -rf /usr/local/share/powershell
+        sudo rm -rf /usr/local/share/chromium
+        sudo rm -rf /opt/hostedtoolcache
+        sudo rm -rf /opt/az
+        sudo rm -rf /opt/microsoft
+        sudo apt-get clean
+        echo "!df -h ~ after free up"; df -h ~
+
+    - name: Build
+      run: |
+        #set -x # Echo commands
+        echo "Current dir: $PWD"
+        #echo '!which java';which java # Where is Java executable
+        #echo '!java -version';java -version # Print Java version
+        #echo '!cmake --version';cmake --version # Print CMake version
+        echo '!env';env # Print all environment variables
+
+        # SDK contains obsolete sdkmanager by default ($ANDROID_SDK_ROOT/tools/bin/sdkmanager),
+        # so download the latest version manually
+        # https://developer.android.com/studio#command-tools
+        wget -q -O tmp.zip https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip && unzip tmp.zip && rm tmp.zip
+        # https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2004-Readme.md#environment-variables-3
+        JAVA_HOME=$JAVA_HOME_11_X64
+        ./cmdline-tools/bin/sdkmanager --sdk_root=${ANDROID_SDK_ROOT} \
+            "cmdline-tools;latest" \
+            | grep -v '\[.*\]' `# Hide progress bar` \
+            || : # Catch error
+
+        # We installed sdkmanager through sdkmanager, so delete the manually downloaded version
+        rm -r cmdline-tools
+
+        $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
+            "platform-tools" \
+            "build-tools;29.0.2" \
+            "ndk;21.3.6528147" \
+            "platforms;android-30" \
+            "cmake;3.18.1" \
+            | grep -v '\[.*\]' `# Hide progress bar` \
+            || : #Catch error
+        
+        # Path to ninja
+        PATH="$ANDROID_SDK_ROOT/cmake/3.18.1/bin:$PATH"
+
+        echo '!ls -a $ANDROID_HOME';ls -a $ANDROID_HOME
+        echo '!ls -a $ANDROID_HOME/platforms';ls -a $ANDROID_HOME/platforms
+        echo '!ls -a $ANDROID_HOME/ndk';ls -a $ANDROID_HOME/ndk
+        echo '!ls -a $ANDROID_HOME/build-tools';ls -a $ANDROID_HOME/build-tools
+        cd engine_repo
+
+        #URHO3D_LIB_TYPE=SHARED
+
+        #./gradlew buildEnvironment
+        #./gradlew build -x test
+        ./gradlew build
+
+    - name: Show remaining space
+      if: ${{ always() }}
+      run: echo "!df -h"; df -h # Disks usage
 
 ...
 

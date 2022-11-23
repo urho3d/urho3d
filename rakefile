@@ -54,6 +54,17 @@ desc 'Build the software'
 task :build, [:target] => [:cmake] do |_, args|
   system "ccache -z" if ENV['USE_CCACHE']
   if ENV['PLATFORM'] == 'android'
+    system "echo '!which java';which java" # Where is Java executable
+    system "echo '!java -version';java -version" # Print Java veriosn
+    system "echo '!env';env" # Print all environment variables
+    system "echo '!ls -a $ANDROID_HOME';ls -a $ANDROID_HOME"
+    system "echo '!ls -a $ANDROID_HOME/platforms';ls -a $ANDROID_HOME/platforms"
+    system "echo '!ls -a $ANDROID_HOME/ndk';ls -a $ANDROID_HOME/ndk"
+    system "echo '!ls -a $ANDROID_HOME/build-tools';ls -a $ANDROID_HOME/build-tools"
+    system "echo '!ls -a $ANDROID_HOME/cmdline-tools';ls -a $ANDROID_HOME/cmdline-tools"
+    system "echo '!ls -a $ANDROID_HOME/cmake';ls -a $ANDROID_HOME/cmake"
+    #system "rm -r $ANDROID_HOME/.temp"
+    #system "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager 'build-tools;30.0.2'"
     Rake::Task[:gradle].invoke('build -x test')
     system "ccache -s" if ENV['USE_CCACHE']
     next
@@ -166,7 +177,7 @@ task :check_license do
     commit = 1
   end
   # TODO: Check and merge any new 3rd-party license into 'Source/ThirdParty/LICENSES'
-  puts "::set-output name=commit::#{commit}"
+  system 'echo "name=commit::#{commit}" >> $GITHUB_OUTPUT'
 end
 
 task :ci do
@@ -222,7 +233,7 @@ end
 task :ci_publish_web do
   require 'json'
   system 'git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git build/urho3d.github.io' or abort 'Failed to clone urho3d/urho3d.github.io'
-  system "rsync -a --delete --exclude tool --exclude *.pak --exclude index.md build/ci/bin/ build/urho3d.github.io/samples" or abort 'Failed to rsync Web samples'
+  system "rsync -a --delete --exclude tool --exclude *.pak --exclude index.md ../engine_build/bin/ build/urho3d.github.io/samples" or abort 'Failed to rsync Web samples'
   Dir.chdir('build/urho3d.github.io/samples') {
     next unless system 'git diff --quiet Urho3D.js.data'
     uuid = `git diff --color=never --word-diff-regex='\\w+' --word-diff=porcelain Urho3D.js`.split.grep(/^[+-]\w+-/).map { |it| it[0] = ''; it }
@@ -322,7 +333,7 @@ task :source_checksum do
   sha256_final = Digest::SHA256.new
   sha256_iter = Digest::SHA256
   Dir['Source/**/*.{c,h}*'].each { |it| sha256_final << sha256_iter.file(it).hexdigest }
-  puts "::set-output name=hexdigest::#{sha256_final.hexdigest}"
+  system 'echo "name=hexdigest::#{sha256_final.hexdigest}" >> $GITHUB_OUTPUT'
 end
 
 task :update_dot_files do
@@ -342,7 +353,7 @@ task :update_dot_files do
       git add script/.build-options script/.env-file && \\
       commit=0 && \\
       if git commit -qm 'GH Actions: Update dot files for DBE.'; then commit=1; fi && \\
-      echo ::set-output name=commit::$commit
+      echo "name=commit::$commit" >> $GITHUB_OUTPUT
     } or abort "Failed to commit dot files update"
   end
 end

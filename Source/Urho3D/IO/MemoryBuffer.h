@@ -14,30 +14,30 @@ class URHO3D_API MemoryBuffer : public AbstractFile
 {
 public:
     /// Construct with a pointer and size.
-    MemoryBuffer(void* data, unsigned size);
+    MemoryBuffer(void* data, i32 size);
     /// Construct as read-only with a pointer and size.
-    MemoryBuffer(const void* data, unsigned size);
+    MemoryBuffer(const void* data, i32 size);
     /// Construct from a vector, which must not go out of scope before MemoryBuffer.
-    explicit MemoryBuffer(Vector<unsigned char>& data);
+    explicit MemoryBuffer(Vector<byte>& data);
     /// Construct from a read-only vector, which must not go out of scope before MemoryBuffer.
-    explicit MemoryBuffer(const Vector<unsigned char>& data);
+    explicit MemoryBuffer(const Vector<byte>& data);
 
     /// Read bytes from the memory area. Return number of bytes actually read.
-    unsigned Read(void* dest, unsigned size) override;
+    i32 Read(void* dest, i32 size) override;
     /// Set position from the beginning of the memory area. Return actual new position.
-    unsigned Seek(unsigned position) override;
+    i64 Seek(i64 position) override;
     /// Write bytes to the memory area.
-    unsigned Write(const void* data, unsigned size) override;
+    i32 Write(const void* data, i32 size) override;
 
     /// Return memory area.
-    unsigned char* GetData() { return buffer_; }
+    byte* GetData() { return buffer_; }
 
     /// Return whether buffer is read-only.
     bool IsReadOnly() { return readOnly_; }
 
 private:
     /// Pointer to the memory area.
-    unsigned char* buffer_;
+    byte* buffer_;
     /// Read-only flag.
     bool readOnly_;
 };

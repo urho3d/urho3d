@@ -16,8 +16,8 @@ void UISelectable::RegisterObject(Context* context)
     context->RegisterFactory<UISelectable>(UI_CATEGORY);
 
     URHO3D_COPY_BASE_ATTRIBUTES(UIElement);
-    URHO3D_ATTRIBUTE("Selection Color", Color, selectionColor_, Color::TRANSPARENT_BLACK, AM_FILE);
-    URHO3D_ATTRIBUTE("Hover Color", Color, hoverColor_, Color::TRANSPARENT_BLACK, AM_FILE);
+    URHO3D_ATTRIBUTE("Selection Color", selectionColor_, Color::TRANSPARENT_BLACK, AM_FILE);
+    URHO3D_ATTRIBUTE("Hover Color", hoverColor_, Color::TRANSPARENT_BLACK, AM_FILE);
 }
 
 void UISelectable::GetBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, const IntRect & currentScissor)

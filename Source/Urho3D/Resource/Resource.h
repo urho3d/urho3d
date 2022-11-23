@@ -61,7 +61,7 @@ public:
     /// @property
     void SetName(const String& name);
     /// Set memory use in bytes, possibly approximate.
-    void SetMemoryUse(unsigned size);
+    void SetMemoryUse(i32 size);
     /// Reset last used timer.
     void ResetUseTimer();
     /// Set the asynchronous loading state. Called by ResourceCache. Resources in the middle of asynchronous loading are not normally returned to user.
@@ -76,7 +76,7 @@ public:
 
     /// Return memory use in bytes, possibly approximate.
     /// @property
-    unsigned GetMemoryUse() const { return memoryUse_; }
+    i32 GetMemoryUse() const { return memoryUse_; }
 
     /// Return time since last use in milliseconds. If referred to elsewhere than in the resource cache, returns always zero.
     /// @property
@@ -93,7 +93,7 @@ private:
     /// Last used timer.
     Timer useTimer_;
     /// Memory use in bytes.
-    unsigned memoryUse_;
+    i32 memoryUse_;
     /// Asynchronous loading state.
     AsyncLoadState asyncLoadState_;
 };
@@ -156,7 +156,7 @@ inline ResourceRef GetResourceRef(Resource* resource, StringHash defaultType)
 template <class T> Vector<String> GetResourceNames(const Vector<SharedPtr<T>>& resources)
 {
     Vector<String> ret(resources.Size());
-    for (unsigned i = 0; i < resources.Size(); ++i)
+    for (i32 i = 0; i < resources.Size(); ++i)
         ret[i] = GetResourceName(resources[i]);
 
     return ret;

@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ---------------------------------------------------------------------------
 */
 
-// Modified by Lasse Oorni for Urho3D
+// Modified for Urho3D
 
 /** @file ImporterRegistry.cpp
 
@@ -52,6 +52,7 @@ corresponding preprocessor flag to selectively disable formats.
 #include <vector>
 #include "BaseImporter.h"
 
+// Urho3D: added
 // Urho3D: disable IRRMESH if IRR disabled
 #ifdef ASSIMP_BUILD_NO_IRR_IMPORTER
 #define ASSIMP_BUILD_NO_IRRMESH_IMPORTER

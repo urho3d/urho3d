@@ -17,7 +17,7 @@ struct CustomGeometryVertex
     /// Normal.
     Vector3 normal_;
     /// Color.
-    unsigned color_;
+    color32 color_;
     /// Texture coordinates.
     Vector2 texCoord_;
     /// Tangent.
@@ -43,9 +43,9 @@ public:
     /// Process octree raycast. May be called from a worker thread.
     void ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results) override;
     /// Return the geometry for a specific LOD level.
-    Geometry* GetLodGeometry(unsigned batchIndex, unsigned level) override;
+    Geometry* GetLodGeometry(i32 batchIndex, i32 level) override;
     /// Return number of occlusion geometry triangles.
-    unsigned GetNumOccluderTriangles() override;
+    i32 GetNumOccluderTriangles() override;
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
     bool DrawOcclusion(OcclusionBuffer* buffer) override;
 
@@ -105,11 +105,11 @@ public:
     CustomGeometryVertex* GetVertex(unsigned geometryIndex, unsigned vertexNum);
 
     /// Set geometry data attribute.
-    void SetGeometryDataAttr(const Vector<unsigned char>& value);
+    void SetGeometryDataAttr(const Vector<byte>& value);
     /// Set materials attribute.
     void SetMaterialsAttr(const ResourceRefList& value);
     /// Return geometry data attribute.
-    Vector<unsigned char> GetGeometryDataAttr() const;
+    Vector<byte> GetGeometryDataAttr() const;
     /// Return materials attribute.
     const ResourceRefList& GetMaterialsAttr() const;
 
@@ -127,7 +127,7 @@ private:
     /// Vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
     /// Element mask used so far.
-    VertexMaskFlags elementMask_;
+    VertexElements elementMask_;
     /// Current geometry being updated.
     unsigned geometryIndex_;
     /// Material list attribute.

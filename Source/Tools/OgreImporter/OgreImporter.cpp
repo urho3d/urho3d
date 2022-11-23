@@ -12,7 +12,7 @@
 #include "OgreImporterUtils.h"
 
 #ifdef WIN32
-#include <windows.h>
+#include <Urho3D/Engine/WinWrapped.h>
 #endif
 
 #include <Urho3D/DebugNew.h>
@@ -112,7 +112,7 @@ void Run(const Vector<String>& arguments)
                 }
                 else if (argument == "mb" && i < arguments.Size() - 1)
                 {
-                    maxBones_ = ToUInt(arguments[i + 1]);
+                    maxBones_ = ToU32(arguments[i + 1]);
                     if (maxBones_ < 1)
                         maxBones_ = 1;
                     ++i;
@@ -143,7 +143,7 @@ void LoadSkeleton(const String& skeletonFileName)
         XMLElement bone = bonesRoot.GetChild("bone");
         while (bone)
         {
-            unsigned index = bone.GetInt("id");
+            unsigned index = bone.GetI32("id");
             String name = bone.GetAttribute("name");
             if (index >= bones_.Size())
                 bones_.Resize(index + 1);
@@ -253,7 +253,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
         XMLElement geometry = subMesh.GetChild("geometry");
         if (geometry)
         {
-            unsigned vertices = geometry.GetInt("vertexcount");
+            unsigned vertices = geometry.GetI32("vertexcount");
             totalVertices += vertices;
             if (maxSubMeshVertices < vertices)
                 maxSubMeshVertices = vertices;
@@ -266,7 +266,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
     XMLElement sharedGeometry = root.GetChild("sharedgeometry");
     if (sharedGeometry)
     {
-        unsigned vertices = sharedGeometry.GetInt("vertexcount");
+        unsigned vertices = sharedGeometry.GetI32("vertexcount");
         totalVertices += vertices;
         if (maxSubMeshVertices < vertices)
             maxSubMeshVertices = vertices;
@@ -307,7 +307,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
         }
 
         if (geometry)
-            vertices = geometry.GetInt("vertexcount");
+            vertices = geometry.GetI32("vertexcount");
 
         ModelSubGeometryLodLevel subGeometryLodLevel;
         ModelVertexBuffer* vBuf;
@@ -347,14 +347,14 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
         while (bufferDef)
         {
             if (bufferDef.HasAttribute("positions"))
-                vBuf->elementMask_ |= MASK_POSITION;
+                vBuf->elementMask_ |= VertexElements::Position;
             if (bufferDef.HasAttribute("normals"))
-                vBuf->elementMask_ |= MASK_NORMAL;
+                vBuf->elementMask_ |= VertexElements::Normal;
             if (bufferDef.HasAttribute("texture_coords"))
             {
-                vBuf->elementMask_ |= MASK_TEXCOORD1;
-                if (bufferDef.GetInt("texture_coords") > 1)
-                    vBuf->elementMask_ |= MASK_TEXCOORD2;
+                vBuf->elementMask_ |= VertexElements::TexCoord1;
+                if (bufferDef.GetI32("texture_coords") > 1)
+                    vBuf->elementMask_ |= VertexElements::TexCoord2;
             }
 
             unsigned vertexNum = vertexStart;
@@ -395,7 +395,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
 
                         vBuf->vertices_[vertexNum].texCoord1_ = vec;
 
-                        if (vBuf->elementMask_ & MASK_TEXCOORD2)
+                        if (!!(vBuf->elementMask_ & VertexElements::TexCoord2))
                         {
                             uv = uv.GetNext("texcoord");
                             if (uv)
@@ -417,15 +417,15 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
             bufferDef = bufferDef.GetNext("vertexbuffer");
         }
 
-        unsigned triangles = faces.GetInt("count");
+        unsigned triangles = faces.GetI32("count");
         unsigned indices = triangles * 3;
 
         XMLElement triangle = faces.GetChild("face");
         while (triangle)
         {
-            unsigned v1 = triangle.GetInt("v1");
-            unsigned v2 = triangle.GetInt("v2");
-            unsigned v3 = triangle.GetInt("v3");
+            unsigned v1 = triangle.GetI32("v1");
+            unsigned v2 = triangle.GetI32("v2");
+            unsigned v3 = triangle.GetI32("v3");
             iBuf->indices_.Push(v3 + vertexStart);
             iBuf->indices_.Push(v2 + vertexStart);
             iBuf->indices_.Push(v1 + vertexStart);
@@ -445,8 +445,8 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                 XMLElement boneAssignment = boneAssignments.GetChild("vertexboneassignment");
                 while (boneAssignment)
                 {
-                    unsigned vertex = boneAssignment.GetInt("vertexindex") + vertexStart;
-                    unsigned bone = boneAssignment.GetInt("boneindex");
+                    unsigned vertex = boneAssignment.GetI32("vertexindex") + vertexStart;
+                    unsigned bone = boneAssignment.GetI32("boneindex");
                     float weight = boneAssignment.GetFloat("weight");
 
                     BoneWeightAssignment assign{static_cast<unsigned char>(bone), weight};
@@ -478,7 +478,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
 
             if ((subGeometryLodLevel.boneWeights_.Size()) && bones_.Size())
             {
-                vBuf->elementMask_ |= MASK_BLENDWEIGHTS | MASK_BLENDINDICES;
+                vBuf->elementMask_ |= VertexElements::BlendWeights | VertexElements::BlendIndices;
                 bool sorted = false;
 
                 // If amount of bones is larger than supported by HW skinning, must remap per submesh
@@ -598,8 +598,8 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                 XMLElement lodSubMesh = lod.GetChild("lodfacelist");
                 while (lodSubMesh)
                 {
-                    unsigned subMeshIndex = lodSubMesh.GetInt("submeshindex");
-                    unsigned triangles = lodSubMesh.GetInt("numfaces");
+                    unsigned subMeshIndex = lodSubMesh.GetI32("submeshindex");
+                    unsigned triangles = lodSubMesh.GetI32("numfaces");
 
                     ModelSubGeometryLodLevel newLodLevel;
                     ModelSubGeometryLodLevel& originalLodLevel = subGeometries_[subMeshIndex][0];
@@ -633,9 +633,9 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                     XMLElement triangle = lodSubMesh.GetChild("face");
                     while (triangle)
                     {
-                        unsigned v1 = triangle.GetInt("v1");
-                        unsigned v2 = triangle.GetInt("v2");
-                        unsigned v3 = triangle.GetInt("v3");
+                        unsigned v1 = triangle.GetI32("v1");
+                        unsigned v2 = triangle.GetI32("v2");
+                        unsigned v3 = triangle.GetI32("v3");
                         iBuf->indices_.Push(v3 + vertexStart);
                         iBuf->indices_.Push(v2 + vertexStart);
                         iBuf->indices_.Push(v1 + vertexStart);
@@ -699,7 +699,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                                     XMLElement poseref = keyframe.GetChild("poseref");
                                     // Get only the end pose
                                     if (poseref && time == length)
-                                        usedPoses.Insert(poseref.GetInt("poseindex"));
+                                        usedPoses.Insert(poseref.GetI32("poseindex"));
 
                                     keyframe = keyframe.GetNext("keyframe");
                                 }
@@ -723,7 +723,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                         for (HashSet<unsigned>::Iterator i = usedPoses.Begin(); i != usedPoses.End(); ++i)
                         {
                             XMLElement pose = poses[*i];
-                            unsigned targetSubMesh = pose.GetInt("index");
+                            unsigned targetSubMesh = pose.GetI32("index");
                             XMLElement poseOffset = pose.GetChild("poseoffset");
 
                             if (useOneBuffer_)
@@ -731,14 +731,14 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                             else
                                 newMorph.buffers_[bufIndex].vertexBuffer_ = targetSubMesh;
 
-                            newMorph.buffers_[bufIndex].elementMask_ = MASK_POSITION;
+                            newMorph.buffers_[bufIndex].elementMask_ = VertexElements::Position;
 
                             ModelVertexBuffer* vBuf = &vertexBuffers_[newMorph.buffers_[bufIndex].vertexBuffer_];
 
                             while (poseOffset)
                             {
                                 // Convert from right- to left-handed
-                                unsigned vertexIndex = poseOffset.GetInt("index") + vertexStarts[targetSubMesh];
+                                unsigned vertexIndex = poseOffset.GetI32("index") + vertexStarts[targetSubMesh];
                                 float x = poseOffset.GetFloat("x");
                                 float y = poseOffset.GetFloat("y");
                                 float z = poseOffset.GetFloat("z");
@@ -784,7 +784,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
     // Check any of the buffers for vertices with missing blend weight assignments
     for (unsigned i = 0; i < vertexBuffers_.Size(); ++i)
     {
-        if (vertexBuffers_[i].elementMask_ & MASK_BLENDWEIGHTS)
+        if (!!(vertexBuffers_[i].elementMask_ & VertexElements::BlendWeights))
         {
             for (unsigned j = 0; j < vertexBuffers_[i].vertices_.Size(); ++j)
                 if (!vertexBuffers_[i].vertices_[j].hasBlendWeights_)
@@ -805,13 +805,13 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                 unsigned indexCount = subGeometries_[i][j].indexCount_;
 
                 // If already has tangents, do not regenerate
-                if (vBuf.elementMask_ & MASK_TANGENT || vBuf.vertices_.Empty() || iBuf.indices_.Empty())
+                if (!!(vBuf.elementMask_ & VertexElements::Tangent) || vBuf.vertices_.Empty() || iBuf.indices_.Empty())
                     continue;
 
-                vBuf.elementMask_ |= MASK_TANGENT;
+                vBuf.elementMask_ |= VertexElements::Tangent;
 
-                if ((vBuf.elementMask_ & (MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1)) != (MASK_POSITION | MASK_NORMAL |
-                    MASK_TEXCOORD1))
+                if ((vBuf.elementMask_ & (VertexElements::Position | VertexElements::Normal | VertexElements::TexCoord1))
+                    != (VertexElements::Position | VertexElements::Normal | VertexElements::TexCoord1))
                     ErrorExit("To generate tangents, positions normals and texcoords are required");
 
                 GenerateTangents(&vBuf.vertices_[0], sizeof(ModelVertex), &iBuf.indices_[0], sizeof(unsigned), indexStart,
@@ -838,48 +838,48 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
         dest.WriteFileID("UMD2");
 
         // Vertexbuffers
-        dest.WriteUInt(vertexBuffers_.Size());
+        dest.WriteU32(vertexBuffers_.Size());
         for (unsigned i = 0; i < vertexBuffers_.Size(); ++i)
             vertexBuffers_[i].WriteData(dest);
 
         // Indexbuffers
-        dest.WriteUInt(indexBuffers_.Size());
+        dest.WriteU32(indexBuffers_.Size());
         for (unsigned i = 0; i < indexBuffers_.Size(); ++i)
             indexBuffers_[i].WriteData(dest);
 
         // Subgeometries
-        dest.WriteUInt(subGeometries_.Size());
+        dest.WriteU32(subGeometries_.Size());
         for (unsigned i = 0; i < subGeometries_.Size(); ++i)
         {
             // Write bone mapping info from the first LOD level. It does not change for further LODs
-            dest.WriteUInt(subGeometries_[i][0].boneMapping_.Size());
+            dest.WriteU32(subGeometries_[i][0].boneMapping_.Size());
             for (unsigned k = 0; k < subGeometries_[i][0].boneMapping_.Size(); ++k)
-                dest.WriteUInt(subGeometries_[i][0].boneMapping_[k]);
+                dest.WriteU32(subGeometries_[i][0].boneMapping_[k]);
 
             // Lod levels for this subgeometry
-            dest.WriteUInt(subGeometries_[i].Size());
+            dest.WriteU32(subGeometries_[i].Size());
             for (unsigned j = 0; j < subGeometries_[i].Size(); ++j)
             {
                 dest.WriteFloat(subGeometries_[i][j].distance_);
-                dest.WriteUInt((unsigned)subGeometries_[i][j].primitiveType_);
-                dest.WriteUInt(subGeometries_[i][j].vertexBuffer_);
-                dest.WriteUInt(subGeometries_[i][j].indexBuffer_);
-                dest.WriteUInt(subGeometries_[i][j].indexStart_);
-                dest.WriteUInt(subGeometries_[i][j].indexCount_);
+                dest.WriteU32((unsigned)subGeometries_[i][j].primitiveType_);
+                dest.WriteU32(subGeometries_[i][j].vertexBuffer_);
+                dest.WriteU32(subGeometries_[i][j].indexBuffer_);
+                dest.WriteU32(subGeometries_[i][j].indexStart_);
+                dest.WriteU32(subGeometries_[i][j].indexCount_);
             }
         }
 
         // Morphs
-        dest.WriteUInt(morphs_.Size());
+        dest.WriteU32(morphs_.Size());
         for (unsigned i = 0; i < morphs_.Size(); ++i)
             morphs_[i].WriteData(dest);
 
         // Skeleton
-        dest.WriteUInt(bones_.Size());
+        dest.WriteU32(bones_.Size());
         for (unsigned i = 0; i < bones_.Size(); ++i)
         {
             dest.WriteString(bones_[i].name_);
-            dest.WriteUInt(bones_[i].parentIndex_);
+            dest.WriteU32(bones_[i].parentIndex_);
             dest.WriteVector3(bones_[i].bindPosition_);
             dest.WriteQuaternion(bones_[i].bindRotation_);
             dest.WriteVector3(bones_[i].bindScale_);
@@ -888,7 +888,7 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
             offsetMatrix = offsetMatrix.Inverse();
             dest.Write(offsetMatrix.Data(), sizeof(Matrix3x4));
 
-            dest.WriteUByte(bones_[i].collisionMask_);
+            dest.WriteU8(bones_[i].collisionMask_);
             if (bones_[i].collisionMask_ & 1u)
                 dest.WriteFloat(bones_[i].radius_);
             if (bones_[i].collisionMask_ & 2u)
@@ -953,9 +953,9 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
                     AnimationTrack newAnimationTrack;
                     newAnimationTrack.name_ = trackName;
                     if (!rotationsOnly)
-                        newAnimationTrack.channelMask_ = CHANNEL_POSITION | CHANNEL_ROTATION;
+                        newAnimationTrack.channelMask_ = AnimationChannels::Position | AnimationChannels::Rotation;
                     else
-                        newAnimationTrack.channelMask_ = CHANNEL_ROTATION;
+                        newAnimationTrack.channelMask_ = AnimationChannels::Rotation;
 
                     XMLElement keyFramesRoot = track.GetChild("keyframes");
                     XMLElement keyFrame = keyFramesRoot.GetChild("keyframe");
@@ -1012,22 +1012,22 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
                 dest.WriteFileID("UANI");
                 dest.WriteString(newAnimation.name_);
                 dest.WriteFloat(newAnimation.length_);
-                dest.WriteUInt(newAnimation.tracks_.Size());
+                dest.WriteU32(newAnimation.tracks_.Size());
                 for (unsigned i = 0; i < newAnimation.tracks_.Size(); ++i)
                 {
                     AnimationTrack& track = newAnimation.tracks_[i];
                     dest.WriteString(track.name_);
-                    dest.WriteUByte(track.channelMask_);
-                    dest.WriteUInt(track.keyFrames_.Size());
+                    dest.WriteU8(ToU8(track.channelMask_));
+                    dest.WriteU32(track.keyFrames_.Size());
                     for (unsigned j = 0; j < track.keyFrames_.Size(); ++j)
                     {
                         AnimationKeyFrame& keyFrame = track.keyFrames_[j];
                         dest.WriteFloat(keyFrame.time_);
-                        if (track.channelMask_ & CHANNEL_POSITION)
+                        if (!!(track.channelMask_ & AnimationChannels::Position))
                             dest.WriteVector3(keyFrame.position_);
-                        if (track.channelMask_ & CHANNEL_ROTATION)
+                        if (!!(track.channelMask_ & AnimationChannels::Rotation))
                             dest.WriteQuaternion(keyFrame.rotation_);
-                        if (track.channelMask_ & CHANNEL_SCALE)
+                        if (!!(track.channelMask_ & AnimationChannels::Scale))
                             dest.WriteVector3(keyFrame.scale_);
                     }
                 }

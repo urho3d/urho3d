@@ -94,6 +94,23 @@ void CreateScene()
             boxObject.occluder = true;
     }
 
+    // Create some animated models
+    const int NUM_MUTANTS = 20;
+    for (int i = 0; i < NUM_MUTANTS; ++i)
+    {
+        Node@ mutantNode = scene_.CreateChild("Mutant");
+        mutantNode.position = Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f);
+        mutantNode.rotation = Quaternion(0.0f, Random(360.0f), 0.0f);
+        mutantNode.SetScale(0.5f + Random(2.0f));
+        AnimatedModel@ mutantObject = mutantNode.CreateComponent("AnimatedModel");
+        mutantObject.model = cache.GetResource("Model", "Models/Mutant/Mutant.mdl");
+        mutantObject.material = cache.GetResource("Material", "Models/Mutant/Materials/mutant_M.xml");
+        mutantObject.castShadows = true;
+        AnimationController@ animCtrl = mutantNode.CreateComponent("AnimationController");
+        animCtrl.PlayExclusive("Models/Mutant/Mutant_Idle0.ani", 0, true, 0.f);
+        animCtrl.SetTime("Models/Mutant/Mutant_Idle0.ani", Random(animCtrl.GetLength("Models/Mutant/Mutant_Idle0.ani")));
+    }
+
     // Create the camera. Limit far clip distance to match the fog
     cameraNode = scene_.CreateChild("Camera");
     Camera@ camera = cameraNode.CreateComponent("Camera");
@@ -236,7 +253,7 @@ bool Raycast(float maxDistance, Vector3& hitPos, Drawable@& hitDrawable)
     Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
     // Pick only geometry objects, not eg. zones or lights, only get the first (closest) hit
     // Note the convenience accessor to scene's Octree component
-    RayQueryResult result = scene_.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, maxDistance, DRAWABLE_GEOMETRY);
+    RayQueryResult result = scene_.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, maxDistance, DrawableTypes::Geometry);
     if (result.drawable !is null)
     {
         hitPos = result.position;

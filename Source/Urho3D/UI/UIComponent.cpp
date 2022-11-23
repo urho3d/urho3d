@@ -101,7 +101,7 @@ public:
 
         Ray ray(camera->GetScreenRay((float)pos.x_ / rect.Width(), (float)pos.y_ / rect.Height()));
         Vector<RayQueryResult> queryResultVector;
-        RayOctreeQuery query(queryResultVector, ray, RAY_TRIANGLE_UV, M_INFINITY, DRAWABLE_GEOMETRY, DEFAULT_VIEWMASK);
+        RayOctreeQuery query(queryResultVector, ray, RAY_TRIANGLE_UV, M_INFINITY, DrawableTypes::Geometry, DEFAULT_VIEWMASK);
 
         octree->Raycast(query);
 
@@ -212,8 +212,8 @@ void UIComponent::OnNodeSet(Node* node)
 
 void UIComponent::OnElementResized(StringHash eventType, VariantMap& args)
 {
-    int width = args[Resized::P_WIDTH].GetInt();
-    int height = args[Resized::P_HEIGHT].GetInt();
+    int width = args[Resized::P_WIDTH].GetI32();
+    int height = args[Resized::P_HEIGHT].GetI32();
 
     if (width < UICOMPONENT_MIN_TEXTURE_SIZE || width > UICOMPONENT_MAX_TEXTURE_SIZE ||
         height < UICOMPONENT_MIN_TEXTURE_SIZE || height > UICOMPONENT_MAX_TEXTURE_SIZE)

@@ -116,28 +116,28 @@ void NavigationMesh::RegisterObject(Context* context)
 {
     context->RegisterFactory<NavigationMesh>(NAVIGATION_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Tile Size", GetTileSize, SetTileSize, int, DEFAULT_TILE_SIZE, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Cell Size", GetCellSize, SetCellSize, float, DEFAULT_CELL_SIZE, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Cell Height", GetCellHeight, SetCellHeight, float, DEFAULT_CELL_HEIGHT, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Agent Height", GetAgentHeight, SetAgentHeight, float, DEFAULT_AGENT_HEIGHT, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Agent Radius", GetAgentRadius, SetAgentRadius, float, DEFAULT_AGENT_RADIUS, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Agent Max Climb", GetAgentMaxClimb, SetAgentMaxClimb, float, DEFAULT_AGENT_MAX_CLIMB, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Agent Max Slope", GetAgentMaxSlope, SetAgentMaxSlope, float, DEFAULT_AGENT_MAX_SLOPE, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Region Min Size", GetRegionMinSize, SetRegionMinSize, float, DEFAULT_REGION_MIN_SIZE, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Region Merge Size", GetRegionMergeSize, SetRegionMergeSize, float, DEFAULT_REGION_MERGE_SIZE, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Edge Max Length", GetEdgeMaxLength, SetEdgeMaxLength, float, DEFAULT_EDGE_MAX_LENGTH, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Edge Max Error", GetEdgeMaxError, SetEdgeMaxError, float, DEFAULT_EDGE_MAX_ERROR, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Detail Sample Distance", GetDetailSampleDistance, SetDetailSampleDistance, float,
+    URHO3D_ACCESSOR_ATTRIBUTE("Tile Size", GetTileSize, SetTileSize, DEFAULT_TILE_SIZE, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Cell Size", GetCellSize, SetCellSize, DEFAULT_CELL_SIZE, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Cell Height", GetCellHeight, SetCellHeight, DEFAULT_CELL_HEIGHT, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Agent Height", GetAgentHeight, SetAgentHeight, DEFAULT_AGENT_HEIGHT, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Agent Radius", GetAgentRadius, SetAgentRadius, DEFAULT_AGENT_RADIUS, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Agent Max Climb", GetAgentMaxClimb, SetAgentMaxClimb, DEFAULT_AGENT_MAX_CLIMB, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Agent Max Slope", GetAgentMaxSlope, SetAgentMaxSlope, DEFAULT_AGENT_MAX_SLOPE, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Region Min Size", GetRegionMinSize, SetRegionMinSize, DEFAULT_REGION_MIN_SIZE, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Region Merge Size", GetRegionMergeSize, SetRegionMergeSize, DEFAULT_REGION_MERGE_SIZE, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Edge Max Length", GetEdgeMaxLength, SetEdgeMaxLength, DEFAULT_EDGE_MAX_LENGTH, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Edge Max Error", GetEdgeMaxError, SetEdgeMaxError, DEFAULT_EDGE_MAX_ERROR, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Detail Sample Distance", GetDetailSampleDistance, SetDetailSampleDistance,
         DEFAULT_DETAIL_SAMPLE_DISTANCE, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Detail Sample Max Error", GetDetailSampleMaxError, SetDetailSampleMaxError, float,
+    URHO3D_ACCESSOR_ATTRIBUTE("Detail Sample Max Error", GetDetailSampleMaxError, SetDetailSampleMaxError,
         DEFAULT_DETAIL_SAMPLE_MAX_ERROR, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Bounding Box Padding", GetPadding, SetPadding, Vector3, Vector3::ONE, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Navigation Data", GetNavigationDataAttr, SetNavigationDataAttr, Vector<unsigned char>,
+    URHO3D_ACCESSOR_ATTRIBUTE("Bounding Box Padding", GetPadding, SetPadding, Vector3::ONE, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Navigation Data", GetNavigationDataAttr, SetNavigationDataAttr,
         Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
-    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Partition Type", GetPartitionType, SetPartitionType, NavmeshPartitionType, navmeshPartitionTypeNames,
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Partition Type", GetPartitionType, SetPartitionType, navmeshPartitionTypeNames,
         NAVMESH_PARTITION_WATERSHED, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Draw OffMeshConnections", GetDrawOffMeshConnections, SetDrawOffMeshConnections, bool, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Draw NavAreas", GetDrawNavAreas, SetDrawNavAreas, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Draw OffMeshConnections", GetDrawOffMeshConnections, SetDrawOffMeshConnections, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Draw NavAreas", GetDrawNavAreas, SetDrawNavAreas, false, AM_DEFAULT);
 }
 
 void NavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
@@ -501,14 +501,14 @@ bool NavigationMesh::Build(const IntVector2& from, const IntVector2& to)
     return true;
 }
 
-Vector<unsigned char> NavigationMesh::GetTileData(const IntVector2& tile) const
+Vector<byte> NavigationMesh::GetTileData(const IntVector2& tile) const
 {
     VectorBuffer ret;
     WriteTile(ret, tile.x_, tile.y_);
     return ret.GetBuffer();
 }
 
-bool NavigationMesh::AddTile(const Vector<unsigned char>& tileData)
+bool NavigationMesh::AddTile(const Vector<byte>& tileData)
 {
     MemoryBuffer buffer(tileData);
     return ReadTile(buffer, false);
@@ -856,7 +856,7 @@ float NavigationMesh::GetAreaCost(unsigned areaID) const
     return 1.0f;
 }
 
-void NavigationMesh::SetNavigationDataAttr(const Vector<unsigned char>& value)
+void NavigationMesh::SetNavigationDataAttr(const Vector<byte>& value)
 {
     ReleaseNavigationMesh();
 
@@ -866,15 +866,15 @@ void NavigationMesh::SetNavigationDataAttr(const Vector<unsigned char>& value)
     MemoryBuffer buffer(value);
 
     boundingBox_ = buffer.ReadBoundingBox();
-    numTilesX_ = buffer.ReadInt();
-    numTilesZ_ = buffer.ReadInt();
+    numTilesX_ = buffer.ReadI32();
+    numTilesZ_ = buffer.ReadI32();
 
     dtNavMeshParams params;     // NOLINT(hicpp-member-init)
     rcVcopy(params.orig, &boundingBox_.min_.x_);
     params.tileWidth = buffer.ReadFloat();
     params.tileHeight = buffer.ReadFloat();
-    params.maxTiles = buffer.ReadInt();
-    params.maxPolys = buffer.ReadInt();
+    params.maxTiles = buffer.ReadI32();
+    params.maxPolys = buffer.ReadI32();
 
     navMesh_ = dtAllocNavMesh();
     if (!navMesh_)
@@ -904,21 +904,21 @@ void NavigationMesh::SetNavigationDataAttr(const Vector<unsigned char>& value)
     // \todo Shall we send E_NAVIGATION_MESH_REBUILT here?
 }
 
-Vector<unsigned char> NavigationMesh::GetNavigationDataAttr() const
+Vector<byte> NavigationMesh::GetNavigationDataAttr() const
 {
     VectorBuffer ret;
 
     if (navMesh_)
     {
         ret.WriteBoundingBox(boundingBox_);
-        ret.WriteInt(numTilesX_);
-        ret.WriteInt(numTilesZ_);
+        ret.WriteI32(numTilesX_);
+        ret.WriteI32(numTilesZ_);
 
         const dtNavMeshParams* params = navMesh_->getParams();
         ret.WriteFloat(params->tileWidth);
         ret.WriteFloat(params->tileHeight);
-        ret.WriteInt(params->maxTiles);
-        ret.WriteInt(params->maxPolys);
+        ret.WriteI32(params->maxTiles);
+        ret.WriteI32(params->maxPolys);
 
         const dtNavMesh* navMesh = navMesh_;
 
@@ -1176,10 +1176,10 @@ void NavigationMesh::AddTriMeshGeometry(NavBuildData* build, Geometry* geometry,
     if (!geometry)
         return;
 
-    const unsigned char* vertexData;
-    const unsigned char* indexData;
-    unsigned vertexSize;
-    unsigned indexSize;
+    const byte* vertexData;
+    const byte* indexData;
+    i32 vertexSize;
+    i32 indexSize;
     const Vector<VertexElement>* elements;
 
     geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
@@ -1234,19 +1234,19 @@ void NavigationMesh::WriteTile(Serializer& dest, int x, int z) const
     if (!tile)
         return;
 
-    dest.WriteInt(x);
-    dest.WriteInt(z);
-    dest.WriteUInt(navMesh->getTileRef(tile));
-    dest.WriteUInt((unsigned)tile->dataSize);
+    dest.WriteI32(x);
+    dest.WriteI32(z);
+    dest.WriteU32(navMesh->getTileRef(tile));
+    dest.WriteU32((unsigned)tile->dataSize);
     dest.Write(tile->data, (unsigned)tile->dataSize);
 }
 
 bool NavigationMesh::ReadTile(Deserializer& source, bool silent)
 {
-    const int x = source.ReadInt();
-    const int z = source.ReadInt();
-    /*dtTileRef tileRef =*/ source.ReadUInt();
-    unsigned navDataSize = source.ReadUInt();
+    const int x = source.ReadI32();
+    const int z = source.ReadI32();
+    /*dtTileRef tileRef =*/ source.ReadU32();
+    unsigned navDataSize = source.ReadU32();
 
     auto* navData = (unsigned char*)dtAlloc(navDataSize, DT_ALLOC_PERM);
     if (!navData)

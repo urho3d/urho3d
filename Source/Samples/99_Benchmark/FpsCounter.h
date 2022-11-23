@@ -3,6 +3,10 @@
 
 #pragma once
 
+#include <Urho3D/Base/PrimitiveTypes.h>
+
+using namespace Urho3D::PrimitiveTypes;
+
 class FpsCounter
 {
 private:

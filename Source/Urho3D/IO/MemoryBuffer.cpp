@@ -8,47 +8,53 @@
 namespace Urho3D
 {
 
-MemoryBuffer::MemoryBuffer(void* data, unsigned size) :
+MemoryBuffer::MemoryBuffer(void* data, i32 size) :
     AbstractFile(size),
-    buffer_((unsigned char*)data),
+    buffer_((byte*)data),
     readOnly_(false)
 {
+    assert(size >= 0);
+
     if (!buffer_)
         size_ = 0;
 }
 
-MemoryBuffer::MemoryBuffer(const void* data, unsigned size) :
+MemoryBuffer::MemoryBuffer(const void* data, i32 size) :
     AbstractFile(size),
-    buffer_((unsigned char*)data),
+    buffer_((byte*)data),
     readOnly_(true)
 {
+    assert(size >= 0);
+
     if (!buffer_)
         size_ = 0;
 }
 
-MemoryBuffer::MemoryBuffer(Vector<unsigned char>& data) :
+MemoryBuffer::MemoryBuffer(Vector<byte>& data) :
     AbstractFile(data.Size()),
     buffer_(data.Begin().ptr_),
     readOnly_(false)
 {
 }
 
-MemoryBuffer::MemoryBuffer(const Vector<unsigned char>& data) :
+MemoryBuffer::MemoryBuffer(const Vector<byte>& data) :
     AbstractFile(data.Size()),
-    buffer_(const_cast<unsigned char*>(data.Begin().ptr_)),
+    buffer_(const_cast<byte*>(data.Begin().ptr_)),
     readOnly_(true)
 {
 }
 
-unsigned MemoryBuffer::Read(void* dest, unsigned size)
+i32 MemoryBuffer::Read(void* dest, i32 size)
 {
+    assert(size >= 0);
+
     if (size + position_ > size_)
         size = size_ - position_;
     if (!size)
         return 0;
 
-    unsigned char* srcPtr = &buffer_[position_];
-    auto* destPtr = (unsigned char*)dest;
+    byte* srcPtr = &buffer_[position_];
+    byte* destPtr = (byte*)dest;
     position_ += size;
 
     memcpy(destPtr, srcPtr, size);
@@ -56,8 +62,10 @@ unsigned MemoryBuffer::Read(void* dest, unsigned size)
     return size;
 }
 
-unsigned MemoryBuffer::Seek(unsigned position)
+i64 MemoryBuffer::Seek(i64 position)
 {
+    assert(position >= 0 && position <= M_MAX_INT);
+
     if (position > size_)
         position = size_;
 
@@ -65,15 +73,17 @@ unsigned MemoryBuffer::Seek(unsigned position)
     return position_;
 }
 
-unsigned MemoryBuffer::Write(const void* data, unsigned size)
+i32 MemoryBuffer::Write(const void* data, i32 size)
 {
+    assert(size >= 0);
+
     if (size + position_ > size_)
         size = size_ - position_;
     if (!size)
         return 0;
 
-    auto* srcPtr = (unsigned char*)data;
-    unsigned char* destPtr = &buffer_[position_];
+    byte* srcPtr = (byte*)data;
+    byte* destPtr = &buffer_[position_];
     position_ += size;
 
     memcpy(destPtr, srcPtr, size);

@@ -280,7 +280,7 @@ void Billboards::AnimateScene(float timeStep)
 
     // Rotate the lights around the world Y-axis
     for (Node* lightNode : lightNodes)
-        lightNode->Rotate(Quaternion(0.0f, LIGHT_ROTATION_SPEED * timeStep, 0.0f), TS_WORLD);
+        lightNode->Rotate(Quaternion(0.0f, LIGHT_ROTATION_SPEED * timeStep, 0.0f), TransformSpace::World);
 
     // Rotate the individual billboards within the billboard sets, then recommit to make the changes visible
     for (i32 i = 0; i < billboardNodes.Size(); ++i)

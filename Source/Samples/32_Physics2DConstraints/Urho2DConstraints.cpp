@@ -534,7 +534,7 @@ void Urho2DConstraints::HandleTouchBegin3(StringHash eventType, VariantMap& even
     auto* graphics = GetSubsystem<Graphics>();
     auto* physicsWorld = scene_->GetComponent<PhysicsWorld2D>();
     using namespace TouchBegin;
-    RigidBody2D* rigidBody = physicsWorld->GetRigidBody(eventData[P_X].GetInt(), eventData[P_Y].GetInt()); // Raycast for RigidBody2Ds to pick
+    RigidBody2D* rigidBody = physicsWorld->GetRigidBody(eventData[P_X].GetI32(), eventData[P_Y].GetI32()); // Raycast for RigidBody2Ds to pick
     if (rigidBody)
     {
         pickedNode = rigidBody->GetNode();
@@ -544,7 +544,7 @@ void Urho2DConstraints::HandleTouchBegin3(StringHash eventType, VariantMap& even
 
         // Create a ConstraintMouse2D - Temporary apply this constraint to the pickedNode to allow grasping and moving with touch
         auto* constraintMouse = pickedNode->CreateComponent<ConstraintMouse2D>();
-        Vector3 pos = camera_->ScreenToWorldPoint(Vector3((float)eventData[P_X].GetInt() / graphics->GetWidth(), (float)eventData[P_Y].GetInt() / graphics->GetHeight(), 0.0f));
+        Vector3 pos = camera_->ScreenToWorldPoint(Vector3((float)eventData[P_X].GetI32() / graphics->GetWidth(), (float)eventData[P_Y].GetI32() / graphics->GetHeight(), 0.0f));
         constraintMouse->SetTarget(Vector2(pos.x_, pos.y_));
         constraintMouse->SetMaxForce(1000 * rigidBody->GetMass());
         constraintMouse->SetCollideConnected(true);
@@ -562,7 +562,7 @@ void Urho2DConstraints::HandleTouchMove3(StringHash eventType, VariantMap& event
         auto* graphics = GetSubsystem<Graphics>();
         auto* constraintMouse = pickedNode->GetComponent<ConstraintMouse2D>();
         using namespace TouchMove;
-        Vector3 pos = camera_->ScreenToWorldPoint(Vector3(float(eventData[P_X].GetInt()) / graphics->GetWidth(), float(eventData[P_Y].GetInt()) / graphics->GetHeight(), 0.0f));
+        Vector3 pos = camera_->ScreenToWorldPoint(Vector3(float(eventData[P_X].GetI32()) / graphics->GetWidth(), float(eventData[P_Y].GetI32()) / graphics->GetHeight(), 0.0f));
         constraintMouse->SetTarget(Vector2(pos.x_, pos.y_));
     }
 }

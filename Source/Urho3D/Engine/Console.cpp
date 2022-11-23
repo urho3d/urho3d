@@ -107,10 +107,10 @@ void Console::SetDefaultStyle(XMLFile* style)
     background_->SetDefaultStyle(style);
     background_->SetStyle("ConsoleBackground");
     rowContainer_->SetStyleAuto();
-    for (unsigned i = 0; i < rowContainer_->GetNumItems(); ++i)
+    for (i32 i = 0; i < rowContainer_->GetNumItems(); ++i)
         rowContainer_->GetItem(i)->SetStyle("ConsoleText");
     interpreters_->SetStyleAuto();
-    for (unsigned i = 0; i < interpreters_->GetNumItems(); ++i)
+    for (i32 i = 0; i < interpreters_->GetNumItems(); ++i)
         interpreters_->GetItem(i)->SetStyle("ConsoleText");
     lineEdit_->SetStyle("ConsoleLineEdit");
 
@@ -396,7 +396,7 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
 
     bool changed = false;
 
-    switch (eventData[P_KEY].GetInt())
+    switch (eventData[P_KEY].GetI32())
     {
     case KEY_UP:
         if (autoCompletePosition_ == 0)
@@ -523,7 +523,7 @@ void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
 
     using namespace LogMessage;
 
-    int level = eventData[P_LEVEL].GetInt();
+    int level = eventData[P_LEVEL].GetI32();
     // The message may be multi-line, so split to rows in that case
     Vector<String> rows = eventData[P_MESSAGE].GetString().Split('\n');
 

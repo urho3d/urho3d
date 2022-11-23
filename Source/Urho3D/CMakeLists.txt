@@ -143,10 +143,6 @@ if (NOT URHO3D_OPENGL)
     list (APPEND EXCLUDED_SOURCE_DIRS GraphicsAPI/OpenGL)
 endif ()
 
-if (NOT URHO3D_D3D9)
-    list (APPEND EXCLUDED_SOURCE_DIRS GraphicsAPI/Direct3D9)
-endif ()
-
 if (NOT URHO3D_D3D11)
     list (APPEND EXCLUDED_SOURCE_DIRS GraphicsAPI/Direct3D11)
 endif ()
@@ -159,9 +155,10 @@ define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cp
 
 if (URHO3D_GENERATEBINDINGS)
 
-    find_package (Doxygen 1.8.17 REQUIRED)
+    # https://github.com/urho3d/Urho3D/issues/2757
+    find_package (Doxygen 1.9.2 REQUIRED)
     if (NOT DOXYGEN_FOUND)
-        message (FATAL_ERROR "Doxygen >= 1.8.17 required to generate bindings")
+        message (FATAL_ERROR "Doxygen >= 1.9.2 required to generate bindings")
     endif ()
 
     # Generating Doxyfile
@@ -365,7 +362,7 @@ if (URHO3D_CLANG_TOOLS)
     set (ANNOTATE_NONSCRIPTABLE "__attribute__((annotate(\"nonscriptable\")))")
 endif ()
 set (APPENDIX "${APPENDIX}\n#define NONSCRIPTABLE ${ANNOTATE_NONSCRIPTABLE}\n\n")
-foreach (DEFINE URHO3D_STATIC_DEFINE URHO3D_OPENGL URHO3D_D3D9 URHO3D_D3D11 URHO3D_SSE URHO3D_DATABASE_ODBC URHO3D_DATABASE_SQLITE URHO3D_LUAJIT URHO3D_TESTING CLANG_PRE_STANDARD)
+foreach (DEFINE URHO3D_STATIC_DEFINE URHO3D_OPENGL URHO3D_D3D11 URHO3D_SSE URHO3D_DATABASE_ODBC URHO3D_DATABASE_SQLITE URHO3D_LUAJIT URHO3D_TESTING CLANG_PRE_STANDARD)
     if (${DEFINE})
         set (APPENDIX "${APPENDIX}#define ${DEFINE}\n")
     endif ()

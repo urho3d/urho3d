@@ -341,7 +341,7 @@ bool Raycast(float maxDistance, Vector3& hitPos, Drawable@& hitDrawable)
     Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
     // Pick only geometry objects, not eg. zones or lights, only get the first (closest) hit
     // Note the convenience accessor to scene's Octree component
-    RayQueryResult result = scene_.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, maxDistance, DRAWABLE_GEOMETRY);
+    RayQueryResult result = scene_.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, maxDistance, DrawableTypes::Geometry);
     if (result.drawable !is null)
     {
         hitPos = result.position;
@@ -534,7 +534,7 @@ void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 void HandleCrowdAgentFailure(StringHash eventType, VariantMap& eventData)
 {
     Node@ node = eventData["Node"].GetPtr();
-    int state = eventData["CrowdAgentState"].GetInt();
+    int state = eventData["CrowdAgentState"].GetI32();
 
     // If the agent's state is invalid, likely from spawning on the side of a box, find a point in a larger area
     if (state == CA_STATE_INVALID)
@@ -548,8 +548,8 @@ void HandleCrowdAgentFailure(StringHash eventType, VariantMap& eventData)
 
 void HandleCrowdAgentFormation(StringHash eventType, VariantMap& eventData)
 {
-    uint index = eventData["Index"].GetUInt();
-    uint size = eventData["Size"].GetUInt();
+    uint index = eventData["Index"].GetU32();
+    uint size = eventData["Size"].GetU32();
     Vector3 position = eventData["Position"].GetVector3();
 
     // The first agent will always move to the exact position, all other agents will select a random point nearby

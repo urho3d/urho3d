@@ -232,7 +232,7 @@ void HandleBitSelectionEdit(StringHash eventType, VariantMap& eventData)
         LineEdit@ attrEdit = eventData["Element"].GetPtr();
 
         inUpdateBitSelection = true;
-        SetBitSelection(attrEdit.parent, attrEdit.text.ToInt());
+        SetBitSelection(attrEdit.parent, attrEdit.text.ToI32());
         inUpdateBitSelection = false;
     }
 
@@ -465,7 +465,7 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
         {
             @vector = @nestedVector;
             vectorStruct = GetNestedVectorStruct(serializables, info.name);
-            repeat = vector[subIndex].GetUInt();    // Nested VariantVector must have a predefined repeat count at the start of the vector
+            repeat = vector[subIndex].GetU32();    // Nested VariantVector must have a predefined repeat count at the start of the vector
             emptyNestedVector = repeat == 0;
         }
         else
@@ -633,7 +633,7 @@ void LoadAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, co
 
 void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const AttributeInfo&in info, bool editable, bool sameValue, const Array<Variant>&in values)
 {
-    uint index = parent.vars["Index"].GetUInt();
+    uint index = parent.vars["Index"].GetU32();
 
     // Assume the first child is always a text label element or a container that containing a text label element
     UIElement@ label = parent.children[0];
@@ -661,7 +661,7 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
         else if (info.enumNames is null || info.enumNames.empty)
             SetEditable(SetValue(parent.children[1], value.ToString(), sameValue), editable && sameValue);
         else
-            SetEditable(SetValue(parent.children[1], value.GetInt(), sameValue), editable && sameValue);
+            SetEditable(SetValue(parent.children[1], value.GetI32(), sameValue), editable && sameValue);
     }
     else if (type == VAR_RESOURCEREF)
     {
@@ -837,7 +837,7 @@ void StoreAttributeEditor(UIElement@ parent, Array<Serializable@>@ serializables
     }
     else if (info.type == VAR_VARIANTMAP)
     {
-        StringHash key(parent.vars["Key"].GetUInt());
+        StringHash key(parent.vars["Key"].GetU32());
         for (uint i = 0; i < serializables.length; ++i)
         {
             VariantMap map = serializables[i].attributes[index].GetVariantMap();
@@ -870,7 +870,7 @@ void SanitizeNumericalValue(VariantType type, String& value)
     if ((type >= VAR_FLOAT && type <= VAR_COLOR) || type == VAR_RECT)
         value = String(value.ToFloat());
     else if (type == VAR_INT || type == VAR_INTRECT || type == VAR_INTVECTOR2 || type == VAR_INTVECTOR3)
-        value = String(value.ToInt());
+        value = String(value.ToI32());
     else if (type == VAR_DOUBLE)
         value = String(value.ToDouble());
 }
@@ -906,7 +906,7 @@ void GetEditorValue(UIElement@ parent, VariantType type, Array<String>@ enumName
     else if (type == VAR_INT)
     {
         if (enumNames is null || enumNames.empty)
-            FillValue(values, Variant(attrEdit.text.ToInt()));
+            FillValue(values, Variant(attrEdit.text.ToI32()));
         else
         {
             DropDownList@ ddl = parent.children[1];
@@ -918,7 +918,7 @@ void GetEditorValue(UIElement@ parent, VariantType type, Array<String>@ enumName
         LineEdit@ le = parent.children[0];
         ResourceRef ref;
         ref.name = le.text.Trimmed();
-        ref.type = StringHash(le.vars[TYPE_VAR].GetUInt());
+        ref.type = StringHash(le.vars[TYPE_VAR].GetU32());
         FillValue(values, Variant(ref));
     }
     else
@@ -1009,9 +1009,9 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
     if (serializables.empty)
         return;
 
-    uint index = attrEdit.vars["Index"].GetUInt();
-    uint subIndex = attrEdit.vars["SubIndex"].GetUInt();
-    uint coordinate = attrEdit.vars["Coordinate"].GetUInt();
+    uint index = attrEdit.vars["Index"].GetU32();
+    uint subIndex = attrEdit.vars["SubIndex"].GetU32();
+    uint coordinate = attrEdit.vars["Coordinate"].GetU32();
     bool intermediateEdit = eventType == TEXT_CHANGED_EVENT_TYPE;
 
     // Do the editor pre logic before attribute is being modified
@@ -1050,7 +1050,7 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
 void LineDragBegin(StringHash eventType, VariantMap& eventData)
 {
     UIElement@ label = eventData["Element"].GetPtr();
-    int x = eventData["X"].GetInt();
+    int x = eventData["X"].GetI32();
     label.vars["posX"] = x;
 
     // Store the old value before dragging
@@ -1072,8 +1072,8 @@ void LineDragMove(StringHash eventTypem, VariantMap& eventData)
     // Prevent undo
     dragEditAttribute = true;
 
-    int x = eventData["X"].GetInt();
-    int posx = label.vars["posX"].GetInt();
+    int x = eventData["X"].GetI32();
+    int posx = label.vars["posX"].GetI32();
     float val = input.mouseMoveX;
 
     float fieldVal = selectedNumEditor.text.ToFloat();
@@ -1216,8 +1216,8 @@ void PickResource(StringHash eventType, VariantMap& eventData)
     if (targets.empty)
         return;
 
-    resourcePickIndex = attrEdit.vars["Index"].GetUInt();
-    resourcePickSubIndex = attrEdit.vars["SubIndex"].GetUInt();
+    resourcePickIndex = attrEdit.vars["Index"].GetU32();
+    resourcePickSubIndex = attrEdit.vars["SubIndex"].GetU32();
     AttributeInfo info = targets[0].attributeInfos[resourcePickIndex];
 
     StringHash resourceType;
@@ -1399,7 +1399,7 @@ void EditResource(StringHash eventType, VariantMap& eventData)
     if (fileName.empty)
         return;
 
-    StringHash resourceType(attrEdit.vars[TYPE_VAR].GetUInt());
+    StringHash resourceType(attrEdit.vars[TYPE_VAR].GetU32());
     Resource@ resource = cache.GetResource(resourceType, fileName);
 
     if (resource !is null)
@@ -1417,7 +1417,7 @@ void TestResource(StringHash eventType, VariantMap& eventData)
     UIElement@ button = eventData["Element"].GetPtr();
     LineEdit@ attrEdit = button.parent.children[0];
 
-    StringHash resourceType(attrEdit.vars[TYPE_VAR].GetUInt());
+    StringHash resourceType(attrEdit.vars[TYPE_VAR].GetU32());
 
     // For now only Animations can be tested
     StringHash animType("Animation");
@@ -1435,7 +1435,7 @@ void TestAnimation(UIElement@ attrEdit)
     if (model is null)
         return;
 
-    uint animStateIndex = (attrEdit.vars["SubIndex"].GetUInt() - 1) / 6;
+    uint animStateIndex = (attrEdit.vars["SubIndex"].GetU32() - 1) / 6;
     if (testAnimState.Get() is null)
     {
         testAnimState = model.GetAnimationState(animStateIndex);

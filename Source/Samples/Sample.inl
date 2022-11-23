@@ -201,7 +201,7 @@ void Sample::HandleKeyUp(StringHash /*eventType*/, VariantMap& eventData)
 {
     using namespace KeyUp;
 
-    int key = eventData[P_KEY].GetInt();
+    int key = eventData[P_KEY].GetI32();
 
     // Close console (if open) or exit when ESC is pressed
     if (key == KEY_ESCAPE)
@@ -227,7 +227,7 @@ void Sample::HandleKeyDown(StringHash /*eventType*/, VariantMap& eventData)
 {
     using namespace KeyDown;
 
-    int key = eventData[P_KEY].GetInt();
+    int key = eventData[P_KEY].GetI32();
 
     // Toggle console with F1
     if (key == KEY_F1)
@@ -337,7 +337,7 @@ void Sample::HandleSceneUpdate(StringHash /*eventType*/, VariantMap& eventData)
     if (touchEnabled_ && cameraNode_)
     {
         Input* input = GetSubsystem<Input>();
-        for (unsigned i = 0; i < input->GetNumTouches(); ++i)
+        for (i32 i = 0; i < input->GetNumTouches(); ++i)
         {
             TouchState* state = input->GetTouch(i);
             if (!state->touchedElement_)    // Touch on empty space

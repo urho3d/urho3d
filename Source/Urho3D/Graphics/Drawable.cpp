@@ -32,10 +32,10 @@ SourceBatch::~SourceBatch() = default;
 SourceBatch& SourceBatch::operator =(const SourceBatch& rhs)= default;
 
 
-Drawable::Drawable(Context* context, unsigned char drawableFlags) :
+Drawable::Drawable(Context* context, DrawableTypes drawableType) :
     Component(context),
     boundingBox_(0.0f, 0.0f),
-    drawableFlags_(drawableFlags),
+    drawableType_(drawableType),
     worldBoundingBoxDirty_(true),
     castShadows_(false),
     occluder_(false),
@@ -61,10 +61,10 @@ Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     maxLights_(0),
     firstLight_(nullptr)
 {
-    if (drawableFlags == DRAWABLE_UNDEFINED || drawableFlags > DRAWABLE_ANY)
-    {
-        URHO3D_LOGERROR("Drawable with undefined drawableFlags");
-    }
+    if (drawableType == DrawableTypes::Undefined)
+        URHO3D_LOGERROR("Drawable with undefined drawableType");
+    else if (CountSetBits((u32)drawableType) != 1)
+        URHO3D_LOGERROR("Drawable with incorrect drawableType");
 }
 
 Drawable::~Drawable()
@@ -74,11 +74,11 @@ Drawable::~Drawable()
 
 void Drawable::RegisterObject(Context* context)
 {
-    URHO3D_ATTRIBUTE("Max Lights", int, maxLights_, 0, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("View Mask", int, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Light Mask", int, lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Shadow Mask", int, shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Max Lights", maxLights_, 0, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Shadow Mask", shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, DEFAULT_ZONEMASK, AM_DEFAULT);
 }
 
 void Drawable::OnSetEnabled()
@@ -126,8 +126,11 @@ void Drawable::UpdateBatches(const FrameInfo& frame)
         lodDistance_ = newLodDistance;
 }
 
-Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level)
+Geometry* Drawable::GetLodGeometry(i32 batchIndex, i32 level)
 {
+    assert(batchIndex >= 0);
+    assert(level >= 0 || level == NINDEX);
+
     // By default return the visible batch geometry
     if (batchIndex < batches_.Size())
         return batches_[batchIndex].geometry_;
@@ -164,25 +167,25 @@ void Drawable::SetLodBias(float bias)
     MarkNetworkUpdate();
 }
 
-void Drawable::SetViewMask(unsigned mask)
+void Drawable::SetViewMask(mask32 mask)
 {
     viewMask_ = mask;
     MarkNetworkUpdate();
 }
 
-void Drawable::SetLightMask(unsigned mask)
+void Drawable::SetLightMask(mask32 mask)
 {
     lightMask_ = mask;
     MarkNetworkUpdate();
 }
 
-void Drawable::SetShadowMask(unsigned mask)
+void Drawable::SetShadowMask(mask32 mask)
 {
     shadowMask_ = mask;
     MarkNetworkUpdate();
 }
 
-void Drawable::SetZoneMask(unsigned mask)
+void Drawable::SetZoneMask(mask32 mask)
 {
     zoneMask_ = mask;
     // Mark dirty to reset cached zone
@@ -190,8 +193,9 @@ void Drawable::SetZoneMask(unsigned mask)
     MarkNetworkUpdate();
 }
 
-void Drawable::SetMaxLights(unsigned num)
+void Drawable::SetMaxLights(i32 num)
 {
+    assert(num >= 0);
     maxLights_ = num;
     MarkNetworkUpdate();
 }
@@ -437,9 +441,9 @@ bool WriteDrawablesToOBJ(const Vector<Drawable*>& drawables, File* outputFile, b
             // If we've reached here than we're going to actually write something to the OBJ file
             anythingWritten = true;
 
-            const unsigned char* vertexData;
-            const unsigned char* indexData;
-            unsigned elementSize, indexSize;
+            const byte* vertexData;
+            const byte* indexData;
+            i32 elementSize, indexSize;
             const Vector<VertexElement>* elements;
             geo->GetRawData(vertexData, elementSize, indexData, indexSize, elements);
             if (!vertexData || !elements)

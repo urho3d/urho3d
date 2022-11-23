@@ -30,12 +30,15 @@ enum CreateMode
 };
 
 /// Transform space for translations and rotations.
-enum TransformSpace
+enum class TransformSpace
 {
-    TS_LOCAL = 0,
-    TS_PARENT,
-    TS_WORLD
+    Local = 0,
+    Parent,
+    World
 };
+
+using ComponentId = id32;
+using NodeId = id32;
 
 /// Internal implementation structure for less performance-critical Node variables.
 struct URHO3D_API NodeImpl
@@ -236,34 +239,34 @@ public:
     }
 
     /// Move the scene node in the chosen transform space.
-    void Translate(const Vector3& delta, TransformSpace space = TS_LOCAL);
+    void Translate(const Vector3& delta, TransformSpace space = TransformSpace::Local);
 
     /// Move the scene node in the chosen transform space (for Urho2D).
-    void Translate2D(const Vector2& delta, TransformSpace space = TS_LOCAL) { Translate(Vector3(delta), space); }
+    void Translate2D(const Vector2& delta, TransformSpace space = TransformSpace::Local) { Translate(Vector3(delta), space); }
 
     /// Rotate the scene node in the chosen transform space.
-    void Rotate(const Quaternion& delta, TransformSpace space = TS_LOCAL);
+    void Rotate(const Quaternion& delta, TransformSpace space = TransformSpace::Local);
 
     /// Rotate the scene node in the chosen transform space (for Urho2D).
-    void Rotate2D(float delta, TransformSpace space = TS_LOCAL) { Rotate(Quaternion(delta), space); }
+    void Rotate2D(float delta, TransformSpace space = TransformSpace::Local) { Rotate(Quaternion(delta), space); }
 
     /// Rotate around a point in the chosen transform space.
-    void RotateAround(const Vector3& point, const Quaternion& delta, TransformSpace space = TS_LOCAL);
+    void RotateAround(const Vector3& point, const Quaternion& delta, TransformSpace space = TransformSpace::Local);
 
     /// Rotate around a point in the chosen transform space (for Urho2D).
-    void RotateAround2D(const Vector2& point, float delta, TransformSpace space = TS_LOCAL)
+    void RotateAround2D(const Vector2& point, float delta, TransformSpace space = TransformSpace::Local)
     {
         RotateAround(Vector3(point), Quaternion(delta), space);
     }
 
     /// Rotate around the X axis.
-    void Pitch(float angle, TransformSpace space = TS_LOCAL);
+    void Pitch(float angle, TransformSpace space = TransformSpace::Local);
     /// Rotate around the Y axis.
-    void Yaw(float angle, TransformSpace space = TS_LOCAL);
+    void Yaw(float angle, TransformSpace space = TransformSpace::Local);
     /// Rotate around the Z axis.
-    void Roll(float angle, TransformSpace space = TS_LOCAL);
+    void Roll(float angle, TransformSpace space = TransformSpace::Local);
     /// Look at a target position in the chosen transform space. Note that the up vector is always specified in world space. Return true if successful, or false if resulted in an illegal rotation, in which case the current rotation remains.
-    bool LookAt(const Vector3& target, const Vector3& up = Vector3::UP, TransformSpace space = TS_WORLD);
+    bool LookAt(const Vector3& target, const Vector3& up = Vector3::UP, TransformSpace space = TransformSpace::World);
     /// Modify scale in parent space uniformly.
     void Scale(float scale);
     /// Modify scale in parent space.
@@ -287,9 +290,9 @@ public:
     /// Mark node and child nodes to need world transform recalculation. Notify listener components.
     void MarkDirty();
     /// Create a child scene node (with specified ID if provided).
-    Node* CreateChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0, bool temporary = false);
+    Node* CreateChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, NodeId id = 0, bool temporary = false);
     /// Create a temporary child scene node (with specified ID if provided).
-    Node* CreateTemporaryChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0);
+    Node* CreateTemporaryChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, NodeId id = 0);
 
     /// Add a child scene node at a specific index. If index is not explicitly specified or is ENDPOS, append the new child at the end.
     void AddChild(Node* node, i32 index = ENDPOS);
@@ -301,13 +304,13 @@ public:
     /// Remove child scene nodes that match criteria.
     void RemoveChildren(bool removeReplicated, bool removeLocal, bool recursive);
     /// Create a component to this node (with specified ID if provided).
-    Component* CreateComponent(StringHash type, CreateMode mode = REPLICATED, unsigned id = 0);
+    Component* CreateComponent(StringHash type, CreateMode mode = REPLICATED, ComponentId id = 0);
     /// Create a component to this node if it does not exist already.
-    Component* GetOrCreateComponent(StringHash type, CreateMode mode = REPLICATED, unsigned id = 0);
+    Component* GetOrCreateComponent(StringHash type, CreateMode mode = REPLICATED, ComponentId id = 0);
     /// Clone a component from another node using its create mode. Return the clone if successful or null on failure.
-    Component* CloneComponent(Component* component, unsigned id = 0);
+    Component* CloneComponent(Component* component, ComponentId id = 0);
     /// Clone a component from another node and specify the create mode. Return the clone if successful or null on failure.
-    Component* CloneComponent(Component* component, CreateMode mode, unsigned id = 0);
+    Component* CloneComponent(Component* component, CreateMode mode, ComponentId id = 0);
     /// Remove a component from this node.
     void RemoveComponent(Component* component);
     /// Remove the first component of specific type from this node.
@@ -318,8 +321,10 @@ public:
     void RemoveComponents(StringHash type);
     /// Remove all components from this node.
     void RemoveAllComponents();
-    /// Adjust index order of an existing component in this node.
-    void ReorderComponent(Component* component, unsigned index);
+
+    /// Adjust index order of an existing component in this node. index can be ENDPOS.
+    void ReorderComponent(Component* component, i32 index);
+
     /// Clone scene node, components and child nodes. Return the clone.
     Node* Clone(CreateMode mode = REPLICATED);
     /// Remove from the parent node. If no other shared pointer references exist, causes immediate deletion.
@@ -334,9 +339,9 @@ public:
     /// Remove listener component.
     void RemoveListener(Component* component);
     /// Template version of creating a component.
-    template <class T> T* CreateComponent(CreateMode mode = REPLICATED, unsigned id = 0);
+    template <class T> T* CreateComponent(CreateMode mode = REPLICATED, ComponentId id = 0);
     /// Template version of getting or creating a component.
-    template <class T> T* GetOrCreateComponent(CreateMode mode = REPLICATED, unsigned id = 0);
+    template <class T> T* GetOrCreateComponent(CreateMode mode = REPLICATED, ComponentId id = 0);
     /// Template version of removing a component.
     template <class T> void RemoveComponent();
     /// Template version of removing all components of specific type.
@@ -344,7 +349,7 @@ public:
 
     /// Return ID.
     /// @property{get_id}
-    unsigned GetID() const { return id_; }
+    NodeId GetID() const { return id_; }
     /// Return whether the node is replicated or local to a scene.
     /// @property
     bool IsReplicated() const;
@@ -540,7 +545,7 @@ public:
     bool IsDirty() const { return dirty_; }
 
     /// Return number of child scene nodes.
-    unsigned GetNumChildren(bool recursive = false) const;
+    i32 GetNumChildren(bool recursive = false) const;
 
     /// Return immediate child scene nodes.
     const Vector<SharedPtr<Node>>& GetChildren() const { return children_; }
@@ -559,7 +564,8 @@ public:
     Vector<Node*> GetChildrenWithTag(const String& tag, bool recursive = false) const;
 
     /// Return child scene node by index.
-    Node* GetChild(unsigned index) const;
+    Node* GetChild(i32 index) const;
+
     /// Return child scene node by name.
     Node* GetChild(const String& name, bool recursive = false) const;
     /// Return child scene node by name.
@@ -569,10 +575,10 @@ public:
 
     /// Return number of components.
     /// @property
-    unsigned GetNumComponents() const { return components_.Size(); }
+    i32 GetNumComponents() const { return components_.Size(); }
 
     /// Return number of non-local components.
-    unsigned GetNumNetworkComponents() const;
+    i32 GetNumNetworkComponents() const;
 
     /// Return all components.
     const Vector<SharedPtr<Component>>& GetComponents() const { return components_; }
@@ -613,7 +619,7 @@ public:
 
     /// Set ID. Called by Scene.
     /// @property{set_id}
-    void SetID(unsigned id);
+    void SetID(NodeId id);
     /// Set scene. Called by Scene.
     void SetScene(Scene* scene);
     /// Reset scene, ID and owner. Called by Scene.
@@ -621,15 +627,15 @@ public:
     /// Set network position attribute.
     void SetNetPositionAttr(const Vector3& value);
     /// Set network rotation attribute.
-    void SetNetRotationAttr(const Vector<unsigned char>& value);
+    void SetNetRotationAttr(const Vector<byte>& value);
     /// Set network parent attribute.
-    void SetNetParentAttr(const Vector<unsigned char>& value);
+    void SetNetParentAttr(const Vector<byte>& value);
     /// Return network position attribute.
     const Vector3& GetNetPositionAttr() const;
     /// Return network rotation attribute.
-    const Vector<unsigned char>& GetNetRotationAttr() const;
+    const Vector<byte>& GetNetRotationAttr() const;
     /// Return network parent attribute.
-    const Vector<unsigned char>& GetNetParentAttr() const;
+    const Vector<byte>& GetNetParentAttr() const;
     /// Load components and optionally load child nodes.
     bool Load(Deserializer& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false,
         CreateMode mode = REPLICATED);
@@ -650,13 +656,15 @@ public:
     /// Mark node dirty in scene replication states.
     void MarkReplicationDirty();
     /// Create a child node with specific ID.
-    Node* CreateChild(unsigned id, CreateMode mode, bool temporary = false);
+    Node* CreateChild(NodeId id, CreateMode mode, bool temporary = false);
     /// Add a pre-created component. Using this function from application code is discouraged, as component operation without an owner node may not be well-defined in all cases. Prefer CreateComponent() instead.
-    void AddComponent(Component* component, unsigned id, CreateMode mode);
+    void AddComponent(Component* component, ComponentId id, CreateMode mode);
+
     /// Calculate number of non-temporary child nodes.
-    unsigned GetNumPersistentChildren() const;
+    i32 GetNumPersistentChildren() const;
+
     /// Calculate number of non-temporary components.
-    unsigned GetNumPersistentComponents() const;
+    i32 GetNumPersistentComponents() const;
 
     /// Set position in parent space silently without marking the node & child nodes dirty. Used by animation code.
     void SetPositionSilent(const Vector3& position) { position_ = position; }
@@ -682,7 +690,7 @@ private:
     /// Set enabled/disabled state with optional recursion. Optionally affect the remembered enable state.
     void SetEnabled(bool enable, bool recursive, bool storeSelf);
     /// Create component, allowing UnknownComponent if actual type is not supported. Leave typeName empty if not known.
-    Component* SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, unsigned id);
+    Component* SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, ComponentId id);
     /// Recalculate the world transform.
     void UpdateWorldTransform() const;
     /// Remove child node by iterator.
@@ -721,7 +729,7 @@ private:
     /// Scene (root node).
     Scene* scene_;
     /// Unique ID within the scene.
-    unsigned id_;
+    NodeId id_;
     /// Position.
     Vector3 position_;
     /// Rotation.
@@ -745,12 +753,12 @@ protected:
     VariantMap vars_;
 };
 
-template <class T> T* Node::CreateComponent(CreateMode mode, unsigned id)
+template <class T> T* Node::CreateComponent(CreateMode mode, ComponentId id)
 {
     return static_cast<T*>(CreateComponent(T::GetTypeStatic(), mode, id));
 }
 
-template <class T> T* Node::GetOrCreateComponent(CreateMode mode, unsigned id)
+template <class T> T* Node::GetOrCreateComponent(CreateMode mode, ComponentId id)
 {
     return static_cast<T*>(GetOrCreateComponent(T::GetTypeStatic(), mode, id));
 }

@@ -183,9 +183,11 @@ void AnimationState::SetTime(float time)
     }
 }
 
-void AnimationState::SetBoneWeight(unsigned index, float weight, bool recursive)
+void AnimationState::SetBoneWeight(i32 index, float weight, bool recursive)
 {
-    if (index >= stateTracks_.Size())
+    assert(index >= 0 || index == NINDEX);
+
+    if (index >= stateTracks_.Size() || index == NINDEX)
         return;
 
     weight = Clamp(weight, 0.0f, 1.0f);
@@ -203,10 +205,10 @@ void AnimationState::SetBoneWeight(unsigned index, float weight, bool recursive)
         if (boneNode)
         {
             const Vector<SharedPtr<Node>>& children = boneNode->GetChildren();
-            for (unsigned i = 0; i < children.Size(); ++i)
+            for (i32 i = 0; i < children.Size(); ++i)
             {
-                unsigned childTrackIndex = GetTrackIndex(children[i]);
-                if (childTrackIndex != M_MAX_UNSIGNED)
+                i32 childTrackIndex = GetTrackIndex(children[i]);
+                if (childTrackIndex != NINDEX)
                     SetBoneWeight(childTrackIndex, weight, true);
             }
         }
@@ -367,9 +369,10 @@ Bone* AnimationState::GetStartBone() const
     return model_ ? startBone_ : nullptr;
 }
 
-float AnimationState::GetBoneWeight(unsigned index) const
+float AnimationState::GetBoneWeight(i32 index) const
 {
-    return index < stateTracks_.Size() ? stateTracks_[index].weight_ : 0.0f;
+    assert(index >= 0 || index == NINDEX);
+    return (index != NINDEX && index < stateTracks_.Size()) ? stateTracks_[index].weight_ : 0.0f;
 }
 
 float AnimationState::GetBoneWeight(const String& name) const
@@ -382,39 +385,39 @@ float AnimationState::GetBoneWeight(StringHash nameHash) const
     return GetBoneWeight(GetTrackIndex(nameHash));
 }
 
-unsigned AnimationState::GetTrackIndex(const String& name) const
+i32 AnimationState::GetTrackIndex(const String& name) const
 {
-    for (unsigned i = 0; i < stateTracks_.Size(); ++i)
+    for (i32 i = 0; i < stateTracks_.Size(); ++i)
     {
         Node* node = stateTracks_[i].node_;
         if (node && node->GetName() == name)
             return i;
     }
 
-    return M_MAX_UNSIGNED;
+    return NINDEX;
 }
 
-unsigned AnimationState::GetTrackIndex(Node* node) const
+i32 AnimationState::GetTrackIndex(Node* node) const
 {
-    for (unsigned i = 0; i < stateTracks_.Size(); ++i)
+    for (i32 i = 0; i < stateTracks_.Size(); ++i)
     {
         if (stateTracks_[i].node_ == node)
             return i;
     }
 
-    return M_MAX_UNSIGNED;
+    return NINDEX;
 }
 
-unsigned AnimationState::GetTrackIndex(StringHash nameHash) const
+i32 AnimationState::GetTrackIndex(StringHash nameHash) const
 {
-    for (unsigned i = 0; i < stateTracks_.Size(); ++i)
+    for (i32 i = 0; i < stateTracks_.Size(); ++i)
     {
         Node* node = stateTracks_[i].node_;
         if (node && node->GetNameHash() == nameHash)
             return i;
     }
 
-    return M_MAX_UNSIGNED;
+    return NINDEX;
 }
 
 float AnimationState::GetLength() const
@@ -463,11 +466,11 @@ void AnimationState::ApplyTrack(AnimationStateTrack& stateTrack, float weight, b
     if (track->keyFrames_.Empty() || !node)
         return;
 
-    unsigned& frame = stateTrack.keyFrame_;
+    i32& frame = stateTrack.keyFrame_;
     track->GetKeyFrameIndex(time_, frame);
 
     // Check if next frame to interpolate to is valid, or if wrapping is needed (looping animation only)
-    unsigned nextFrame = frame + 1;
+    i32 nextFrame = frame + 1;
     bool interpolate = true;
     if (nextFrame >= track->keyFrames_.Size())
     {
@@ -481,7 +484,7 @@ void AnimationState::ApplyTrack(AnimationStateTrack& stateTrack, float weight, b
     }
 
     const AnimationKeyFrame* keyFrame = &track->keyFrames_[frame];
-    const AnimationChannelFlags channelMask = track->channelMask_;
+    const AnimationChannels channelMask = track->channelMask_;
 
     Vector3 newPosition;
     Quaternion newRotation;
@@ -495,38 +498,38 @@ void AnimationState::ApplyTrack(AnimationStateTrack& stateTrack, float weight, b
             timeInterval += animation_->GetLength();
         float t = timeInterval > 0.0f ? (time_ - keyFrame->time_) / timeInterval : 1.0f;
 
-        if (channelMask & CHANNEL_POSITION)
+        if (!!(channelMask & AnimationChannels::Position))
             newPosition = keyFrame->position_.Lerp(nextKeyFrame->position_, t);
-        if (channelMask & CHANNEL_ROTATION)
+        if (!!(channelMask & AnimationChannels::Rotation))
             newRotation = keyFrame->rotation_.Slerp(nextKeyFrame->rotation_, t);
-        if (channelMask & CHANNEL_SCALE)
+        if (!!(channelMask & AnimationChannels::Scale))
             newScale = keyFrame->scale_.Lerp(nextKeyFrame->scale_, t);
     }
     else
     {
-        if (channelMask & CHANNEL_POSITION)
+        if (!!(channelMask & AnimationChannels::Position))
             newPosition = keyFrame->position_;
-        if (channelMask & CHANNEL_ROTATION)
+        if (!!(channelMask & AnimationChannels::Rotation))
             newRotation = keyFrame->rotation_;
-        if (channelMask & CHANNEL_SCALE)
+        if (!!(channelMask & AnimationChannels::Scale))
             newScale = keyFrame->scale_;
     }
 
     if (blendingMode_ == ABM_ADDITIVE) // not ABM_LERP
     {
-        if (channelMask & CHANNEL_POSITION)
+        if (!!(channelMask & AnimationChannels::Position))
         {
             Vector3 delta = newPosition - stateTrack.bone_->initialPosition_;
             newPosition = node->GetPosition() + delta * weight;
         }
-        if (channelMask & CHANNEL_ROTATION)
+        if (!!(channelMask & AnimationChannels::Rotation))
         {
             Quaternion delta = newRotation * stateTrack.bone_->initialRotation_.Inverse();
             newRotation = (delta * node->GetRotation()).Normalized();
             if (!Equals(weight, 1.0f))
                 newRotation = node->GetRotation().Slerp(newRotation, weight);
         }
-        if (channelMask & CHANNEL_SCALE)
+        if (!!(channelMask & AnimationChannels::Scale))
         {
             Vector3 delta = newScale - stateTrack.bone_->initialScale_;
             newScale = node->GetScale() + delta * weight;
@@ -536,31 +539,31 @@ void AnimationState::ApplyTrack(AnimationStateTrack& stateTrack, float weight, b
     {
         if (!Equals(weight, 1.0f)) // not full weight
         {
-            if (channelMask & CHANNEL_POSITION)
+            if (!!(channelMask & AnimationChannels::Position))
                 newPosition = node->GetPosition().Lerp(newPosition, weight);
-            if (channelMask & CHANNEL_ROTATION)
+            if (!!(channelMask & AnimationChannels::Rotation))
                 newRotation = node->GetRotation().Slerp(newRotation, weight);
-            if (channelMask & CHANNEL_SCALE)
+            if (!!(channelMask & AnimationChannels::Scale))
                 newScale = node->GetScale().Lerp(newScale, weight);
         }
     }
 
     if (silent)
     {
-        if (channelMask & CHANNEL_POSITION)
+        if (!!(channelMask & AnimationChannels::Position))
             node->SetPositionSilent(newPosition);
-        if (channelMask & CHANNEL_ROTATION)
+        if (!!(channelMask & AnimationChannels::Rotation))
             node->SetRotationSilent(newRotation);
-        if (channelMask & CHANNEL_SCALE)
+        if (!!(channelMask & AnimationChannels::Scale))
             node->SetScaleSilent(newScale);
     }
     else
     {
-        if (channelMask & CHANNEL_POSITION)
+        if (!!(channelMask & AnimationChannels::Position))
             node->SetPosition(newPosition);
-        if (channelMask & CHANNEL_ROTATION)
+        if (!!(channelMask & AnimationChannels::Rotation))
             node->SetRotation(newRotation);
-        if (channelMask & CHANNEL_SCALE)
+        if (!!(channelMask & AnimationChannels::Scale))
             node->SetScale(newScale);
     }
 }

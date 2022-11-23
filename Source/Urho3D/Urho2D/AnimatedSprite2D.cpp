@@ -58,12 +58,12 @@ void AnimatedSprite2D::RegisterObject(Context* context)
 
     URHO3D_COPY_BASE_ATTRIBUTES(StaticSprite2D);
     URHO3D_REMOVE_ATTRIBUTE("Sprite");
-    URHO3D_ACCESSOR_ATTRIBUTE("Speed", GetSpeed, SetSpeed, float, 1.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Entity", GetEntity, SetEntity, String, String::EMPTY, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Animation Set", GetAnimationSetAttr, SetAnimationSetAttr, ResourceRef,
+    URHO3D_ACCESSOR_ATTRIBUTE("Speed", GetSpeed, SetSpeed, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Entity", GetEntity, SetEntity, String::EMPTY, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Animation Set", GetAnimationSetAttr, SetAnimationSetAttr,
         ResourceRef(AnimatedSprite2D::GetTypeStatic()), AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Animation", GetAnimation, SetAnimationAttr, String, String::EMPTY, AM_DEFAULT);
-    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Loop Mode", GetLoopMode, SetLoopMode, LoopMode2D, loopModeNames, LM_DEFAULT, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Animation", GetAnimation, SetAnimationAttr, String::EMPTY, AM_DEFAULT);
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Loop Mode", GetLoopMode, SetLoopMode, loopModeNames, LM_DEFAULT, AM_DEFAULT);
 }
 
 void AnimatedSprite2D::OnSetEnabled()
@@ -410,7 +410,7 @@ void AnimatedSprite2D::UpdateSourceBatchesSpriter()
 
     Rect drawRect;
     Rect textureRect;
-    unsigned color = color_.ToUInt();
+    color32 color = color_.ToU32();
 
     Vertex2D vertex0;
     Vertex2D vertex1;
@@ -464,10 +464,10 @@ void AnimatedSprite2D::UpdateSourceBatchesSpriter()
         vertex3.uv_ = Vector2(textureRect.max_.x_, textureRect.min_.y_);
 
         Color finalColor;
-        finalColor.FromUInt(color);
+        finalColor.FromU32(color);
         finalColor.a_ = info.alpha_;
 
-        vertex0.color_ = vertex1.color_ = vertex2.color_ = vertex3.color_ = finalColor.ToUInt();
+        vertex0.color_ = vertex1.color_ = vertex2.color_ = vertex3.color_ = finalColor.ToU32();
 
         vertices.Push(vertex0);
         vertices.Push(vertex1);

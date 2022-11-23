@@ -26,16 +26,16 @@ const float CHASSIS_WIDTH = 2.6f;
 void Vehicle::RegisterObject(Context* context)
 {
     context->RegisterFactory<Vehicle>();
-    URHO3D_ATTRIBUTE("Steering", float, steering_, 0.0f, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Controls Yaw", float, controls_.yaw_, 0.0f, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Controls Pitch", float, controls_.pitch_, 0.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Steering", steering_, 0.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Controls Yaw", controls_.yaw_, 0.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Controls Pitch", controls_.pitch_, 0.0f, AM_DEFAULT);
 }
 
 Vehicle::Vehicle(Urho3D::Context* context)
     : LogicComponent(context),
       steering_(0.0f)
 {
-    SetUpdateEventMask(USE_FIXEDUPDATE | USE_POSTUPDATE);
+    SetUpdateEventMask(LogicComponentEvents::FixedUpdate | LogicComponentEvents::PostUpdate);
     engineForce_ = 0.0f;
     brakingForce_ = 50.0f;
     vehicleSteering_ = 0.0f;

@@ -90,14 +90,14 @@ static void Register_AnimationTriggerPoint(asIScriptEngine* engine)
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<AnimationTriggerPoint>(engine, "AnimationTriggerPoint");
 }
 
-// AreaAllocator::AreaAllocator(int width, int height, bool fastMode = true)
-static void AreaAllocator__AreaAllocator_int_int_bool(AreaAllocator* _ptr, int width, int height, bool fastMode)
+// AreaAllocator::AreaAllocator(i32 width, i32 height, bool fastMode = true)
+static void AreaAllocator__AreaAllocator_i32_i32_bool(AreaAllocator* _ptr, i32 width, i32 height, bool fastMode)
 {
     new(_ptr) AreaAllocator(width, height, fastMode);
 }
 
-// AreaAllocator::AreaAllocator(int width, int height, int maxWidth, int maxHeight, bool fastMode = true)
-static void AreaAllocator__AreaAllocator_int_int_int_int_bool(AreaAllocator* _ptr, int width, int height, int maxWidth, int maxHeight, bool fastMode)
+// AreaAllocator::AreaAllocator(i32 width, i32 height, i32 maxWidth, i32 maxHeight, bool fastMode = true)
+static void AreaAllocator__AreaAllocator_i32_i32_i32_i32_bool(AreaAllocator* _ptr, i32 width, i32 height, i32 maxWidth, i32 maxHeight, bool fastMode)
 {
     new(_ptr) AreaAllocator(width, height, maxWidth, maxHeight, fastMode);
 }
@@ -105,10 +105,10 @@ static void AreaAllocator__AreaAllocator_int_int_int_int_bool(AreaAllocator* _pt
 // class AreaAllocator | File: ../Math/AreaAllocator.h
 static void Register_AreaAllocator(asIScriptEngine* engine)
 {
-    // AreaAllocator::AreaAllocator(int width, int height, bool fastMode = true)
-    engine->RegisterObjectBehaviour("AreaAllocator", asBEHAVE_CONSTRUCT, "void f(int, int, bool = true)", AS_FUNCTION_OBJFIRST(AreaAllocator__AreaAllocator_int_int_bool), AS_CALL_CDECL_OBJFIRST);
-    // AreaAllocator::AreaAllocator(int width, int height, int maxWidth, int maxHeight, bool fastMode = true)
-    engine->RegisterObjectBehaviour("AreaAllocator", asBEHAVE_CONSTRUCT, "void f(int, int, int, int, bool = true)", AS_FUNCTION_OBJFIRST(AreaAllocator__AreaAllocator_int_int_int_int_bool), AS_CALL_CDECL_OBJFIRST);
+    // AreaAllocator::AreaAllocator(i32 width, i32 height, bool fastMode = true)
+    engine->RegisterObjectBehaviour("AreaAllocator", asBEHAVE_CONSTRUCT, "void f(int, int, bool = true)", AS_FUNCTION_OBJFIRST(AreaAllocator__AreaAllocator_i32_i32_bool), AS_CALL_CDECL_OBJFIRST);
+    // AreaAllocator::AreaAllocator(i32 width, i32 height, i32 maxWidth, i32 maxHeight, bool fastMode = true)
+    engine->RegisterObjectBehaviour("AreaAllocator", asBEHAVE_CONSTRUCT, "void f(int, int, int, int, bool = true)", AS_FUNCTION_OBJFIRST(AreaAllocator__AreaAllocator_i32_i32_i32_i32_bool), AS_CALL_CDECL_OBJFIRST);
 
     // AreaAllocator::~AreaAllocator() | Implicitly-declared
     engine->RegisterObjectBehaviour("AreaAllocator", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(AreaAllocator), AS_CALL_CDECL_OBJFIRST);
@@ -2291,7 +2291,7 @@ static void Sphere__Sphere_constspPolyhedronamp(Sphere* _ptr, const Polyhedron& 
 // class Sphere | File: ../Math/Sphere.h
 static void Register_Sphere(asIScriptEngine* engine)
 {
-    // Sphere::Sphere(const Vector3* vertices, unsigned count) noexcept
+    // Sphere::Sphere(const Vector3* vertices, i32 count) noexcept
     // Error: type "const Vector3*" can not automatically bind
 
     // Sphere::Sphere(const Sphere& sphere) noexcept = default
@@ -2529,8 +2529,8 @@ static void StringHash__StringHash_constspStringHashamp(StringHash* _ptr, const 
     new(_ptr) StringHash(rhs);
 }
 
-// explicit constexpr StringHash::StringHash(unsigned value) noexcept
-static void StringHash_constexpr_StringHash_unsigned(StringHash* _ptr, unsigned value)
+// explicit constexpr StringHash::StringHash(hash32 value) noexcept
+static void StringHash_constexpr_StringHash_hash32(StringHash* _ptr, hash32 value)
 {
     new(_ptr) StringHash(value);
 }
@@ -2549,8 +2549,8 @@ static void Register_StringHash(asIScriptEngine* engine)
 
     // StringHash::StringHash(const StringHash& rhs) noexcept = default
     engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const StringHash&in)", AS_FUNCTION_OBJFIRST(StringHash__StringHash_constspStringHashamp), AS_CALL_CDECL_OBJFIRST);
-    // explicit constexpr StringHash::StringHash(unsigned value) noexcept
-    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(uint)", AS_FUNCTION_OBJFIRST(StringHash_constexpr_StringHash_unsigned), AS_CALL_CDECL_OBJFIRST);
+    // explicit constexpr StringHash::StringHash(hash32 value) noexcept
+    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(hash32)", AS_FUNCTION_OBJFIRST(StringHash_constexpr_StringHash_hash32), AS_CALL_CDECL_OBJFIRST);
     // StringHash::StringHash(const String& str) noexcept
     engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const String&in)", AS_FUNCTION_OBJFIRST(StringHash__StringHash_constspStringamp), AS_CALL_CDECL_OBJFIRST);
 
@@ -2813,6 +2813,13 @@ static void Variant__Variant_constspStringamp(Variant* _ptr, const String& value
     new(_ptr) Variant(value);
 }
 
+// Variant::Variant(const Vector<byte>& value)
+static void Variant__Variant_constspVectorlesbytegreamp(Variant* _ptr, CScriptArray* value_conv)
+{
+    Vector<byte> value = ArrayToVector<byte>(value_conv);
+    new(_ptr) Variant(value);
+}
+
 // Variant::Variant(const VectorBuffer& value)
 static void Variant__Variant_constspVectorBufferamp(Variant* _ptr, const VectorBuffer& value)
 {
@@ -2915,10 +2922,10 @@ static void Register_Variant(asIScriptEngine* engine)
 {
     // Variant::Variant(VariantType type, const char* value)
     // Error: type "const char*" can not automatically bind
+    // Variant::Variant(c32 value)
+    // Not registered because have @nobind mark
     // Variant::Variant(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
-    // Variant::Variant(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // Variant::Variant(const char* type, const char* value)
     // Error: type "const char*" can not automatically bind
     // Variant::Variant(const char* value)
@@ -2956,6 +2963,8 @@ static void Register_Variant(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Color&in)", AS_FUNCTION_OBJFIRST(Variant__Variant_constspColoramp), AS_CALL_CDECL_OBJFIRST);
     // Variant::Variant(const String& value)
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const String&in)", AS_FUNCTION_OBJFIRST(Variant__Variant_constspStringamp), AS_CALL_CDECL_OBJFIRST);
+    // Variant::Variant(const Vector<byte>& value)
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(Array<byte>@+)", AS_FUNCTION_OBJFIRST(Variant__Variant_constspVectorlesbytegreamp), AS_CALL_CDECL_OBJFIRST);
     // Variant::Variant(const VectorBuffer& value)
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const VectorBuffer&in)", AS_FUNCTION_OBJFIRST(Variant__Variant_constspVectorBufferamp), AS_CALL_CDECL_OBJFIRST);
     // Variant::Variant(const ResourceRef& value)
@@ -3017,6 +3026,12 @@ static void Vector2__Vector2_float_float(Vector2* _ptr, float x, float y)
     new(_ptr) Vector2(x, y);
 }
 
+// Vector2::Vector2(i32 x, i32 y) noexcept
+static void Vector2__Vector2_i32_i32(Vector2* _ptr, i32 x, i32 y)
+{
+    new(_ptr) Vector2(x, y);
+}
+
 // class Vector2 | File: ../Math/Vector2.h
 static void Register_Vector2(asIScriptEngine* engine)
 {
@@ -3029,6 +3044,8 @@ static void Register_Vector2(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Vector2", asBEHAVE_CONSTRUCT, "void f(const IntVector2&in)", AS_FUNCTION_OBJFIRST(Vector2__Vector2_constspIntVector2amp), AS_CALL_CDECL_OBJFIRST);
     // Vector2::Vector2(float x, float y) noexcept
     engine->RegisterObjectBehaviour("Vector2", asBEHAVE_CONSTRUCT, "void f(float, float)", AS_FUNCTION_OBJFIRST(Vector2__Vector2_float_float), AS_CALL_CDECL_OBJFIRST);
+    // Vector2::Vector2(i32 x, i32 y) noexcept
+    engine->RegisterObjectBehaviour("Vector2", asBEHAVE_CONSTRUCT, "void f(int, int)", AS_FUNCTION_OBJFIRST(Vector2__Vector2_i32_i32), AS_CALL_CDECL_OBJFIRST);
 
     RegisterMembers_Vector2<Vector2>(engine, "Vector2");
 
@@ -3235,7 +3252,7 @@ static void XMLElement__XMLElement_constspXMLElementamp(XMLElement* _ptr, const 
 // class XMLElement | File: ../Resource/XMLElement.h
 static void Register_XMLElement(asIScriptEngine* engine)
 {
-    // XMLElement::XMLElement(XMLFile* file, const XPathResultSet* resultSet, const pugi::xpath_node* xpathNode, unsigned xpathResultIndex)
+    // XMLElement::XMLElement(XMLFile* file, const XPathResultSet* resultSet, const pugi::xpath_node* xpathNode, i32 xpathResultIndex)
     // Error: type "const XPathResultSet*" can not automatically bind
     // XMLElement::XMLElement(XMLFile* file, pugi::xml_node_struct* node)
     // Error: type "pugi::xml_node_struct*" can not automatically bind
@@ -4830,8 +4847,15 @@ static void Register_UI(asIScriptEngine* engine)
     #endif
 }
 
-// VectorBuffer::VectorBuffer(Deserializer& source, unsigned size)
-static void VectorBuffer__VectorBuffer_Deserializeramp_unsigned(VectorBuffer* _ptr, Deserializer& source, unsigned size)
+// explicit VectorBuffer::VectorBuffer(const Vector<byte>& data)
+static void VectorBuffer__VectorBuffer_constspVectorlesbytegreamp(VectorBuffer* _ptr, CScriptArray* data_conv)
+{
+    Vector<byte> data = ArrayToVector<byte>(data_conv);
+    new(_ptr) VectorBuffer(data);
+}
+
+// VectorBuffer::VectorBuffer(Deserializer& source, i32 size)
+static void VectorBuffer__VectorBuffer_Deserializeramp_i32(VectorBuffer* _ptr, Deserializer& source, i32 size)
 {
     new(_ptr) VectorBuffer(source, size);
 }
@@ -4839,13 +4863,13 @@ static void VectorBuffer__VectorBuffer_Deserializeramp_unsigned(VectorBuffer* _p
 // class VectorBuffer | File: ../IO/VectorBuffer.h
 static void Register_VectorBuffer(asIScriptEngine* engine)
 {
-    // VectorBuffer::VectorBuffer(const void* data, unsigned size)
+    // VectorBuffer::VectorBuffer(const void* data, i32 size)
     // Error: type "const void*" can not automatically bind
-    // explicit VectorBuffer::VectorBuffer(const Vector<unsigned char>& data)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
 
-    // VectorBuffer::VectorBuffer(Deserializer& source, unsigned size)
-    engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(Deserializer&, uint)", AS_FUNCTION_OBJFIRST(VectorBuffer__VectorBuffer_Deserializeramp_unsigned), AS_CALL_CDECL_OBJFIRST);
+    // explicit VectorBuffer::VectorBuffer(const Vector<byte>& data)
+    engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(Array<byte>@+)", AS_FUNCTION_OBJFIRST(VectorBuffer__VectorBuffer_constspVectorlesbytegreamp), AS_CALL_CDECL_OBJFIRST);
+    // VectorBuffer::VectorBuffer(Deserializer& source, i32 size)
+    engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(Deserializer&, int)", AS_FUNCTION_OBJFIRST(VectorBuffer__VectorBuffer_Deserializeramp_i32), AS_CALL_CDECL_OBJFIRST);
 
     // VectorBuffer::~VectorBuffer() | Implicitly-declared
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(VectorBuffer), AS_CALL_CDECL_OBJFIRST);

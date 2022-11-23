@@ -18,7 +18,7 @@ class FileWatcher;
 class PackageFile;
 
 /// Sets to priority so that a package or file is pushed to the end of the vector.
-static const unsigned PRIORITY_LAST = 0xffffffff;
+inline constexpr i32 PRIORITY_LAST = -1;
 
 /// Container of resources with specific type.
 struct ResourceGroup
@@ -72,11 +72,11 @@ public:
     ~ResourceCache() override;
 
     /// Add a resource load directory. Optional priority parameter which will control search order.
-    bool AddResourceDir(const String& pathName, unsigned priority = PRIORITY_LAST);
+    bool AddResourceDir(const String& pathName, i32 priority = PRIORITY_LAST);
     /// Add a package file for loading resources from. Optional priority parameter which will control search order.
-    bool AddPackageFile(PackageFile* package, unsigned priority = PRIORITY_LAST);
+    bool AddPackageFile(PackageFile* package, i32 priority = PRIORITY_LAST);
     /// Add a package file for loading resources from by name. Optional priority parameter which will control search order.
-    bool AddPackageFile(const String& fileName, unsigned priority = PRIORITY_LAST);
+    bool AddPackageFile(const String& fileName, i32 priority = PRIORITY_LAST);
     /// Add a manually created resource. Must be uniquely named within its type.
     bool AddManualResource(Resource* resource);
     /// Remove a resource load directory.

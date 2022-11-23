@@ -24,7 +24,8 @@ unset (CMAKE_FIND_ROOT_PATH)
 if (URHO3D_DOCS)
     set (REQUIRED REQUIRED)
 endif ()
-find_package (Doxygen ${REQUIRED})
+# https://github.com/urho3d/Urho3D/issues/2757
+find_package (Doxygen 1.9.2 ${REQUIRED})
 
 if (DOXYGEN_FOUND)
     # It is not an error when DOT is not found, instead just switching off the Doxygen's HAVE_DOT option
@@ -68,27 +69,6 @@ if (DOXYGEN_FOUND)
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/AngelScriptAPI.h ${CMAKE_CURRENT_BINARY_DIR}/generated/AngelScriptAPI.h
             DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ScriptAPI.dox ${CMAKE_CURRENT_SOURCE_DIR}/AngelScriptAPI.h)
     endif ()
-    if (TARGET tolua++ AND NOT CMAKE_CROSSCOMPILING)
-        file (GLOB PKGS RELATIVE ${CMAKE_SOURCE_DIR}/Source/Urho3D/LuaScript/pkgs ${CMAKE_SOURCE_DIR}/Source/Urho3D/LuaScript/pkgs/*.pkg)
-        list (SORT PKGS)
-        set (PKGLIST "// This is a generated file. DO NOT EDIT!\n\n")
-        foreach (PKG ${PKGS})
-            set (PKGLIST "${PKGLIST}$pfile \"${PKG}\"\n")
-        endforeach ()
-        file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaPkgToDox.txt.new ${PKGLIST})
-        execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaPkgToDox.txt.new ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaPkgToDox.txt)
-        execute_process (COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaPkgToDox.txt.new)
-        file (GLOB_RECURSE API_PKG_FILES ${CMAKE_SOURCE_DIR}/Source/Urho3D/LuaScript/pkgs/*.pkg)
-        add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaScriptAPI.dox
-            COMMAND ${CMAKE_BINARY_DIR}/bin/tool/tolua++ -L ToDoxHook.lua -P -o ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaScriptAPI.dox ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaPkgToDox.txt
-            DEPENDS tolua++ ${API_PKG_FILES} ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaPkgToDox.txt ${CMAKE_SOURCE_DIR}/Source/Urho3D/LuaScript/pkgs/ToDoxHook.lua
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Source/Urho3D/LuaScript/pkgs
-            COMMENT "Dumping LuaScript API to LuaScriptAPI.dox")
-    else ()
-        add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaScriptAPI.dox
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/LuaScriptAPI.dox ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaScriptAPI.dox
-            DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/LuaScriptAPI.dox)
-    endif ()
 
     # In quiet mode, redirect standard output stream of Doxygen to a null device
     if (URHO3D_DOCS_QUIET)
@@ -101,14 +81,14 @@ if (DOXYGEN_FOUND)
 
     # Add custom 'doc' target for generating Urho3D documentation
     if (URHO3D_UPDATE_SOURCE_TREE)
-        foreach (FILE ScriptAPI.dox AngelScriptAPI.h LuaScriptAPI.dox)
+        foreach (FILE ScriptAPI.dox AngelScriptAPI.h)
             list (APPEND UPDATE_COMMANDS COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/generated/${FILE} ${CMAKE_CURRENT_SOURCE_DIR}/${FILE})
         endforeach ()
     endif ()
     file (GLOB DOX_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.dox)
     add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/html/index.html
         COMMAND ${DOXYGEN_EXECUTABLE} generated/Doxyfile ${REDIRECT_STDOUT}
-        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/generated/Doxyfile ${DOX_FILES} ${CMAKE_CURRENT_BINARY_DIR}/generated/ScriptAPI.dox ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaScriptAPI.dox
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/generated/Doxyfile ${DOX_FILES} ${CMAKE_CURRENT_BINARY_DIR}/generated/ScriptAPI.dox
         COMMENT "Generating documentation with Doxygen")
     add_custom_target (doc ${ALL}
         ${UPDATE_COMMANDS}

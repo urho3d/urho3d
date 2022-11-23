@@ -58,4 +58,11 @@ void Test_Container_Str()
         assert(substrings[1] == "bb");
         assert(substrings[2] == "CC");
     }
+
+    {
+        String uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ@*?4点";
+        String lowercase = "abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя@*?4点";
+        assert(uppercase.ToLower() == lowercase);
+        assert(lowercase.ToUpper() == uppercase);
+    }
 }
