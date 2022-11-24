@@ -2,7 +2,20 @@
 
 # Urho3D
 
-Игровой движок, ориентированный на русскоязычное сообщество. Последняя англоязычная версия доступна [тут](https://github.com/urho3d/Urho3D/releases/tag/1.9.0).
+**This repository is now focused on Russian-speaking community only.
+If you were looking for original version of Urho3D (international), check out:**
+
+* [Urho3D 1.9](https://github.com/urho3d/Urho3D/releases/tag/1.9.0): Last English version of Urho3D, unmaintained.
+
+* [Rebel Fork](https://github.com/rbfx/rbfx): Reimagining of Urho3D with significant API changes, in active development.
+
+* [U3D Community](https://github.com/u3d-community/U3D): Urho3D 1.8, in maintenance mode.
+
+Sincerely yours, [Eugene Kozlov](https://github.com/eugeneko)
+
+---
+
+Игровой движок, ориентированный на русскоязычное сообщество.
 
 [![CI/CD](https://github.com/urho3d/Urho3D/workflows/CI/CD/badge.svg)](https://github.com/urho3d/Urho3D/actions?query=workflow%3ACI%2FCD)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/4954/badge.svg)](https://scan.coverity.com/projects/urho3d-urho3d)
