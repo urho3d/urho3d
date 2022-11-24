@@ -22,7 +22,11 @@
 #elif defined(__ANDROID__) || defined (__arm__) || defined(__aarch64__) || defined (__EMSCRIPTEN__)
 #if URHO3D_GLES3
 #include <GLES3/gl3.h>
+#ifndef __EMSCRIPTEN__
 #include <GLES3/gl3ext.h>
+#else
+#include <GLES3/gl2ext.h>
+#endif
 #else
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
