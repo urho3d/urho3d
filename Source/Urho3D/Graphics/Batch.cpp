@@ -6,6 +6,7 @@
 #include "../Graphics/Camera.h"
 #include "../Graphics/Geometry.h"
 #include "../Graphics/Graphics.h"
+#include "../GraphicsAPI/GraphicsDefs.h"
 #include "../Graphics/Material.h"
 #include "../Graphics/Renderer.h"
 #include "../Graphics/Technique.h"
@@ -514,7 +515,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                     }
 
                     normalOffsetScale *= light->GetShadowBias().normalOffset_;
-#ifdef GL_ES_VERSION_2_0
+#ifdef MOBILE_GRAPHICS
                     normalOffsetScale *= renderer->GetMobileNormalOffsetMul();
 #endif
                     graphics->SetShaderParameter(VSP_NORMALOFFSETSCALE, normalOffsetScale);
@@ -575,11 +576,11 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
     }
 
     // Set zone texture if necessary
-#ifndef GL_ES_VERSION_2_0
+#ifndef URHO3D_GLES2
     if (zone_ && graphics->HasTextureUnit(TU_ZONE))
         graphics->SetTexture(TU_ZONE, zone_->GetZoneTexture());
 #else
-    // On OpenGL ES set the zone texture to the environment unit instead
+    // On OpenGL ES2 set the zone texture to the environment unit instead
     if (zone_ && zone_->GetZoneTexture() && graphics->HasTextureUnit(TU_ENVIRONMENT))
         graphics->SetTexture(TU_ENVIRONMENT, zone_->GetZoneTexture());
 #endif
@@ -775,7 +776,7 @@ void BatchQueue::SortFrontToBack2Pass(Vector<Batch*>& batches)
 {
     // Mobile devices likely use a tiled deferred approach, with which front-to-back sorting is irrelevant. The 2-pass
     // method is also time consuming, so just sort with state having priority
-#ifdef GL_ES_VERSION_2_0
+#ifdef MOBILE_GRAPHICS
     Sort(batches.Begin(), batches.End(), CompareBatchesState);
 #else
     // For desktop, first sort by distance and remap shader/material/geometry IDs in the sort key

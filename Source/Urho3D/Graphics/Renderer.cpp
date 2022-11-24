@@ -943,7 +943,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, i32 viewWidth, i
         }
         else
         {
-#ifndef GL_ES_VERSION_2_0
+#ifndef URHO3D_GLES2
             // OpenGL (desktop) and D3D11: shadow compare mode needs to be specifically enabled for the shadow map
             newShadowMap->SetFilterMode(FILTER_BILINEAR);
             newShadowMap->SetShadowCompare(shadowMapUsage == TEXTURE_DEPTHSTENCIL);
@@ -1808,7 +1808,7 @@ void Renderer::CreateGeometries()
     pointLightGeometry_->SetIndexBuffer(plib);
     pointLightGeometry_->SetDrawRange(TRIANGLE_LIST, 0, plib->GetIndexCount());
 
-#if !defined(GL_ES_VERSION_2_0)
+#if !defined(URHO3D_GLES2)
     if (graphics_->GetShadowMapFormat())
     {
         faceSelectCubeMap_ = new TextureCube(context_);

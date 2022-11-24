@@ -14,6 +14,7 @@
 #include <Urho3D/Graphics/Octree.h>
 #include <Urho3D/Graphics/Renderer.h>
 #include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/Graphics/RenderPath.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/Scene.h>
@@ -130,6 +131,14 @@ void SkeletalAnimation::CreateScene()
         // Create our custom Mover component that will move & animate the model during each frame's update
         auto* mover = modelNode->CreateComponent<Mover>();
         mover->SetParameters(MODEL_MOVE_SPEED, MODEL_ROTATE_SPEED, bounds);
+#ifdef URHO3D_GLES3
+        Node* nLight = modelNode->CreateChild("Light", LOCAL);
+        nLight->SetPosition(Vector3(1.0f, 2.0f, 1.0f));
+        nLight->LookAt(Vector3::ZERO, Vector3::UP, TransformSpace::Parent);
+        Light* light = nLight->CreateComponent<Light>();
+        light->SetLightType(LIGHT_SPOT);
+        light->SetColor(Color(0.5f + Random(0.5f), 0.5f + Random(0.5f), 0.5f + Random(0.5f)));
+#endif
     }
 
     // Create the camera. Limit far clip distance to match the fog
@@ -139,7 +148,28 @@ void SkeletalAnimation::CreateScene()
 
     // Set an initial position for the camera scene node above the plane
     cameraNode_->SetPosition(Vector3(0.0f, 5.0f, 0.0f));
+#ifdef URHO3D_GLES3
+    CreateLights();
+#endif
 }
+
+#ifdef URHO3D_GLES3
+void SkeletalAnimation::CreateLights() {
+    for (unsigned i = 0; i < 40; i++) {
+        Node* nLight = scene_->CreateChild("Light", LOCAL);
+        Vector3 pos(Random(40.0f) - 20.0f, 1.0f + Random(1.0f), Random(40.0f) - 20.0f);
+        nLight->SetPosition(pos);
+        pos.y_ = 0;
+        pos.x_ += Random(2.0f) - 1.0f;
+        pos.z_ += Random(2.0f) - 1.0f;
+        nLight->LookAt(pos);
+
+        Light* light = nLight->CreateComponent<Light>();
+        light->SetLightType(LIGHT_SPOT);
+        light->SetColor(Color(0.5f + Random(0.5f), 0.5f + Random(0.5f), 0.5f + Random(0.5f)));
+    }
+}
+#endif
 
 void SkeletalAnimation::CreateInstructions()
 {
@@ -168,6 +198,12 @@ void SkeletalAnimation::SetupViewport()
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
+#ifdef URHO3D_GLES3
+        SharedPtr<RenderPath> rp(new RenderPath);
+        auto* cache = GetSubsystem<ResourceCache>();
+        rp->Load(cache->GetResource<XMLFile>("RenderPaths/Deferred.xml"));
+        viewport->SetRenderPath(rp);
+#endif
     renderer->SetViewport(0, viewport);
 }
 

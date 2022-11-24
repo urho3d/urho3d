@@ -51,6 +51,10 @@ private:
     void CreateScene();
     /// Construct an instruction text to the UI.
     void CreateInstructions();
+#ifdef URHO3D_GLES3
+    /// Create additional lights fo scene
+    void CreateLights();
+#endif
     /// Set up a viewport for displaying the scene.
     void SetupViewport();
     /// Subscribe to application-wide logic update and post-render update events.

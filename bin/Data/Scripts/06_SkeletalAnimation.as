@@ -5,7 +5,6 @@
 //     - Enabling a cascaded shadow map on a directional light, which allows high-quality shadows
 //       over a large area (typically used in outdoor scenes for shadows cast by sunlight)
 //     - Displaying renderer debug geometry
-
 #include "Scripts/Utilities/Sample.as"
 
 void Start()
@@ -64,6 +63,11 @@ void CreateScene()
     light.shadowBias = BiasParameters(0.00025f, 0.5f);
     // Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light.shadowCascade = CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f);
+    if (graphics.apiName == "GLES3")
+    {
+    	CreateLights();
+    }
+	
 
     // Create animated models
     const uint NUM_MODELS = 30;
@@ -97,6 +101,16 @@ void CreateScene()
         // it to instantiate the object (using the script file & class name provided)
         Mover@ mover = cast<Mover>(modelNode.CreateScriptObject(scriptFile, "Mover"));
         mover.SetParameters(MODEL_MOVE_SPEED, MODEL_ROTATE_SPEED, bounds);
+
+        if (graphics.apiName == "GLES3")
+        {
+            Node@ nLight = modelNode.CreateChild("Light" + i, LOCAL);
+            nLight.position = Vector3(1, 2, 1);
+            nLight.LookAt(Vector3::ZERO, Vector3::UP, TransformSpace::Parent);
+            Light@ light = nLight.CreateComponent("Light");
+            light.lightType = LIGHT_SPOT;
+            light.color = Color(0.5f + Random(0.5f), 0.5f + Random(0.5f), 0.5f + Random(0.5f));
+        }
     }
 
     // Create the camera. Limit far clip distance to match the fog
@@ -106,6 +120,22 @@ void CreateScene()
 
     // Set an initial position for the camera scene node above the plane
     cameraNode.position = Vector3(0.0f, 5.0f, 0.0f);
+}
+
+void CreateLights() {
+    for (uint i = 0; i < 40; i++) {
+        Node@ nLight = scene_.CreateChild("Light" + i, LOCAL);
+        Vector3 pos = Vector3(Random(40.0f) - 20.0f, 1.0f + Random(1.0), Random(40.0f) - 20.0f);
+        nLight.position = pos;
+        pos.y = 0;
+        pos.x += Random(2.0f) - 1.0f;
+        pos.z += Random(2.0f) - 1.0f;
+        nLight.LookAt(pos);
+
+        Light@ light = nLight.CreateComponent("Light");
+        light.lightType = LIGHT_SPOT;
+        light.color = Color(0.5f + Random(0.5f), 0.5f + Random(0.5f), 0.5f + Random(0.5f));
+    }
 }
 
 void CreateInstructions()
@@ -129,6 +159,12 @@ void SetupViewport()
 {
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     Viewport@ viewport = Viewport(scene_, cameraNode.GetComponent("Camera"));
+    if (graphics.apiName == "GLES3")
+    {
+        RenderPath rp;
+        rp.Load(cache.GetResource("XMLFile", "RenderPaths/Deferred.xml"));
+    	viewport.renderPath = rp;
+    }
     renderer.viewports[0] = viewport;
 }
 
@@ -226,6 +262,7 @@ class Mover : ScriptObject
             state.AddTime(timeStep);
     }
 }
+
 
 // Create XML patch instructions for screen joystick layout specific to this sample app
 String patchInstructions =

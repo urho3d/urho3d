@@ -29,6 +29,11 @@ enum GAPI
     GAPI_D3D11
 };
 
+#if defined(DESKTOP_GRAPHICS) || defined(URHO3D_GLES3)
+#define DESKTOP_GRAPHICS_OR_GLES3
+#endif
+
+
 /// Primitive type.
 enum PrimitiveType
 {
@@ -319,7 +324,7 @@ enum TextureUnit
     TU_SPECULAR = 2,
     TU_EMISSIVE = 3,
     TU_ENVIRONMENT = 4,
-#ifdef DESKTOP_GRAPHICS
+#ifdef DESKTOP_GRAPHICS_OR_GLES3
     TU_VOLUMEMAP = 5,
     TU_CUSTOM1 = 6,
     TU_CUSTOM2 = 7,

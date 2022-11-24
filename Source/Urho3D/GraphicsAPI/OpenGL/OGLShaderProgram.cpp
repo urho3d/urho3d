@@ -172,7 +172,7 @@ bool ShaderProgram_OGL::Link()
     }
 
     // Check for constant buffers
-#ifndef GL_ES_VERSION_2_0
+#ifndef URHO3D_GLES2
     HashMap<unsigned, unsigned> blockToBinding;
 
     if (Graphics::GetGL3Support())
@@ -260,7 +260,7 @@ bool ShaderProgram_OGL::Link()
             ShaderParameter parameter{paramName, type, location};
             bool store = location >= 0;
 
-#ifndef GL_ES_VERSION_2_0
+#ifndef URHO3D_GLES2
             // If running OpenGL 3, the uniform may be inside a constant buffer
             if (parameter.location_ < 0 && Graphics::GetGL3Support())
             {
@@ -336,7 +336,7 @@ bool ShaderProgram_OGL::NeedParameterUpdate(ShaderParameterGroup group, const vo
     }
 
     // The shader program may use a mixture of constant buffers and individual uniforms even in the same group
-#ifndef GL_ES_VERSION_2_0
+#ifndef URHO3D_GLES2
     bool useBuffer = constantBuffers_[group].Get() || constantBuffers_[group + MAX_SHADER_PARAMETER_GROUPS].Get();
     bool useIndividual = !constantBuffers_[group].Get() || !constantBuffers_[group + MAX_SHADER_PARAMETER_GROUPS].Get();
     bool needUpdate = false;
@@ -368,7 +368,7 @@ bool ShaderProgram_OGL::NeedParameterUpdate(ShaderParameterGroup group, const vo
 void ShaderProgram_OGL::ClearParameterSource(ShaderParameterGroup group)
 {
     // The shader program may use a mixture of constant buffers and individual uniforms even in the same group
-#ifndef GL_ES_VERSION_2_0
+#ifndef URHO3D_GLES2
     bool useBuffer = constantBuffers_[group].Get() || constantBuffers_[group + MAX_SHADER_PARAMETER_GROUPS].Get();
     bool useIndividual = !constantBuffers_[group].Get() || !constantBuffers_[group + MAX_SHADER_PARAMETER_GROUPS].Get();
 
@@ -387,7 +387,7 @@ void ShaderProgram_OGL::ClearParameterSources()
     if (!globalFrameNumber)
         ++globalFrameNumber;
 
-#ifndef GL_ES_VERSION_2_0
+#ifndef URHO3D_GLES2
     for (auto& globalParameterSource : globalParameterSources)
         globalParameterSource = (const void*)M_MAX_UNSIGNED;
 #endif

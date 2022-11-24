@@ -112,7 +112,7 @@ bool Texture3D::SetData_OGL(unsigned level, int x, int y, int z, int width, int 
 
     graphics_->SetTextureForUpdate_OGL(this);
 
-#ifndef GL_ES_VERSION_2_0
+#ifndef URHO3D_GLES2
     bool wholeLevel = x == 0 && y == 0 && z == 0 && width == levelWidth && height == levelHeight && depth == levelDepth;
     unsigned format = GetSRGB() ? GetSRGBFormat_OGL(format_) : format_;
 
@@ -322,7 +322,7 @@ bool Texture3D::Create_OGL()
 {
     Release_OGL();
 
-#ifdef GL_ES_VERSION_2_0
+#if defined(GL_ES_VERSION_2_0) && !defined(GL_ES_VERSION_3_0)
     URHO3D_LOGERROR("Failed to create 3D texture, currently unsupported on OpenGL ES 2");
     return false;
 #else
@@ -353,7 +353,7 @@ bool Texture3D::Create_OGL()
         glTexImage3D(target_, 0, format, width_, height_, depth_, 0, externalFormat, dataType, nullptr);
         if (glGetError())
         {
-            URHO3D_LOGERROR("Failed to create texture");
+            URHO3D_LOGERROR("Failed to create 3D texture");
             success = false;
         }
     }

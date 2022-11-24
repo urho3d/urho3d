@@ -462,7 +462,7 @@ bool TextureCube::Create_OGL()
         }
     }
     if (!success)
-        URHO3D_LOGERROR("Failed to create texture");
+        URHO3D_LOGERROR("Failed to create cube texture");
 
     // Set mipmapping
     if (usage_ == TEXTURE_DEPTHSTENCIL || usage_ == TEXTURE_DYNAMIC)

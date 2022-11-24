@@ -18,6 +18,7 @@
 #define glBindRenderbufferEXT glBindRenderbuffer
 #define glRenderbufferStorageEXT glRenderbufferStorage
 #define glDeleteRenderbuffersEXT glDeleteRenderbuffers
+#define glRenderbufferStorageMultisampleEXT glRenderbufferStorageMultisample
 #endif
 
 namespace Urho3D
@@ -54,7 +55,7 @@ bool RenderSurface::CreateRenderBuffer_OGL(unsigned width, unsigned height, unsi
     {
         glGenRenderbuffersEXT(1, &renderBuffer_);
         glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, renderBuffer_);
-#ifndef GL_ES_VERSION_2_0
+#ifndef URHO3D_GLES2
         if (multiSample > 1)
             glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, multiSample, format, width, height);
         else

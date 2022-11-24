@@ -137,6 +137,7 @@ cmake_dependent_option (URHO3D_NETWORK "Enable networking support" TRUE "NOT WEB
 option (URHO3D_PHYSICS "Enable physics support" TRUE)
 option (URHO3D_PHYSICS2D "Enable 2D physics support" TRUE)
 option (URHO3D_URHO2D "Enable 2D graphics support" TRUE)
+option (URHO3D_GLES3 "Enable GLES3" FALSE)
 option (URHO3D_WEBP "Enable WebP support" TRUE)
 if (ARM AND NOT ANDROID AND NOT RPI AND NOT APPLE)
     set (ARM_ABI_FLAGS "" CACHE STRING "Specify ABI compiler flags (ARM on Linux platform only); e.g. Orange-Pi Mini 2 could use '-mcpu=cortex-a7 -mfpu=neon-vfpv4'")
@@ -463,6 +464,7 @@ foreach (OPT
         URHO3D_TRACY_PROFILING
         URHO3D_THREADING
         URHO3D_URHO2D
+        URHO3D_GLES3
         URHO3D_WEBP
         URHO3D_WIN32_CONSOLE)
     if (${OPT})
@@ -681,6 +683,9 @@ else ()
                 # Since version 1.39.5 emcc disables deprecated find event target behavior by default; we revert the flag for now until the support is removed
                 # (See https://github.com/emscripten-core/emscripten/commit/948af470be12559367e7629f31cf7c841fbeb2a9#diff-291d81f9d42b322a89881b6d91f7a122 for more detail)
                 set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s EXTRA_EXPORTED_RUNTIME_METHODS=\"['Pointer_stringify']\" -s FORCE_FILESYSTEM=1 -s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=0")
+                if (URHO3D_GLES3)
+                    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sFULL_ES3")
+                endif()
                 set (CMAKE_C_FLAGS_RELEASE "-Oz -DNDEBUG")
                 set (CMAKE_CXX_FLAGS_RELEASE "-Oz -DNDEBUG")
                 # Remove variables to make the -O3 regalloc easier
@@ -940,6 +945,9 @@ macro (define_dependency_libs TARGET)
 
         # Graphics
         if (URHO3D_OPENGL)
+            if (NOT (ANDROID OR WEB OR IOS OR TVOS))
+                set (URHO3D_GLES3 FALSE)
+            endif()
             if (APPLE)
                 # Do nothing
             elseif (WIN32)
@@ -951,7 +959,11 @@ macro (define_dependency_libs TARGET)
                     list (APPEND LIBS brcmGLESv2)
                 endif ()
             elseif (ANDROID OR ARM)
-                list (APPEND LIBS GLESv1_CM GLESv2)
+                if (URHO3D_GLES3)
+                    list (APPEND LIBS GLESv3)
+                else ()
+                    list (APPEND LIBS GLESv1_CM GLESv2)
+                endif ()
             else ()
                 list (APPEND LIBS GL)
             endif ()
