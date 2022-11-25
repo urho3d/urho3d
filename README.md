@@ -1,33 +1,45 @@
-![Urho3D logo](https://raw.githubusercontent.com/urho3d/Urho3D/master/bin/Data/Textures/LogoLarge.png)
-
-# Urho3D
-
 **This repository is now focused on Russian-speaking community only.
-If you were looking for original version of Urho3D (international), check out:**
+If you were looking for international versions of Urho3D, check out:**
 
-* [Urho3D 1.9](https://github.com/urho3d/Urho3D/releases/tag/1.9.0): Last English version of Urho3D, unmaintained.
+* [Urho3D 1.9.0](https://github.com/urho3d/Urho3D/releases/tag/1.9.0): Last English version of Urho3D, unmaintained.
 
 * [Rebel Fork](https://github.com/rbfx/rbfx): Reimagining of Urho3D with significant API changes, in active development.
 
-* [U3D Community](https://github.com/u3d-community/U3D): Urho3D 1.8, in maintenance mode.
+* [U3D Community](https://github.com/u3d-community/U3D): Urho3D 1.8.0, in maintenance mode.
 
-Sincerely yours, [Eugene Kozlov](https://github.com/eugeneko)
+Sincerely yours, [Eugene Kozlov](https://github.com/eugeneko) (Rebel Fork developer)
 
 ---
 
-Игровой движок, ориентированный на русскоязычное сообщество.
+# Urho3D
 
 [![CI/CD](https://github.com/urho3d/Urho3D/workflows/CI/CD/badge.svg)](https://github.com/urho3d/Urho3D/actions?query=workflow%3ACI%2FCD)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/4954/badge.svg)](https://scan.coverity.com/projects/urho3d-urho3d)
 
-**Urho3D** is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. Greatly inspired by OGRE and Horde3D.
+**Urho3D** - это легковесный, кроссплатформенный 2D и 3D игровой движок, написанный на C++ и опубликованный под лицензией MIT.
 
-Main website: [https://urho3d.io/](https://urho3d.io/)
+## Лицензия
 
-## License
-Licensed under the MIT license, see [LICENSE](licenses/urho3d/LICENSE) for details.
+Urho3D распространяется под лицензией MIT.
+
+Тексты лицензий:
+* [Проект Urho3D](licenses/urho3d/LICENSE)
+* [Третьесторонние библиотеки](licenses).
+
+Папку [licenses](licenses) удобно распространять вместе с игрой.
+
+## Важные ссылки:
+
+* [Документация, сгенерированная Doxygen](https://urho3d-doxygen.github.io)
+
+## Авторы проекта
+
+Основателем проекта является [Lasse Öörni](https://github.com/cadaver). Огромный вклад в развитие проекта также внесли
+[Yao Wei Tjong](https://github.com/weitjong), [asterj](https://github.com/aster2013)
+и многие другие разработчики, список которых можно посмотреть [тут](https://github.com/urho3d/Urho3D/graphs/contributors).
 
 ## Contributing
+
 Before making pull requests, please read the [Contribution checklist](https://urho3d.io/documentation/HEAD/_contribution_checklist.html) and [Coding conventions](https://urho3d.io/documentation/HEAD/_coding_conventions.html) pages from the documentation.
 
 ## Credits
