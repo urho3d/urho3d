@@ -141,7 +141,7 @@ using GpuIndex16 = u16;
 SpriteBatchBase::SpriteBatchBase(Context* context) : Object(context)
 {
     graphics_ = GetSubsystem<Graphics>();
-    
+
     qIndexBuffer_ = new IndexBuffer(context_);
     qIndexBuffer_->SetShadowed(true);
 

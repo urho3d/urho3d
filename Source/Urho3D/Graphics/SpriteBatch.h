@@ -29,7 +29,7 @@ class URHO3D_API SpriteBatch : public SpriteBatchBase
     URHO3D_OBJECT(SpriteBatch, SpriteBatchBase);
 
     // ============================ Рисование фигур с помощью функции AddTriangle() ============================
- 
+
 public:
 
     void DrawTriangle(const Vector2& v0, const Vector2& v1, const Vector2& v2);
@@ -40,7 +40,7 @@ public:
     void DrawAABBSolid(const Vector2& min, const Vector2& max);
     void DrawAABoxSolid(const Vector2& centerPos, const Vector2& halfSize);
     void DrawAABoxSolid(float centerX, float centerY, float halfWidth, float halfHeight);
-    
+
     void DrawCircle(const Vector2& centerPos, float radius);
     void DrawCircle(float centerX, float centerY, float radius);
 

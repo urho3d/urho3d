@@ -113,7 +113,7 @@ void SpriteBatch::DrawSpriteInternal()
     {
         // Сдвигаем спрайт на -origin
         Rect resultDest(sprite_.destination_.min_ - sprite_.origin_, sprite_.destination_.max_ - sprite_.origin_);
-        
+
         // Лицевая грань задаётся по часовой стрелке. Учитываем, что ось Y направлена вниз.
         // Но нет большой разницы, так как спрайты двусторонние
         quad_.v0_.position_ = Vector3(resultDest.min_.x_, resultDest.min_.y_, 0); // Верхний левый угол спрайта
