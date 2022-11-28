@@ -147,7 +147,7 @@ jobs:
     name: 🍏
     runs-on: latest
     needs: init
-    if: needs.init.outputs.skip == '0' && github.event_name != 'repository_dispatch'
+    if: false && needs.init.outputs.skip == '0' && github.event_name != 'repository_dispatch'
     strategy:
       fail-fast: false
       matrix:
@@ -168,7 +168,7 @@ jobs:
         uses: actions/checkout@v3
         with: { fetch-depth: 0 }
       - name: Select xcode
-        run: sudo xcode-select -s '/Applications/Xcode.app'
+        run: sudo xcode-select -s '/Applications/Xcode_12.app'
       - name: Install dependencies
         run: while ! brew install doxygen graphviz; do sleep 1; done
       - name: CMake
