@@ -70,37 +70,6 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
 - Comparison of several sorting algorithms by Juha Nieminen
   http://warp.povusers.org/SortComparison/
 
-Urho3D uses the following third-party libraries:
-- AngelScript 2.35.1 WIP (http://www.angelcode.com/angelscript)
-- Boost 1.64.0 (http://www.boost.org) - only used for AngelScript generic bindings
-- Box2D 2.4.1+ (https://box2d.org)
-- Bullet 3.06+ (http://www.bulletphysics.org)
-- Civetweb 1.7 (https://github.com/civetweb/civetweb)
-- FreeType 2.8 (https://www.freetype.org)
-- GLEW 1.13.0 (http://glew.sourceforge.net)
-- SLikeNet (https://github.com/SLikeSoft/SLikeNet)
-- libcpuid 0.4.0+ (https://github.com/anrieff/libcpuid)
-- Lua 5.1 (https://www.lua.org)
-- LuaJIT 2.1.0+ (http://www.luajit.org)
-- LZ4 1.7.5 (https://github.com/lz4/lz4)
-- Mustache 1.0 (https://mustache.github.io, https://github.com/kainjow/Mustache)
-- nanodbc 2.12.4+ (https://lexicalunit.github.io/nanodbc)
-- Open Asset Import Library 4.1.0 (http://assimp.sourceforge.net)
-- pugixml 1.12+ (http://pugixml.org)
-- RapidJSON 1.1.0+ (https://github.com/Tencent/rapidjson)
-- Recast/Detour (https://github.com/recastnavigation/recastnavigation)
-- SDL 2.0.10+ (https://www.libsdl.org)
-- SQLite 3.36.0 (https://www.sqlite.org)
-- StanHull (https://codesuppository.blogspot.com/2006/03/john-ratcliffs-code-suppository-blog.html)
-- stb_image 2.18 (https://nothings.org)
-- stb_image_write 1.08 (https://nothings.org)
-- stb_rect_pack 0.11 (https://nothings.org)
-- stb_vorbis 1.13b (https://nothings.org)
-- tolua++ 1.0.93 (defunct - http://www.codenix.com/~tolua)
-- WebP (https://chromium.googlesource.com/webm/libwebp)
-- ETCPACK (https://github.com/Ericsson/ETCPACK)
-- Tracy 0.7.6 (https://github.com/wolfpld/tracy)
-
 DXT / PVRTC decompression code based on the Squish library and the Oolong
 Engine.
 Jack and mushroom models from the realXtend project. (https://www.realxtend.org)
