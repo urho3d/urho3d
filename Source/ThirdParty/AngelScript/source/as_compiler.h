@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2020 Andreas Jonsson
+   Copyright (c) 2003-2022 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -102,7 +102,7 @@ struct asCExprValue
 	bool  isRefToLocal : 1; // The reference may be to a local variable
 	bool  isRefSafe : 1; // the life-time of the ref is guaranteed for the duration of the access
 	short dummy : 9;
-	short stackOffset;
+	int   stackOffset; // used both for stack offset and indexing global variables
 
 private:
 	// These values must not be accessed directly in order to avoid problems with endianess. 
@@ -198,17 +198,20 @@ enum EImplicitConv
 
 enum EConvCost
 {
-	asCC_NO_CONV               = 0,
-	asCC_CONST_CONV            = 1,
-	asCC_ENUM_SAME_SIZE_CONV   = 2,
-	asCC_ENUM_DIFF_SIZE_CONV   = 3,
-	asCC_PRIMITIVE_SIZE_CONV   = 4,
-	asCC_SIGNED_CONV           = 5,
-	asCC_INT_FLOAT_CONV        = 6,
-	asCC_REF_CONV              = 7,
-	asCC_OBJ_TO_PRIMITIVE_CONV = 8,
-	asCC_TO_OBJECT_CONV        = 9,
-	asCC_VARIABLE_CONV         = 10
+	asCC_NO_CONV                  = 0,
+	asCC_CONST_CONV               = 1,
+	asCC_ENUM_SAME_SIZE_CONV      = 2,
+	asCC_ENUM_DIFF_SIZE_CONV      = 3,
+	asCC_PRIMITIVE_SIZE_UP_CONV   = 4,
+	asCC_PRIMITIVE_SIZE_DOWN_CONV = 5,
+	asCC_SIGNED_TO_UNSIGNED_CONV  = 5,
+	asCC_UNSIGNED_TO_SIGNED_CONV  = 6,
+	asCC_INT_TO_FLOAT_CONV        = 7,
+	asCC_FLOAT_TO_INT_CONV        = 8,
+	asCC_REF_CONV                 = 9,
+	asCC_OBJ_TO_PRIMITIVE_CONV    = 10,
+	asCC_TO_OBJECT_CONV           = 11,
+	asCC_VARIABLE_CONV            = 12
 };
 
 class asCCompiler
@@ -233,7 +236,7 @@ protected:
 	void CompileStatement(asCScriptNode *statement, bool *hasReturn, asCByteCode *bc);
 	void CompileIfStatement(asCScriptNode *node, bool *hasReturn, asCByteCode *bc);
 	void CompileSwitchStatement(asCScriptNode *node, bool *hasReturn, asCByteCode *bc);
-	void CompileCase(asCScriptNode *node, asCByteCode *bc);
+	void CompileCase(asCScriptNode *node, asCByteCode *bc, bool *hasReturn, bool *hasBreak);
 	void CompileForStatement(asCScriptNode *node, asCByteCode *bc);
 	void CompileWhileStatement(asCScriptNode *node, asCByteCode *bc);
 	void CompileDoWhileStatement(asCScriptNode *node, asCByteCode *bc);
@@ -269,7 +272,7 @@ protected:
 	int  CompileAnonymousInitList(asCScriptNode *listNode, asCExprContext *ctx, const asCDataType &dt);
 
 	int  CallDefaultConstructor(const asCDataType &type, int offset, bool isObjectOnHeap, asCByteCode *bc, asCScriptNode *node, int isVarGlobOrMem = 0, bool derefDest = false);
-	int  CallCopyConstructor(asCDataType &type, int offset, bool isObjectOnHeap, asCByteCode *bc, asCExprContext *arg, asCScriptNode *node, bool isGlobalVar = false, bool derefDestination = false);
+	int  CallCopyConstructor(asCDataType &type, int offset, bool isObjectOnHeap, asCExprContext *ctx, asCExprContext *arg, asCScriptNode *node, bool isGlobalVar = false, bool derefDestination = false);
 	void CallDestructor(asCDataType &type, int offset, bool isObjectOnHeap, asCByteCode *bc);
 	int  CompileArgumentList(asCScriptNode *node, asCArray<asCExprContext *> &args, asCArray<asSNamedArgument> &namedArgs);
 	int  CompileDefaultAndNamedArgs(asCScriptNode *node, asCArray<asCExprContext*> &args, int funcId, asCObjectType *type, asCArray<asSNamedArgument> *namedArgs = 0);
@@ -278,7 +281,7 @@ protected:
 	void CompileMemberInitialization(asCByteCode *bc, bool onlyDefaults);
 	bool CompileAutoType(asCDataType &autoType, asCExprContext &compiledCtx, asCScriptNode *exprNode, asCScriptNode *errNode);
 	bool CompileInitialization(asCScriptNode *node, asCByteCode *bc, const asCDataType &type, asCScriptNode *errNode, int offset, asQWORD *constantValue, int isVarGlobOrMem, asCExprContext *preCompiled = 0);
-	void CompileInitAsCopy(asCDataType &type, int offset, asCByteCode *bc, asCExprContext *arg, asCScriptNode *node, bool derefDestination);
+	void CompileInitAsCopy(asCDataType &type, int offset, asCExprContext *ctx, asCExprContext *arg, asCScriptNode *node, bool derefDestination);
 
 	// Helper functions
 	void ConvertToPostFix(asCScriptNode *expr, asCArray<asCScriptNode *> &postfix);

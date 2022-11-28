@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2021 Andreas Jonsson
+   Copyright (c) 2003-2022 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -572,7 +572,7 @@ int asCBuilder::CompileFunction(const char *sectionName, const char *code, int l
 	// Tell the engine that the function exists already so the compiler can access it
 	if( compileFlags & asCOMP_ADD_TO_MODULE )
 	{
-		r = CheckNameConflict(func->name.AddressOf(), node, scripts[0], module->m_defaultNamespace, false, false);
+		r = CheckNameConflict(func->name.AddressOf(), node, scripts[0], module->m_defaultNamespace, false, false, false);
 		if( r < 0 )
 		{
 			func->ReleaseInternal();
@@ -1076,7 +1076,7 @@ int asCBuilder::VerifyProperty(asCDataType *dt, const char *decl, asCString &nam
 	}
 	else
 	{
-		if( CheckNameConflict(name.AddressOf(), nameNode, &source, ns, true, false) < 0 )
+		if( CheckNameConflict(name.AddressOf(), nameNode, &source, ns, true, false, false) < 0 )
 			return asNAME_TAKEN;
 	}
 
@@ -1507,14 +1507,14 @@ int asCBuilder::CheckNameConflictMember(asCTypeInfo *t, const char *name, asCScr
 	if (ns)
 	{
 		// Check as if not a function as it doesn't matter the function signature
-		return CheckNameConflict(name, node, code, ns, true, isVirtualProperty);
+		return CheckNameConflict(name, node, code, ns, true, isVirtualProperty, false);
 	}
 	
 	return 0;
 }
 
 // TODO: This should use SymbolLookup
-int asCBuilder::CheckNameConflict(const char *name, asCScriptNode *node, asCScriptCode *code, asSNameSpace *ns, bool isProperty, bool isVirtualProperty)
+int asCBuilder::CheckNameConflict(const char *name, asCScriptNode *node, asCScriptCode *code, asSNameSpace *ns, bool isProperty, bool isVirtualProperty, bool isSharedIntf)
 {
 	// Check against registered object types
 	if( engine->GetRegisteredType(name, ns) != 0 )
@@ -1610,18 +1610,22 @@ int asCBuilder::CheckNameConflict(const char *name, asCScriptNode *node, asCScri
 		if (interfaceDeclarations[n]->name == name &&
 			interfaceDeclarations[n]->typeInfo->nameSpace == ns)
 		{
-			if (code)
+			// Don't report an error if the application wants to ignore duplicate declarations of shared interfaces
+			if (!(isSharedIntf && engine->ep.ignoreDuplicateSharedIntf))
 			{
-				asCString str;
-				if (ns->name != "")
-					str = ns->name + "::" + name;
-				else
-					str = name;
-				str.Format(TXT_NAME_CONFLICT_s_INTF, str.AddressOf());
-				WriteError(str, code, node);
-			}
+				if (code)
+				{
+					asCString str;
+					if (ns->name != "")
+						str = ns->name + "::" + name;
+					else
+						str = name;
+					str.Format(TXT_NAME_CONFLICT_s_INTF, str.AddressOf());
+					WriteError(str, code, node);
+				}
 
-			return -1;
+				return -1;
+			}
 		}
 	}
 
@@ -1759,6 +1763,8 @@ int asCBuilder::CheckNameConflict(const char *name, asCScriptNode *node, asCScri
 			}
 		}
 	}
+#else
+	UNUSED_VAR(isSharedIntf);
 #endif
 
 	return 0;
@@ -1852,7 +1858,7 @@ int asCBuilder::ValidateVirtualProperty(asCScriptFunction *func)
 	if( func->objectType )
 		r = CheckNameConflictMember(func->objectType, func->name.SubString(4).AddressOf(), 0, 0, true, true);
 	else
-		r = CheckNameConflict(func->name.SubString(4).AddressOf(), 0, 0, func->nameSpace, true, true);
+		r = CheckNameConflict(func->name.SubString(4).AddressOf(), 0, 0, func->nameSpace, true, true, false);
 	if( r < 0 )
 		return -5;
 	
@@ -1891,7 +1897,7 @@ int asCBuilder::RegisterFuncDef(asCScriptNode *node, asCScriptCode *file, asSNam
 	// Check for name conflict with other types
 	if (ns)
 	{
-		int r = CheckNameConflict(name.AddressOf(), node, file, ns, true, false);
+		int r = CheckNameConflict(name.AddressOf(), node, file, ns, true, false, false);
 		if (asSUCCESS != r)
 		{
 			node->Destroy(engine);
@@ -1990,6 +1996,7 @@ void asCBuilder::CompleteFuncDef(sFuncDef *funcDef)
 
 			if( fdt2->name == fdt->name &&
 				fdt2->nameSpace == fdt->nameSpace &&
+				fdt2->parentClass == fdt->parentClass &&
 				fdt2->funcdef->IsSignatureExceptNameEqual(func) )
 			{
 				// Replace our funcdef for the existing one
@@ -2048,7 +2055,7 @@ int asCBuilder::RegisterGlobalVar(asCScriptNode *node, asCScriptCode *file, asSN
 	{
 		// Verify that the name isn't taken
 		asCString name(&file->code[n->tokenPos], n->tokenLength);
-		CheckNameConflict(name.AddressOf(), n, file, ns, true, false);
+		CheckNameConflict(name.AddressOf(), n, file, ns, true, false, false);
 
 		// Register the global variable
 		sGlobalVariableDescription *gvar = asNEW(sGlobalVariableDescription);
@@ -2127,7 +2134,7 @@ int asCBuilder::RegisterMixinClass(asCScriptNode *node, asCScriptCode *file, asS
 	int r, c;
 	file->ConvertPosToRowCol(n->tokenPos, &r, &c);
 
-	CheckNameConflict(name.AddressOf(), n, file, ns, true, false);
+	CheckNameConflict(name.AddressOf(), n, file, ns, true, false, false);
 
 	sMixinClass *decl = asNEW(sMixinClass);
 	if( decl == 0 )
@@ -2237,7 +2244,7 @@ int asCBuilder::RegisterClass(asCScriptNode *node, asCScriptCode *file, asSNameS
 	int r, c;
 	file->ConvertPosToRowCol(n->tokenPos, &r, &c);
 
-	CheckNameConflict(name.AddressOf(), n, file, ns, true, false);
+	CheckNameConflict(name.AddressOf(), n, file, ns, true, false, false);
 
 	sClassDeclaration *decl = asNEW(sClassDeclaration);
 	if( decl == 0 )
@@ -2408,7 +2415,7 @@ int asCBuilder::RegisterInterface(asCScriptNode *node, asCScriptCode *file, asSN
 
 	asCString name;
 	name.Assign(&file->code[n->tokenPos], n->tokenLength);
-	CheckNameConflict(name.AddressOf(), n, file, ns, true, false);
+	CheckNameConflict(name.AddressOf(), n, file, ns, true, false, isShared);
 
 	sClassDeclaration *decl = asNEW(sClassDeclaration);
 	if( decl == 0 )
@@ -3725,7 +3732,7 @@ void asCBuilder::CompileClasses(asUINT numTempl)
 	//                         allow incremental builds, i.e. allow application to add or replace classes in an
 	//                         existing module. However, the applications that want to use that should use a special
 	//                         build flag to not finalize the module.
-    
+
     // Urho3D: disable garbage collection from script classes
     /*
 
@@ -3914,9 +3921,9 @@ void asCBuilder::CompileClasses(asUINT numTempl)
 		// Reset the counter
 		numReevaluations = 0;
 	}
-    
-    // Urho3D: end
-    */
+
+// Urho3D: end
+*/
 }
 
 void asCBuilder::IncludeMethodsFromMixins(sClassDeclaration *decl)
@@ -4354,7 +4361,7 @@ int asCBuilder::RegisterEnum(asCScriptNode *node, asCScriptCode *file, asSNameSp
 		module->m_externalTypes.PushLast(existingSharedType);
 
 	// Check the name and add the enum
-	int r = CheckNameConflict(name.AddressOf(), tmp->firstChild, file, ns, true, false);
+	int r = CheckNameConflict(name.AddressOf(), tmp->firstChild, file, ns, true, false, false);
 	if( asSUCCESS == r )
 	{
 		asCEnumType *st;
@@ -4524,7 +4531,7 @@ int asCBuilder::RegisterTypedef(asCScriptNode *node, asCScriptCode *file, asSNam
 	name.Assign(&file->code[tmp->tokenPos], tmp->tokenLength);
 
 	// If the name is not already in use add it
- 	int r = CheckNameConflict(name.AddressOf(), tmp, file, ns, true, false);
+ 	int r = CheckNameConflict(name.AddressOf(), tmp, file, ns, true, false, false);
 
 	asCTypedefType *st = 0;
 	if( asSUCCESS == r )
@@ -4892,7 +4899,7 @@ int asCBuilder::RegisterScriptFunction(asCScriptNode *node, asCScriptCode *file,
 				WriteError(TXT_METHOD_CANT_HAVE_NAME_OF_CLASS, file, node);
 		}
 		else
-			CheckNameConflict(name.AddressOf(), node, file, ns, false, false);
+			CheckNameConflict(name.AddressOf(), node, file, ns, false, false, false);
 	}
 	else
 	{
@@ -5414,7 +5421,7 @@ int asCBuilder::RegisterImportedFunction(int importID, asCScriptNode *node, asCS
 		ns = engine->nameSpaces[0];
 
 	GetParsedFunctionDetails(node->firstChild, file, 0, name, returnType, parameterNames, parameterTypes, inOutFlags, defaultArgs, funcTraits, ns);
-	CheckNameConflict(name.AddressOf(), node, file, ns, false, false);
+	CheckNameConflict(name.AddressOf(), node, file, ns, false, false, false);
 
 	// Check that the same function hasn't been registered already in the namespace
 	asCArray<int> funcs;

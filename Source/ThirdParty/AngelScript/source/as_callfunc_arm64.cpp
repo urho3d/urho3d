@@ -108,7 +108,7 @@ static inline bool IsRegisterHFA(const asCDataType &type)
 {
 	const asCTypeInfo *const typeInfo = type.GetTypeInfo();
 
-	if( typeInfo == nullptr ||
+	if( typeInfo == 0 ||
 		(typeInfo->flags & asOBJ_APP_CLASS_ALLFLOATS) == 0 ||
 		type.IsObjectHandle() || type.IsReference() )
 		return false;

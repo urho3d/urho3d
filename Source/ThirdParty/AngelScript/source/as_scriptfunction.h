@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2021 Andreas Jonsson
+   Copyright (c) 2003-2022 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -61,7 +61,8 @@ struct asSScriptVariable
 	asCString   name;
 	asCDataType type;
 	int         stackOffset;
-	asUINT      declaredAtProgramPos;
+	asUINT      onHeap : 1;
+	asUINT      declaredAtProgramPos : 31;
 };
 
 enum asEListPatternNodeType
@@ -237,7 +238,7 @@ public:
 
 	void      DestroyInternal();
 
-	void      AddVariable(asCString &name, asCDataType &type, int stackOffset);
+	void      AddVariable(const asCString &name, asCDataType &type, int stackOffset, bool onHeap);
 
 	int       GetSpaceNeededForArguments();
 	int       GetSpaceNeededForReturnValue();
@@ -267,6 +268,9 @@ public:
 
 	void      AllocateScriptFunctionData();
 	void      DeallocateScriptFunctionData();
+
+	asCScriptFunction* FindNextFunctionCalled(asUINT startSearchFromProgramPos, int *stackDelta, asUINT *outProgramPos);
+	asCScriptFunction* GetCalledFunction(asDWORD programPos);
 
 	asCGlobalProperty *GetPropertyByGlobalVarPtr(void *gvarPtr);
 
@@ -328,15 +332,6 @@ public:
 		// The stack space needed for the local variables
 		asDWORD                         variableSpace;
 
-		// These hold information on objects and function pointers, including temporary
-		// variables used by exception handler and when saving bytecode
-		asCArray<asCTypeInfo*>          objVariableTypes;
-		asCArray<int>                   objVariablePos; // offset on stackframe
-
-		// The first variables in above array are allocated on the heap, the rest on the stack.
-		// This variable shows how many are on the heap.
-		asUINT                          objVariablesOnHeap;
-
 		// Holds information on scope for object variables on the stack
 		asCArray<asSObjectVariableInfo> objVariableInfo;
 
@@ -349,8 +344,10 @@ public:
 		// JIT compiled code of this function
 		asJITFunction                   jitFunction;
 
-		// Holds debug information on explicitly declared variables
+		// Holds type information on both explicitly declared variables and temporary variables
+		// Used during exception handling, byte code serialization, debugging, and context serialization
 		asCArray<asSScriptVariable*>    variables;
+
 		// Store position, line number pairs for debug information
 		asCArray<int>                   lineNumbers;
 		// Store the script section where the code was declared

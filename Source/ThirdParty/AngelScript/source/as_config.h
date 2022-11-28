@@ -1334,7 +1334,6 @@
 	#define AS_NO_THREADS
 #endif
 
-
 // The assert macro
 
 // Urho3D: commented out original

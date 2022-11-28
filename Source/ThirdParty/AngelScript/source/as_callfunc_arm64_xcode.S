@@ -39,29 +39,16 @@
 
 #if defined(__aarch64__)
 
-.arch armv8-a
-.text
+.align 2
+.global _GetHFAReturnDouble
+.global _GetHFAReturnFloat
+.global _CallARM64Ret128
+.global _CallARM64RetInMemory
+.global _CallARM64Double
+.global _CallARM64Float
+.global _CallARM64
 
-.global GetHFAReturnDouble
-.global GetHFAReturnFloat
-.global CallARM64Ret128
-.global CallARM64RetInMemory
-.global CallARM64Double
-.global CallARM64Float
-.global CallARM64
-
-#if !defined(__MACH__)
-.type GetHFAReturnDouble, %function
-.type GetHFAReturnFloat, %function
-.type CallARM64Ret128, %function
-.type CallARM64RetInMemory, %function
-.type CallARM64Double, %function
-.type CallARM64Float, %function
-.type CallARM64, %function
-#endif /* __MACH__ */
-
-.align  2
-GetHFAReturnDouble:
+_GetHFAReturnDouble:
     adr     x9, populateDoubles
     sub     x9, x9, x1, lsr 1 // x9 -= returnSize >> 1; (/2 because double is 2x instruction size)
     br      x9
@@ -74,8 +61,7 @@ populateDoubles:
 
     ret
 
-.align  2
-GetHFAReturnFloat:
+_GetHFAReturnFloat:
     adr     x9, populateFloats
     sub     x9, x9, x2 // x9 -= returnSize; (already 4 bytes per return)
     br      x9
@@ -89,16 +75,15 @@ populateFloats:
     ret
 
 
-//[returnType] CallARM64[type](
+//[returnType] _CallARM64[type](
 //    const asQWORD *gpRegArgs,    asQWORD numGPRegArgs,
 //    const asQWORD *floatRegArgs, asQWORD numFloatRegArgs,
 //    const asQWORD *stackArgs,    asQWORD numStackArgs,
 //    asFUNCTION_t func
 //)
-.align  2
-CallARM64Double:
-CallARM64Float:
-CallARM64:
+_CallARM64Double:
+_CallARM64Float:
+_CallARM64:
     .cfi_startproc
     stp     fp, lr, [sp,#-0x20]!
     str     x20, [sp,#0x10]
@@ -173,7 +158,7 @@ populateGPRegisterArgsEnd:
     .cfi_endproc
 
 .align  2
-CallARM64Ret128:
+_CallARM64Ret128:
     .cfi_startproc
     stp     fp, lr, [sp,#-0x20]!
     str     x20, [sp,#0x10]
@@ -186,7 +171,7 @@ CallARM64Ret128:
     mov     x20, x6
     mov     x6, x7
     mov     x7, #0
-    bl      CallARM64
+    bl      _CallARM64
 
     str     x1, [x20]
 
@@ -201,7 +186,7 @@ CallARM64Ret128:
     .cfi_endproc
 
 .align  2
-CallARM64RetInMemory:
+_CallARM64RetInMemory:
     .cfi_startproc
     stp     fp, lr, [sp,#-0x10]!
     mov     fp, sp
@@ -212,7 +197,7 @@ CallARM64RetInMemory:
     mov     x8, x6
     mov     x6, x7
     mov     x7, #0
-    bl      CallARM64
+    bl      _CallARM64
 
     mov     x0, x8
 
@@ -227,3 +212,4 @@ CallARM64RetInMemory:
 #endif /* __aarch64__ */
 
 #endif /* !AS_MAX_PORTABILITY */
+

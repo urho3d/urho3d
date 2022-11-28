@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2021 Andreas Jonsson
+   Copyright (c) 2003-2022 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -107,7 +107,7 @@
 #define TXT_EXPECTED_PRE_OPERATOR             "Expected pre operator"
 #define TXT_EXPECTED_STRING                   "Expected string"
 #define TXT_EXPR_DOESNT_EVAL_TO_FUNC          "Expression doesn't evaluate to a function"
-#define TXT_EXPR_MUST_BE_BOOL                 "Expression must be of boolean type"
+#define TXT_EXPR_MUST_BE_BOOL_s               "Expression must be of boolean type, instead found '%s'"
 #define TXT_EXPR_s_IS_DATA_TYPE               "Expression '%s' is a data type"
 #define TXT_EXTERNAL_SHARED_s_NOT_FOUND       "External shared entity '%s' not found"
 #define TXT_EXTERNAL_SHARED_s_CANNOT_REDEF    "External shared entity '%s' cannot redefine the original entity"

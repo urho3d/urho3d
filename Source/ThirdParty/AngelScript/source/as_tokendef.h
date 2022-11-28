@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2019 Andreas Jonsson
+   Copyright (c) 2003-2021 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -101,8 +101,8 @@ enum eTokenType
 	ttListSeparator,       // ,
 	ttStartStatementBlock, // {
 	ttEndStatementBlock,   // }
-	ttOpenParanthesis,     // (
-	ttCloseParanthesis,    // )
+	ttOpenParenthesis,     // (
+	ttCloseParenthesis,    // )
 	ttOpenBracket,         // [
 	ttCloseBracket,        // ]
 	ttAmp,                 // &
@@ -231,8 +231,8 @@ sTokenWord const tokenWords[] =
 	asTokenDef(","         , ttListSeparator),
 	asTokenDef("{"         , ttStartStatementBlock),
 	asTokenDef("}"         , ttEndStatementBlock),
-	asTokenDef("("         , ttOpenParanthesis),
-	asTokenDef(")"         , ttCloseParanthesis),
+	asTokenDef("("         , ttOpenParenthesis),
+	asTokenDef(")"         , ttCloseParenthesis),
 	asTokenDef("["         , ttOpenBracket),
 	asTokenDef("]"         , ttCloseBracket),
 	asTokenDef("?"         , ttQuestion),
