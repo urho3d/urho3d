@@ -11,6 +11,15 @@ Sincerely yours, [Eugene Kozlov](https://github.com/eugeneko) (Rebel Fork develo
 
 ---
 
+Other forks:
+
+* https://github.com/Urho-Net/Urho.Net
+* https://gitlab.com/luckeyproductions/dry
+* https://github.com/xamarin/urho
+* https://github.com/AtomicGameEngine/AtomicGameEngine
+
+---
+
 # Urho3D
 
 [![CI/CD](https://github.com/urho3d/Urho3D/workflows/CI/CD/badge.svg)](https://github.com/urho3d/Urho3D/actions?query=workflow%3ACI%2FCD)
