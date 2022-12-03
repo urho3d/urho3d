@@ -6,6 +6,12 @@
 
 #include "../AngelScript/Manual_Core.h"
 
+#ifdef _WIN32
+#include <ctime>
+#else
+#include <time.h>
+#endif
+
 namespace Urho3D
 {
 
@@ -334,6 +340,40 @@ String Time_GetTimeStamp(Time* time)
     return Time::GetTimeStamp();
 }
 
+void DateTime_EpochToUtc(unsigned t, tm* pThis)
+{
+#ifdef _WIN32
+    _gmtime32_s(pThis, (long*)&t);
+#else
+    time_t tt = (time_t)t;
+    gmtime_r(&tt, pThis);
+#endif // _WIN32
+}
+
+void DateTime_EpochToLocal(unsigned t, tm* pThis)
+{
+#ifdef _WIN32
+    _localtime32_s(pThis, (long*)&t);
+#else
+    time_t tt = (time_t)t;
+    localtime_r(&tt, pThis);
+#endif // _WIN32
+}
+
+unsigned DateTime_UtcToEpoch(tm* pThis)
+{
+#ifdef _WIN32
+    return (unsigned)_mkgmtime(pThis);
+#else
+    return (unsigned)timegm(pThis);
+#endif // _WIN32
+}
+
+unsigned DateTime_LocalToEpoch(tm* pThis)
+{
+    return (unsigned)mktime(pThis);
+}
+
 static void RegisterTime(asIScriptEngine* engine)
 {
     // static unsigned Time::GetSystemTime() | File: ../Core/Timer.h
@@ -344,6 +384,22 @@ static void RegisterTime(asIScriptEngine* engine)
 
     // static String Time::GetTimeStamp() | File: ../Core/Timer.h */
     engine->RegisterObjectMethod("Time", "String get_timeStamp() const", AS_FUNCTION_OBJLAST(Time_GetTimeStamp), AS_CALL_CDECL_OBJLAST);
+
+    engine->RegisterObjectType("DateTime", sizeof(tm), asOBJ_VALUE | asOBJ_POD);
+    engine->RegisterObjectProperty("DateTime", "int sec", asOFFSET(tm, tm_sec));
+    engine->RegisterObjectProperty("DateTime", "int min", asOFFSET(tm, tm_min));
+    engine->RegisterObjectProperty("DateTime", "int hour", asOFFSET(tm, tm_hour));
+    engine->RegisterObjectProperty("DateTime", "int day", asOFFSET(tm, tm_mday));
+    engine->RegisterObjectProperty("DateTime", "int mon", asOFFSET(tm, tm_mon));
+    engine->RegisterObjectProperty("DateTime", "int year", asOFFSET(tm, tm_year));
+    engine->RegisterObjectProperty("DateTime", "int wday", asOFFSET(tm, tm_wday));
+    engine->RegisterObjectProperty("DateTime", "int yday", asOFFSET(tm, tm_yday));
+    engine->RegisterObjectProperty("DateTime", "int isdst", asOFFSET(tm, tm_isdst));
+
+    engine->RegisterObjectMethod("DateTime", "void EpochToUtc(uint)", AS_FUNCTION_OBJLAST(DateTime_EpochToUtc), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("DateTime", "void EpochToLocal(uint)", AS_FUNCTION_OBJLAST(DateTime_EpochToLocal), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("DateTime", "uint UtcToEpoch()const", AS_FUNCTION_OBJLAST(DateTime_UtcToEpoch), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("DateTime", "uint LocalToEpoch()const", AS_FUNCTION_OBJLAST(DateTime_LocalToEpoch), AS_CALL_CDECL_OBJLAST);
 }
 
 // ========================================================================================
