@@ -1147,12 +1147,36 @@ Vector<String> String::Split(const char* str, char separator, bool keepEmptyStri
 String String::Joined(const Vector<String>& subStrings, const String& glue)
 {
     if (subStrings.Empty())
-        return String();
+        return {};
 
-    String joinedString(subStrings[0]);
-    for (i32 i = 1; i < subStrings.Size(); ++i)
-        joinedString.Append(glue).Append(subStrings[i]);
+    i32 glueLen = glue.Length();
+    i32 commonLen = -glueLen;
+    for (const auto& s : subStrings)
+        commonLen += s.Length() + glueLen;
 
+    String joinedString;
+    if (commonLen)
+    {
+
+        joinedString.Reserve(commonLen);
+        joinedString.Resize(commonLen);
+        const char* strGlue = glue.GetBuffer();
+        char* dest = joinedString.GetBuffer();
+        for (i32 i = 0; i < subStrings.Size(); ++i)
+        {
+            i32 l = subStrings[i].Length();
+            if (l)
+            {
+                memcpy(dest, subStrings[i].GetBuffer(), l);
+                dest += l;
+            }
+            if (glueLen && i != subStrings.Size() - 1)
+            {
+                memcpy(dest, strGlue, glueLen);
+                dest += glueLen;
+            }
+        }
+    }
     return joinedString;
 }
 
