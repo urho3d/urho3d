@@ -225,10 +225,10 @@ static String formatVariable(asIScriptContext* context, int stringTypeID, as_unk
         char buf[1024];
         return strFromSprintf(buf, snprintf(buf, sizeof(buf), fmt, reinterpret_cast<String*>(val)->CString()));
     }
-    
+
     if (valTypeId > asTYPEID_DOUBLE) // For enums
         valTypeId = asTYPEID_INT32;
-    
+
     char buffer[256];
 
     switch (valTypeId)
