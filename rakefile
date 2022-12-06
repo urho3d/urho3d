@@ -38,6 +38,7 @@ task :cmake => [:init] do
     var.chomp!
     build_options = "#{build_options} -D #{var}=#{ENV[var]}" if ENV[var]
   }
+  print %Q{#{script} "#{build_tree}" #{build_options}}
   system %Q{#{script} "#{build_tree}" #{build_options}} or abort
 end
 
@@ -73,7 +74,7 @@ task :build, [:target] => [:cmake] do |_, args|
   case ENV['GENERATOR']
   when 'xcode'
     concurrent = '' # Assume xcodebuild will do the right things without the '-jobs'
-    filter = '|xcpretty -c && exit ${PIPESTATUS[0]}' if system('xcpretty -v >/dev/null 2>&1')
+    filter = '|xcpretty -c && exit ${PIPESTATUS[0]}' if system('xcpretty -v >/dev/null 2>&1') && ENV['USE_XCPRETTY']
   when 'vs'
     concurrent = '/maxCpuCount'
   else
