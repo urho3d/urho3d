@@ -283,12 +283,13 @@ if (URHO3D_LUA)
         else ()
             set (ALTERNATE_COMMAND CMAKE_COMMAND ${CMAKE_COMMAND} -E env CC=${SAVED_CC} CXX=${SAVED_CXX} CI=$ENV{CI} ${CMAKE_COMMAND})
         endif ()
-        ExternalProject_Add (tolua++
+        ExternalProject_Add (tolua++bin
             SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/ThirdParty/toluapp/src/bin
             CMAKE_ARGS -D URHO3D_DEPLOYMENT_TARGET=generic -D DEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -D BAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -D URHO3D_UPDATE_SOURCE_TREE=${URHO3D_UPDATE_SOURCE_TREE} -D CMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
             ${TRAVIS_ANDROID_FIX}
             ${ALTERNATE_COMMAND})
         add_make_clean_files (${CMAKE_BINARY_DIR}/bin/tool/tolua++)
+        message("Added tolua++ as an external project")
     else ()
         # Otherwise, build it internally as per normal
         add_subdirectory (../ThirdParty/toluapp/src/bin ../ThirdParty/toluapp/src/bin)
@@ -310,7 +311,7 @@ if (URHO3D_LUA)
         file (GLOB PKG_FILES LuaScript/pkgs/${DIR}/*.pkg)
         add_custom_command (OUTPUT ${GEN_CPP_FILE}
             COMMAND ${CMAKE_BINARY_DIR}/bin/tool/tolua++ -E ${CMAKE_PROJECT_NAME} -L ToCppHook.lua -o ${GEN_CPP_FILE} ${NAME}
-            DEPENDS tolua++ ${API_PKG_FILE} ${PKG_FILES} LuaScript/pkgs/ToCppHook.lua
+            DEPENDS tolua++bin ${API_PKG_FILE} ${PKG_FILES} LuaScript/pkgs/ToCppHook.lua 
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/LuaScript/pkgs
             COMMENT "Generating tolua++ API binding on the fly for ${DIR}")
     endforeach ()
@@ -353,6 +354,13 @@ if (IOS OR TVOS)
     set (EXCLUDE_FROM_ALL EXCLUDE_FROM_ALL)
 endif ()
 setup_library (${URHO3D_LIB_TYPE} ${EXCLUDE_FROM_ALL})
+
+# Workaround for Xcode parrallel build failing: Add the generated sources as a custom target that Urho3D depends on so they are generated first.
+if (URHO3D_LUA)
+    add_custom_target (LuaGenCppFiles
+        DEPENDS tolua++bin ${LUA_GEN_CPP_FILES})
+    add_dependencies(${TARGET_NAME} LuaGenCppFiles)
+endif()
 
 # Generate platform specific export header file (can only be called after the target has been added)
 if (MSVC)
