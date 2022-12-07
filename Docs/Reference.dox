@@ -731,6 +731,7 @@ The placeholders in a format string are generally defined as {[NumberOrName][%fo
 If a number is specified for insertion, then it indicates the number among the passed parameters.
 If a name is given, then a variable with the given name is searched in the order: local variables, class members (if the method is called inside a class method), global variables.
 You can also use the name "this" inside class methods. If neither number nor name is specified, the next parameter in order is taken.
+Searching by local variable names only works in scripts built from source code or from bytecode with debug information preserved. To save debugging information, run the ScriptCompiler with the -nostrip option.
 If the passed paramter or founded variable is an object, it is converted to a string as follows - the object method is searched for "String ToString()const", then "String opImplConv()const", then "String toString()const"
 and finally the global method "String ToString(const ObjectTypeName&in)".
 If one of the methods is found, then it is called and its result is used. If no functions are found, the "[object ObjectTypeName ObjectAddress]" is returned.
@@ -3648,12 +3649,13 @@ Compiles AngelScript file(s) to binary bytecode for faster loading. Can also dum
 Usage:
 
 \verbatim
-ScriptCompiler <input file> [resource path for includes]
+ScriptCompiler <input file> [resource path for includes] [-nostrip]
 ScriptCompiler -dumpapi <Doxygen output file> [C header output file]
 
 \endverbatim
 
 The output files are saved with the extension .asc (compiled AngelScript.) binary files are not automatically loaded instead of the text format (.as) script files, instead resource requests and resource references in objects need to point to the compiled files. In a final build of an application it may be convenient to simply replace the text format script files with the compiled scripts.
+By default, debugging information about local variable names is removed from the bytecode. If you use string formatting with local variable names in placeholders, you need to add the -nostrip option when you run the compiler.
 
 The script API dump mode can be used to replace the 'ScriptAPI.dox' file in the 'Docs' directory. If the output file name is not provided then the script API would be dumped to standard output (console) instead.
 

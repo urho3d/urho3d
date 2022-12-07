@@ -577,13 +577,13 @@ asIScriptObject* ScriptFile::CreateObject(const String& className, bool useInter
     return obj;
 }
 
-bool ScriptFile::SaveByteCode(Serializer& dest)
+bool ScriptFile::SaveByteCode(Serializer& dest, bool stripDebugInfo)
 {
     if (compiled_)
     {
         dest.WriteFileID("ASBC");
         ByteCodeSerializer serializer = ByteCodeSerializer(dest);
-        return scriptModule_->SaveByteCode(&serializer, true) >= 0;
+        return scriptModule_->SaveByteCode(&serializer, stripDebugInfo) >= 0;
     }
     else
         return false;

@@ -24,7 +24,7 @@
 
 using namespace Urho3D;
 
-void CompileScript(Context* context, const String& fileName);
+void CompileScript(Context* context, const String& fileName, bool stripDebugSymbols);
 
 int main(int argc, char** argv)
 {
@@ -39,7 +39,7 @@ int main(int argc, char** argv)
     String outputFile;
 
     if (arguments.Size() < 1)
-        ErrorExit("Usage: ScriptCompiler <input file> [resource path for includes]\n"
+        ErrorExit("Usage: ScriptCompiler <input file> [resource path for includes] [-nostrip]\n"
                   "       ScriptCompiler -dumpapi <source tree> <Doxygen output file> [C header output file]");
     else
     {
@@ -96,20 +96,30 @@ int main(int argc, char** argv)
 
         auto* cache = context->GetSubsystem<ResourceCache>();
 
+        bool stripDebugSymbols = true;
+        for (int idx = arguments.Size() - 1; idx > 0; idx--)
+        {
+            if (arguments[idx] == "-nostrip")
+            {
+                stripDebugSymbols = false;
+                break;
+            }
+        }
+
         // Add resource path to be able to resolve includes
-        if (arguments.Size() > 1)
+        if (arguments.Size() > 1 && arguments[1] != "-nostrip")
             cache->AddResourceDir(arguments[1]);
         else
             cache->AddResourceDir(cache->GetPreferredResourceDir(path));
 
         if (!file.StartsWith("*"))
-            CompileScript(context, outputFile);
+            CompileScript(context, outputFile, stripDebugSymbols);
         else
         {
             Vector<String> scriptFiles;
             context->GetSubsystem<FileSystem>()->ScanDir(scriptFiles, path, file + extension, SCAN_FILES, false);
             for (unsigned i = 0; i < scriptFiles.Size(); ++i)
-                CompileScript(context, path + scriptFiles[i]);
+                CompileScript(context, path + scriptFiles[i], stripDebugSymbols);
         }
     }
     else
@@ -134,7 +144,7 @@ int main(int argc, char** argv)
     return EXIT_SUCCESS;
 }
 
-void CompileScript(Context* context, const String& fileName)
+void CompileScript(Context* context, const String& fileName, bool stripDebugSymbols)
 {
     PrintLine("Compiling script file " + fileName);
 
@@ -152,5 +162,5 @@ void CompileScript(Context* context, const String& fileName)
     if (!outFile.IsOpen())
         ErrorExit("Failed to open output file " + fileName);
 
-    script.SaveByteCode(outFile);
+    script.SaveByteCode(outFile, stripDebugSymbols);
 }

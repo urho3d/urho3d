@@ -460,7 +460,30 @@ static String format_argsA(const String& pattern, void* a1, int i1, void* a2, in
     return formatString(pattern, 10, ua);
 }
 
-
+#ifdef AS_MAX_PORTABILITY
+static void String_Format_gen(asIScriptGeneric* gen)
+{
+    int argsCount = gen->GetArgCount();
+    Vector<as_unkn_arg> args(argsCount);
+    for (int i = 0; i < argsCount; i++)
+    {
+        args[i].typeId = gen->GetArgTypeId(i);
+        args[i].val = gen->GetArgAddress(i);
+    }
+    *static_cast<String*>(gen->GetAddressOfReturnLocation()) = formatString(*static_cast<String*>(gen->GetObject()), argsCount, args.Buffer());
+}
+static void Format_String_gen(asIScriptGeneric* gen)
+{
+    int argsCount = gen->GetArgCount();
+    Vector<as_unkn_arg> args(argsCount - 1);
+    for (int i = 1; i < argsCount; i++)
+    {
+        args[i - 1].typeId = gen->GetArgTypeId(i);
+        args[i - 1].val = gen->GetArgAddress(i);
+    }
+    *static_cast<String*>(gen->GetAddressOfReturnLocation()) = formatString(*static_cast<String*>(gen->GetArgAddress(0)), argsCount - 1, args.Buffer());
+}
+#endif
 
 // This function is called after ASRegisterGenerated()
 void ASRegisterManualLast_Container(asIScriptEngine* engine)
@@ -484,30 +507,55 @@ void ASRegisterManualLast_Container(asIScriptEngine* engine)
     engine->RegisterObjectMethod("String", "String& opAssign(bool)", AS_FUNCTION_OBJLAST(StringAssignBool), AS_CALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "String opAdd(bool) const", AS_FUNCTION_OBJLAST(StringAddBool), AS_CALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "String opAdd_r(bool) const", AS_FUNCTION_OBJLAST(StringAddBoolReverse), AS_CALL_CDECL_OBJLAST);
+#ifndef AS_MAX_PORTABILITY
+    engine->RegisterObjectMethod("String", "String f()const", AS_FUNCTION_OBJFIRST(format_args0), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "String f(?&in a0)const", AS_FUNCTION_OBJFIRST(format_args1), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1)const", AS_FUNCTION_OBJFIRST(format_args2), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2)const", AS_FUNCTION_OBJFIRST(format_args3), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3)const", AS_FUNCTION_OBJFIRST(format_args4), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4)const", AS_FUNCTION_OBJFIRST(format_args5), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5)const",AS_FUNCTION_OBJFIRST(format_args6), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6)const", AS_FUNCTION_OBJFIRST(format_args7), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7)const", AS_FUNCTION_OBJFIRST(format_args8), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7,?&in a8)const", AS_FUNCTION_OBJFIRST(format_args9), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7,?&in a8,?&in a9)const",AS_FUNCTION_OBJFIRST(format_argsA), AS_CALL_CDECL_OBJFIRST);
 
-    engine->RegisterObjectMethod("String", "String f()const", asFUNCTION(format_args0), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "String f(?&in a0)const", asFUNCTION(format_args1), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1)const", asFUNCTION(format_args2), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2)const", asFUNCTION(format_args3), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3)const", asFUNCTION(format_args4), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4)const", asFUNCTION(format_args5), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5)const",asFUNCTION(format_args6), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6)const", asFUNCTION(format_args7), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7)const", asFUNCTION(format_args8), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7,?&in a8)const", asFUNCTION(format_args9), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7,?&in a8,?&in a9)const",asFUNCTION(format_argsA), asCALL_CDECL_OBJFIRST);
+    engine->RegisterGlobalFunction("String format(const String&in pattern)", AS_FUNCTION(format_args0), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0)", AS_FUNCTION(format_args1), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1)", AS_FUNCTION(format_args2), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2)", AS_FUNCTION(format_args3), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3)", AS_FUNCTION(format_args4), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4)", AS_FUNCTION(format_args5), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5)", AS_FUNCTION(format_args6), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6)", AS_FUNCTION(format_args7), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7)", AS_FUNCTION(format_args8), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7,?&in a8)", AS_FUNCTION(format_args9), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7,?&in a8,?&in a9)", AS_FUNCTION(format_argsA), AS_CALL_CDECL);
+#else
+    engine->RegisterObjectMethod("String", "String f()const", asFUNCTION(String_Format_gen), asCALL_GENERIC);
+    engine->RegisterObjectMethod("String", "String f(?&in a0)const", asFUNCTION(String_Format_gen), asCALL_GENERIC);
+    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1)const", asFUNCTION(String_Format_gen), asCALL_GENERIC);
+    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2)const", asFUNCTION(String_Format_gen), asCALL_GENERIC);
+    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3)const", asFUNCTION(String_Format_gen), asCALL_GENERIC);
+    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4)const", asFUNCTION(String_Format_gen), asCALL_GENERIC);
+    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5)const", asFUNCTION(String_Format_gen), asCALL_GENERIC);
+    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6)const", asFUNCTION(String_Format_gen), asCALL_GENERIC);
+    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7)const", asFUNCTION(String_Format_gen), asCALL_GENERIC);
+    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7,?&in a8)const", asFUNCTION(String_Format_gen), asCALL_GENERIC);
+    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7,?&in a8,?&in a9)const", asFUNCTION(String_Format_gen), asCALL_GENERIC);
 
-    engine->RegisterGlobalFunction("String format(const String&in pattern)", asFUNCTION(format_args0), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0)", asFUNCTION(format_args1), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1)", asFUNCTION(format_args2), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2)", asFUNCTION(format_args3), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3)", asFUNCTION(format_args4), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4)", asFUNCTION(format_args5), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5)", asFUNCTION(format_args6), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6)", asFUNCTION(format_args7), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7)", asFUNCTION(format_args8), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7,?&in a8)", asFUNCTION(format_args9), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7,?&in a8,?&in a9)", asFUNCTION(format_argsA), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String format(const String&in pattern)", asFUNCTION(Format_String_gen), asCALL_GENERIC);
+    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0)", asFUNCTION(Format_String_gen), asCALL_GENERIC);
+    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1)", asFUNCTION(Format_String_gen), asCALL_GENERIC);
+    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2)", asFUNCTION(Format_String_gen), asCALL_GENERIC);
+    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3)", asFUNCTION(Format_String_gen), asCALL_GENERIC);
+    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4)", asFUNCTION(Format_String_gen), asCALL_GENERIC);
+    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5)", asFUNCTION(Format_String_gen), asCALL_GENERIC);
+    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6)", asFUNCTION(Format_String_gen), asCALL_GENERIC);
+    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7)", asFUNCTION(Format_String_gen), asCALL_GENERIC);
+    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7,?&in a8)", asFUNCTION(Format_String_gen), asCALL_GENERIC);
+    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7,?&in a8,?&in a9)", asFUNCTION(Format_String_gen), asCALL_GENERIC);
+#endif
 }
 
 }
