@@ -82,7 +82,7 @@ public:
     /// Create a script object. Optionally search for the first class in the module that implements the specified interface.
     asIScriptObject* CreateObject(const String& className, bool useInterface = false);
     /// Save the script bytecode. Return true if successful.
-    bool SaveByteCode(Serializer& dest);
+    bool SaveByteCode(Serializer& dest, bool stripDebugInfo = true);
 
     /// Return script module.
     asIScriptModule* GetScriptModule() const { return scriptModule_; }
