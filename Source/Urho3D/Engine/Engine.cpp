@@ -270,9 +270,32 @@ bool Engine::Initialize(const VariantMap& parameters)
                 graphics->SetForceGL2(GetParameter(parameters, EP_FORCE_GL2).GetBool());
         }
 
+        int width = 0, height = 0;
+        const auto& paramWidth = GetParameter(parameters, EP_WINDOW_WIDTH, 0);
+        const auto& paramHeight = GetParameter(parameters, EP_WINDOW_HEIGHT, 0);
+        int monitor = GetParameter(parameters, EP_MONITOR, 0).GetI32();
+        if (paramWidth.GetType() == VAR_FLOAT || paramHeight.GetType() == VAR_FLOAT)
+        {
+            auto res = graphics->GetDesktopResolution(monitor);
+            if (paramWidth.GetType() == VAR_FLOAT)
+                width = paramWidth.GetFloat() * res.x_;
+            else
+                width = paramWidth.GetI32();
+
+            if (paramHeight.GetType() == VAR_FLOAT)
+                height = paramHeight.GetFloat() * res.y_;
+            else
+                height = paramHeight.GetI32();
+        }
+        else
+        {
+            width = paramWidth.GetI32();
+            height = paramHeight.GetI32();
+        }
+
         if (!graphics->SetMode(
-            GetParameter(parameters, EP_WINDOW_WIDTH, 0).GetI32(),
-            GetParameter(parameters, EP_WINDOW_HEIGHT, 0).GetI32(),
+            width,
+            height,
             GetParameter(parameters, EP_FULL_SCREEN, true).GetBool(),
             GetParameter(parameters, EP_BORDERLESS, false).GetBool(),
             GetParameter(parameters, EP_WINDOW_RESIZABLE, false).GetBool(),
@@ -280,7 +303,7 @@ bool Engine::Initialize(const VariantMap& parameters)
             GetParameter(parameters, EP_VSYNC, false).GetBool(),
             GetParameter(parameters, EP_TRIPLE_BUFFER, false).GetBool(),
             GetParameter(parameters, EP_MULTI_SAMPLE, 1).GetI32(),
-            GetParameter(parameters, EP_MONITOR, 0).GetI32(),
+            monitor,
             GetParameter(parameters, EP_REFRESH_RATE, 0).GetI32()
         ))
             return false;
@@ -899,12 +922,18 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
             }
             else if (argument == "x" && !value.Empty())
             {
-                ret[EP_WINDOW_WIDTH] = ToI32(value);
+                if (value.Contains('.'))
+                    ret[EP_WINDOW_WIDTH] = ToFloat(value);
+                else
+                    ret[EP_WINDOW_WIDTH] = ToI32(value);
                 ++i;
             }
             else if (argument == "y" && !value.Empty())
             {
-                ret[EP_WINDOW_HEIGHT] = ToI32(value);
+                if (value.Contains('.'))
+                    ret[EP_WINDOW_HEIGHT] = ToFloat(value);
+                else
+                    ret[EP_WINDOW_HEIGHT] = ToI32(value);
                 ++i;
             }
             else if (argument == "monitor" && !value.Empty()) {

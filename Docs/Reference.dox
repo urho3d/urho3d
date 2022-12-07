@@ -196,8 +196,8 @@ The full list of supported parameters, their datatypes and default values: (also
 - ExternalWindow (void ptr) External window handle to use instead of creating an application window. Default null.
 - WindowIcon (string) %Window icon image resource name. Default empty (use application default icon.)
 - WindowTitle (string) %Window title. Default "Urho3D".
-- WindowWidth (int) %Window horizontal dimension. Default 0 (use desktop resolution, or 1024 in windowed mode.)
-- WindowHeight (int) %Window vertical dimension. Default 0 (use desktop resolution, or 768 in windowed mode.)
+- WindowWidth (int or float) %Window horizontal dimension. Default 0 (use desktop resolution, or 1024 in windowed mode). If param is float (i.e. 0.75), size calculated as desktop resolution width * parameter.
+- WindowHeight (int or float) %Window vertical dimension. Default 0 (use desktop resolution, or 768 in windowed mode). If param is float (i.e. 0.75), size calculated as desktop resolution height * parameter.
 - WindowPositionX (int) %Window horizontal position. Default center to screen.
 - WindowPositionY (int) %Window vertical position. Default center to screen.
 - FullScreen (bool) Whether to create a full-screen window. Default true.
