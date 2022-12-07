@@ -1146,6 +1146,8 @@ static void JSONValue__JSONValue_constspJSONValueamp(JSONValue* _ptr, const JSON
 // class JSONValue | File: ../Resource/JSONValue.h
 static void Register_JSONValue(asIScriptEngine* engine)
 {
+    // JSONValue::JSONValue(JSONValue&& value)
+    // Not registered because have @nobind mark
     // JSONValue::JSONValue(const JSONArray& value)
     // Error: type "const JSONArray&" can not automatically bind
     // JSONValue::JSONValue(const JSONObject& value)
