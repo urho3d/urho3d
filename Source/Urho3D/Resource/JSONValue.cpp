@@ -602,6 +602,17 @@ VariantVector JSONValue::GetVariantVector() const
     return variantVector;
 }
 
+void JSONValue::Swap(JSONValue& other)
+{
+    unsigned t = type_;
+    type_ = other.type_;
+    other.type_ = t;
+
+    double n = numberValue_;
+    numberValue_ = other.numberValue_;
+    other.numberValue_ = n;
+}
+
 String JSONValue::GetValueTypeName(JSONValueType type)
 {
     return valueTypeNames[type];

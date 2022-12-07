@@ -132,6 +132,13 @@ public:
     {
         *this = value;
     }
+    /// Move-construct from another JSON value.
+    /// @nobind
+    JSONValue(JSONValue&& value)
+        : type_(0)
+    {
+        Swap(value);
+    }
     /// Destruct.
     ~JSONValue()
     {
@@ -158,6 +165,9 @@ public:
     JSONValue& operator =(const JSONObject& rhs);
     /// Assign from another JSON value.
     JSONValue& operator =(const JSONValue& rhs);
+    /// Move from another JSON value.
+    /// @nobind
+    JSONValue& operator=(JSONValue&& rhs) { Swap(rhs); return *this; }
 
     /// Return value type.
     /// @property
@@ -273,6 +283,8 @@ public:
     void SetVariantVector(const VariantVector& variantVector, Context* context = nullptr);
     /// Return a variant vector.
     VariantVector GetVariantVector() const;
+    /// Swap content of two values
+    void Swap(JSONValue& other);
 
     /// Empty JSON value.
     static const JSONValue EMPTY;
