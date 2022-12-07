@@ -271,12 +271,12 @@ bool Engine::Initialize(const VariantMap& parameters)
         }
 
         int width = 0, height = 0;
-        const auto& paramWidth = GetParameter(parameters, EP_WINDOW_WIDTH, 0);
-        const auto& paramHeight = GetParameter(parameters, EP_WINDOW_HEIGHT, 0);
+        const Variant& paramWidth = GetParameter(parameters, EP_WINDOW_WIDTH, 0);
+        const Variant& paramHeight = GetParameter(parameters, EP_WINDOW_HEIGHT, 0);
         int monitor = GetParameter(parameters, EP_MONITOR, 0).GetI32();
         if (paramWidth.GetType() == VAR_FLOAT || paramHeight.GetType() == VAR_FLOAT)
         {
-            auto res = graphics->GetDesktopResolution(monitor);
+            IntVector2 res = graphics->GetDesktopResolution(monitor);
             if (paramWidth.GetType() == VAR_FLOAT)
                 width = paramWidth.GetFloat() * res.x_;
             else
