@@ -169,16 +169,29 @@ static void convertToString(void* object, asIScriptContext* context, int typeId,
         return;
     }
 
+    bool isMemberFunc = true;
     asIScriptFunction* pFunc = typeInfo->GetMethodByDecl("String ToString()const");
     if (!pFunc)
         pFunc = typeInfo->GetMethodByDecl("String opImplConv()const");
     if (!pFunc)
         pFunc = typeInfo->GetMethodByDecl("String toString()const");
+    if (!pFunc)
+    {
+        isMemberFunc = false;
+        const char* ns = typeInfo->GetNamespace();
+        String nameOfType = (ns ? String(ns) + "::" : String()) + typeInfo->GetName();
+        String nameOfFunc = String("String ToString(const ") + nameOfType + "&in)";
+        pFunc = context->GetFunction()->GetModule()->GetFunctionByDecl(nameOfFunc.CString());
+    }
     if (pFunc)
     {
         context->PushState();
         context->Prepare(pFunc);
-        context->SetObject(object);
+        if (isMemberFunc)
+            context->SetObject(object);
+        else
+            context->SetArgObject(0, object);
+
         bool success = context->Execute() == asEXECUTION_FINISHED;
         if (success)
             result = *(String*)context->GetAddressOfReturnValue();

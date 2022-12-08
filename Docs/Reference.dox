@@ -713,6 +713,31 @@ Much of the Urho3D classes are exposed to scripts, however things that require l
 
 - Template functions for getting components or resources by type are not supported. Instead automatic type casts are performed as necessary.
 
+Also, for String in AngelScript, the possibility of formatting has been added, similar to printf. The method can be called as
+
+\code
+formatString.f(parameters)
+format(formatString, parameters)
+\endcode
+
+For example
+
+\code
+Print("Values is 0x{%08X}, {}".f(1, 2));
+text = format("{hours%02i}:{minutes%02i}";
+\endcode
+
+The placeholders in a format string are generally defined as {[NumberOrName][%formatSpecifier]}.
+If a number is specified for insertion, then it indicates the number among the passed parameters.
+If a name is given, then a variable with the given name is searched in the order: local variables, class members (if the method is called inside a class method), global variables.
+You can also use the name "this" inside class methods. If neither number nor name is specified, the next parameter in order is taken.
+If the passed paramter or founded variable is an object, it is converted to a string as follows - the object method is searched for "String ToString()const", then "String opImplConv()const", then "String toString()const"
+and finally the global method "String ToString(const ObjectTypeName&in)".
+If one of the methods is found, then it is called and its result is used. If no functions are found, the "[object ObjectTypeName ObjectAddress]" is returned.
+For enum values used their number value.
+You can also specify a formatting sequence after the %, as in the "printf" C function. If not specified, the formatting sequence is selected depending on the type of the parameter.
+In total, you can specify up to 10 parameters when calling "format". Some samples of use you can look at bin\Data\Scripts\Tests\Str\format.as.
+
 Check the automatically built \ref ScriptAPI "Scripting API" documentation for the exact function signatures. Note that the API documentation can be regenerated to the Urho3D log file by calling \ref Script::DumpAPI "DumpAPI()" function on the Script subsystem or by using \ref Tools_ScriptCompiler "ScriptCompiler tool".
 
 \section Script_Bytecode Precompiling scripts to bytecode

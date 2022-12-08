@@ -167,6 +167,18 @@ void TestStrFormat_AppObjToStringConversion()
     Assert("--[{}]--".f(Vector3(0.1f, 0.1f, 0.1f)) == "--[0.1 0.1 0.1]--");
 }
 
+String ToString(const Scene&in obj)
+{
+	return "Scene {}".f(obj.name);
+}
+
+void TestStrFormat_GlobalToStringConversion()
+{
+	Scene sc;
+	sc.name = "Test";
+    Assert("{sc}".f() == "Scene Test");
+}
+
 void Test_Str_Format()
 {
     TestStrFormat_Empty();
@@ -182,4 +194,5 @@ void Test_Str_Format()
     TestStrFormat_ObjToStringConversion();
     TestStrFormat_ObjtoStringConversion();
     TestStrFormat_AppObjToStringConversion();
+	TestStrFormat_GlobalToStringConversion();
 }
