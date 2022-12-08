@@ -195,6 +195,7 @@ if (URHO3D_GENERATEBINDINGS)
                                #${CMAKE_SOURCE_DIR}/Source/Urho3D/CSharp/Generated.cpp
                                #fake_output_to_force_run_every_time
                         COMMAND ${CMAKE_COMMAND} -E echo "Generating XMLs with AST to ${XML_AST_DIR}"
+                        COMMAND ${CMAKE_COMMAND} -E rm -f "${XML_AST_DIR}/*.xml"
                         COMMAND ${DOXYGEN_EXECUTABLE} "${DOXYFILE_PATH}"
                         COMMAND ${CMAKE_COMMAND} -E echo "Running ${BINDING_GENERATOR_PATH} ${XML_AST_DIR} ${CMAKE_SOURCE_DIR}"
                         COMMAND "${BINDING_GENERATOR_PATH}" "${XML_AST_DIR}" "${CMAKE_SOURCE_DIR}"

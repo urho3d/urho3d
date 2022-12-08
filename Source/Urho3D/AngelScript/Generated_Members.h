@@ -2206,6 +2206,8 @@ template <class T> void RegisterMembers_JSONValue(asIScriptEngine* engine, const
     // Error: type "const JSONArray&" can not automatically bind
     // JSONValue& JSONValue::operator =(const JSONObject& rhs)
     // Error: type "const JSONObject&" can not automatically bind
+    // JSONValue& JSONValue::operator =(JSONValue&& rhs)
+    // Not registered because have @nobind mark
     // void JSONValue::SetVariantVector(const VariantVector& variantVector, Context* context = nullptr)
     // Error: type "const VariantVector&" can not automatically bind
 
@@ -2354,6 +2356,9 @@ template <class T> void RegisterMembers_JSONValue(asIScriptEngine* engine, const
     // unsigned JSONValue::Size() const
     engine->RegisterObjectMethod(className, "uint Size() const", AS_METHODPR(T, Size, () const, unsigned), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_size() const", AS_METHODPR(T, Size, () const, unsigned), AS_CALL_THISCALL);
+
+    // void JSONValue::Swap(JSONValue& other)
+    engine->RegisterObjectMethod(className, "void Swap(JSONValue&)", AS_METHODPR(T, Swap, (JSONValue&), void), AS_CALL_THISCALL);
 
     // static JSONValueType JSONValue::GetValueTypeFromName(const char* typeName)
     // Error: type "const char*" can not automatically bind
