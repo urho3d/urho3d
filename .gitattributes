@@ -2,3 +2,12 @@ Docs/* linguist-documentation
 Source/ThirdParty/* linguist-vendored
 bin/Data/Fonts/* linguist-vendored
 *.h linguist-language=C++
+
+# Автоматически нормализуем концы строк, если у пользователя не настроен параметр autocrlf
+# https://docs.github.com/en/get-started/getting-started-with-git/configuring-git-to-handle-line-endings
+* text=auto
+
+# Явно указываем файлы, в которых хотим всегда нормализовать концы строк
+*.c text
+*.cpp text
+*.h text
