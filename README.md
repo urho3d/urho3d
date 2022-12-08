@@ -52,10 +52,6 @@ Urho3D распространяется под лицензией MIT.
 [Yao Wei Tjong](https://github.com/weitjong), [asterj](https://github.com/aster2013)
 и многие другие разработчики, список которых можно посмотреть [тут](https://github.com/urho3d/Urho3D/graphs/contributors).
 
-## Contributing
-
-Before making pull requests, please read the [Contribution checklist](https://urho3d.io/documentation/HEAD/_contribution_checklist.html) and [Coding conventions](https://urho3d.io/documentation/HEAD/_coding_conventions.html) pages from the documentation.
-
 ## Credits
 
 Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
