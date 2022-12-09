@@ -169,13 +169,13 @@ void TestStrFormat_AppObjToStringConversion()
 
 String ToString(const Scene&in obj)
 {
-	return "Scene {}".f(obj.name);
+    return "Scene {}".f(obj.name);
 }
 
 void TestStrFormat_GlobalToStringConversion()
 {
-	Scene sc;
-	sc.name = "Test";
+    Scene sc;
+    sc.name = "Test";
     Assert("{sc}".f() == "Scene Test");
 }
 
@@ -194,5 +194,5 @@ void Test_Str_Format()
     TestStrFormat_ObjToStringConversion();
     TestStrFormat_ObjtoStringConversion();
     TestStrFormat_AppObjToStringConversion();
-	TestStrFormat_GlobalToStringConversion();
+    TestStrFormat_GlobalToStringConversion();
 }

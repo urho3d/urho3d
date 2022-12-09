@@ -128,7 +128,7 @@ static void findVariable(asIScriptContext* context, const String& varName, void*
     {
         const char* contextVarName = nullptr;
         context->GetVar(idx, 0, &contextVarName, &typeId);
-        if (varName == contextVarName)
+        if (varName == contextVarName && context->IsVarInScope(idx, 0))
         {
             var = context->GetAddressOfVar(idx);
             return;
