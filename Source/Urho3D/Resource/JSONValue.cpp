@@ -608,9 +608,10 @@ void JSONValue::Swap(JSONValue& other)
     type_ = other.type_;
     other.type_ = t;
 
-    double n = numberValue_;
-    numberValue_ = other.numberValue_;
-    other.numberValue_ = n;
+    char tmp[sizeof(numberValue_)];
+    memcpy(tmp, &numberValue_, sizeof(numberValue_));
+    memcpy(&numberValue_, &other.numberValue_, sizeof(numberValue_));
+    memcpy(&other.numberValue_, tmp, sizeof(numberValue_));
 }
 
 String JSONValue::GetValueTypeName(JSONValueType type)

@@ -133,8 +133,7 @@ public:
         *this = value;
     }
     /// Move-construct from another JSON value.
-    /// @nobind
-    JSONValue(JSONValue&& value)
+    JSONValue(JSONValue&& value) noexcept
         : type_(0)
     {
         Swap(value);
@@ -166,8 +165,7 @@ public:
     /// Assign from another JSON value.
     JSONValue& operator =(const JSONValue& rhs);
     /// Move from another JSON value.
-    /// @nobind
-    JSONValue& operator=(JSONValue&& rhs) { Swap(rhs); return *this; }
+    JSONValue& operator=(JSONValue&& rhs) noexcept { Swap(rhs); return *this; }
 
     /// Return value type.
     /// @property
