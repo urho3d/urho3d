@@ -128,7 +128,7 @@ static void findVariable(asIScriptContext* context, const String& varName, void*
     {
         const char* contextVarName = nullptr;
         context->GetVar(idx, 0, &contextVarName, &typeId);
-        if (varName == contextVarName)
+        if (varName == contextVarName && context->IsVarInScope(idx, 0))
         {
             var = context->GetAddressOfVar(idx);
             return;
@@ -169,16 +169,29 @@ static void convertToString(void* object, asIScriptContext* context, int typeId,
         return;
     }
 
+    bool isMemberFunc = true;
     asIScriptFunction* pFunc = typeInfo->GetMethodByDecl("String ToString()const");
     if (!pFunc)
         pFunc = typeInfo->GetMethodByDecl("String opImplConv()const");
     if (!pFunc)
         pFunc = typeInfo->GetMethodByDecl("String toString()const");
+    if (!pFunc)
+    {
+        isMemberFunc = false;
+        const char* ns = typeInfo->GetNamespace();
+        String nameOfType = (ns ? String(ns) + "::" : String()) + typeInfo->GetName();
+        String nameOfFunc = String("String ToString(const ") + nameOfType + "&in)";
+        pFunc = context->GetFunction()->GetModule()->GetFunctionByDecl(nameOfFunc.CString());
+    }
     if (pFunc)
     {
         context->PushState();
         context->Prepare(pFunc);
-        context->SetObject(object);
+        if (isMemberFunc)
+            context->SetObject(object);
+        else
+            context->SetArgObject(0, object);
+
         bool success = context->Execute() == asEXECUTION_FINISHED;
         if (success)
             result = *(String*)context->GetAddressOfReturnValue();
@@ -386,16 +399,67 @@ static String formatString(const String& pattern, int argsCount, as_unkn_arg* ar
 }
 
 static String format_args0(const String& pattern) { return formatString(pattern, 0, nullptr); }
-static String format_args1(const String& pattern, void* a1, ...) { return formatString(pattern, 1, (as_unkn_arg*)&a1); }
-static String format_args2(const String& pattern, void* a1, ...) { return formatString(pattern, 2, (as_unkn_arg*)&a1); }
-static String format_args3(const String& pattern, void* a1, ...) { return formatString(pattern, 3, (as_unkn_arg*)&a1); }
-static String format_args4(const String& pattern, void* a1, ...) { return formatString(pattern, 4, (as_unkn_arg*)&a1); }
-static String format_args5(const String& pattern, void* a1, ...) { return formatString(pattern, 5, (as_unkn_arg*)&a1); }
-static String format_args6(const String& pattern, void* a1, ...) { return formatString(pattern, 6, (as_unkn_arg*)&a1); }
-static String format_args7(const String& pattern, void* a1, ...) { return formatString(pattern, 7, (as_unkn_arg*)&a1); }
-static String format_args8(const String& pattern, void* a1, ...) { return formatString(pattern, 8, (as_unkn_arg*)&a1); }
-static String format_args9(const String& pattern, void* a1, ...) { return formatString(pattern, 9, (as_unkn_arg*)&a1); }
-static String format_args10(const String& pattern, void* a1, ...) { return formatString(pattern, 10, (as_unkn_arg*)&a1); }
+
+static String format_args1(const String& pattern, void* a1, int i1)
+{
+    as_unkn_arg ua[] = {{a1, i1}};
+    return formatString(pattern, 1, ua);
+}
+
+static String format_args2(const String& pattern, void* a1, int i1, void* a2, int i2)
+{
+    as_unkn_arg ua[] = {{a1, i1}, {a2, i2}};
+    return formatString(pattern, 2, ua);
+}
+
+static String format_args3(const String& pattern, void* a1, int i1, void* a2, int i2, void* a3, int i3)
+{
+    as_unkn_arg ua[] = {{a1, i1}, {a2, i2}, {a3, i3}};
+    return formatString(pattern, 3, ua);
+}
+
+static String format_args4(const String& pattern, void* a1, int i1, void* a2, int i2, void* a3, int i3, void* a4, int i4)
+{
+    as_unkn_arg ua[] = {{a1, i1}, {a2, i2}, {a3, i3}, {a4, i4}};
+    return formatString(pattern, 4, ua);
+}
+
+static String format_args5(const String& pattern, void* a1, int i1, void* a2, int i2, void* a3, int i3, void* a4, int i4, void* a5, int i5)
+{
+    as_unkn_arg ua[] = {{a1, i1}, {a2, i2}, {a3, i3}, {a4, i4}, {a5, i5}};
+    return formatString(pattern, 5, ua);
+}
+
+static String format_args6(const String& pattern, void* a1, int i1, void* a2, int i2, void* a3, int i3, void* a4, int i4, void* a5, int i5, void* a6, int i6)
+{
+    as_unkn_arg ua[] = {{a1, i1}, {a2, i2}, {a3, i3}, {a4, i4}, {a5, i5}, {a6, i6}};
+    return formatString(pattern, 6, ua);
+}
+
+static String format_args7(const String& pattern, void* a1, int i1, void* a2, int i2, void* a3, int i3, void* a4, int i4, void* a5, int i5, void* a6, int i6, void* a7, int i7)
+{
+    as_unkn_arg ua[] = {{a1, i1}, {a2, i2}, {a3, i3}, {a4, i4}, {a5, i5}, {a6, i6}, {a7, i7}};
+    return formatString(pattern, 7, ua);
+}
+
+static String format_args8(const String& pattern, void* a1, int i1, void* a2, int i2, void* a3, int i3, void* a4, int i4, void* a5, int i5, void* a6, int i6, void* a7, int i7, void* a8, int i8)
+{
+    as_unkn_arg ua[] = {{a1, i1}, {a2, i2}, {a3, i3}, {a4, i4}, {a5, i5}, {a6, i6}, {a7, i7}, {a8, i8}};
+    return formatString(pattern, 8, ua);
+}
+
+static String format_args9(const String& pattern, void* a1, int i1, void* a2, int i2, void* a3, int i3, void* a4, int i4, void* a5, int i5, void* a6, int i6, void* a7, int i7, void* a8, int i8, void* a9, int i9)
+{
+    as_unkn_arg ua[] = {{a1, i1}, {a2, i2}, {a3, i3}, {a4, i4}, {a5, i5}, {a6, i6}, {a7, i7}, {a8, i8}, {a9, i9}};
+    return formatString(pattern, 9, ua);
+}
+
+static String format_argsA(const String& pattern, void* a1, int i1, void* a2, int i2, void* a3, int i3, void* a4, int i4, void* a5, int i5, void* a6, int i6, void* a7, int i7, void* a8, int i8, void* a9, int i9, void* aA, int iA)
+{
+    as_unkn_arg ua[] = {{a1, i1}, {a2, i2}, {a3, i3}, {a4, i4}, {a5, i5}, {a6, i6}, {a7, i7}, {a8, i8}, {a9, i9}, {aA, iA}};
+    return formatString(pattern, 10, ua);
+}
+
 
 
 // This function is called after ASRegisterGenerated()
@@ -431,7 +495,7 @@ void ASRegisterManualLast_Container(asIScriptEngine* engine)
     engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6)const", asFUNCTION(format_args7), asCALL_CDECL_OBJFIRST);
     engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7)const", asFUNCTION(format_args8), asCALL_CDECL_OBJFIRST);
     engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7,?&in a8)const", asFUNCTION(format_args9), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7,?&in a8,?&in a9)const",asFUNCTION(format_args10), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "String f(?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7,?&in a8,?&in a9)const",asFUNCTION(format_argsA), asCALL_CDECL_OBJFIRST);
 
     engine->RegisterGlobalFunction("String format(const String&in pattern)", asFUNCTION(format_args0), asCALL_CDECL);
     engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0)", asFUNCTION(format_args1), asCALL_CDECL);
@@ -443,7 +507,7 @@ void ASRegisterManualLast_Container(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6)", asFUNCTION(format_args7), asCALL_CDECL);
     engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7)", asFUNCTION(format_args8), asCALL_CDECL);
     engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7,?&in a8)", asFUNCTION(format_args9), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7,?&in a8,?&in a9)", asFUNCTION(format_args10), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String format(const String&in pattern,?&in a0,?&in a1,?&in a2,?&in a3,?&in a4,?&in a5,?&in a6,?&in a7,?&in a8,?&in a9)", asFUNCTION(format_argsA), asCALL_CDECL);
 }
 
 }
