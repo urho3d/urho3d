@@ -1,25 +1,3 @@
-**This repository is now focused on Russian-speaking community only.
-If you were looking for international versions of Urho3D, check out:**
-
-* [Urho3D 1.9.0](https://github.com/urho3d/Urho3D/releases/tag/1.9.0): Last English version of Urho3D, unmaintained.
-
-* [Rebel Fork](https://github.com/rbfx/rbfx): Reimagining of Urho3D with significant API changes, in active development.
-
-* [U3D Community](https://github.com/u3d-community/U3D): Urho3D 1.8.0, in maintenance mode.
-
-Sincerely yours, [Eugene Kozlov](https://github.com/eugeneko) (Rebel Fork developer)
-
----
-
-Other forks:
-
-* https://github.com/Urho-Net/Urho.Net
-* https://gitlab.com/luckeyproductions/dry
-* https://github.com/xamarin/urho
-* https://github.com/AtomicGameEngine/AtomicGameEngine
-
----
-
 # Urho3D
 
 [![CI/CD](https://github.com/urho3d/Urho3D/workflows/CI/CD/badge.svg)](https://github.com/urho3d/Urho3D/actions?query=workflow%3ACI%2FCD)
