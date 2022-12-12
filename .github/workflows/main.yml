@@ -438,13 +438,8 @@ jobs:
     - name: "Удаление кэша"
       run: |
         # Сохраняем заголовки и описания коммитов в строку
-
-        echo "!!! github.event_name = ${{ github.event_name }}"
-
-        if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-          # Переменная {{ github.event.pull_request.commits }} содержит число коммитов в PR
-          COMMITS=`git -C engine_repo log --format=%B -n${{ github.event.pull_request.commits }}`
-        fi
+        # Переменная ${{ github.event.commits }} содержит число добавляемых коммитов
+        COMMITS=`git -C engine_repo log --format=%B -n${{ github.event.commits }}`
 
         # Ищем в строке [clear cache]
         if [[ "$COMMITS" == *"[cache clear]"* ]]; then
