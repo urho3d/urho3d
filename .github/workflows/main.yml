@@ -429,14 +429,13 @@ jobs:
         echo "$HOME/programs" >> $GITHUB_PATH
 
     - name: Cache
-      #if: false # Временно отключаем кэш, так как [cache clear] не учитывается
       uses: actions/cache@v3
       with:
         path: engine_build
         key: linux-${{ matrix.COMPILER.ID }}-${{ matrix.BITS }}-${{ matrix.LIB_TYPE.ID }}-${{ matrix.BUILD_TYPE.ID }}-${{ github.sha }}
         restore-keys: linux-${{ matrix.COMPILER.ID }}-${{ matrix.BITS }}-${{ matrix.LIB_TYPE.ID }}-${{ matrix.BUILD_TYPE.ID }}
 
-    -name: "Удаление кэша"
+    - name: "Удаление кэша"
       run: |
         # Сохраняем заголовки и описания коммитов в строку
         # Переменная {{ github.event.pull_request.commits }} содержит число коммитов в PR
