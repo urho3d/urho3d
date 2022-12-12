@@ -441,8 +441,11 @@ jobs:
         # Переменная ${{ github.event.commits }} содержит число добавляемых коммитов
         COMMITS=`git -C engine_repo log --format=%B -n${{ github.event.commits }}`
 
+        echo "Коммиты: $COMMITS"
+
         # Ищем в строке [clear cache]
-        if [[ "$COMMITS" == *"[cache clear]"* ]]; then
+        #if [[ "$COMMITS" == *"[cache clear]"* ]]; then
+        if [[ "$COMMITS" == "$COMMITS" ]]; then
           echo "Удаляем кэш"
           ls
           echo "Конец"
