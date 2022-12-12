@@ -429,6 +429,7 @@ jobs:
         echo "$HOME/programs" >> $GITHUB_PATH
 
     - name: Cache
+      if: false # Временно отключаем кэш, так как [cache clear] не учитывается
       uses: actions/cache@v3
       with:
         path: engine_build
@@ -543,6 +544,7 @@ jobs:
       run: sudo apt install mingw-w64
 
     - name: Cache
+      if: false # Временно отключаем кэш, так как [cache clear] не учитывается
       uses: actions/cache@v3
       with:
         path: engine_build
