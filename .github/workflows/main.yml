@@ -439,7 +439,7 @@ jobs:
       run: |
         # Сохраняем заголовки и описания коммитов в строку
         # Переменная {{ github.event.pull_request.commits }} содержит число коммитов в PR
-        COMMITS=`git log --format=%B -n${{ github.event.pull_request.commits }}`
+        COMMITS=`git -C engine_repo log --format=%B -n${{ github.event.pull_request.commits }}`
         
         echo "Current dir: $PWD"
 
