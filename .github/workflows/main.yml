@@ -449,14 +449,19 @@ jobs:
         then # Для push проверка всех коммитов уже выполнена
           # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
           echo "CLEAR_CACHE=1" >> $GITHUB_ENV
+          echo "Удаляем для push"
         else # Для pull_request список коммитов нужно получать самому
           NUM_COMMITS="${{ github.event.pull_request.commits }}"
 
           # Сохраняем названия и описания коммитов в строку
           COMMITS=`git -C engine_repo log --format=%B -n$NUM_COMMITS`
+          
+          echo "COMMITS=$COMMITS"
+
 
           if [[ "$COMMITS" == *"[clear cache]"* ]]; then
             echo "CLEAR_CACHE=1" >> $GITHUB_ENV
+            echo "Удаляем для PR!"
           fi
         fi
 
