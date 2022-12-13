@@ -429,12 +429,23 @@ jobs:
         echo "$HOME/programs" >> $GITHUB_PATH
 
     - name: Cache
-      if: false # Временно отключаем кэш, так как [cache clear] не учитывается
       uses: actions/cache@v3
       with:
         path: engine_build
         key: linux-${{ matrix.COMPILER.ID }}-${{ matrix.BITS }}-${{ matrix.LIB_TYPE.ID }}-${{ matrix.BUILD_TYPE.ID }}-${{ github.sha }}
         restore-keys: linux-${{ matrix.COMPILER.ID }}-${{ matrix.BITS }}-${{ matrix.LIB_TYPE.ID }}-${{ matrix.BUILD_TYPE.ID }}
+
+      # https://docs.github.com/en/actions/learn-github-actions/expressions
+      # https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
+      # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#push
+      # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
+    - name: "Удаляем кэш по запросу пользователя"
+      if: |
+        (github.event_name == 'pull_request' && contains(github.event.pull_request.title, '[clear cache]')) ||
+        (github.event_name == 'push' && contains(join(github.event.commits.*.message, ' '), '[clear cache]'))
+
+      run: |
+        rm -rf engine_build
 
     - name: Build
       run: |
