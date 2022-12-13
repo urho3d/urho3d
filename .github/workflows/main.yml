@@ -453,7 +453,7 @@ jobs:
           NUM_COMMITS="${{ github.event.pull_request.commits }}"
 
           # Сохраняем названия и описания коммитов в строку
-          COMMITS=`git log --format=%B -n$NUM_COMMITS`
+          COMMITS=`git -C engine_repo log --format=%B -n$NUM_COMMITS`
 
           if [[ "$COMMITS" == *"[clear cache]"* ]]; then
             echo "CLEAR_CACHE=1" >> $GITHUB_ENV
