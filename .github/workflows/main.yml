@@ -440,7 +440,7 @@ jobs:
       with:
         script: |
           const json = ${{ toJSON(github.event) }}
-          console.log(commits); 
+          console.log(json); 
 
       # https://docs.github.com/en/actions/learn-github-actions/expressions
       # https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
