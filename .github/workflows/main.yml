@@ -407,10 +407,14 @@ jobs:
 
     name: 🐧-${{ matrix.COMPILER.ID }}-${{ matrix.BITS }}-${{ matrix.LIB_TYPE.ID }}-${{ matrix.BUILD_TYPE.ID }}
 
+
+
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-      with: { path: "engine_repo" }
+      with:
+        path: "engine_repo"
+        fetch-depth: 0
 
     - name: Install dependencies
       run: |
