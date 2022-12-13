@@ -452,6 +452,8 @@ jobs:
           exit 1
         fi
 
+        echo "Тип коммита ${{ github.event_name }}"
+
         # Сохраняем заголовки и описания коммитов в строку
         COMMITS=`git -C engine_repo log --format=%B -n$NUM_COMMITS`
 
