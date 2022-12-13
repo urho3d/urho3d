@@ -463,7 +463,7 @@ jobs:
     - name: "Удаляем кэш"
       if: env.CLEAR_CACHE == '1'
       run: |
-        echo "!!!ОЧИЩАЕМ КЭШ"
+        rm -rf engine_build
 
     - name: Build
       run: |
