@@ -407,14 +407,22 @@ jobs:
 
     name: 🐧-${{ matrix.COMPILER.ID }}-${{ matrix.BITS }}-${{ matrix.LIB_TYPE.ID }}-${{ matrix.BUILD_TYPE.ID }}
 
-
-
     steps:
+    - name: Определяем число коммитов для Checkout
+      run: |
+        if [[ "${{ github.event_name }}" == "pull_request" ]]
+        then 
+          https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
+          echo "FETCH_DEPTH=((${{ github.event.pull_request.commits }}++))" >> $GITHUB_ENV
+        else # push
+          echo "FETCH_DEPTH=1" >> $GITHUB_ENV
+        fi
+
     - name: Checkout
       uses: actions/checkout@v3
       with:
-        path: "engine_repo"
-        fetch-depth: 20
+        path: engine_repo
+        fetch-depth: ${{ env.FETCH_DEPTH }}
 
     - name: Install dependencies
       run: |
