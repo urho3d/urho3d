@@ -442,11 +442,12 @@ jobs:
         if [[ "${{ github.event_name }}" == "push" ]]
         then
           # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#push
-          NUM_COMMITS="${{ github.event.push.commits }}"
+          echo "!!!! PUSH"
+          NUM_COMMITS=${{ github.event.push.commits }}
         elif [[ "${{ github.event_name }}" == "pull_request" ]]
         then
           # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
-          NUM_COMMITS="${{ github.event.pull_request.commits }}"
+          NUM_COMMITS=${{ github.event.pull_request.commits }}
         else
           echo "Неизвестный тип события"
           exit 1
