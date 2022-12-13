@@ -466,9 +466,12 @@ jobs:
           echo "Удаляем для push"
         else # Для pull_request список коммитов нужно получать самому
           NUM_COMMITS="${{ github.event.pull_request.commits }}"
+          
+          COMMITS=${{ join(github.event.pull_request._links.commits.*.message, ' '), '[clear cache]') }}
 
           # Сохраняем названия и описания коммитов в строку
-          COMMITS=`git -C engine_repo log --format=%B -n$NUM_COMMITS`
+          #COMMITS=`git -C engine_repo log --format=%B -n$NUM_COMMITS`
+          
           
           echo "COMMITS=$COMMITS"
 
