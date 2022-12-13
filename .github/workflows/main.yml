@@ -435,13 +435,6 @@ jobs:
         key: linux-${{ matrix.COMPILER.ID }}-${{ matrix.BITS }}-${{ matrix.LIB_TYPE.ID }}-${{ matrix.BUILD_TYPE.ID }}-${{ github.sha }}
         restore-keys: linux-${{ matrix.COMPILER.ID }}-${{ matrix.BITS }}-${{ matrix.LIB_TYPE.ID }}-${{ matrix.BUILD_TYPE.ID }}
 
-    - name: JSON
-      uses: actions/github-script@v6
-      with:
-        script: |
-          const json = ${{ toJSON(github.event) }}
-          console.log(json); 
-
       # https://docs.github.com/en/actions/learn-github-actions/expressions
       # https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
       # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#push
