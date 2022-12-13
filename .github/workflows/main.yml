@@ -413,7 +413,9 @@ jobs:
         if [[ "${{ github.event_name }}" == "pull_request" ]]
         then 
           # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
-          echo "FETCH_DEPTH=((${{ github.event.pull_request.commits }}++))" >> $GITHUB_ENV
+          NUM_COMMITS=${{ github.event.pull_request.commits }}
+          ((++NUM_COMMITS))
+          echo "FETCH_DEPTH=$NUM_COMMITS" >> $GITHUB_ENV
         else # push
           echo "FETCH_DEPTH=1" >> $GITHUB_ENV
         fi
