@@ -407,24 +407,9 @@ jobs:
 
     name: 🐧-${{ matrix.COMPILER.ID }}-${{ matrix.BITS }}-${{ matrix.LIB_TYPE.ID }}-${{ matrix.BUILD_TYPE.ID }}
 
-    steps:
-    - name: Определяем число коммитов для Checkout
-      run: |
-        if [[ "${{ github.event_name }}" == "pull_request" ]]
-        then 
-          # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
-          NUM_COMMITS=${{ github.event.pull_request.commits }}
-          ((++NUM_COMMITS))
-          echo "FETCH_DEPTH=$NUM_COMMITS" >> $GITHUB_ENV
-        else # push
-          echo "FETCH_DEPTH=1" >> $GITHUB_ENV
-        fi
-
     - name: Checkout
       uses: actions/checkout@v3
-      with:
-        path: engine_repo
-        fetch-depth: ${{ env.FETCH_DEPTH }}
+      with: { path: "engine_repo" }
 
     - name: Install dependencies
       run: |
@@ -453,37 +438,11 @@ jobs:
       # https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
       # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#push
       # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
-    - name: "Ищем в названиях и описаниях коммитов [clear cache]"
+    - name: "Удаляем кэш по запросу пользователя"
       if: |
-        github.event_name == 'pull_request' ||
+        (github.event_name == 'pull_request' && contains(github.event.pull_request.title, '[clear cache]')) ||
         (github.event_name == 'push' && contains(join(github.event.commits.*.message, ' '), '[clear cache]'))
 
-      run: |
-        if [[ "${{ github.event_name }}" == "push" ]]
-        then # Для push проверка всех коммитов уже выполнена
-          # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
-          echo "CLEAR_CACHE=1" >> $GITHUB_ENV
-          echo "Удаляем для push"
-        else # Для pull_request список коммитов нужно получать самому
-          NUM_COMMITS="${{ github.event.pull_request.commits }}"
-          
-          COMMITS=${{ join(github.event.pull_request._links.commits.*.message, ' '), '[clear cache]') }}
-
-          # Сохраняем названия и описания коммитов в строку
-          #COMMITS=`git -C engine_repo log --format=%B -n$NUM_COMMITS`
-          
-          
-          echo "COMMITS=$COMMITS"
-
-
-          if [[ "$COMMITS" == *"[clear cache]"* ]]; then
-            echo "CLEAR_CACHE=1" >> $GITHUB_ENV
-            echo "Удаляем для PR!"
-          fi
-        fi
-
-    - name: "Удаляем кэш"
-      if: env.CLEAR_CACHE == '1'
       run: |
         rm -rf engine_build
 
