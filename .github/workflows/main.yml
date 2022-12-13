@@ -437,11 +437,28 @@ jobs:
 
     - name: "Удаление кэша"
       run: |
-        # Сохраняем заголовки и описания коммитов в строку
-        # Переменная ${{ github.event.commits }} содержит число добавляемых коммитов
-        COMMITS=`git -C engine_repo log --format=%B -n${{ github.event.commits }}`
+        # Получаем число коммитов
+        # https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
+        if [[ "${{ github.event_name }}" == "push" ]]
+        then
+          # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#push
+          NUM_COMMITS="${{ github.event.push.commits }}"
+        elif [[ "${{ github.event_name }}" == "pull_request" ]]
+        then
+          # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
+          NUM_COMMITS="${{ github.event.pull_request.commits }}"
+        else
+          echo "Неизвестный тип события"
+          exit 1
+        fi
 
-        echo "Коммиты: $COMMITS"
+        # Сохраняем заголовки и описания коммитов в строку
+        COMMITS=`git -C engine_repo log --format=%B -n$NUM_COMMITS`
+
+        # Ищем в строке [cache clear]
+        if [[ "$COMMITS" == *"[clear cache]"* ]]; then
+          echo "Нужно очищать!"
+        fi
 
         # Ищем в строке [clear cache]
         #if [[ "$COMMITS" == *"[cache clear]"* ]]; then
