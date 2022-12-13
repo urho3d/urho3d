@@ -435,41 +435,35 @@ jobs:
         key: linux-${{ matrix.COMPILER.ID }}-${{ matrix.BITS }}-${{ matrix.LIB_TYPE.ID }}-${{ matrix.BUILD_TYPE.ID }}-${{ github.sha }}
         restore-keys: linux-${{ matrix.COMPILER.ID }}-${{ matrix.BITS }}-${{ matrix.LIB_TYPE.ID }}-${{ matrix.BUILD_TYPE.ID }}
 
-    - name: "Удаление кэша"
+      # https://docs.github.com/en/actions/learn-github-actions/expressions
+      # https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
+      # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#push
+      # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
+    - name: "Ищем в названиях и описаниях коммитов [clear cache]"
+      if: |
+        github.event_name == 'pull_request' ||
+        (github.event_name == 'push' && contains(join(github.event.commits.*.message, ' '), '[clear cache]'))
+
       run: |
-        # Получаем число коммитов
-        # https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
         if [[ "${{ github.event_name }}" == "push" ]]
-        then
-          # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#push
-          echo "!!!! PUSH"
-          NUM_COMMITS=${{ github.event.push.commits }}
-        elif [[ "${{ github.event_name }}" == "pull_request" ]]
-        then
-          # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
-          NUM_COMMITS=${{ github.event.pull_request.commits }}
-        else
-          echo "Неизвестный тип события"
-          exit 1
+        then # Для push проверка всех коммитов уже выполнена
+          # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
+          echo "CLEAR_CACHE=1" >> $GITHUB_ENV
+        else # Для pull_request список коммитов нужно получать самому
+          NUM_COMMITS="${{ github.event.pull_request.commits }}"
+
+          # Сохраняем названия и описания коммитов в строку
+          COMMITS=`git log --format=%B -n$NUM_COMMITS`
+
+          if [[ "$COMMITS" == *"[clear cache]"* ]]; then
+            echo "CLEAR_CACHE=1" >> $GITHUB_ENV
+          fi
         fi
 
-        echo "Тип коммита ${{ github.event_name }}"
-
-        # Сохраняем заголовки и описания коммитов в строку
-        COMMITS=`git -C engine_repo log --format=%B -n$NUM_COMMITS`
-
-        # Ищем в строке [cache clear]
-        if [[ "$COMMITS" == *"[clear cache]"* ]]; then
-          echo "Нужно очищать!"
-        fi
-
-        # Ищем в строке [clear cache]
-        #if [[ "$COMMITS" == *"[cache clear]"* ]]; then
-        if [[ "$COMMITS" == "$COMMITS" ]]; then
-          echo "Удаляем кэш"
-          ls
-          echo "Конец"
-        fi
+    - name: "Удаляем кэш"
+      if: env.CLEAR_CACHE == '1'
+      run: |
+        echo "!!!ОЧИЩАЕМ КЭШ"
 
     - name: Build
       run: |
