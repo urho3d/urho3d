@@ -236,7 +236,7 @@ template <class T> void Context::RegisterFactory(const char* category)
 
 template <class T> T* Context::RegisterSubsystem()
 {
-    auto* subsystem = new T(this);
+    T* subsystem = new T(this);
     RegisterSubsystem(subsystem);
     return subsystem;
 }
