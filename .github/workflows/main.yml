@@ -428,7 +428,7 @@ jobs:
         wget -q -O tmp.zip https://github.com/rurho3d/doxygen-builder/raw/main/doxygen_linux64.zip && unzip tmp.zip && rm tmp.zip
         echo "$HOME/programs" >> $GITHUB_PATH
 
-    - name: Cache
+    - name: Скачиваем кэш
       uses: actions/cache@v3
       with:
         path: engine_build
@@ -439,11 +439,10 @@ jobs:
       # https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
       # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#push
       # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
-    - name: "Удаляем кэш по запросу пользователя"
+    - name: Удаляем кэш по запросу пользователя
       if: |
         (github.event_name == 'pull_request' && contains(github.event.pull_request.title, '[clear cache]')) ||
         (github.event_name == 'push' && contains(join(github.event.commits.*.message, ' '), '[clear cache]'))
-
       run: |
         rm -rf engine_build
 
@@ -549,18 +548,24 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-      with: { path: "engine_repo" }
+      with: { path: engine_repo }
 
     - name: Install dependencies
       run: sudo apt install mingw-w64
 
-    - name: Cache
-      if: false # Временно отключаем кэш, так как [cache clear] не учитывается
+    - name: Скачиваем кэш
       uses: actions/cache@v3
       with:
         path: engine_build
         key: linux-mingw-${{ matrix.BITS }}-${{ matrix.LIB_TYPE.ID }}-${{ matrix.BUILD_TYPE.ID }}-${{ github.sha }}
         restore-keys: linux-mingw-${{ matrix.BITS }}-${{ matrix.LIB_TYPE.ID }}-${{ matrix.BUILD_TYPE.ID }}
+
+    - name: Удаляем кэш по запросу пользователя
+      if: |
+        (github.event_name == 'pull_request' && contains(github.event.pull_request.title, '[clear cache]')) ||
+        (github.event_name == 'push' && contains(join(github.event.commits.*.message, ' '), '[clear cache]'))
+      run: |
+        rm -rf engine_build
 
     - name: Build
       run: |
@@ -631,7 +636,7 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-      with: { path: "engine_repo" }
+      with: { path: engine_repo }
 
     - name: Free up space
       run: |
