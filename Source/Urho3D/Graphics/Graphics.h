@@ -746,7 +746,7 @@ private:
     bool OpenWindow_D3D11(int width, int height, bool resizable, bool borderless);
 
     /// Adjust the window for new resolution and fullscreen mode.
-    void AdjustWindow_D3D11(int& newWidth, int& newHeight, bool& newFullscreen, bool& newBorderless, int& monitor);
+    void AdjustWindow_D3D11(int& newWidth, int& newHeight, bool& newFullscreen, bool& newBorderless, bool& newResizable, int& monitor);
 
     /// Create the Direct3D11 device and swap chain. Requires an open window. Can also be called again to recreate swap chain. Return true on success.
     bool CreateDevice_D3D11(int width, int height);
