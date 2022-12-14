@@ -269,7 +269,7 @@ bool Graphics::SetScreenMode_D3D11(int width, int height, const ScreenModeParams
             return false;
     }
 
-    AdjustWindow_D3D11(width, height, newParams.fullscreen_, newParams.borderless_, newParams.monitor_);
+    AdjustWindow_D3D11(width, height, newParams.fullscreen_, newParams.borderless_, newParams.resizable_, newParams.monitor_);
 
     if (maximize)
     {
@@ -1997,7 +1997,7 @@ bool Graphics::OpenWindow_D3D11(int width, int height, bool resizable, bool bord
     return true;
 }
 
-void Graphics::AdjustWindow_D3D11(int& newWidth, int& newHeight, bool& newFullscreen, bool& newBorderless, int& monitor)
+void Graphics::AdjustWindow_D3D11(int& newWidth, int& newHeight, bool& newFullscreen, bool& newBorderless, bool& newResizable, int& monitor)
 {
     if (!externalWindow_)
     {
@@ -2035,6 +2035,7 @@ void Graphics::AdjustWindow_D3D11(int& newWidth, int& newHeight, bool& newFullsc
         if (!newFullscreen) SDL_HideWindow(window_);
         SDL_SetWindowFullscreen(window_, newFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
         SDL_SetWindowBordered(window_, newBorderless ? SDL_FALSE : SDL_TRUE);
+        SDL_SetWindowResizable(window_, newResizable ? SDL_TRUE : SDL_FALSE);
         if (!newFullscreen) SDL_ShowWindow(window_);
 
         // Resize now if was postponed
