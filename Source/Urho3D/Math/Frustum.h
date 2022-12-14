@@ -63,7 +63,7 @@ public:
     /// Test if a point is inside or outside.
     Intersection IsInside(const Vector3& point) const
     {
-        for (const auto& plane : planes_)
+        for (const Plane& plane : planes_)
         {
             if (plane.Distance(point) < 0.0f)
                 return OUTSIDE;
@@ -76,7 +76,7 @@ public:
     Intersection IsInside(const Sphere& sphere) const
     {
         bool allInside = true;
-        for (const auto& plane : planes_)
+        for (const Plane& plane : planes_)
         {
             float dist = plane.Distance(sphere.center_);
             if (dist < -sphere.radius_)
@@ -91,7 +91,7 @@ public:
     /// Test if a sphere if (partially) inside or outside.
     Intersection IsInsideFast(const Sphere& sphere) const
     {
-        for (const auto& plane : planes_)
+        for (const Plane& plane : planes_)
         {
             if (plane.Distance(sphere.center_) < -sphere.radius_)
                 return OUTSIDE;
@@ -107,7 +107,7 @@ public:
         Vector3 edge = center - box.min_;
         bool allInside = true;
 
-        for (const auto& plane : planes_)
+        for (const Plane& plane : planes_)
         {
             float dist = plane.normal_.DotProduct(center) + plane.d_;
             float absDist = plane.absNormal_.DotProduct(edge);
@@ -127,7 +127,7 @@ public:
         Vector3 center = box.Center();
         Vector3 edge = center - box.min_;
 
-        for (const auto& plane : planes_)
+        for (const Plane& plane : planes_)
         {
             float dist = plane.normal_.DotProduct(center) + plane.d_;
             float absDist = plane.absNormal_.DotProduct(edge);
@@ -143,7 +143,7 @@ public:
     float Distance(const Vector3& point) const
     {
         float distance = 0.0f;
-        for (const auto& plane : planes_)
+        for (const Plane& plane : planes_)
             distance = Max(-plane.Distance(point), distance);
 
         return distance;
