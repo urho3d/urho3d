@@ -40,6 +40,7 @@ SDL_WAYLAND_SYM(void, wl_proxy_destroy, (struct wl_proxy *))
 SDL_WAYLAND_SYM(int, wl_proxy_add_listener, (struct wl_proxy *, void (**)(void), void *))
 SDL_WAYLAND_SYM(void, wl_proxy_set_user_data, (struct wl_proxy *, void *))
 SDL_WAYLAND_SYM(void *, wl_proxy_get_user_data, (struct wl_proxy *))
+SDL_WAYLAND_SYM(uint32_t, wl_proxy_get_version, (struct wl_proxy *))
 SDL_WAYLAND_SYM(uint32_t, wl_proxy_get_id, (struct wl_proxy *))
 SDL_WAYLAND_SYM(const char *, wl_proxy_get_class, (struct wl_proxy *))
 SDL_WAYLAND_SYM(void, wl_proxy_set_queue, (struct wl_proxy *, struct wl_event_queue *))
@@ -69,6 +70,11 @@ SDL_WAYLAND_SYM(struct wl_proxy *, wl_proxy_marshal_constructor, (struct wl_prox
 
 SDL_WAYLAND_MODULE(WAYLAND_CLIENT_1_10)
 SDL_WAYLAND_SYM(struct wl_proxy *, wl_proxy_marshal_constructor_versioned, (struct wl_proxy *proxy, uint32_t opcode, const struct wl_interface *interface, uint32_t version, ...))
+
+SDL_WAYLAND_MODULE(WAYLAND_CLIENT_1_20)
+SDL_WAYLAND_SYM(struct wl_proxy*, wl_proxy_marshal_flags, (struct wl_proxy *proxy, uint32_t opcode, const struct wl_interface *interfac, uint32_t version, uint32_t flags, ...))
+SDL_WAYLAND_SYM(struct wl_proxy*, wl_proxy_marshal_array_flags, (struct wl_proxy *proxy, uint32_t opcode, const struct wl_interface *interface, uint32_t version,  uint32_t flags, union wl_argument *args))
+
 
 SDL_WAYLAND_INTERFACE(wl_seat_interface)
 SDL_WAYLAND_INTERFACE(wl_surface_interface)
