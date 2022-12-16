@@ -3,6 +3,24 @@
 [![CI/CD](https://github.com/urho3d/Urho3D/workflows/CI/CD/badge.svg)](https://github.com/urho3d/Urho3D/actions?query=workflow%3ACI%2FCD)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/4954/badge.svg)](https://scan.coverity.com/projects/urho3d-urho3d)
 
+**Urho3D** is a free lightweight, cross-platform 2D and 3D game engine.
+
+## License
+
+Licensed under the MIT license, see [LICENSE](licenses/urho3d/LICENSE) for details.<br>
+Licenses for third-party libraries: [licenses](licenses).<br>
+Credits: [licenses/urho3d/credits.md](licenses/urho3d/credits.md)
+
+## Project Authors
+
+The founder of the project is [Lasse Öörni](https://github.com/cadaver). A huge contribution to the project was also made by
+[Yao Wei Tjong](https://github.com/weitjong), [asterj](https://github.com/aster2013)
+and many other developers, a list of which can be viewed [here](https://github.com/urho3d/Urho3D/graphs/contributors).
+
+---
+
+# Информация для русскоязычной аудитории
+
 **Urho3D** - это легковесный, кроссплатформенный 2D и 3D игровой движок.
 
 ## Лицензия
