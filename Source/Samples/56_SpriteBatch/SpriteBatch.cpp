@@ -32,6 +32,7 @@ public:
         engineParameters_[EP_WINDOW_WIDTH] = 1200;
         engineParameters_[EP_WINDOW_HEIGHT] = 900;
         engineParameters_[EP_FRAME_LIMITER] = false;
+        engineParameters_[EP_LOG_NAME] = GetSubsystem<FileSystem>()->GetAppPreferencesDir("urho3d", "logs") + "56_SpriteBatch.log";
     }
 
     void Start()
