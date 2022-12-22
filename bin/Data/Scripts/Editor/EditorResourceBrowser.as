@@ -1222,7 +1222,9 @@ int GetResourceType(StringHash fileType)
     return RESOURCE_TYPE_UNKNOWN;
 }
 
-bool GetExtensionType(String path, StringHash &out fileType)
+// TODO: Должно быть bool GetExtensionType(String path, StringHash &out fileType).
+// Временный workaround для https://github.com/urho3d/urho3d/issues/3148
+bool GetExtensionType(String path, StringHash& fileType)
 {
     StringHash type = StringHash(GetExtension(path));
     if (type == EXTENSION_TYPE_TTF)
