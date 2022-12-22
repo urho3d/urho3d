@@ -6358,7 +6358,7 @@ template <class T> void RegisterMembers_Vector3(asIScriptEngine* engine, const c
     // Vector3& Vector3::operator /=(const Vector3& rhs)
     engine->RegisterObjectMethod(className, "Vector3& opDivAssign(const Vector3&in)", AS_METHODPR(T, operator/=, (const Vector3&), Vector3&), AS_CALL_THISCALL);
 
-    // Vector3& Vector3::operator =(const Vector3& rhs) noexcept = default
+    // Vector3& Vector3::operator =(const Vector3& rhs) noexcept
     engine->RegisterObjectMethod(className, "Vector3& opAssign(const Vector3&in)", AS_METHODPR(T, operator=, (const Vector3&), Vector3&), AS_CALL_THISCALL);
 
     // bool Vector3::operator ==(const Vector3& rhs) const
