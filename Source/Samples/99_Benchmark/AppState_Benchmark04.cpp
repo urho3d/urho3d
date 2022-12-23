@@ -59,7 +59,7 @@ void AppState_Benchmark04::HandleEndAllViewsRender(StringHash eventType, Variant
     Graphics* graphics = GetSubsystem<Graphics>();
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     Texture2D* ball = GetSubsystem<ResourceCache>()->GetResource<Texture2D>("Urho2D/Ball.png");
-    Texture2D* head = cache->GetResource<Texture2D>("Urho2D/imp/imp_head.png");
+    Texture2D* head = cache->GetResource<Texture2D>("Textures/FishBoneLogo.png");
 
     GetSubsystem<Graphics>()->Clear(CLEAR_COLOR, Color::GREEN);
 
