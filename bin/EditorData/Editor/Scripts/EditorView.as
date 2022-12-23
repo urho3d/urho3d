@@ -695,7 +695,7 @@ void SetRenderPath(const String&in newRenderPathName)
         renderPath = renderer.defaultRenderPath.Clone();
 
     // Append gamma correction postprocess and disable/enable it as requested
-    renderPath.Append(cache.GetResource("XMLFile", "PostProcess/GammaCorrection.xml"));
+    renderPath.Append(cache.GetResource("XMLFile", "Editor/PostProcess/GammaCorrection.xml"));
     renderPath.SetEnabled("GammaCorrection", gammaCorrection);
 
     renderer.hdrRendering = HDR;
