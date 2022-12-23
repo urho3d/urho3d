@@ -1020,7 +1020,7 @@ void InitParticleEffectPreview()
     particleEffectPreviewGridNode = particlePreviewScene.CreateChild("Grid");
     particleEffectPreviewGrid = particleEffectPreviewGridNode.CreateComponent("CustomGeometry");
     particleEffectPreviewGrid.numGeometries = 1;
-    particleEffectPreviewGrid.material = cache.GetResource("Material", "Materials/VColUnlit.xml");
+    particleEffectPreviewGrid.material = cache.GetResource("Material", "Editor/Materials/VColUnlit.xml");
     particleEffectPreviewGrid.viewMask = 0x80000000; // Editor raycasts use viewmask 0x7fffffff
     particleEffectPreviewGrid.occludee = false;
 

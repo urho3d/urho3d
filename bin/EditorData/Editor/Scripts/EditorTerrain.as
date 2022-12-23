@@ -23,7 +23,7 @@ class TerrainEditorBrushVisualizer
         node = Node();
         customGeometry = node.CreateComponent("CustomGeometry");
         customGeometry.numGeometries = 1;
-        customGeometry.material = cache.GetResource("Material", "Materials/VColUnlit.xml");
+        customGeometry.material = cache.GetResource("Material", "Editor/Materials/VColUnlit.xml");
         customGeometry.occludee = false;
         customGeometry.enabled = true;
     }
