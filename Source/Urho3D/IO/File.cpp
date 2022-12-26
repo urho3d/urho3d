@@ -50,6 +50,8 @@ static i32 FSeek64(FILE* stream, i64 offset, i32 origin)
 {
 #ifdef _MSC_VER
     return _fseeki64(stream, offset, origin);
+#elif defined(__APPLE__)
+    return fseeko(stream, offset, origin);
 #else
     return fseeko64(stream, offset, origin);
 #endif
@@ -59,6 +61,8 @@ static i64 FTell64(FILE* stream)
 {
 #ifdef _MSC_VER
     return _ftelli64(stream);
+#elif defined(__APPLE__)
+    return ftello64(stream);
 #else
     return ftello64(stream);
 #endif
