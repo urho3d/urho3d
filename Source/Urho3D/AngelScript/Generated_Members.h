@@ -14527,10 +14527,10 @@ template <class T> void RegisterMembers_SpriteBatch(asIScriptEngine* engine, con
 {
     RegisterMembers_SpriteBatchBase<T>(engine, className);
 
-    // void SpriteBatch::DrawSprite(Texture2D* texture, const Rect& destination, Rect* source = nullptr, u32 color = 0xFFFFFFFF, float rotation = 0.0f, const Vector2& origin = Vector2::ZERO, const Vector2& scale = Vector2::ONE, FlipModes flipModes = FlipModes::None)
-    // Error: type "Rect*" can not automatically bind
-    // void SpriteBatch::DrawSprite(Texture2D* texture, const Vector2& position, Rect* source = nullptr, u32 color = 0xFFFFFFFF, float rotation = 0.0f, const Vector2& origin = Vector2::ZERO, const Vector2& scale = Vector2::ONE, FlipModes flipModes = FlipModes::None)
-    // Error: type "Rect*" can not automatically bind
+    // void SpriteBatch::DrawSprite(Texture2D* texture, const Rect& destination, const Rect* source = nullptr, u32 color = 0xFFFFFFFF, float rotation = 0.0f, const Vector2& origin = Vector2::ZERO, const Vector2& scale = Vector2::ONE, FlipModes flipModes = FlipModes::None)
+    // Error: type "const Rect*" can not automatically bind
+    // void SpriteBatch::DrawSprite(Texture2D* texture, const Vector2& position, const Rect* source = nullptr, u32 color = 0xFFFFFFFF, float rotation = 0.0f, const Vector2& origin = Vector2::ZERO, const Vector2& scale = Vector2::ONE, FlipModes flipModes = FlipModes::None)
+    // Error: type "const Rect*" can not automatically bind
 
     // void SpriteBatch::DrawAABBSolid(const Vector2& min, const Vector2& max)
     engine->RegisterObjectMethod(className, "void DrawAABBSolid(const Vector2&in, const Vector2&in)", AS_METHODPR(T, DrawAABBSolid, (const Vector2&, const Vector2&), void), AS_CALL_THISCALL);
