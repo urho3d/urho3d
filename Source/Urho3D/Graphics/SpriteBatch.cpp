@@ -22,16 +22,29 @@ SpriteBatch::SpriteBatch(Context* context) : SpriteBatchBase(context)
     shapePS_ = graphics_->GetShader(PS, "Basic", "VERTEXCOLOR");
 }
 
-static Rect PosToDest(const Vector2& position, Texture2D* texture)
+static Rect PosToDest(const Vector2& position, Texture2D* texture, const Rect* src)
 {
-    // Проверки не производятся, текстура должна быть корректной
-    return Rect
-    (
-        position.x_,
-        position.y_,
-        position.x_ + texture->GetWidth(),
-        position.y_ + texture->GetHeight()
-    );
+    if (src == nullptr)
+    {
+        // Проверки не производятся, текстура должна быть корректной
+        return Rect
+        (
+            position.x_,
+            position.y_,
+            position.x_ + texture->GetWidth(),
+            position.y_ + texture->GetHeight()
+        );
+    }
+    else
+    {
+        return Rect
+        (
+            position.x_,
+            position.y_,
+            position.x_ + (src->Right() - src->Left()), // Сперва вычисляем размер, так как там вероятно более близкие
+            position.y_ + (src->Bottom() - src->Top()) // значения и меньше ошибка вычислений
+        );
+    }
 }
 
 // Преобразует пиксельные координаты в диапазон [0, 1]
@@ -56,7 +69,7 @@ static Rect SrcToUV(const Rect* source, Texture2D* texture)
     }
 }
 
-void SpriteBatch::DrawSprite(Texture2D* texture, const Rect& destination, Rect* source, u32 color,
+void SpriteBatch::DrawSprite(Texture2D* texture, const Rect& destination, const Rect* source, u32 color,
     float rotation, const Vector2& origin, const Vector2& scale, FlipModes flipModes)
 {
     if (!texture)
@@ -79,7 +92,7 @@ void SpriteBatch::DrawSprite(Texture2D* texture, const Rect& destination, Rect* 
     DrawSpriteInternal();
 }
 
-void SpriteBatch::DrawSprite(Texture2D* texture, const Vector2& position, Rect* source, u32 color,
+void SpriteBatch::DrawSprite(Texture2D* texture, const Vector2& position, const Rect* source, u32 color,
     float rotation, const Vector2 &origin, const Vector2& scale, FlipModes flipModes)
 {
     if (!texture)
@@ -88,7 +101,7 @@ void SpriteBatch::DrawSprite(Texture2D* texture, const Vector2& position, Rect* 
     sprite_.texture_ = texture;
     sprite_.vs_ = spriteVS_;
     sprite_.ps_ = spritePS_;
-    sprite_.destination_ = PosToDest(position, texture);
+    sprite_.destination_ = PosToDest(position, texture, source);
     sprite_.sourceUV_ = SrcToUV(source, texture);
     sprite_.flipModes_ = flipModes;
     sprite_.scale_ = scale;
