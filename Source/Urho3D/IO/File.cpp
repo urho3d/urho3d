@@ -483,6 +483,8 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
 
 #ifdef _WIN32
     handle_ = _wfopen(GetWideNativePath(fileName).CString(), openMode[mode]);
+#elif defined(__APPLE__)
+    handle_ = fopen(GetNativePath(fileName).CString(), openMode[mode]);
 #else
     handle_ = fopen64(GetNativePath(fileName).CString(), openMode[mode]);
 #endif
@@ -492,6 +494,8 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
     {
 #ifdef _WIN32
         handle_ = _wfopen(GetWideNativePath(fileName).CString(), openMode[mode + 1]);
+#elif defined(__APPLE__)
+        handle_ = fopen(GetNativePath(fileName).CString(), openMode[mode + 1]);
 #else
         handle_ = fopen64(GetNativePath(fileName).CString(), openMode[mode + 1]);
 #endif
