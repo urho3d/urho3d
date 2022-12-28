@@ -62,7 +62,7 @@ static i64 FTell64(FILE* stream)
 #ifdef _MSC_VER
     return _ftelli64(stream);
 #elif defined(__APPLE__)
-    return ftello64(stream);
+    return ftello(stream);
 #else
     return ftello64(stream);
 #endif
