@@ -21,7 +21,7 @@
 
 # Modified for Urho3D, the modified portion is licensed under below license
 
-# Copyright (c) 2008-2022 the Urho3D project
+# Copyright (c) 2008-2023 the Urho3D project
 # License: MIT
 
 # Urho3D: This hack allows build 32-bit version on Linux Mint x64

@@ -21,7 +21,7 @@
 
 # Modified by Yao Wei Tjong for Urho3D, the modified portion is licensed under below license
 
-# Copyright (c) 2008-2022 the Urho3D project
+# Copyright (c) 2008-2023 the Urho3D project
 # License: MIT
 
 # Urho3D - replaced FindLibraryAndSONAME macro with get_soname macro

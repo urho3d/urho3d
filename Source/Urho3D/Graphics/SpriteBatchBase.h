@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2022 the Urho3D project
+// Copyright (c) 2008-2023 the Urho3D project
 // License: MIT
 
 // Класс SpriteBatch разбит на части для более легкого восприятия кода

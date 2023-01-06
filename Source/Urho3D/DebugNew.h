@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2022 the Urho3D project
+// Copyright (c) 2008-2023 the Urho3D project
 // License: MIT
 
 // This file overrides global new to provide file and line information to allocations for easier memory leak detection on MSVC

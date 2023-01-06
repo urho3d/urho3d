@@ -1,4 +1,4 @@
-# Copyright (c) 2008-2022 the Urho3D project
+# Copyright (c) 2008-2023 the Urho3D project
 # License: MIT
 
 # Set CMake minimum version
@@ -170,7 +170,7 @@ if (URHO3D_MACOSX_BUNDLE OR (APPLE AND ARM))
         set (MACOSX_BUNDLE_SHORT_VERSION_STRING ${URHO3D_VERSION})
     endif ()
     if (NOT MACOSX_BUNDLE_COPYRIGHT)
-        set (MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2008-2022 the Urho3D project.")
+        set (MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2008-2023 the Urho3D project.")
     endif ()
 endif ()
 
