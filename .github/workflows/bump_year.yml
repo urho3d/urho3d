@@ -76,7 +76,7 @@ jobs:
 
           #  Создаём и отправляем коммит
           git add -A
-          git commit -m "Обновляем год в копирайтах до $YEAR"
+          git commit -m "Обновил год в копирайтах до $YEAR"
 
           # github.token использовать нельзя, так как текущий workflow меняется (а вместе с ним и токен).
           # Используем personal access token (PAT) со scope = workflow
