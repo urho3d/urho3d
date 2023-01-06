@@ -1,0 +1,95 @@
+# Copyright (c) 2022-2022 the Dviglo project
+# Copyright (c) 2008-2022 the Urho3D project
+# License: MIT
+
+# Данный workflow обновляет год в копирайтах
+
+# Отображаемое имя workflow
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#name
+name: Обновление года в копирайтах
+
+# Условия, при которых будет запущен workflow
+on:
+  # Запускается вручную (через вкладку Actions)
+  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_dispatch
+  workflow_dispatch:
+
+  # Запускается каждую полночь
+  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
+  schedule: [cron: '0 0 * * *']
+
+# Workflow состоит из jobs, которые могут выполняться последовательно или параллельно
+jobs:
+  # Идентификатор job
+  # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_id
+  BumpYear:
+    # Будет запущен на виртуальной машине с последней версией Ubuntu
+    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idruns-on
+    runs-on: ubuntu-latest
+
+    # Отображаемое имя job 
+    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idname
+    name: Обновляем год в копирайтах
+
+    # Ничего не делаем в форках
+    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idif
+    if: github.repository == 'urho3d/urho3d'
+
+    # Job состоит из последовательности задач
+    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idsteps
+    steps:
+      # Отображаемое имя step
+    - name: Работаем
+
+      # Дефолтная командная оболочка моментально прекращает работу, если при выполнении любой команды возникла ошибка.
+      # Нам же нужна возможность обработки ошибок
+      # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsshell
+      shell: bash {0} # Позволяем обработку ошибок
+
+      run: |
+        # Автор коммита
+        git config --global user.email [бот]@users.noreply.github.com
+        git config --global user.name [Бот]
+
+        # Кто-то может изменить репозиторий в этот самый момент, поэтому пробуем несколько раз
+        for (( i = 0; i < 4; ++i ))
+        do
+          # При клонировании репозитория возможно одновременно авторизоваться, чтобы без авторизации
+          # выполнять команду git push.
+          # Но так делать нельзя, так как токен будет в открытом виде сохранён в файл repo/.git/config
+          # https://github.blog/2012-09-21-easier-builds-and-deployments-using-git-over-https-and-oauth/
+          git clone https://github.com/${{ github.repository }} repo
+
+          # Проверяем год в файле с текстом лицензии
+          YEAR=`date +%Y`
+          if grep -qF "Copyright (c) 2022-$YEAR the Urho3D project." repo/licenses/urho3d/LICENSE
+          then
+            exit 0 # Год уже правильный, выходим
+          fi
+
+          # Обновляем год во всех файлах
+          cd repo
+
+          # Про find читайте тут: https://github.com/dviglo/dviglo/pull/3
+          find . -type f -not -path './.git/*' -exec perl -pi -e "s/2022-[0-9]{4} the Dviglo project/2022-$YEAR the Dviglo project/g" {} +
+          find . -type f -not -path './.git/*' -exec perl -pi -e "s/2008-[0-9]{4} the Urho3D project/2008-$YEAR the Urho3D project/g" {} +
+
+          #  Создаём и отправляем коммит
+          git add -A
+          git commit -m "Обновляем год в копирайтах до $YEAR"
+
+          # github.token использовать нельзя, так как текущий workflow меняется (а вместе с ним и токен).
+          # Используем personal access token (PAT) со scope = workflow
+          git push https://${{ secrets.DVIGLO_BUMP_YEAR }}@github.com/${{ github.repository }}
+
+          EXIT_CODE=$? # Сохраняем в переменную код возврата предыдущей команды (push)
+          if (( $EXIT_CODE == 0 ))
+          then
+            break # Коммит успешно отправлен
+          fi
+
+          echo "========== Ещё одна попытка =========="
+          cd ..
+          rm -rf repo
+          sleep 20
+        done
