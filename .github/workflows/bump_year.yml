@@ -62,7 +62,7 @@ jobs:
 
           # Проверяем год в файле с текстом лицензии
           YEAR=`date +%Y`
-          if grep -qF "Copyright (c) 2022-$YEAR the Urho3D project." repo/licenses/urho3d/LICENSE
+          if grep -qF "Copyright (c) 2008-$YEAR the Urho3D project." repo/licenses/urho3d/LICENSE
           then
             exit 0 # Год уже правильный, выходим
           fi
