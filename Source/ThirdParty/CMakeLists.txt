@@ -83,6 +83,6 @@ endif ()
 # Вызовы макроса setup_library() пополняют список статических таргетов STATIC_LIBRARY_TARGETS,
 # используя PARENT_SCOPE (т.е. в scope папки ThirdParty).
 # Пробрасываем сформированный список ещё на уровень выше, чтобы список был доступен
-# в scope папки Source).
+# в scope папки Source.
 # Возможно вместо этого стоит использовать GLOBAL property в качестве глобальной переменной
 set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} PARENT_SCOPE)
