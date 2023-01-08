@@ -23,6 +23,9 @@ foreach (CACHE_VAR ${CACHE_VARS})
 endforeach ()
 message ("!! CMAKE_ARGS: ${CMAKE_ARGS}")
 
+# Включаем поддержку папок в IDE
+set_property (GLOBAL PROPERTY USE_FOLDERS ON)
+
 # Set CMake modules search path
 set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
