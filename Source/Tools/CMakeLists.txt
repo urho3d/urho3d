@@ -1,8 +1,12 @@
 # Copyright (c) 2008-2023 the Urho3D project
+# Copyright (c) 2022-2023 the Dviglo project
 # License: MIT
 
 # Set project name
 project (Urho3D-Tools)
+
+# В IDE инструменты будут помещены в папку tools
+set (CMAKE_FOLDER tools)
 
 # Find Urho3D library
 find_package (Urho3D REQUIRED)
