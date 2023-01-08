@@ -1,4 +1,5 @@
 # Copyright (c) 2008-2023 the Urho3D project
+# Copyright (c) 2022-2023 the Dviglo project
 # License: MIT
 
 # Check existence of various header files and their functions required by some of the third-party libraries and Urho3D library
@@ -48,80 +49,7 @@ if (URHO3D_LIB_TYPE STREQUAL SHARED AND NOT WIN32 AND NOT ANDROID AND NOT IOS AN
     endif ()
 endif ()
 
-# Add targets
-foreach (TARGET ETCPACK FreeType LZ4 PugiXml rapidjson SDL StanHull STB)
-    add_subdirectory (ThirdParty/${TARGET})
-endforeach ()
-
-if (URHO3D_ANGELSCRIPT)
-    add_subdirectory (ThirdParty/AngelScript)
-    if (WEB OR (ARM AND URHO3D_64BIT) OR URHO3D_FORCE_AS_MAX_PORTABILITY)
-        add_subdirectory (ThirdParty/boost)
-    endif ()
-endif ()
-
-if (URHO3D_LUA)
-    add_subdirectory (ThirdParty/Lua${JIT})
-    add_subdirectory (ThirdParty/toluapp/src/lib)
-endif ()
-
-if (URHO3D_NETWORK)
-    add_subdirectory (ThirdParty/Civetweb)
-    add_subdirectory (ThirdParty/SLikeNet)
-endif ()
-
-if (URHO3D_DATABASE_ODBC)
-    add_subdirectory (ThirdParty/nanodbc)
-endif ()
-if (URHO3D_DATABASE_SQLITE)
-    add_subdirectory (ThirdParty/SQLite)
-endif ()
-
-if (URHO3D_IK)
-    add_subdirectory (ThirdParty/ik)
-endif ()
-
-if (URHO3D_NAVIGATION)
-    add_subdirectory (ThirdParty/Detour)
-    add_subdirectory (ThirdParty/DetourCrowd)
-    add_subdirectory (ThirdParty/DetourTileCache)
-    add_subdirectory (ThirdParty/Recast)
-endif ()
-
-if (URHO3D_URHO2D)
-    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/spine)
-        add_subdirectory (ThirdParty/spine)
-        # Add definition for Spine
-        add_definitions (-DURHO3D_SPINE)
-    endif ()
-endif ()
-
-if (URHO3D_WEBP)
-    add_subdirectory (ThirdParty/WebP)
-endif ()
-
-if (URHO3D_PHYSICS)
-    add_subdirectory (ThirdParty/Bullet)
-endif ()
-
-if (URHO3D_PHYSICS2D)
-    add_subdirectory (ThirdParty/Box2D)
-endif ()
-
-if (URHO3D_TRACY_PROFILING)
-    add_subdirectory (ThirdParty/Tracy)
-endif ()
-
-if (NOT ANDROID AND NOT ARM AND NOT WEB)
-    if (URHO3D_OPENGL)
-        add_subdirectory (ThirdParty/GLEW)
-    endif()
-
-    if (NOT CMAKE_SYSTEM_NAME STREQUAL Linux)
-        add_subdirectory (ThirdParty/LibCpuId)
-    endif ()
-endif ()
-
+add_subdirectory (ThirdParty)
 add_subdirectory (Urho3D)
 
 if (URHO3D_CLANG_TOOLS)
