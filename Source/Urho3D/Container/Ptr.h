@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "../Base/PrimitiveTypes.h"
 #include "../Container/RefCounted.h"
 #include "../Container/Swap.h"
 
