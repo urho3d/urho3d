@@ -3603,8 +3603,16 @@ if(TARGET SDL2::SDL2-static AND NOT TARGET SDL2::SDL2)
   add_library(SDL2::SDL2 ALIAS SDL2-static)
 endif()
 
-# Urho3D: Добавлено
+# Urho3D: Всё, что ниже - добавлено
+
 # Необходимо установить TARGET_NAME перед вызовом макроса install_header_files
 set (TARGET_NAME SDL2-static)
+
 # Копируем заголовочные файлы в BUILD_DIR/include/Urho3D/ThirdParty/SDL
-install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK)    # Note: the trailing slash is significant
+install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK) # Слэш в конце важен
+
+# SDL_config.h пока не существует и мы не можем его скопировать с помощью install_header_files.
+# Поэтому заново генерируем
+file (GENERATE
+      OUTPUT "${THIRD_PARTY_INCLUDE_DIR}/SDL/SDL_config.h"
+      INPUT "${SDL2_BINARY_DIR}/SDL_config.h.intermediate")

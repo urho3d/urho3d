@@ -65,6 +65,3 @@ endif ()
 if (URHO3D_EXTRAS)
     add_subdirectory (Extras)
 endif ()
-
-# В целях минимизации изменений в SDL, подключаем SDL тут
-target_link_libraries (Urho3D SDL2-static)
