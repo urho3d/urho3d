@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -23,25 +23,34 @@
 #include "SDL_haptic.h"
 #include "SDL_windowshaptic_c.h"
 
+/* Set up for C function definitions, even when using C++ */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern int SDL_DINPUT_HapticInit(void);
-extern int SDL_DINPUT_MaybeAddDevice(const DIDEVICEINSTANCE *pdidInstance);
-extern int SDL_DINPUT_MaybeRemoveDevice(const DIDEVICEINSTANCE *pdidInstance);
-extern int SDL_DINPUT_HapticOpen(SDL_Haptic * haptic, SDL_hapticlist_item *item);
-extern int SDL_DINPUT_JoystickSameHaptic(SDL_Haptic * haptic, SDL_Joystick * joystick);
-extern int SDL_DINPUT_HapticOpenFromJoystick(SDL_Haptic * haptic, SDL_Joystick * joystick);
-extern void SDL_DINPUT_HapticClose(SDL_Haptic * haptic);
+extern int SDL_DINPUT_HapticMaybeAddDevice(const DIDEVICEINSTANCE *pdidInstance);
+extern int SDL_DINPUT_HapticMaybeRemoveDevice(const DIDEVICEINSTANCE *pdidInstance);
+extern int SDL_DINPUT_HapticOpen(SDL_Haptic *haptic, SDL_hapticlist_item *item);
+extern int SDL_DINPUT_JoystickSameHaptic(SDL_Haptic *haptic, SDL_Joystick *joystick);
+extern int SDL_DINPUT_HapticOpenFromJoystick(SDL_Haptic *haptic, SDL_Joystick *joystick);
+extern void SDL_DINPUT_HapticClose(SDL_Haptic *haptic);
 extern void SDL_DINPUT_HapticQuit(void);
-extern int SDL_DINPUT_HapticNewEffect(SDL_Haptic * haptic, struct haptic_effect *effect, SDL_HapticEffect * base);
-extern int SDL_DINPUT_HapticUpdateEffect(SDL_Haptic * haptic, struct haptic_effect *effect, SDL_HapticEffect * data);
-extern int SDL_DINPUT_HapticRunEffect(SDL_Haptic * haptic, struct haptic_effect *effect, Uint32 iterations);
-extern int SDL_DINPUT_HapticStopEffect(SDL_Haptic * haptic, struct haptic_effect *effect);
-extern void SDL_DINPUT_HapticDestroyEffect(SDL_Haptic * haptic, struct haptic_effect *effect);
-extern int SDL_DINPUT_HapticGetEffectStatus(SDL_Haptic * haptic, struct haptic_effect *effect);
-extern int SDL_DINPUT_HapticSetGain(SDL_Haptic * haptic, int gain);
-extern int SDL_DINPUT_HapticSetAutocenter(SDL_Haptic * haptic, int autocenter);
-extern int SDL_DINPUT_HapticPause(SDL_Haptic * haptic);
-extern int SDL_DINPUT_HapticUnpause(SDL_Haptic * haptic);
-extern int SDL_DINPUT_HapticStopAll(SDL_Haptic * haptic);
+extern int SDL_DINPUT_HapticNewEffect(SDL_Haptic *haptic, struct haptic_effect *effect, SDL_HapticEffect *base);
+extern int SDL_DINPUT_HapticUpdateEffect(SDL_Haptic *haptic, struct haptic_effect *effect, SDL_HapticEffect *data);
+extern int SDL_DINPUT_HapticRunEffect(SDL_Haptic *haptic, struct haptic_effect *effect, Uint32 iterations);
+extern int SDL_DINPUT_HapticStopEffect(SDL_Haptic *haptic, struct haptic_effect *effect);
+extern void SDL_DINPUT_HapticDestroyEffect(SDL_Haptic *haptic, struct haptic_effect *effect);
+extern int SDL_DINPUT_HapticGetEffectStatus(SDL_Haptic *haptic, struct haptic_effect *effect);
+extern int SDL_DINPUT_HapticSetGain(SDL_Haptic *haptic, int gain);
+extern int SDL_DINPUT_HapticSetAutocenter(SDL_Haptic *haptic, int autocenter);
+extern int SDL_DINPUT_HapticPause(SDL_Haptic *haptic);
+extern int SDL_DINPUT_HapticUnpause(SDL_Haptic *haptic);
+extern int SDL_DINPUT_HapticStopAll(SDL_Haptic *haptic);
+
+/* Ends C function definitions when using C++ */
+#ifdef __cplusplus
+}
+#endif
 
 /* vi: set ts=4 sw=4 expandtab: */

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -34,14 +34,13 @@
 #include <pspkerneltypes.h>
 #include <pspthreadman.h>
 
-
 static int ThreadEntry(SceSize args, void *argp)
 {
-    SDL_RunThread(*(void **) argp);
+    SDL_RunThread(*(SDL_Thread **)argp);
     return 0;
 }
 
-int SDL_SYS_CreateThread(SDL_Thread *thread, void *args)
+int SDL_SYS_CreateThread(SDL_Thread *thread)
 {
     SceKernelThreadInfo status;
     int priority = 32;
@@ -53,13 +52,13 @@ int SDL_SYS_CreateThread(SDL_Thread *thread, void *args)
     }
 
     thread->handle = sceKernelCreateThread(thread->name, ThreadEntry,
-                           priority, thread->stacksize ? ((int) thread->stacksize) : 0x8000,
-                           PSP_THREAD_ATTR_VFPU, NULL);
+                                           priority, thread->stacksize ? ((int)thread->stacksize) : 0x8000,
+                                           PSP_THREAD_ATTR_VFPU, NULL);
     if (thread->handle < 0) {
         return SDL_SetError("sceKernelCreateThread() failed");
     }
 
-    sceKernelStartThread(thread->handle, 4, &args);
+    sceKernelStartThread(thread->handle, 4, &thread);
     return 0;
 }
 
@@ -70,7 +69,7 @@ void SDL_SYS_SetupThread(const char *name)
 
 SDL_threadID SDL_ThreadID(void)
 {
-    return (SDL_threadID) sceKernelGetThreadId();
+    return (SDL_threadID)sceKernelGetThreadId();
 }
 
 void SDL_SYS_WaitThread(SDL_Thread *thread)
@@ -95,17 +94,16 @@ int SDL_SYS_SetThreadPriority(SDL_ThreadPriority priority)
     int value;
 
     if (priority == SDL_THREAD_PRIORITY_LOW) {
-        value = 19;
+        value = 111;
     } else if (priority == SDL_THREAD_PRIORITY_HIGH) {
-        value = -10;
+        value = 32;
     } else if (priority == SDL_THREAD_PRIORITY_TIME_CRITICAL) {
-        value = -20;
+        value = 16;
     } else {
-        value = 0;
+        value = 50;
     }
 
-    return sceKernelChangeThreadPriority(sceKernelGetThreadId(),value);
-
+    return sceKernelChangeThreadPriority(sceKernelGetThreadId(), value);
 }
 
 #endif /* SDL_THREAD_PSP */

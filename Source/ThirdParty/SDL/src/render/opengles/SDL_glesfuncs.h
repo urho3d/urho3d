@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,6 +27,7 @@ SDL_PROC_OES(void, glBlendFuncSeparateOES, (GLenum, GLenum, GLenum, GLenum))
 SDL_PROC(void, glClear, (GLbitfield))
 SDL_PROC(void, glClearColor, (GLclampf, GLclampf, GLclampf, GLclampf))
 SDL_PROC(void, glColor4f, (GLfloat, GLfloat, GLfloat, GLfloat))
+SDL_PROC(void, glColorPointer, (GLint, GLenum, GLsizei, const GLvoid *))
 SDL_PROC(void, glDeleteTextures, (GLsizei, const GLuint *))
 SDL_PROC(void, glDisable, (GLenum))
 SDL_PROC(void, glDisableClientState, (GLenum array))
@@ -43,7 +44,7 @@ SDL_PROC(void, glLoadIdentity, (void))
 SDL_PROC(void, glMatrixMode, (GLenum))
 SDL_PROC(void, glOrthof, (GLfloat, GLfloat, GLfloat, GLfloat, GLfloat, GLfloat))
 SDL_PROC(void, glPixelStorei, (GLenum, GLint))
-SDL_PROC(void, glReadPixels, (GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, GLvoid*))
+SDL_PROC(void, glReadPixels, (GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, GLvoid *))
 SDL_PROC(void, glScissor, (GLint, GLint, GLsizei, GLsizei))
 SDL_PROC(void, glTexCoordPointer, (GLint, GLenum, GLsizei, const GLvoid *))
 SDL_PROC(void, glTexEnvf, (GLenum, GLenum, GLfloat))
@@ -56,10 +57,6 @@ SDL_PROC(void, glViewport, (GLint, GLint, GLsizei, GLsizei))
 SDL_PROC_OES(void, glBindFramebufferOES, (GLenum, GLuint))
 SDL_PROC_OES(void, glFramebufferTexture2DOES, (GLenum, GLenum, GLenum, GLuint, GLint))
 SDL_PROC_OES(GLenum, glCheckFramebufferStatusOES, (GLenum))
-SDL_PROC(void, glPushMatrix, (void))
-SDL_PROC(void, glTranslatef, (GLfloat, GLfloat, GLfloat))
-SDL_PROC(void, glRotatef, (GLfloat, GLfloat, GLfloat, GLfloat))
-SDL_PROC(void, glPopMatrix, (void))
-SDL_PROC_OES(void, glDeleteFramebuffersOES, (GLsizei, const GLuint*))
+SDL_PROC_OES(void, glDeleteFramebuffersOES, (GLsizei, const GLuint *))
 
 /* vi: set ts=4 sw=4 expandtab: */

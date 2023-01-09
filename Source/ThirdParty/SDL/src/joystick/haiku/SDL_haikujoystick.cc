@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -64,18 +64,17 @@ extern "C"
         char name[B_OS_NAME_LENGTH];
 
         /* Search for attached joysticks */
-          nports = joystick.CountDevices();
-          numjoysticks = 0;
-          SDL_memset(SDL_joyport, 0, (sizeof SDL_joyport));
-          SDL_memset(SDL_joyname, 0, (sizeof SDL_joyname));
-        for (i = 0; (numjoysticks < MAX_JOYSTICKS) && (i < nports); ++i)
-        {
+        nports = joystick.CountDevices();
+        numjoysticks = 0;
+        SDL_memset(SDL_joyport, 0, (sizeof SDL_joyport));
+        SDL_memset(SDL_joyname, 0, (sizeof SDL_joyname));
+        for (i = 0; (numjoysticks < MAX_JOYSTICKS) && (i < nports); ++i) {
             if (joystick.GetDeviceName(i, name) == B_OK) {
                 if (joystick.Open(name) != B_ERROR) {
-                    BString stick_name;
+                      BString stick_name;
                       joystick.GetControllerName(&stick_name);
                       SDL_joyport[numjoysticks] = SDL_strdup(name);
-                      SDL_joyname[numjoysticks] = SDL_strdup(stick_name.String());
+                      SDL_joyname[numjoysticks] = SDL_CreateJoystickName(0, 0, NULL, stick_name.String());
                       numjoysticks++;
                       joystick.Close();
                 }
@@ -93,15 +92,23 @@ extern "C"
     {
     }
 
-/* Function to get the device-dependent name of a joystick */
     static const char *HAIKU_JoystickGetDeviceName(int device_index)
     {
         return SDL_joyname[device_index];
     }
 
+    static const char *HAIKU_JoystickGetDevicePath(int device_index)
+    {
+        return SDL_joyport[device_index];
+    }
+
     static int HAIKU_JoystickGetDevicePlayerIndex(int device_index)
     {
         return -1;
+    }
+
+    static void HAIKU_JoystickSetDevicePlayerIndex(int device_index, int player_index)
+    {
     }
 
 /* Function to perform the mapping from device index to the instance id for this index */
@@ -110,14 +117,14 @@ extern "C"
         return device_index;
     }
 
-    static void HAIKU_JoystickClose(SDL_Joystick * joystick);
+    static void HAIKU_JoystickClose(SDL_Joystick *joystick);
 
 /* Function to open a joystick for use.
    The joystick to open is specified by the device index.
    This should fill the nbuttons and naxes fields of the joystick structure.
    It returns 0, or -1 if there is an error.
  */
-    static int HAIKU_JoystickOpen(SDL_Joystick * joystick, int device_index)
+    static int HAIKU_JoystickOpen(SDL_Joystick *joystick, int device_index)
     {
         BJoystick *stick;
 
@@ -164,7 +171,7 @@ extern "C"
  * but instead should call SDL_PrivateJoystick*() to deliver events
  * and update joystick device state.
  */
-    static void HAIKU_JoystickUpdate(SDL_Joystick * joystick)
+    static void HAIKU_JoystickUpdate(SDL_Joystick *joystick)
     {
         static const Uint8 hat_map[9] = {
             SDL_HAT_CENTERED,
@@ -213,7 +220,7 @@ extern "C"
     }
 
 /* Function to close a joystick after use */
-    static void HAIKU_JoystickClose(SDL_Joystick * joystick)
+    static void HAIKU_JoystickClose(SDL_Joystick *joystick)
     {
         if (joystick->hwdata) {
             joystick->hwdata->stick->Close();
@@ -240,17 +247,47 @@ extern "C"
         SDL_joyname[0] = NULL;
     }
 
-    static SDL_JoystickGUID HAIKU_JoystickGetDeviceGUID( int device_index )
+    static SDL_JoystickGUID HAIKU_JoystickGetDeviceGUID(int device_index)
     {
-        SDL_JoystickGUID guid;
-        /* the GUID is just the first 16 chars of the name for now */
-        const char *name = HAIKU_JoystickGetDeviceName( device_index );
-        SDL_zero( guid );
-        SDL_memcpy( &guid, name, SDL_min( sizeof(guid), SDL_strlen( name ) ) );
-        return guid;
+        /* the GUID is just the name for now */
+        const char *name = HAIKU_JoystickGetDeviceName(device_index);
+        return SDL_CreateJoystickGUIDForName(name);
     }
 
-    static int HAIKU_JoystickRumble(SDL_Joystick * joystick, Uint16 low_frequency_rumble, Uint16 high_frequency_rumble, Uint32 duration_ms)
+    static int HAIKU_JoystickRumble(SDL_Joystick *joystick, Uint16 low_frequency_rumble, Uint16 high_frequency_rumble)
+    {
+        return SDL_Unsupported();
+    }
+
+
+    static int HAIKU_JoystickRumbleTriggers(SDL_Joystick *joystick, Uint16 left_rumble, Uint16 right_rumble)
+    {
+        return SDL_Unsupported();
+    }
+
+    static SDL_bool
+    HAIKU_JoystickGetGamepadMapping(int device_index, SDL_GamepadMapping *out)
+    {
+        return SDL_FALSE;
+    }
+
+    static Uint32 HAIKU_JoystickGetCapabilities(SDL_Joystick *joystick)
+    {
+        return 0;
+    }
+
+    static int HAIKU_JoystickSetLED(SDL_Joystick *joystick, Uint8 red, Uint8 green, Uint8 blue)
+    {
+        return SDL_Unsupported();
+    }
+
+
+    static int HAIKU_JoystickSendEffect(SDL_Joystick *joystick, const void *data, int size)
+    {
+        return SDL_Unsupported();
+    }
+
+    static int HAIKU_JoystickSetSensorsEnabled(SDL_Joystick *joystick, SDL_bool enabled)
     {
         return SDL_Unsupported();
     }
@@ -261,14 +298,22 @@ extern "C"
         HAIKU_JoystickGetCount,
         HAIKU_JoystickDetect,
         HAIKU_JoystickGetDeviceName,
+        HAIKU_JoystickGetDevicePath,
         HAIKU_JoystickGetDevicePlayerIndex,
+        HAIKU_JoystickSetDevicePlayerIndex,
         HAIKU_JoystickGetDeviceGUID,
         HAIKU_JoystickGetDeviceInstanceID,
         HAIKU_JoystickOpen,
         HAIKU_JoystickRumble,
+        HAIKU_JoystickRumbleTriggers,
+        HAIKU_JoystickGetCapabilities,
+        HAIKU_JoystickSetLED,
+        HAIKU_JoystickSendEffect,
+        HAIKU_JoystickSetSensorsEnabled,
         HAIKU_JoystickUpdate,
         HAIKU_JoystickClose,
         HAIKU_JoystickQuit,
+        HAIKU_JoystickGetGamepadMapping
     };
 
 }                              // extern "C"

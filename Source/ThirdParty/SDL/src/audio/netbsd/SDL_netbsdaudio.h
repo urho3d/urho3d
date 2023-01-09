@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,7 +25,7 @@
 
 #include "../SDL_sysaudio.h"
 
-#define _THIS   SDL_AudioDevice *this
+#define _THIS SDL_AudioDevice *this
 
 struct SDL_PrivateAudioData
 {
@@ -41,7 +41,7 @@ struct SDL_PrivateAudioData
     float next_frame;
 };
 
-#define FUDGE_TICKS 10      /* The scheduler overhead ticks per frame */
+#define FUDGE_TICKS 10 /* The scheduler overhead ticks per frame */
 
 #endif /* SDL_netbsdaudio_h_ */
 

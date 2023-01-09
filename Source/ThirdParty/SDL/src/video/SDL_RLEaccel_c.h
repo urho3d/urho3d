@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -26,12 +26,8 @@
 
 /* Useful functions and variables from SDL_RLEaccel.c */
 
-extern int SDL_RLESurface(SDL_Surface * surface);
-extern int SDLCALL SDL_RLEBlit     (SDL_Surface * src, SDL_Rect * srcrect,
-                                    SDL_Surface * dst, SDL_Rect * dstrect);
-extern int SDLCALL SDL_RLEAlphaBlit(SDL_Surface * src, SDL_Rect * srcrect,
-                                    SDL_Surface * dst, SDL_Rect * dstrect);
-extern void SDL_UnRLESurface(SDL_Surface * surface, int recode);
+extern int SDL_RLESurface(SDL_Surface *surface);
+extern void SDL_UnRLESurface(SDL_Surface *surface, int recode);
 
 #endif /* SDL_RLEaccel_c_h_ */
 

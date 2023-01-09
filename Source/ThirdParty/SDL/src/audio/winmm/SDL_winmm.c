@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,7 +27,6 @@
 #include "../../core/windows/SDL_windows.h"
 #include <mmsystem.h>
 
-#include "SDL_assert.h"
 #include "SDL_timer.h"
 #include "SDL_audio.h"
 #include "../SDL_audio_c.h"
@@ -76,12 +75,19 @@ static void DetectWave##typ##Devs(void) { \
     const UINT iscapture = iscap ? 1 : 0; \
     const UINT devcount = wave##typ##GetNumDevs(); \
     capstyp##2W caps; \
+    SDL_AudioSpec spec; \
     UINT i; \
+    SDL_zero(spec); \
     for (i = 0; i < devcount; i++) { \
         if (wave##typ##GetDevCaps(i,(LP##capstyp##W)&caps,sizeof(caps))==MMSYSERR_NOERROR) { \
             char *name = WIN_LookupAudioDeviceName(caps.szPname,&caps.NameGuid); \
             if (name != NULL) { \
-                SDL_AddAudioDevice((int) iscapture, name, (void *) ((size_t) i+1)); \
+                /* Note that freq/format are not filled in, as this information \
+                 * is not provided by the caps struct! At best, we get possible \
+                 * sample formats, but not an _active_ format. \
+                 */ \
+                spec.channels = (Uint8)caps.wChannels; \
+                SDL_AddAudioDevice((int) iscapture, name, &spec, (void *) ((size_t) i+1)); \
                 SDL_free(name); \
             } \
         } \
@@ -129,7 +135,7 @@ FillSound(HWAVEOUT hwo, UINT uMsg, DWORD_PTR dwInstance,
 }
 
 static int
-SetMMerror(char *function, MMRESULT code)
+SetMMerror(const char *function, MMRESULT code)
 {
     int len;
     char errbuf[MAXERRORLENGTH];
@@ -277,10 +283,11 @@ PrepWaveFormat(_THIS, UINT devId, WAVEFORMATEX *pfmt, const int iscapture)
 }
 
 static int
-WINMM_OpenDevice(_THIS, void *handle, const char *devname, int iscapture)
+WINMM_OpenDevice(_THIS, const char *devname)
 {
-    SDL_AudioFormat test_format = SDL_FirstAudioFormat(this->spec.format);
-    int valid_datatype = 0;
+    SDL_AudioFormat test_format;
+    SDL_bool iscapture = this->iscapture;
+    void *handle = this->handle;
     MMRESULT result;
     WAVEFORMATEX waveformat;
     UINT devId = WAVE_MAPPER;  /* WAVE_MAPPER == choose system's default */
@@ -307,7 +314,7 @@ WINMM_OpenDevice(_THIS, void *handle, const char *devname, int iscapture)
     if (this->spec.channels > 2)
         this->spec.channels = 2;        /* !!! FIXME: is this right? */
 
-    while ((!valid_datatype) && (test_format)) {
+    for (test_format = SDL_FirstAudioFormat(this->spec.format); test_format; test_format = SDL_NextAudioFormat()) {
         switch (test_format) {
         case AUDIO_U8:
         case AUDIO_S16:
@@ -315,20 +322,17 @@ WINMM_OpenDevice(_THIS, void *handle, const char *devname, int iscapture)
         case AUDIO_F32:
             this->spec.format = test_format;
             if (PrepWaveFormat(this, devId, &waveformat, iscapture)) {
-                valid_datatype = 1;
-            } else {
-                test_format = SDL_NextAudioFormat();
+                break;
             }
-            break;
-
+            continue;
         default:
-            test_format = SDL_NextAudioFormat();
-            break;
+            continue;
         }
+        break;
     }
 
-    if (!valid_datatype) {
-        return SDL_SetError("Unsupported audio format");
+    if (!test_format) {
+        return SDL_SetError("%s: Unsupported audio format", "winmm");
     }
 
     /* Update the fragment size as size in bytes */
@@ -387,7 +391,7 @@ WINMM_OpenDevice(_THIS, void *handle, const char *devname, int iscapture)
         return SDL_OutOfMemory();
     }
 
-    SDL_zero(this->hidden->wavebuf);
+    SDL_zeroa(this->hidden->wavebuf);
     for (i = 0; i < NUM_BUFFERS; ++i) {
         this->hidden->wavebuf[i].dwBufferLength = this->spec.size;
         this->hidden->wavebuf[i].dwFlags = WHDR_DONE;
@@ -428,8 +432,7 @@ WINMM_OpenDevice(_THIS, void *handle, const char *devname, int iscapture)
     return 0;                   /* Ready to go! */
 }
 
-
-static int
+static SDL_bool
 WINMM_Init(SDL_AudioDriverImpl * impl)
 {
     /* Set the function pointers */
@@ -444,11 +447,11 @@ WINMM_Init(SDL_AudioDriverImpl * impl)
 
     impl->HasCaptureSupport = SDL_TRUE;
 
-    return 1;   /* this audio target is available. */
+    return SDL_TRUE;   /* this audio target is available. */
 }
 
 AudioBootStrap WINMM_bootstrap = {
-    "winmm", "Windows Waveform Audio", WINMM_Init, 0
+    "winmm", "Windows Waveform Audio", WINMM_Init, SDL_FALSE
 };
 
 #endif /* SDL_AUDIO_DRIVER_WINMM */

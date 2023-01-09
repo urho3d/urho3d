@@ -433,7 +433,7 @@ bool Graphics::SetScreenMode_OGL(int width, int height, const ScreenModeParams& 
                 {
     #ifndef __EMSCRIPTEN__
                     if (!window_)
-                        window_ = SDL_CreateWindowFrom(externalWindow_, SDL_WINDOW_OPENGL);
+                        window_ = SDL_CreateWindowFrom(externalWindow_);
                     newParams.fullscreen_ = false;
     #endif
                 }

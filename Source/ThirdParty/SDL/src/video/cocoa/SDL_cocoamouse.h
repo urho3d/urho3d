@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -32,7 +32,7 @@ extern void Cocoa_HandleMouseWarp(CGFloat x, CGFloat y);
 extern void Cocoa_QuitMouse(_THIS);
 
 typedef struct {
-    /* Wether we've seen a cursor warp since the last move event. */
+    /* Whether we've seen a cursor warp since the last move event. */
     SDL_bool seenWarp;
     /* What location our last cursor warp was to. */
     CGFloat lastWarpX;
@@ -40,7 +40,6 @@ typedef struct {
     /* What location we last saw the cursor move to. */
     CGFloat lastMoveX;
     CGFloat lastMoveY;
-    void *tapdata;
 } SDL_MouseData;
 
 @interface NSCursor (InvisibleCursor)

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -28,7 +28,6 @@
 #include "../../core/windows/SDL_windows.h"
 #include <shlobj.h>
 
-#include "SDL_assert.h"
 #include "SDL_error.h"
 #include "SDL_stdinc.h"
 #include "SDL_filesystem.h"
@@ -36,40 +35,26 @@
 char *
 SDL_GetBasePath(void)
 {
-    typedef DWORD (WINAPI *GetModuleFileNameExW_t)(HANDLE, HMODULE, LPWSTR, DWORD);
-    GetModuleFileNameExW_t pGetModuleFileNameExW;
     DWORD buflen = 128;
     WCHAR *path = NULL;
-    HANDLE psapi = LoadLibrary(L"psapi.dll");
     char *retval = NULL;
     DWORD len = 0;
     int i;
 
-    if (!psapi) {
-        WIN_SetError("Couldn't load psapi.dll");
-        return NULL;
-    }
-
-    pGetModuleFileNameExW = (GetModuleFileNameExW_t)GetProcAddress(psapi, "GetModuleFileNameExW");
-    if (!pGetModuleFileNameExW) {
-        WIN_SetError("Couldn't find GetModuleFileNameExW");
-        FreeLibrary(psapi);
-        return NULL;
-    }
-
     while (SDL_TRUE) {
-        void *ptr = SDL_realloc(path, buflen * sizeof (WCHAR));
-        if (!ptr) {
+        void *ptr = SDL_realloc(path, buflen * sizeof(WCHAR));
+        if (ptr == NULL) {
             SDL_free(path);
-            FreeLibrary(psapi);
             SDL_OutOfMemory();
             return NULL;
         }
 
-        path = (WCHAR *) ptr;
+        path = (WCHAR *)ptr;
 
-        len = pGetModuleFileNameExW(GetCurrentProcess(), NULL, path, buflen);
-        if (len != buflen) {
+        len = GetModuleFileNameW(NULL, path, buflen);
+        /* if it truncated, then len >= buflen - 1 */
+        /* if there was enough room (or failure), len < buflen - 1 */
+        if (len < buflen - 1) {
             break;
         }
 
@@ -77,24 +62,22 @@ SDL_GetBasePath(void)
         buflen *= 2;
     }
 
-    FreeLibrary(psapi);
-
     if (len == 0) {
         SDL_free(path);
         WIN_SetError("Couldn't locate our .exe");
         return NULL;
     }
 
-    for (i = len-1; i > 0; i--) {
+    for (i = len - 1; i > 0; i--) {
         if (path[i] == '\\') {
             break;
         }
     }
 
-    SDL_assert(i > 0); /* Should have been an absolute path. */
-    path[i+1] = '\0';  /* chop off filename. */
+    SDL_assert(i > 0);  /* Should have been an absolute path. */
+    path[i + 1] = '\0'; /* chop off filename. */
 
-    retval = WIN_StringToUTF8(path);
+    retval = WIN_StringToUTF8W(path);
     SDL_free(path);
 
     return retval;
@@ -113,16 +96,16 @@ SDL_GetPrefPath(const char *org, const char *app)
 
     WCHAR path[MAX_PATH];
     char *retval = NULL;
-    WCHAR* worg = NULL;
-    WCHAR* wapp = NULL;
+    WCHAR *worg = NULL;
+    WCHAR *wapp = NULL;
     size_t new_wpath_len = 0;
     BOOL api_result = FALSE;
 
-    if (!app) {
+    if (app == NULL) {
         SDL_InvalidParamError("app");
         return NULL;
     }
-    if (!org) {
+    if (org == NULL) {
         org = "";
     }
 
@@ -131,20 +114,20 @@ SDL_GetPrefPath(const char *org, const char *app)
         return NULL;
     }
 
-    worg = WIN_UTF8ToString(org);
+    worg = WIN_UTF8ToStringW(org);
     if (worg == NULL) {
         SDL_OutOfMemory();
         return NULL;
     }
 
-    wapp = WIN_UTF8ToString(app);
+    wapp = WIN_UTF8ToStringW(app);
     if (wapp == NULL) {
         SDL_free(worg);
         SDL_OutOfMemory();
         return NULL;
     }
 
-    new_wpath_len = lstrlenW(worg) + lstrlenW(wapp) + lstrlenW(path) + 3;
+    new_wpath_len = SDL_wcslen(worg) + SDL_wcslen(wapp) + SDL_wcslen(path) + 3;
 
     if ((new_wpath_len + 1) > MAX_PATH) {
         SDL_free(worg);
@@ -154,8 +137,8 @@ SDL_GetPrefPath(const char *org, const char *app)
     }
 
     if (*worg) {
-        lstrcatW(path, L"\\");
-        lstrcatW(path, worg);
+        SDL_wcslcat(path, L"\\", SDL_arraysize(path));
+        SDL_wcslcat(path, worg, SDL_arraysize(path));
     }
     SDL_free(worg);
 
@@ -168,8 +151,8 @@ SDL_GetPrefPath(const char *org, const char *app)
         }
     }
 
-    lstrcatW(path, L"\\");
-    lstrcatW(path, wapp);
+    SDL_wcslcat(path, L"\\", SDL_arraysize(path));
+    SDL_wcslcat(path, wapp, SDL_arraysize(path));
     SDL_free(wapp);
 
     api_result = CreateDirectoryW(path, NULL);
@@ -180,13 +163,31 @@ SDL_GetPrefPath(const char *org, const char *app)
         }
     }
 
-    lstrcatW(path, L"\\");
+    SDL_wcslcat(path, L"\\", SDL_arraysize(path));
 
-    retval = WIN_StringToUTF8(path);
+    retval = WIN_StringToUTF8W(path);
 
     return retval;
 }
 
 #endif /* SDL_FILESYSTEM_WINDOWS */
+
+#ifdef SDL_FILESYSTEM_XBOX
+#include "SDL_filesystem.h"
+#include "SDL_error.h"
+char *
+SDL_GetBasePath(void)
+{
+    SDL_Unsupported();
+    return NULL;
+}
+
+char *
+SDL_GetPrefPath(const char *org, const char *app)
+{
+    SDL_Unsupported();
+    return NULL;
+}
+#endif /* SDL_FILESYSTEM_XBOX */
 
 /* vi: set ts=4 sw=4 expandtab: */

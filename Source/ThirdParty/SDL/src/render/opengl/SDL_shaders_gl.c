@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -23,7 +23,6 @@
 #if SDL_VIDEO_RENDER_OGL && !SDL_RENDER_DISABLED
 
 #include "SDL_stdinc.h"
-#include "SDL_log.h"
 #include "SDL_opengl.h"
 #include "SDL_video.h"
 #include "SDL_shaders_gl.h"
@@ -61,6 +60,8 @@ struct GL_ShaderContext
 
     GL_ShaderData shaders[NUM_SHADERS];
 };
+
+/* *INDENT-OFF* */ /* clang-format off */
 
 #define COLOR_VERTEX_SHADER                                     \
 "varying vec4 v_color;\n"                                       \
@@ -150,7 +151,7 @@ struct GL_ShaderContext
 "uniform sampler2D tex1; // U/V \n"                             \
 "\n"                                                            \
 
-#define NV12_SHADER_BODY                                        \
+#define NV12_RA_SHADER_BODY                                     \
 "\n"                                                            \
 "void main()\n"                                                 \
 "{\n"                                                           \
@@ -164,6 +165,31 @@ struct GL_ShaderContext
 "    // Get the U and V values \n"                              \
 "    tcoord *= UVCoordScale;\n"                                 \
 "    yuv.yz = texture2D(tex1, tcoord).ra;\n"                    \
+"\n"                                                            \
+"    // Do the color transform \n"                              \
+"    yuv += offset;\n"                                          \
+"    rgb.r = dot(yuv, Rcoeff);\n"                               \
+"    rgb.g = dot(yuv, Gcoeff);\n"                               \
+"    rgb.b = dot(yuv, Bcoeff);\n"                               \
+"\n"                                                            \
+"    // That was easy. :) \n"                                   \
+"    gl_FragColor = vec4(rgb, 1.0) * v_color;\n"                \
+"}"                                                             \
+
+#define NV12_RG_SHADER_BODY                                     \
+"\n"                                                            \
+"void main()\n"                                                 \
+"{\n"                                                           \
+"    vec2 tcoord;\n"                                            \
+"    vec3 yuv, rgb;\n"                                          \
+"\n"                                                            \
+"    // Get the Y value \n"                                     \
+"    tcoord = v_texCoord;\n"                                    \
+"    yuv.x = texture2D(tex0, tcoord).r;\n"                      \
+"\n"                                                            \
+"    // Get the U and V values \n"                              \
+"    tcoord *= UVCoordScale;\n"                                 \
+"    yuv.yz = texture2D(tex1, tcoord).rg;\n"                    \
 "\n"                                                            \
 "    // Do the color transform \n"                              \
 "    yuv += offset;\n"                                          \
@@ -211,8 +237,7 @@ struct GL_ShaderContext
  * NOTE: Always use sampler2D, etc here. We'll #define them to the
  *  texture_rectangle versions if we choose to use that extension.
  */
-static const char *shader_source[NUM_SHADERS][2] =
-{
+static const char *shader_source[NUM_SHADERS][2] = {
     /* SHADER_NONE */
     { NULL, NULL },
 
@@ -260,7 +285,7 @@ static const char *shader_source[NUM_SHADERS][2] =
 "    gl_FragColor = texture2D(tex0, v_texCoord) * v_color;\n"
 "}"
     },
-
+#if SDL_HAVE_YUV
     /* SHADER_YUV_JPEG */
     {
         /* vertex shader */
@@ -295,25 +320,43 @@ static const char *shader_source[NUM_SHADERS][2] =
         /* fragment shader */
         NV12_SHADER_PROLOGUE
         JPEG_SHADER_CONSTANTS
-        NV12_SHADER_BODY
+        NV12_RA_SHADER_BODY
     },
-    /* SHADER_NV12_BT601 */
+    /* SHADER_NV12_RA_BT601 */
     {
         /* vertex shader */
         TEXTURE_VERTEX_SHADER,
         /* fragment shader */
         NV12_SHADER_PROLOGUE
         BT601_SHADER_CONSTANTS
-        NV12_SHADER_BODY
+        NV12_RA_SHADER_BODY
     },
-    /* SHADER_NV12_BT709 */
+    /* SHADER_NV12_RG_BT601 */
+    {
+        /* vertex shader */
+        TEXTURE_VERTEX_SHADER,
+        /* fragment shader */
+        NV12_SHADER_PROLOGUE
+        BT601_SHADER_CONSTANTS
+        NV12_RG_SHADER_BODY
+    },
+    /* SHADER_NV12_RA_BT709 */
     {
         /* vertex shader */
         TEXTURE_VERTEX_SHADER,
         /* fragment shader */
         NV12_SHADER_PROLOGUE
         BT709_SHADER_CONSTANTS
-        NV12_SHADER_BODY
+        NV12_RA_SHADER_BODY
+    },
+    /* SHADER_NV12_RG_BT709 */
+    {
+        /* vertex shader */
+        TEXTURE_VERTEX_SHADER,
+        /* fragment shader */
+        NV12_SHADER_PROLOGUE
+        BT709_SHADER_CONSTANTS
+        NV12_RG_SHADER_BODY
     },
     /* SHADER_NV21_JPEG */
     {
@@ -342,10 +385,12 @@ static const char *shader_source[NUM_SHADERS][2] =
         BT709_SHADER_CONSTANTS
         NV21_SHADER_BODY
     },
+#endif /* SDL_HAVE_YUV */
 };
 
-static SDL_bool
-CompileShader(GL_ShaderContext *ctx, GLhandleARB shader, const char *defines, const char *source)
+/* *INDENT-ON* */ /* clang-format on */
+
+static SDL_bool CompileShader(GL_ShaderContext *ctx, GLhandleARB shader, const char *defines, const char *source)
 {
     GLint status;
     const char *sources[2];
@@ -362,13 +407,13 @@ CompileShader(GL_ShaderContext *ctx, GLhandleARB shader, const char *defines, co
         char *info;
 
         ctx->glGetObjectParameterivARB(shader, GL_OBJECT_INFO_LOG_LENGTH_ARB, &length);
-        info = SDL_small_alloc(char, length+1, &isstack);
+        info = SDL_small_alloc(char, length + 1, &isstack);
         ctx->glGetInfoLogARB(shader, length, NULL, info);
         SDL_LogError(SDL_LOG_CATEGORY_RENDER,
-            "Failed to compile shader:\n%s%s\n%s", defines, source, info);
+                     "Failed to compile shader:\n%s%s\n%s", defines, source, info);
 #ifdef DEBUG_SHADERS
         fprintf(stderr,
-            "Failed to compile shader:\n%s%s\n%s", defines, source, info);
+                "Failed to compile shader:\n%s%s\n%s", defines, source, info);
 #endif
         SDL_small_free(info, isstack);
 
@@ -378,8 +423,7 @@ CompileShader(GL_ShaderContext *ctx, GLhandleARB shader, const char *defines, co
     }
 }
 
-static SDL_bool
-CompileShaderProgram(GL_ShaderContext *ctx, int index, GL_ShaderData *data)
+static SDL_bool CompileShaderProgram(GL_ShaderContext *ctx, int index, GL_ShaderData *data)
 {
     const int num_tmus_bound = 4;
     const char *vert_defines = "";
@@ -396,12 +440,12 @@ CompileShaderProgram(GL_ShaderContext *ctx, int index, GL_ShaderData *data)
     /* Make sure we use the correct sampler type for our texture type */
     if (ctx->GL_ARB_texture_rectangle_supported) {
         frag_defines =
-"#define sampler2D sampler2DRect\n"
-"#define texture2D texture2DRect\n"
-"#define UVCoordScale 0.5\n";
+            "#define sampler2D sampler2DRect\n"
+            "#define texture2D texture2DRect\n"
+            "#define UVCoordScale 0.5\n";
     } else {
-        frag_defines = 
-"#define UVCoordScale 1.0\n";
+        frag_defines =
+            "#define UVCoordScale 1.0\n";
     }
 
     /* Create one program object to rule them all */
@@ -428,7 +472,7 @@ CompileShaderProgram(GL_ShaderContext *ctx, int index, GL_ShaderData *data)
     ctx->glUseProgramObjectARB(data->program);
     for (i = 0; i < num_tmus_bound; ++i) {
         char tex_name[10];
-        SDL_snprintf(tex_name, SDL_arraysize(tex_name), "tex%d", i);
+        (void)SDL_snprintf(tex_name, SDL_arraysize(tex_name), "tex%d", i);
         location = ctx->glGetUniformLocationARB(data->program, tex_name);
         if (location >= 0) {
             ctx->glUniform1iARB(location, i);
@@ -436,11 +480,10 @@ CompileShaderProgram(GL_ShaderContext *ctx, int index, GL_ShaderData *data)
     }
     ctx->glUseProgramObjectARB(0);
 
-    return (ctx->glGetError() == GL_NO_ERROR);
+    return ctx->glGetError() == GL_NO_ERROR;
 }
 
-static void
-DestroyShaderProgram(GL_ShaderContext *ctx, GL_ShaderData *data)
+static void DestroyShaderProgram(GL_ShaderContext *ctx, GL_ShaderData *data)
 {
     ctx->glDeleteObjectARB(data->vert_shader);
     ctx->glDeleteObjectARB(data->frag_shader);
@@ -455,7 +498,7 @@ GL_CreateShaderContext(void)
     int i;
 
     ctx = (GL_ShaderContext *)SDL_calloc(1, sizeof(*ctx));
-    if (!ctx) {
+    if (ctx == NULL) {
         return NULL;
     }
 
@@ -471,20 +514,20 @@ GL_CreateShaderContext(void)
         SDL_GL_ExtensionSupported("GL_ARB_shading_language_100") &&
         SDL_GL_ExtensionSupported("GL_ARB_vertex_shader") &&
         SDL_GL_ExtensionSupported("GL_ARB_fragment_shader")) {
-        ctx->glGetError = (GLenum (*)(void)) SDL_GL_GetProcAddress("glGetError");
-        ctx->glAttachObjectARB = (PFNGLATTACHOBJECTARBPROC) SDL_GL_GetProcAddress("glAttachObjectARB");
-        ctx->glCompileShaderARB = (PFNGLCOMPILESHADERARBPROC) SDL_GL_GetProcAddress("glCompileShaderARB");
-        ctx->glCreateProgramObjectARB = (PFNGLCREATEPROGRAMOBJECTARBPROC) SDL_GL_GetProcAddress("glCreateProgramObjectARB");
-        ctx->glCreateShaderObjectARB = (PFNGLCREATESHADEROBJECTARBPROC) SDL_GL_GetProcAddress("glCreateShaderObjectARB");
-        ctx->glDeleteObjectARB = (PFNGLDELETEOBJECTARBPROC) SDL_GL_GetProcAddress("glDeleteObjectARB");
-        ctx->glGetInfoLogARB = (PFNGLGETINFOLOGARBPROC) SDL_GL_GetProcAddress("glGetInfoLogARB");
-        ctx->glGetObjectParameterivARB = (PFNGLGETOBJECTPARAMETERIVARBPROC) SDL_GL_GetProcAddress("glGetObjectParameterivARB");
-        ctx->glGetUniformLocationARB = (PFNGLGETUNIFORMLOCATIONARBPROC) SDL_GL_GetProcAddress("glGetUniformLocationARB");
-        ctx->glLinkProgramARB = (PFNGLLINKPROGRAMARBPROC) SDL_GL_GetProcAddress("glLinkProgramARB");
-        ctx->glShaderSourceARB = (PFNGLSHADERSOURCEARBPROC) SDL_GL_GetProcAddress("glShaderSourceARB");
-        ctx->glUniform1iARB = (PFNGLUNIFORM1IARBPROC) SDL_GL_GetProcAddress("glUniform1iARB");
-        ctx->glUniform1fARB = (PFNGLUNIFORM1FARBPROC) SDL_GL_GetProcAddress("glUniform1fARB");
-        ctx->glUseProgramObjectARB = (PFNGLUSEPROGRAMOBJECTARBPROC) SDL_GL_GetProcAddress("glUseProgramObjectARB");
+        ctx->glGetError = (GLenum(*)(void))SDL_GL_GetProcAddress("glGetError");
+        ctx->glAttachObjectARB = (PFNGLATTACHOBJECTARBPROC)SDL_GL_GetProcAddress("glAttachObjectARB");
+        ctx->glCompileShaderARB = (PFNGLCOMPILESHADERARBPROC)SDL_GL_GetProcAddress("glCompileShaderARB");
+        ctx->glCreateProgramObjectARB = (PFNGLCREATEPROGRAMOBJECTARBPROC)SDL_GL_GetProcAddress("glCreateProgramObjectARB");
+        ctx->glCreateShaderObjectARB = (PFNGLCREATESHADEROBJECTARBPROC)SDL_GL_GetProcAddress("glCreateShaderObjectARB");
+        ctx->glDeleteObjectARB = (PFNGLDELETEOBJECTARBPROC)SDL_GL_GetProcAddress("glDeleteObjectARB");
+        ctx->glGetInfoLogARB = (PFNGLGETINFOLOGARBPROC)SDL_GL_GetProcAddress("glGetInfoLogARB");
+        ctx->glGetObjectParameterivARB = (PFNGLGETOBJECTPARAMETERIVARBPROC)SDL_GL_GetProcAddress("glGetObjectParameterivARB");
+        ctx->glGetUniformLocationARB = (PFNGLGETUNIFORMLOCATIONARBPROC)SDL_GL_GetProcAddress("glGetUniformLocationARB");
+        ctx->glLinkProgramARB = (PFNGLLINKPROGRAMARBPROC)SDL_GL_GetProcAddress("glLinkProgramARB");
+        ctx->glShaderSourceARB = (PFNGLSHADERSOURCEARBPROC)SDL_GL_GetProcAddress("glShaderSourceARB");
+        ctx->glUniform1iARB = (PFNGLUNIFORM1IARBPROC)SDL_GL_GetProcAddress("glUniform1iARB");
+        ctx->glUniform1fARB = (PFNGLUNIFORM1FARBPROC)SDL_GL_GetProcAddress("glUniform1fARB");
+        ctx->glUseProgramObjectARB = (PFNGLUSEPROGRAMOBJECTARBPROC)SDL_GL_GetProcAddress("glUseProgramObjectARB");
         if (ctx->glGetError &&
             ctx->glAttachObjectARB &&
             ctx->glCompileShaderARB &&
@@ -520,14 +563,12 @@ GL_CreateShaderContext(void)
     return ctx;
 }
 
-void
-GL_SelectShader(GL_ShaderContext *ctx, GL_Shader shader)
+void GL_SelectShader(GL_ShaderContext *ctx, GL_Shader shader)
 {
     ctx->glUseProgramObjectARB(ctx->shaders[shader].program);
 }
 
-void
-GL_DestroyShaderContext(GL_ShaderContext *ctx)
+void GL_DestroyShaderContext(GL_ShaderContext *ctx)
 {
     int i;
 

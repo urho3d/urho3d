@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -28,16 +28,21 @@
 #include "SDL_thread.h"
 #include "SDL_thread_c.h"
 
+/* Set up for C function definitions, even when using C++ */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* This function creates a thread, passing args to SDL_RunThread(),
    saves a system-dependent thread id in thread->id, and returns 0
    on success.
 */
 #ifdef SDL_PASSED_BEGINTHREAD_ENDTHREAD
-extern int SDL_SYS_CreateThread(SDL_Thread * thread, void *args,
+extern int SDL_SYS_CreateThread(SDL_Thread *thread,
                                 pfnSDL_CurrentBeginThread pfnBeginThread,
                                 pfnSDL_CurrentEndThread pfnEndThread);
 #else
-extern int SDL_SYS_CreateThread(SDL_Thread * thread, void *args);
+extern int SDL_SYS_CreateThread(SDL_Thread *thread);
 #endif
 
 /* This function does any necessary setup in the child thread */
@@ -49,10 +54,10 @@ extern int SDL_SYS_SetThreadPriority(SDL_ThreadPriority priority);
 /* This function waits for the thread to finish and frees any data
    allocated by SDL_SYS_CreateThread()
  */
-extern void SDL_SYS_WaitThread(SDL_Thread * thread);
+extern void SDL_SYS_WaitThread(SDL_Thread *thread);
 
 /* Mark thread as cleaned up as soon as it exits, without joining. */
-extern void SDL_SYS_DetachThread(SDL_Thread * thread);
+extern void SDL_SYS_DetachThread(SDL_Thread *thread);
 
 /* Get the thread local storage for this thread */
 extern SDL_TLSData *SDL_SYS_GetTLSData(void);
@@ -62,8 +67,13 @@ extern int SDL_SYS_SetTLSData(SDL_TLSData *data);
 
 /* This is for internal SDL use, so we don't need #ifdefs everywhere. */
 extern SDL_Thread *
-SDL_CreateThreadInternal(int (SDLCALL * fn) (void *), const char *name,
+SDL_CreateThreadInternal(int(SDLCALL *fn)(void *), const char *name,
                          const size_t stacksize, void *data);
+
+/* Ends C function definitions when using C++ */
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SDL_systhread_h_ */
 

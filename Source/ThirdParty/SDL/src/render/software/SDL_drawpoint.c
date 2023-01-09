@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,17 +20,15 @@
 */
 #include "../../SDL_internal.h"
 
-#if !SDL_RENDER_DISABLED
+#if SDL_VIDEO_RENDER_SW && !SDL_RENDER_DISABLED
 
 #include "SDL_draw.h"
 #include "SDL_drawpoint.h"
 
-
-int
-SDL_DrawPoint(SDL_Surface * dst, int x, int y, Uint32 color)
+int SDL_DrawPoint(SDL_Surface *dst, int x, int y, Uint32 color)
 {
-    if (!dst) {
-        return SDL_SetError("Passed NULL destination surface");
+    if (dst == NULL) {
+        return SDL_InvalidParamError("SDL_DrawPoint(): dst");
     }
 
     /* This function doesn't work on surfaces < 8 bpp */
@@ -61,17 +59,16 @@ SDL_DrawPoint(SDL_Surface * dst, int x, int y, Uint32 color)
     return 0;
 }
 
-int
-SDL_DrawPoints(SDL_Surface * dst, const SDL_Point * points, int count,
-               Uint32 color)
+int SDL_DrawPoints(SDL_Surface *dst, const SDL_Point *points, int count,
+                   Uint32 color)
 {
     int minx, miny;
     int maxx, maxy;
     int i;
     int x, y;
 
-    if (!dst) {
-        return SDL_SetError("Passed NULL destination surface");
+    if (dst == NULL) {
+        return SDL_InvalidParamError("SDL_DrawPoints(): dst");
     }
 
     /* This function doesn't work on surfaces < 8 bpp */
@@ -109,6 +106,6 @@ SDL_DrawPoints(SDL_Surface * dst, const SDL_Point * points, int count,
     return 0;
 }
 
-#endif /* !SDL_RENDER_DISABLED */
+#endif /* SDL_VIDEO_RENDER_SW && !SDL_RENDER_DISABLED */
 
 /* vi: set ts=4 sw=4 expandtab: */

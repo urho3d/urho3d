@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -29,7 +29,7 @@
 #endif
 
 #if DEBUG_CONVERT
-#define LOG_DEBUG_CONVERT(from, to) fprintf(stderr, "Converting %s to %s.\n", from, to);
+#define LOG_DEBUG_CONVERT(from, to) SDL_Log("SDL_AUDIO_CONVERT: Converting %s to %s.\n", from, to);
 #else
 #define LOG_DEBUG_CONVERT(from, to)
 #endif
@@ -40,11 +40,12 @@
 #include "samplerate.h"
 extern SDL_bool SRC_available;
 extern int SRC_converter;
-extern SRC_STATE* (*SRC_src_new)(int converter_type, int channels, int *error);
+extern SRC_STATE *(*SRC_src_new)(int converter_type, int channels, int *error);
 extern int (*SRC_src_process)(SRC_STATE *state, SRC_DATA *data);
 extern int (*SRC_src_reset)(SRC_STATE *state);
-extern SRC_STATE* (*SRC_src_delete)(SRC_STATE *state);
-extern const char* (*SRC_src_strerror)(int error);
+extern SRC_STATE *(*SRC_src_delete)(SRC_STATE *state);
+extern const char *(*SRC_src_strerror)(int error);
+extern int (*SRC_src_simple)(SRC_DATA *data, int converter_type, int channels);
 #endif
 
 /* Functions to get a list of "close" audio formats */
@@ -52,7 +53,8 @@ extern SDL_AudioFormat SDL_FirstAudioFormat(SDL_AudioFormat format);
 extern SDL_AudioFormat SDL_NextAudioFormat(void);
 
 /* Function to calculate the size and silence for a SDL_AudioSpec */
-extern void SDL_CalculateAudioSpec(SDL_AudioSpec * spec);
+extern Uint8 SDL_SilenceValueForFormat(const SDL_AudioFormat format);
+extern void SDL_CalculateAudioSpec(SDL_AudioSpec *spec);
 
 /* Choose the audio filter functions below */
 extern void SDL_ChooseAudioConverters(void);
@@ -68,11 +70,6 @@ extern SDL_AudioFilter SDL_Convert_F32_to_U8;
 extern SDL_AudioFilter SDL_Convert_F32_to_S16;
 extern SDL_AudioFilter SDL_Convert_F32_to_U16;
 extern SDL_AudioFilter SDL_Convert_F32_to_S32;
-
-/* You need to call SDL_PrepareResampleFilter() before using the internal resampler.
-   SDL_AudioQuit() calls SDL_FreeResamplerFilter(), you should never call it yourself. */
-extern int SDL_PrepareResampleFilter(void);
-extern void SDL_FreeResampleFilter(void);
 
 #endif /* SDL_audio_c_h_ */
 

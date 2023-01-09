@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -48,13 +48,13 @@ extern "C" {
 static int SDL_BeAppActive = 0;
 static SDL_Thread *SDL_AppThread = NULL;
 
-static int
-StartBeApp(void *unused)
+/* Default application signature */
+const char *signature = "application/x-SDL-executable";
+
+static int StartBeApp(void *unused)
 {
     BApplication *App;
 
-    // default application signature
-    const char *signature = "application/x-SDL-executable";
     // dig resources for correct signature
     image_info info;
     int32 cookie = 0;
@@ -64,8 +64,9 @@ StartBeApp(void *unused)
             BAppFileInfo app_info(&f);
             if (app_info.InitCheck() == B_OK) {
                 char sig[B_MIME_TYPE_LENGTH];
-                if (app_info.GetSignature(sig) == B_OK)
+                if (app_info.GetSignature(sig) == B_OK) {
                     signature = strndup(sig, B_MIME_TYPE_LENGTH);
+                }
             }
         }
     }
@@ -74,7 +75,7 @@ StartBeApp(void *unused)
 
     App->Run();
     delete App;
-    return (0);
+    return 0;
 }
 
 /* Initialize the Be Application, if it's not already started */
@@ -115,7 +116,7 @@ SDL_InitBeApp(void)
     ++SDL_BeAppActive;
 
     /* The app is running, and we're ready to go */
-    return (0);
+    return 0;
 }
 
 /* Quit the Be Application, if there's nothing left to do */
@@ -146,7 +147,7 @@ SDL_QuitBeApp(void)
 void SDL_BApp::ClearID(SDL_BWin *bwin) {
     _SetSDLWindow(NULL, bwin->GetID());
     int32 i = _GetNumWindowSlots() - 1;
-    while(i >= 0 && GetSDLWindow(i) == NULL) {
+    while (i >= 0 && GetSDLWindow(i) == NULL) {
         _PopBackWindow();
         --i;
     }

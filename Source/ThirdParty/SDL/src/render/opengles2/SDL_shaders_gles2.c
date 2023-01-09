@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,113 +22,136 @@
 
 #if SDL_VIDEO_RENDER_OGL_ES2 && !SDL_RENDER_DISABLED
 
+#include "SDL_hints.h"
 #include "SDL_video.h"
 #include "SDL_opengles2.h"
 #include "SDL_shaders_gles2.h"
 #include "SDL_stdinc.h"
 
+/* *INDENT-OFF* */ /* clang-format off */
+
 /*************************************************************************************************
  * Vertex/fragment shader source                                                                 *
  *************************************************************************************************/
-/* Notes on a_angle:
-   * It is a vector containing sin and cos for rotation matrix
-   * To get correct rotation for most cases when a_angle is disabled cos
-     value is decremented by 1.0 to get proper output with 0.0 which is
-     default value
-*/
-static const Uint8 GLES2_VertexSrc_Default_[] = " \
-    uniform mat4 u_projection; \
-    attribute vec2 a_position; \
-    attribute vec2 a_texCoord; \
-    attribute vec2 a_angle; \
-    attribute vec2 a_center; \
-    varying vec2 v_texCoord; \
-    \
-    void main() \
-    { \
-        float s = a_angle[0]; \
-        float c = a_angle[1] + 1.0; \
-        mat2 rotationMatrix = mat2(c, -s, s, c); \
-        vec2 position = rotationMatrix * (a_position - a_center) + a_center; \
-        v_texCoord = a_texCoord; \
-        gl_Position = u_projection * vec4(position, 0.0, 1.0);\
-        gl_PointSize = 1.0; \
-    } \
-";
 
-static const Uint8 GLES2_FragmentSrc_SolidSrc_[] = " \
-    precision mediump float; \
-    uniform vec4 u_color; \
-    \
-    void main() \
-    { \
-        gl_FragColor = u_color; \
-    } \
-";
+static const char GLES2_Fragment_Include_Best_Texture_Precision[] = \
+"#ifdef GL_FRAGMENT_PRECISION_HIGH\n"                           \
+"#define SDL_TEXCOORD_PRECISION highp\n"                        \
+"#else\n"                                                       \
+"#define SDL_TEXCOORD_PRECISION mediump\n"                      \
+"#endif\n"                                                      \
+"\n"                                                            \
+"precision mediump float;\n"                                    \
+"\n"                                                            \
+;
 
-static const Uint8 GLES2_FragmentSrc_TextureABGRSrc_[] = " \
-    precision mediump float; \
-    uniform sampler2D u_texture; \
-    uniform vec4 u_color; \
-    varying vec2 v_texCoord; \
-    \
-    void main() \
-    { \
-        gl_FragColor = texture2D(u_texture, v_texCoord); \
-        gl_FragColor *= u_color; \
-    } \
-";
+static const char GLES2_Fragment_Include_Medium_Texture_Precision[] = \
+"#define SDL_TEXCOORD_PRECISION mediump\n"                      \
+"precision mediump float;\n"                                    \
+"\n"                                                            \
+;
+
+static const char GLES2_Fragment_Include_High_Texture_Precision[] = \
+"#define SDL_TEXCOORD_PRECISION highp\n"                        \
+"precision mediump float;\n"                                    \
+"\n"                                                            \
+;
+
+static const char GLES2_Fragment_Include_Undef_Precision[] =    \
+"#define mediump\n"                                             \
+"#define highp\n"                                               \
+"#define lowp\n"                                                \
+"#define SDL_TEXCOORD_PRECISION\n"                              \
+"\n"                                                            \
+;
+
+static const char GLES2_Vertex_Default[] =                      \
+"uniform mat4 u_projection;\n"                                  \
+"attribute vec2 a_position;\n"                                  \
+"attribute vec4 a_color;\n"                                     \
+"attribute vec2 a_texCoord;\n"                                  \
+"varying vec2 v_texCoord;\n"                                    \
+"varying vec4 v_color;\n"                                       \
+"\n"                                                            \
+"void main()\n"                                                 \
+"{\n"                                                           \
+"    v_texCoord = a_texCoord;\n"                                \
+"    gl_Position = u_projection * vec4(a_position, 0.0, 1.0);\n" \
+"    gl_PointSize = 1.0;\n"                                     \
+"    v_color = a_color;\n"                                      \
+"}\n"                                                           \
+;
+
+static const char GLES2_Fragment_Solid[] =                      \
+"varying mediump vec4 v_color;\n"                               \
+"\n"                                                            \
+"void main()\n"                                                 \
+"{\n"                                                           \
+"    gl_FragColor = v_color;\n"                                 \
+"}\n"                                                           \
+;
+
+static const char GLES2_Fragment_TextureABGR[] =                \
+"uniform sampler2D u_texture;\n"                                \
+"varying mediump vec4 v_color;\n"                               \
+"varying SDL_TEXCOORD_PRECISION vec2 v_texCoord;\n"             \
+"\n"                                                            \
+"void main()\n"                                                 \
+"{\n"                                                           \
+"    gl_FragColor = texture2D(u_texture, v_texCoord);\n"        \
+"    gl_FragColor *= v_color;\n"                                \
+"}\n"                                                           \
+;
 
 /* ARGB to ABGR conversion */
-static const Uint8 GLES2_FragmentSrc_TextureARGBSrc_[] = " \
-    precision mediump float; \
-    uniform sampler2D u_texture; \
-    uniform vec4 u_color; \
-    varying vec2 v_texCoord; \
-    \
-    void main() \
-    { \
-        vec4 abgr = texture2D(u_texture, v_texCoord); \
-        gl_FragColor = abgr; \
-        gl_FragColor.r = abgr.b; \
-        gl_FragColor.b = abgr.r; \
-        gl_FragColor *= u_color; \
-    } \
-";
+static const char GLES2_Fragment_TextureARGB[] =                \
+"uniform sampler2D u_texture;\n"                                \
+"varying mediump vec4 v_color;\n"                               \
+"varying SDL_TEXCOORD_PRECISION vec2 v_texCoord;\n"             \
+"\n"                                                            \
+"void main()\n"                                                 \
+"{\n"                                                           \
+"    mediump vec4 abgr = texture2D(u_texture, v_texCoord);\n"   \
+"    gl_FragColor = abgr;\n"                                    \
+"    gl_FragColor.r = abgr.b;\n"                                \
+"    gl_FragColor.b = abgr.r;\n"                                \
+"    gl_FragColor *= v_color;\n"                                \
+"}\n"                                                           \
+;
 
 /* RGB to ABGR conversion */
-static const Uint8 GLES2_FragmentSrc_TextureRGBSrc_[] = " \
-    precision mediump float; \
-    uniform sampler2D u_texture; \
-    uniform vec4 u_color; \
-    varying vec2 v_texCoord; \
-    \
-    void main() \
-    { \
-        vec4 abgr = texture2D(u_texture, v_texCoord); \
-        gl_FragColor = abgr; \
-        gl_FragColor.r = abgr.b; \
-        gl_FragColor.b = abgr.r; \
-        gl_FragColor.a = 1.0; \
-        gl_FragColor *= u_color; \
-    } \
-";
+static const char GLES2_Fragment_TextureRGB[] =                 \
+"uniform sampler2D u_texture;\n"                                \
+"varying mediump vec4 v_color;\n"                               \
+"varying SDL_TEXCOORD_PRECISION vec2 v_texCoord;\n"             \
+"\n"                                                            \
+"void main()\n"                                                 \
+"{\n"                                                           \
+"    mediump vec4 abgr = texture2D(u_texture, v_texCoord);\n"   \
+"    gl_FragColor = abgr;\n"                                    \
+"    gl_FragColor.r = abgr.b;\n"                                \
+"    gl_FragColor.b = abgr.r;\n"                                \
+"    gl_FragColor.a = 1.0;\n"                                   \
+"    gl_FragColor *= v_color;\n"                                \
+"}\n"                                                           \
+;
 
 /* BGR to ABGR conversion */
-static const Uint8 GLES2_FragmentSrc_TextureBGRSrc_[] = " \
-    precision mediump float; \
-    uniform sampler2D u_texture; \
-    uniform vec4 u_color; \
-    varying vec2 v_texCoord; \
-    \
-    void main() \
-    { \
-        vec4 abgr = texture2D(u_texture, v_texCoord); \
-        gl_FragColor = abgr; \
-        gl_FragColor.a = 1.0; \
-        gl_FragColor *= u_color; \
-    } \
-";
+static const char GLES2_Fragment_TextureBGR[] =                 \
+"uniform sampler2D u_texture;\n"                                \
+"varying mediump vec4 v_color;\n"                               \
+"varying SDL_TEXCOORD_PRECISION vec2 v_texCoord;\n"             \
+"\n"                                                            \
+"void main()\n"                                                 \
+"{\n"                                                           \
+"    mediump vec4 abgr = texture2D(u_texture, v_texCoord);\n"   \
+"    gl_FragColor = abgr;\n"                                    \
+"    gl_FragColor.a = 1.0;\n"                                   \
+"    gl_FragColor *= v_color;\n"                                \
+"}\n"                                                           \
+;
+
+#if SDL_HAVE_YUV
 
 #define JPEG_SHADER_CONSTANTS                                   \
 "// YUV offset \n"                                              \
@@ -138,6 +161,7 @@ static const Uint8 GLES2_FragmentSrc_TextureBGRSrc_[] = " \
 "const mat3 matrix = mat3( 1,       1,        1,\n"             \
 "                          0,      -0.3441,   1.772,\n"         \
 "                          1.402,  -0.7141,   0);\n"            \
+"\n"                                                            \
 
 #define BT601_SHADER_CONSTANTS                                  \
 "// YUV offset \n"                                              \
@@ -147,6 +171,7 @@ static const Uint8 GLES2_FragmentSrc_TextureBGRSrc_[] = " \
 "const mat3 matrix = mat3( 1.1644,  1.1644,   1.1644,\n"        \
 "                          0,      -0.3918,   2.0172,\n"        \
 "                          1.596,  -0.813,    0);\n"            \
+"\n"                                                            \
 
 #define BT709_SHADER_CONSTANTS                                  \
 "// YUV offset \n"                                              \
@@ -156,19 +181,18 @@ static const Uint8 GLES2_FragmentSrc_TextureBGRSrc_[] = " \
 "const mat3 matrix = mat3( 1.1644,  1.1644,   1.1644,\n"        \
 "                          0,      -0.2132,   2.1124,\n"        \
 "                          1.7927, -0.5329,   0);\n"            \
+"\n"                                                            \
 
 
 #define YUV_SHADER_PROLOGUE                                     \
-"precision mediump float;\n"                                    \
 "uniform sampler2D u_texture;\n"                                \
 "uniform sampler2D u_texture_u;\n"                              \
 "uniform sampler2D u_texture_v;\n"                              \
-"uniform vec4 u_color;\n"                                  \
-"varying vec2 v_texCoord;\n"                                    \
+"varying mediump vec4 v_color;\n"                               \
+"varying SDL_TEXCOORD_PRECISION vec2 v_texCoord;\n"             \
 "\n"                                                            \
 
 #define YUV_SHADER_BODY                                         \
-"\n"                                                            \
 "void main()\n"                                                 \
 "{\n"                                                           \
 "    mediump vec3 yuv;\n"                                       \
@@ -185,11 +209,10 @@ static const Uint8 GLES2_FragmentSrc_TextureBGRSrc_[] = " \
 "\n"                                                            \
 "    // That was easy. :) \n"                                   \
 "    gl_FragColor = vec4(rgb, 1);\n"                            \
-"    gl_FragColor *= u_color;\n"                           \
+"    gl_FragColor *= v_color;\n"                                \
 "}"                                                             \
 
-#define NV12_SHADER_BODY                                        \
-"\n"                                                            \
+#define NV12_RA_SHADER_BODY                                     \
 "void main()\n"                                                 \
 "{\n"                                                           \
 "    mediump vec3 yuv;\n"                                       \
@@ -205,11 +228,29 @@ static const Uint8 GLES2_FragmentSrc_TextureBGRSrc_[] = " \
 "\n"                                                            \
 "    // That was easy. :) \n"                                   \
 "    gl_FragColor = vec4(rgb, 1);\n"                            \
-"    gl_FragColor *= u_color;\n"                           \
+"    gl_FragColor *= v_color;\n"                                \
+"}"                                                             \
+
+#define NV12_RG_SHADER_BODY                                     \
+"void main()\n"                                                 \
+"{\n"                                                           \
+"    mediump vec3 yuv;\n"                                       \
+"    lowp vec3 rgb;\n"                                          \
+"\n"                                                            \
+"    // Get the YUV values \n"                                  \
+"    yuv.x = texture2D(u_texture,   v_texCoord).r;\n"           \
+"    yuv.yz = texture2D(u_texture_u, v_texCoord).rg;\n"         \
+"\n"                                                            \
+"    // Do the color transform \n"                              \
+"    yuv += offset;\n"                                          \
+"    rgb = matrix * yuv;\n"                                     \
+"\n"                                                            \
+"    // That was easy. :) \n"                                   \
+"    gl_FragColor = vec4(rgb, 1);\n"                            \
+"    gl_FragColor *= v_color;\n"                                \
 "}"                                                             \
 
 #define NV21_SHADER_BODY                                        \
-"\n"                                                            \
 "void main()\n"                                                 \
 "{\n"                                                           \
 "    mediump vec3 yuv;\n"                                       \
@@ -225,344 +266,179 @@ static const Uint8 GLES2_FragmentSrc_TextureBGRSrc_[] = " \
 "\n"                                                            \
 "    // That was easy. :) \n"                                   \
 "    gl_FragColor = vec4(rgb, 1);\n"                            \
-"    gl_FragColor *= u_color;\n"                           \
+"    gl_FragColor *= v_color;\n"                                \
 "}"                                                             \
 
 /* YUV to ABGR conversion */
-static const Uint8 GLES2_FragmentSrc_TextureYUVJPEGSrc_[] = \
+static const char GLES2_Fragment_TextureYUVJPEG[] = \
         YUV_SHADER_PROLOGUE \
         JPEG_SHADER_CONSTANTS \
         YUV_SHADER_BODY \
 ;
-static const Uint8 GLES2_FragmentSrc_TextureYUVBT601Src_[] = \
+static const char GLES2_Fragment_TextureYUVBT601[] = \
         YUV_SHADER_PROLOGUE \
         BT601_SHADER_CONSTANTS \
         YUV_SHADER_BODY \
 ;
-static const Uint8 GLES2_FragmentSrc_TextureYUVBT709Src_[] = \
+static const char GLES2_Fragment_TextureYUVBT709[] = \
         YUV_SHADER_PROLOGUE \
         BT709_SHADER_CONSTANTS \
         YUV_SHADER_BODY \
 ;
 
 /* NV12 to ABGR conversion */
-static const Uint8 GLES2_FragmentSrc_TextureNV12JPEGSrc_[] = \
+static const char GLES2_Fragment_TextureNV12JPEG[] = \
         YUV_SHADER_PROLOGUE \
         JPEG_SHADER_CONSTANTS \
-        NV12_SHADER_BODY \
+        NV12_RA_SHADER_BODY \
 ;
-static const Uint8 GLES2_FragmentSrc_TextureNV12BT601Src_[] = \
+static const char GLES2_Fragment_TextureNV12BT601_RA[] = \
         YUV_SHADER_PROLOGUE \
         BT601_SHADER_CONSTANTS \
-        NV12_SHADER_BODY \
+        NV12_RA_SHADER_BODY \
 ;
-static const Uint8 GLES2_FragmentSrc_TextureNV12BT709Src_[] = \
+static const char GLES2_Fragment_TextureNV12BT601_RG[] = \
+        YUV_SHADER_PROLOGUE \
+        BT601_SHADER_CONSTANTS \
+        NV12_RG_SHADER_BODY \
+;
+static const char GLES2_Fragment_TextureNV12BT709_RA[] = \
         YUV_SHADER_PROLOGUE \
         BT709_SHADER_CONSTANTS \
-        NV12_SHADER_BODY \
+        NV12_RA_SHADER_BODY \
+;
+static const char GLES2_Fragment_TextureNV12BT709_RG[] = \
+        YUV_SHADER_PROLOGUE \
+        BT709_SHADER_CONSTANTS \
+        NV12_RG_SHADER_BODY \
 ;
 
 /* NV21 to ABGR conversion */
-static const Uint8 GLES2_FragmentSrc_TextureNV21JPEGSrc_[] = \
+static const char GLES2_Fragment_TextureNV21JPEG[] = \
         YUV_SHADER_PROLOGUE \
         JPEG_SHADER_CONSTANTS \
         NV21_SHADER_BODY \
 ;
-static const Uint8 GLES2_FragmentSrc_TextureNV21BT601Src_[] = \
+static const char GLES2_Fragment_TextureNV21BT601[] = \
         YUV_SHADER_PROLOGUE \
         BT601_SHADER_CONSTANTS \
         NV21_SHADER_BODY \
 ;
-static const Uint8 GLES2_FragmentSrc_TextureNV21BT709Src_[] = \
+static const char GLES2_Fragment_TextureNV21BT709[] = \
         YUV_SHADER_PROLOGUE \
         BT709_SHADER_CONSTANTS \
         NV21_SHADER_BODY \
 ;
+#endif
 
 /* Custom Android video format texture */
-static const Uint8 GLES2_FragmentSrc_TextureExternalOESSrc_[] = " \
-    #extension GL_OES_EGL_image_external : require\n\
-    precision mediump float; \
-    uniform samplerExternalOES u_texture; \
-    uniform vec4 u_color; \
-    varying vec2 v_texCoord; \
-    \
-    void main() \
-    { \
-        gl_FragColor = texture2D(u_texture, v_texCoord); \
-        gl_FragColor *= u_color; \
-    } \
-";
+static const char GLES2_Fragment_TextureExternalOES_Prologue[] = \
+"#extension GL_OES_EGL_image_external : require\n"              \
+"\n"                                                            \
+;
+static const char GLES2_Fragment_TextureExternalOES[] =         \
+"uniform samplerExternalOES u_texture;\n"                       \
+"varying mediump vec4 v_color;\n"                               \
+"varying SDL_TEXCOORD_PRECISION vec2 v_texCoord;\n"             \
+"\n"                                                            \
+"void main()\n"                                                 \
+"{\n"                                                           \
+"    gl_FragColor = texture2D(u_texture, v_texCoord);\n"        \
+"    gl_FragColor *= v_color;\n"                                \
+"}\n"                                                           \
+;
 
-static const GLES2_ShaderInstance GLES2_VertexSrc_Default = {
-    GL_VERTEX_SHADER,
-    GLES2_SOURCE_SHADER,
-    sizeof(GLES2_VertexSrc_Default_),
-    GLES2_VertexSrc_Default_
-};
-
-static const GLES2_ShaderInstance GLES2_FragmentSrc_SolidSrc = {
-    GL_FRAGMENT_SHADER,
-    GLES2_SOURCE_SHADER,
-    sizeof(GLES2_FragmentSrc_SolidSrc_),
-    GLES2_FragmentSrc_SolidSrc_
-};
-
-static const GLES2_ShaderInstance GLES2_FragmentSrc_TextureABGRSrc = {
-    GL_FRAGMENT_SHADER,
-    GLES2_SOURCE_SHADER,
-    sizeof(GLES2_FragmentSrc_TextureABGRSrc_),
-    GLES2_FragmentSrc_TextureABGRSrc_
-};
-
-static const GLES2_ShaderInstance GLES2_FragmentSrc_TextureARGBSrc = {
-    GL_FRAGMENT_SHADER,
-    GLES2_SOURCE_SHADER,
-    sizeof(GLES2_FragmentSrc_TextureARGBSrc_),
-    GLES2_FragmentSrc_TextureARGBSrc_
-};
-
-static const GLES2_ShaderInstance GLES2_FragmentSrc_TextureRGBSrc = {
-    GL_FRAGMENT_SHADER,
-    GLES2_SOURCE_SHADER,
-    sizeof(GLES2_FragmentSrc_TextureRGBSrc_),
-    GLES2_FragmentSrc_TextureRGBSrc_
-};
-
-static const GLES2_ShaderInstance GLES2_FragmentSrc_TextureBGRSrc = {
-    GL_FRAGMENT_SHADER,
-    GLES2_SOURCE_SHADER,
-    sizeof(GLES2_FragmentSrc_TextureBGRSrc_),
-    GLES2_FragmentSrc_TextureBGRSrc_
-};
-
-static const GLES2_ShaderInstance GLES2_FragmentSrc_TextureYUVJPEGSrc = {
-    GL_FRAGMENT_SHADER,
-    GLES2_SOURCE_SHADER,
-    sizeof(GLES2_FragmentSrc_TextureYUVJPEGSrc_),
-    GLES2_FragmentSrc_TextureYUVJPEGSrc_
-};
-
-static const GLES2_ShaderInstance GLES2_FragmentSrc_TextureYUVBT601Src = {
-    GL_FRAGMENT_SHADER,
-    GLES2_SOURCE_SHADER,
-    sizeof(GLES2_FragmentSrc_TextureYUVBT601Src_),
-    GLES2_FragmentSrc_TextureYUVBT601Src_
-};
-
-static const GLES2_ShaderInstance GLES2_FragmentSrc_TextureYUVBT709Src = {
-    GL_FRAGMENT_SHADER,
-    GLES2_SOURCE_SHADER,
-    sizeof(GLES2_FragmentSrc_TextureYUVBT709Src_),
-    GLES2_FragmentSrc_TextureYUVBT709Src_
-};
-
-static const GLES2_ShaderInstance GLES2_FragmentSrc_TextureNV12JPEGSrc = {
-    GL_FRAGMENT_SHADER,
-    GLES2_SOURCE_SHADER,
-    sizeof(GLES2_FragmentSrc_TextureNV12JPEGSrc_),
-    GLES2_FragmentSrc_TextureNV12JPEGSrc_
-};
-
-static const GLES2_ShaderInstance GLES2_FragmentSrc_TextureNV12BT601Src = {
-    GL_FRAGMENT_SHADER,
-    GLES2_SOURCE_SHADER,
-    sizeof(GLES2_FragmentSrc_TextureNV12BT601Src_),
-    GLES2_FragmentSrc_TextureNV12BT601Src_
-};
-
-static const GLES2_ShaderInstance GLES2_FragmentSrc_TextureNV21BT709Src = {
-    GL_FRAGMENT_SHADER,
-    GLES2_SOURCE_SHADER,
-    sizeof(GLES2_FragmentSrc_TextureNV21BT709Src_),
-    GLES2_FragmentSrc_TextureNV21BT709Src_
-};
-
-static const GLES2_ShaderInstance GLES2_FragmentSrc_TextureNV21JPEGSrc = {
-    GL_FRAGMENT_SHADER,
-    GLES2_SOURCE_SHADER,
-    sizeof(GLES2_FragmentSrc_TextureNV21JPEGSrc_),
-    GLES2_FragmentSrc_TextureNV21JPEGSrc_
-};
-
-static const GLES2_ShaderInstance GLES2_FragmentSrc_TextureNV21BT601Src = {
-    GL_FRAGMENT_SHADER,
-    GLES2_SOURCE_SHADER,
-    sizeof(GLES2_FragmentSrc_TextureNV21BT601Src_),
-    GLES2_FragmentSrc_TextureNV21BT601Src_
-};
-
-static const GLES2_ShaderInstance GLES2_FragmentSrc_TextureNV12BT709Src = {
-    GL_FRAGMENT_SHADER,
-    GLES2_SOURCE_SHADER,
-    sizeof(GLES2_FragmentSrc_TextureNV12BT709Src_),
-    GLES2_FragmentSrc_TextureNV12BT709Src_
-};
-
-static const GLES2_ShaderInstance GLES2_FragmentSrc_TextureExternalOESSrc = {
-    GL_FRAGMENT_SHADER,
-    GLES2_SOURCE_SHADER,
-    sizeof(GLES2_FragmentSrc_TextureExternalOESSrc_),
-    GLES2_FragmentSrc_TextureExternalOESSrc_
-};
-
-
-/*************************************************************************************************
- * Vertex/fragment shader definitions                                                            *
- *************************************************************************************************/
-
-static GLES2_Shader GLES2_VertexShader_Default = {
-    1,
-    {
-        &GLES2_VertexSrc_Default
-    }
-};
-
-static GLES2_Shader GLES2_FragmentShader_SolidSrc = {
-    1,
-    {
-        &GLES2_FragmentSrc_SolidSrc
-    }
-};
-
-static GLES2_Shader GLES2_FragmentShader_TextureABGRSrc = {
-    1,
-    {
-        &GLES2_FragmentSrc_TextureABGRSrc
-    }
-};
-
-static GLES2_Shader GLES2_FragmentShader_TextureARGBSrc = {
-    1,
-    {
-        &GLES2_FragmentSrc_TextureARGBSrc
-    }
-};
-
-static GLES2_Shader GLES2_FragmentShader_TextureRGBSrc = {
-    1,
-    {
-        &GLES2_FragmentSrc_TextureRGBSrc
-    }
-};
-
-static GLES2_Shader GLES2_FragmentShader_TextureBGRSrc = {
-    1,
-    {
-        &GLES2_FragmentSrc_TextureBGRSrc
-    }
-};
-
-static GLES2_Shader GLES2_FragmentShader_TextureYUVJPEGSrc = {
-    1,
-    {
-        &GLES2_FragmentSrc_TextureYUVJPEGSrc
-    }
-};
-
-static GLES2_Shader GLES2_FragmentShader_TextureYUVBT601Src = {
-    1,
-    {
-        &GLES2_FragmentSrc_TextureYUVBT601Src
-    }
-};
-
-static GLES2_Shader GLES2_FragmentShader_TextureYUVBT709Src = {
-    1,
-    {
-        &GLES2_FragmentSrc_TextureYUVBT709Src
-    }
-};
-
-static GLES2_Shader GLES2_FragmentShader_TextureNV12JPEGSrc = {
-    1,
-    {
-        &GLES2_FragmentSrc_TextureNV12JPEGSrc
-    }
-};
-
-static GLES2_Shader GLES2_FragmentShader_TextureNV12BT601Src = {
-    1,
-    {
-        &GLES2_FragmentSrc_TextureNV12BT601Src
-    }
-};
-
-static GLES2_Shader GLES2_FragmentShader_TextureNV12BT709Src = {
-    1,
-    {
-        &GLES2_FragmentSrc_TextureNV12BT709Src
-    }
-};
-
-static GLES2_Shader GLES2_FragmentShader_TextureNV21JPEGSrc = {
-    1,
-    {
-        &GLES2_FragmentSrc_TextureNV21JPEGSrc
-    }
-};
-
-static GLES2_Shader GLES2_FragmentShader_TextureNV21BT601Src = {
-    1,
-    {
-        &GLES2_FragmentSrc_TextureNV21BT601Src
-    }
-};
-
-static GLES2_Shader GLES2_FragmentShader_TextureNV21BT709Src = {
-    1,
-    {
-        &GLES2_FragmentSrc_TextureNV21BT709Src
-    }
-};
-
-static GLES2_Shader GLES2_FragmentShader_TextureExternalOESSrc = {
-    1,
-    {
-        &GLES2_FragmentSrc_TextureExternalOESSrc
-    }
-};
-
+/* *INDENT-ON* */ /* clang-format on */
 
 /*************************************************************************************************
  * Shader selector                                                                               *
  *************************************************************************************************/
 
-const GLES2_Shader *GLES2_GetShader(GLES2_ShaderType type)
+const char *GLES2_GetShaderPrologue(GLES2_ShaderType type)
+{
+    switch (type) {
+    case GLES2_SHADER_FRAGMENT_TEXTURE_EXTERNAL_OES:
+        return GLES2_Fragment_TextureExternalOES_Prologue;
+    default:
+        return "";
+    }
+}
+
+const char *GLES2_GetShaderInclude(GLES2_ShaderIncludeType type)
+{
+    switch (type) {
+    case GLES2_SHADER_FRAGMENT_INCLUDE_UNDEF_PRECISION:
+        return GLES2_Fragment_Include_Undef_Precision;
+    case GLES2_SHADER_FRAGMENT_INCLUDE_BEST_TEXCOORD_PRECISION:
+        return GLES2_Fragment_Include_Best_Texture_Precision;
+    case GLES2_SHADER_FRAGMENT_INCLUDE_MEDIUM_TEXCOORD_PRECISION:
+        return GLES2_Fragment_Include_Medium_Texture_Precision;
+    case GLES2_SHADER_FRAGMENT_INCLUDE_HIGH_TEXCOORD_PRECISION:
+        return GLES2_Fragment_Include_High_Texture_Precision;
+    default:
+        return "";
+    }
+}
+
+GLES2_ShaderIncludeType GLES2_GetTexCoordPrecisionEnumFromHint()
+{
+    const char *texcoord_hint = SDL_GetHint("SDL_RENDER_OPENGLES2_TEXCOORD_PRECISION");
+    GLES2_ShaderIncludeType value = GLES2_SHADER_FRAGMENT_INCLUDE_BEST_TEXCOORD_PRECISION;
+    if (texcoord_hint) {
+        if (SDL_strcmp(texcoord_hint, "undefined") == 0) {
+            return GLES2_SHADER_FRAGMENT_INCLUDE_UNDEF_PRECISION;
+        }
+        if (SDL_strcmp(texcoord_hint, "high") == 0) {
+            return GLES2_SHADER_FRAGMENT_INCLUDE_HIGH_TEXCOORD_PRECISION;
+        }
+        if (SDL_strcmp(texcoord_hint, "medium") == 0) {
+            return GLES2_SHADER_FRAGMENT_INCLUDE_MEDIUM_TEXCOORD_PRECISION;
+        }
+    }
+    return value;
+}
+
+const char *GLES2_GetShader(GLES2_ShaderType type)
 {
     switch (type) {
     case GLES2_SHADER_VERTEX_DEFAULT:
-        return &GLES2_VertexShader_Default;
-    case GLES2_SHADER_FRAGMENT_SOLID_SRC:
-        return &GLES2_FragmentShader_SolidSrc;
-    case GLES2_SHADER_FRAGMENT_TEXTURE_ABGR_SRC:
-        return &GLES2_FragmentShader_TextureABGRSrc;
-    case GLES2_SHADER_FRAGMENT_TEXTURE_ARGB_SRC:
-        return &GLES2_FragmentShader_TextureARGBSrc;
-    case GLES2_SHADER_FRAGMENT_TEXTURE_RGB_SRC:
-        return &GLES2_FragmentShader_TextureRGBSrc;
-    case GLES2_SHADER_FRAGMENT_TEXTURE_BGR_SRC:
-        return &GLES2_FragmentShader_TextureBGRSrc;
-    case GLES2_SHADER_FRAGMENT_TEXTURE_YUV_JPEG_SRC:
-        return &GLES2_FragmentShader_TextureYUVJPEGSrc;
-    case GLES2_SHADER_FRAGMENT_TEXTURE_YUV_BT601_SRC:
-        return &GLES2_FragmentShader_TextureYUVBT601Src;
-    case GLES2_SHADER_FRAGMENT_TEXTURE_YUV_BT709_SRC:
-        return &GLES2_FragmentShader_TextureYUVBT709Src;
-    case GLES2_SHADER_FRAGMENT_TEXTURE_NV12_JPEG_SRC:
-        return &GLES2_FragmentShader_TextureNV12JPEGSrc;
-    case GLES2_SHADER_FRAGMENT_TEXTURE_NV12_BT601_SRC:
-        return &GLES2_FragmentShader_TextureNV12BT601Src;
-    case GLES2_SHADER_FRAGMENT_TEXTURE_NV12_BT709_SRC:
-        return &GLES2_FragmentShader_TextureNV12BT709Src;
-    case GLES2_SHADER_FRAGMENT_TEXTURE_NV21_JPEG_SRC:
-        return &GLES2_FragmentShader_TextureNV21JPEGSrc;
-    case GLES2_SHADER_FRAGMENT_TEXTURE_NV21_BT601_SRC:
-        return &GLES2_FragmentShader_TextureNV21BT601Src;
-    case GLES2_SHADER_FRAGMENT_TEXTURE_NV21_BT709_SRC:
-        return &GLES2_FragmentShader_TextureNV21BT709Src;
-    case GLES2_SHADER_FRAGMENT_TEXTURE_EXTERNAL_OES_SRC:
-        return &GLES2_FragmentShader_TextureExternalOESSrc;
+        return GLES2_Vertex_Default;
+    case GLES2_SHADER_FRAGMENT_SOLID:
+        return GLES2_Fragment_Solid;
+    case GLES2_SHADER_FRAGMENT_TEXTURE_ABGR:
+        return GLES2_Fragment_TextureABGR;
+    case GLES2_SHADER_FRAGMENT_TEXTURE_ARGB:
+        return GLES2_Fragment_TextureARGB;
+    case GLES2_SHADER_FRAGMENT_TEXTURE_RGB:
+        return GLES2_Fragment_TextureRGB;
+    case GLES2_SHADER_FRAGMENT_TEXTURE_BGR:
+        return GLES2_Fragment_TextureBGR;
+#if SDL_HAVE_YUV
+    case GLES2_SHADER_FRAGMENT_TEXTURE_YUV_JPEG:
+        return GLES2_Fragment_TextureYUVJPEG;
+    case GLES2_SHADER_FRAGMENT_TEXTURE_YUV_BT601:
+        return GLES2_Fragment_TextureYUVBT601;
+    case GLES2_SHADER_FRAGMENT_TEXTURE_YUV_BT709:
+        return GLES2_Fragment_TextureYUVBT709;
+    case GLES2_SHADER_FRAGMENT_TEXTURE_NV12_JPEG:
+        return GLES2_Fragment_TextureNV12JPEG;
+    case GLES2_SHADER_FRAGMENT_TEXTURE_NV12_RA_BT601:
+        return GLES2_Fragment_TextureNV12BT601_RA;
+    case GLES2_SHADER_FRAGMENT_TEXTURE_NV12_RG_BT601:
+        return GLES2_Fragment_TextureNV12BT601_RG;
+    case GLES2_SHADER_FRAGMENT_TEXTURE_NV12_RA_BT709:
+        return GLES2_Fragment_TextureNV12BT709_RA;
+    case GLES2_SHADER_FRAGMENT_TEXTURE_NV12_RG_BT709:
+        return GLES2_Fragment_TextureNV12BT709_RG;
+    case GLES2_SHADER_FRAGMENT_TEXTURE_NV21_JPEG:
+        return GLES2_Fragment_TextureNV21JPEG;
+    case GLES2_SHADER_FRAGMENT_TEXTURE_NV21_BT601:
+        return GLES2_Fragment_TextureNV21BT601;
+    case GLES2_SHADER_FRAGMENT_TEXTURE_NV21_BT709:
+        return GLES2_Fragment_TextureNV21BT709;
+#endif
+    case GLES2_SHADER_FRAGMENT_TEXTURE_EXTERNAL_OES:
+        return GLES2_Fragment_TextureExternalOES;
     default:
         return NULL;
     }

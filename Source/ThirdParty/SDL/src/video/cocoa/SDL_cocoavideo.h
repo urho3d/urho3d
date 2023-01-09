@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,9 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by UkoeHB for Urho3D
-
 #include "../../SDL_internal.h"
 
 #ifndef SDL_cocoavideo_h_
@@ -100,30 +97,22 @@ DECLARE_ALERT_STYLE(Critical);
 
 @class SDLTranslatorResponder;
 
-typedef struct SDL_VideoData
-{
-    int allow_spaces;
-    unsigned int modifierFlags;
-    void *key_layout;
-    SDLTranslatorResponder *fieldEdit;
-    NSInteger clipboard_count;
-    Uint32 screensaver_activity;
-    BOOL screensaver_use_iopm;
-    IOPMAssertionID screensaver_assertion;
-    SDL_mutex *swaplock;
-} SDL_VideoData;
+@interface SDL_VideoData : NSObject
+    @property (nonatomic) int allow_spaces;
+    @property (nonatomic) int trackpad_is_touch_only;
+    @property (nonatomic) unsigned int modifierFlags;
+    @property (nonatomic) void *key_layout;
+    @property (nonatomic) SDLTranslatorResponder *fieldEdit;
+    @property (nonatomic) NSInteger clipboard_count;
+    @property (nonatomic) IOPMAssertionID screensaver_assertion;
+    @property (nonatomic) SDL_mutex *swaplock;
+@end
 
 /* Utility functions */
 extern NSImage * Cocoa_CreateImage(SDL_Surface * surface);
 
-/* Fix build with the 10.10 SDK */
-#if MAC_OS_X_VERSION_MAX_ALLOWED < 101100
-#define NSEventSubtypeTouch NSTouchEventSubtype
-// Urho3D: begin edit (fixes build failure on El Capitan, OSX 10.12)
-#endif
 /* Fix build with the 10.11 SDK */
 #if MAC_OS_X_VERSION_MAX_ALLOWED < 101200
-// Urho3D: end edit
 #define NSEventSubtypeMouseEvent NSMouseEventSubtype
 #endif
 

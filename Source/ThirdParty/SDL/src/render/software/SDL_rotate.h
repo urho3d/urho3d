@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,11 +22,9 @@
 #ifndef SDL_rotate_h_
 #define SDL_rotate_h_
 
-#ifndef MIN
-#define MIN(a,b)    (((a) < (b)) ? (a) : (b))
-#endif
-
-extern SDL_Surface *SDLgfx_rotateSurface(SDL_Surface * src, double angle, int centerx, int centery, int smooth, int flipx, int flipy, int dstwidth, int dstheight, double cangle, double sangle);
-extern void SDLgfx_rotozoomSurfaceSizeTrig(int width, int height, double angle, int *dstwidth, int *dstheight, double *cangle, double *sangle);
+extern SDL_Surface *SDLgfx_rotateSurface(SDL_Surface *src, double angle, int smooth, int flipx, int flipy,
+                                         const SDL_Rect *rect_dest, double cangle, double sangle, const SDL_FPoint *center);
+extern void SDLgfx_rotozoomSurfaceSizeTrig(int width, int height, double angle, const SDL_FPoint *center,
+                                           SDL_Rect *rect_dest, double *cangle, double *sangle);
 
 #endif /* SDL_rotate_h_ */

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,7 +27,7 @@
 #include "SDL_video.h"
 #include "SDL_naclvideo.h"
 
-#if SDL_LOADSO_DLOPEN
+#ifdef HAVE_DLOPEN
 #include "dlfcn.h"
 #endif
 
@@ -45,7 +45,7 @@ NACL_GLES_LoadLibrary(_THIS, const char *path)
 void *
 NACL_GLES_GetProcAddress(_THIS, const char *proc)
 {
-#if SDL_LOADSO_DLOPEN
+#ifdef HAVE_DLOPEN
     return dlsym( 0 /* RTLD_DEFAULT */, proc);
 #else
     return NULL;

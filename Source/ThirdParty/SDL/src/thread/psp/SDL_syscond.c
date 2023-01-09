@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -45,7 +45,7 @@ SDL_CreateCond(void)
 {
     SDL_cond *cond;
 
-    cond = (SDL_cond *) SDL_malloc(sizeof(SDL_cond));
+    cond = (SDL_cond *)SDL_malloc(sizeof(SDL_cond));
     if (cond) {
         cond->lock = SDL_CreateMutex();
         cond->wait_sem = SDL_CreateSemaphore(0);
@@ -58,12 +58,11 @@ SDL_CreateCond(void)
     } else {
         SDL_OutOfMemory();
     }
-    return (cond);
+    return cond;
 }
 
 /* Destroy a condition variable */
-void
-SDL_DestroyCond(SDL_cond * cond)
+void SDL_DestroyCond(SDL_cond *cond)
 {
     if (cond) {
         if (cond->wait_sem) {
@@ -80,11 +79,10 @@ SDL_DestroyCond(SDL_cond * cond)
 }
 
 /* Restart one of the threads that are waiting on the condition variable */
-int
-SDL_CondSignal(SDL_cond * cond)
+int SDL_CondSignal(SDL_cond *cond)
 {
-    if (!cond) {
-        return SDL_SetError("Passed a NULL condition variable");
+    if (cond == NULL) {
+        return SDL_InvalidParamError("cond");
     }
 
     /* If there are waiting threads not already signalled, then
@@ -104,11 +102,10 @@ SDL_CondSignal(SDL_cond * cond)
 }
 
 /* Restart all threads that are waiting on the condition variable */
-int
-SDL_CondBroadcast(SDL_cond * cond)
+int SDL_CondBroadcast(SDL_cond *cond)
 {
-    if (!cond) {
-        return SDL_SetError("Passed a NULL condition variable");
+    if (cond == NULL) {
+        return SDL_InvalidParamError("cond");
     }
 
     /* If there are waiting threads not already signalled, then
@@ -158,13 +155,12 @@ Thread B:
     SDL_CondSignal(cond);
     SDL_UnlockMutex(lock);
  */
-int
-SDL_CondWaitTimeout(SDL_cond * cond, SDL_mutex * mutex, Uint32 ms)
+int SDL_CondWaitTimeout(SDL_cond *cond, SDL_mutex *mutex, Uint32 ms)
 {
     int retval;
 
-    if (!cond) {
-        return SDL_SetError("Passed a NULL condition variable");
+    if (cond == NULL) {
+        return SDL_InvalidParamError("cond");
     }
 
     /* Obtain the protection mutex, and increment the number of waiters.
@@ -213,8 +209,7 @@ SDL_CondWaitTimeout(SDL_cond * cond, SDL_mutex * mutex, Uint32 ms)
 }
 
 /* Wait on the condition variable forever */
-int
-SDL_CondWait(SDL_cond * cond, SDL_mutex * mutex)
+int SDL_CondWait(SDL_cond *cond, SDL_mutex *mutex)
 {
     return SDL_CondWaitTimeout(cond, mutex, SDL_MUTEX_MAXWAIT);
 }

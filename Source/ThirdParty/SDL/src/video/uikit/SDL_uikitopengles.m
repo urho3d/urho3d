@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,7 +20,7 @@
 */
 #include "../../SDL_internal.h"
 
-#if SDL_VIDEO_DRIVER_UIKIT
+#if SDL_VIDEO_DRIVER_UIKIT && (SDL_VIDEO_OPENGL_ES || SDL_VIDEO_OPENGL_ES2)
 
 #include "SDL_uikitopengles.h"
 #import "SDL_uikitopenglview.h"
@@ -150,9 +150,8 @@ UIKit_GL_CreateContext(_THIS, SDL_Window * window)
          * versions. */
         EAGLRenderingAPI api = major;
 
-        /* iOS currently doesn't support GLES >3.0. iOS 6 also only supports up
-         * to GLES 2.0. */
-        if (major > 3 || (major == 3 && (minor > 0 || !UIKit_IsSystemVersionAtLeast(7.0)))) {
+        /* iOS currently doesn't support GLES >3.0. */
+        if (major > 3 || (major == 3 && minor > 0)) {
             SDL_SetError("OpenGL ES %d.%d context could not be created", major, minor);
             return NULL;
         }
@@ -162,19 +161,15 @@ UIKit_GL_CreateContext(_THIS, SDL_Window * window)
         }
 
         if (_this->gl_config.share_with_current_context) {
-            EAGLContext *context = (__bridge EAGLContext *) SDL_GL_GetCurrentContext();
-            sharegroup = context.sharegroup;
+            EAGLContext *currContext = (__bridge EAGLContext *) SDL_GL_GetCurrentContext();
+            sharegroup = currContext.sharegroup;
         }
 
         if (window->flags & SDL_WINDOW_ALLOW_HIGHDPI) {
             /* Set the scale to the natural scale factor of the screen - the
              * backing dimensions of the OpenGL view will match the pixel
              * dimensions of the screen rather than the dimensions in points. */
-            if ([data.uiwindow.screen respondsToSelector:@selector(nativeScale)]) {
-                scale = data.uiwindow.screen.nativeScale;
-            } else {
-                scale = data.uiwindow.screen.scale;
-            }
+            scale = data.uiwindow.screen.nativeScale;
         }
 
         context = [[SDLEAGLContext alloc] initWithAPI:api sharegroup:sharegroup];

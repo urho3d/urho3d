@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,7 +22,6 @@
 
 #if SDL_VIDEO_DRIVER_DIRECTFB
 
-#include "SDL_assert.h"
 #include "SDL_DirectFB_video.h"
 #include "SDL_DirectFB_shape.h"
 #include "SDL_DirectFB_window.h"
@@ -35,12 +34,21 @@ DirectFB_CreateShaper(SDL_Window* window) {
     SDL_ShapeData* data;
     int resized_properly;
 
-    result = malloc(sizeof(SDL_WindowShaper));
+    result = SDL_malloc(sizeof(SDL_WindowShaper));
+    if (!result) {
+        SDL_OutOfMemory();
+        return NULL;
+    }
     result->window = window;
     result->mode.mode = ShapeModeDefault;
     result->mode.parameters.binarizationCutoff = 1;
     result->userx = result->usery = 0;
     data = SDL_malloc(sizeof(SDL_ShapeData));
+    if (!data) {
+        SDL_free(result);
+        SDL_OutOfMemory();
+        return NULL;
+    }
     result->driverdata = data;
     data->surface = NULL;
     window->shaper = result;
@@ -97,8 +105,7 @@ DirectFB_SetWindowShape(SDL_WindowShaper *shaper,SDL_Surface *shape,SDL_WindowSh
         SDL_DFB_CHECKERR(devdata->dfb->CreateSurface(devdata->dfb, &dsc, &data->surface));
 
         /* Assume that shaper->alphacutoff already has a value, because SDL_SetWindowShape() should have given it one. */
-        SDL_DFB_ALLOC_CLEAR(bitmap, shape->w * shape->h);
-        SDL_CalculateShapeBitmap(shaper->mode,shape,bitmap,1);
+        SDL_CalculateShapeBitmap(shaper->mode, shape, bitmap, 1);
 
         src = bitmap;
 

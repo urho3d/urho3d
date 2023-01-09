@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -24,9 +24,8 @@
 
 #include "../../SDL_internal.h"
 
-
-extern int SDL_BlendFillRect(SDL_Surface * dst, const SDL_Rect * rect, SDL_BlendMode blendMode, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
-extern int SDL_BlendFillRects(SDL_Surface * dst, const SDL_Rect * rects, int count, SDL_BlendMode blendMode, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+extern int SDL_BlendFillRect(SDL_Surface *dst, const SDL_Rect *rect, SDL_BlendMode blendMode, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+extern int SDL_BlendFillRects(SDL_Surface *dst, const SDL_Rect *rects, int count, SDL_BlendMode blendMode, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
 #endif /* SDL_blendfillrect_h_ */
 

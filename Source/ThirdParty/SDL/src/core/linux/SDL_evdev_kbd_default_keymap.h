@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,6 +18,8 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+/* *INDENT-OFF* */ /* clang-format off */
 
 static unsigned short default_key_map_0[NR_KEYS] = {
     0xf200, 0xf01b, 0xf031, 0xf032, 0xf033, 0xf034, 0xf035, 0xf036, 
@@ -4374,6 +4376,8 @@ static unsigned short default_key_map_127[NR_KEYS] = {
 };
 #endif /* INCLUDE_EXTENDED_KEYMAP */
 
+/* *INDENT-ON* */ /* clang-format on */
+
 static unsigned short *default_key_maps[MAX_NR_KEYMAPS] = {
     default_key_map_0,
     default_key_map_1,
@@ -4504,7 +4508,7 @@ static unsigned short *default_key_maps[MAX_NR_KEYMAPS] = {
     default_key_map_125,
     default_key_map_126,
     default_key_map_127,
-#else /* !INCLUDE_EXTENDED_KEYMAP */
+#else  /* !INCLUDE_EXTENDED_KEYMAP */
     NULL,
     NULL,
     NULL,

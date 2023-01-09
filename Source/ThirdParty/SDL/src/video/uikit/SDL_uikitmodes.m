@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,14 +22,151 @@
 
 #if SDL_VIDEO_DRIVER_UIKIT
 
-#include "SDL_assert.h"
+#include "SDL_system.h"
 #include "SDL_uikitmodes.h"
 
 #include "../../events/SDL_events_c.h"
 
+#import <sys/utsname.h>
+
 @implementation SDL_DisplayData
 
+- (instancetype)initWithScreen:(UIScreen*)screen
+{
+    if (self = [super init]) {
+        self.uiscreen = screen;
+
+        /*
+         * A well up to date list of device info can be found here:
+         * https://github.com/lmirosevic/GBDeviceInfo/blob/master/GBDeviceInfo/GBDeviceInfo_iOS.m
+         */
+        NSDictionary* devices = @{
+            @"iPhone1,1": @163,
+            @"iPhone1,2": @163,
+            @"iPhone2,1": @163,
+            @"iPhone3,1": @326,
+            @"iPhone3,2": @326,
+            @"iPhone3,3": @326,
+            @"iPhone4,1": @326,
+            @"iPhone5,1": @326,
+            @"iPhone5,2": @326,
+            @"iPhone5,3": @326,
+            @"iPhone5,4": @326,
+            @"iPhone6,1": @326,
+            @"iPhone6,2": @326,
+            @"iPhone7,1": @401,
+            @"iPhone7,2": @326,
+            @"iPhone8,1": @326,
+            @"iPhone8,2": @401,
+            @"iPhone8,4": @326,
+            @"iPhone9,1": @326,
+            @"iPhone9,2": @401,
+            @"iPhone9,3": @326,
+            @"iPhone9,4": @401,
+            @"iPhone10,1": @326,
+            @"iPhone10,2": @401,
+            @"iPhone10,3": @458,
+            @"iPhone10,4": @326,
+            @"iPhone10,5": @401,
+            @"iPhone10,6": @458,
+            @"iPhone11,2": @458,
+            @"iPhone11,4": @458,
+            @"iPhone11,6": @458,
+            @"iPhone11,8": @326,
+            @"iPhone12,1": @326,
+            @"iPhone12,3": @458,
+            @"iPhone12,5": @458,
+            @"iPad1,1": @132,
+            @"iPad2,1": @132,
+            @"iPad2,2": @132,
+            @"iPad2,3": @132,
+            @"iPad2,4": @132,
+            @"iPad2,5": @163,
+            @"iPad2,6": @163,
+            @"iPad2,7": @163,
+            @"iPad3,1": @264,
+            @"iPad3,2": @264,
+            @"iPad3,3": @264,
+            @"iPad3,4": @264,
+            @"iPad3,5": @264,
+            @"iPad3,6": @264,
+            @"iPad4,1": @264,
+            @"iPad4,2": @264,
+            @"iPad4,3": @264,
+            @"iPad4,4": @326,
+            @"iPad4,5": @326,
+            @"iPad4,6": @326,
+            @"iPad4,7": @326,
+            @"iPad4,8": @326,
+            @"iPad4,9": @326,
+            @"iPad5,1": @326,
+            @"iPad5,2": @326,
+            @"iPad5,3": @264,
+            @"iPad5,4": @264,
+            @"iPad6,3": @264,
+            @"iPad6,4": @264,
+            @"iPad6,7": @264,
+            @"iPad6,8": @264,
+            @"iPad6,11": @264,
+            @"iPad6,12": @264,
+            @"iPad7,1": @264,
+            @"iPad7,2": @264,
+            @"iPad7,3": @264,
+            @"iPad7,4": @264,
+            @"iPad7,5": @264,
+            @"iPad7,6": @264,
+            @"iPad7,11": @264,
+            @"iPad7,12": @264,
+            @"iPad8,1": @264,
+            @"iPad8,2": @264,
+            @"iPad8,3": @264,
+            @"iPad8,4": @264,
+            @"iPad8,5": @264,
+            @"iPad8,6": @264,
+            @"iPad8,7": @264,
+            @"iPad8,8": @264,
+            @"iPad11,1": @326,
+            @"iPad11,2": @326,
+            @"iPad11,3": @326,
+            @"iPad11,4": @326,
+            @"iPod1,1": @163,
+            @"iPod2,1": @163,
+            @"iPod3,1": @163,
+            @"iPod4,1": @326,
+            @"iPod5,1": @326,
+            @"iPod7,1": @326,
+            @"iPod9,1": @326,
+        };
+
+        struct utsname systemInfo;
+        uname(&systemInfo);
+        NSString* deviceName =
+            [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
+        id foundDPI = devices[deviceName];
+        if (foundDPI) {
+            self.screenDPI = (float)[foundDPI integerValue];
+        } else {
+            /*
+             * Estimate the DPI based on the screen scale multiplied by the base DPI for the device
+             * type (e.g. based on iPhone 1 and iPad 1)
+             */
+            float scale = (float)screen.nativeScale;
+            float defaultDPI;
+            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+                defaultDPI = 132.0f;
+            } else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+                defaultDPI = 163.0f;
+            } else {
+                defaultDPI = 160.0f;
+            }
+            self.screenDPI = scale * defaultDPI;
+        }
+    }
+    return self;
+}
+
 @synthesize uiscreen;
+@synthesize screenDPI;
 
 @end
 
@@ -39,6 +176,44 @@
 
 @end
 
+@interface SDL_DisplayWatch : NSObject
+@end
+
+@implementation SDL_DisplayWatch
+
++ (void)start
+{
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+
+    [center addObserver:self selector:@selector(screenConnected:)
+            name:UIScreenDidConnectNotification object:nil];
+    [center addObserver:self selector:@selector(screenDisconnected:)
+            name:UIScreenDidDisconnectNotification object:nil];
+}
+
++ (void)stop
+{
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+
+    [center removeObserver:self
+            name:UIScreenDidConnectNotification object:nil];
+    [center removeObserver:self
+            name:UIScreenDidDisconnectNotification object:nil];
+}
+
++ (void)screenConnected:(NSNotification*)notification
+{
+    UIScreen *uiscreen = [notification object];
+    UIKit_AddDisplay(uiscreen, SDL_TRUE);
+}
+
++ (void)screenDisconnected:(NSNotification*)notification
+{
+    UIScreen *uiscreen = [notification object];
+    UIKit_DelDisplay(uiscreen);
+}
+
+@end
 
 static int
 UIKit_AllocateDisplayModeData(SDL_DisplayMode * mode,
@@ -123,8 +298,8 @@ UIKit_AddDisplayMode(SDL_VideoDisplay * display, int w, int h, UIScreen * uiscre
     return 0;
 }
 
-static int
-UIKit_AddDisplay(UIScreen *uiscreen)
+int
+UIKit_AddDisplay(UIScreen *uiscreen, SDL_bool send_event)
 {
     UIScreenMode *uiscreenmode = uiscreen.currentMode;
     CGSize size = uiscreen.bounds.size;
@@ -153,18 +328,32 @@ UIKit_AddDisplay(UIScreen *uiscreen)
     display.current_mode = mode;
 
     /* Allocate the display data */
-    SDL_DisplayData *data = [[SDL_DisplayData alloc] init];
+    SDL_DisplayData *data = [[SDL_DisplayData alloc] initWithScreen:uiscreen];
     if (!data) {
         UIKit_FreeDisplayModeData(&display.desktop_mode);
         return SDL_OutOfMemory();
     }
 
-    data.uiscreen = uiscreen;
-
     display.driverdata = (void *) CFBridgingRetain(data);
-    SDL_AddVideoDisplay(&display);
+    SDL_AddVideoDisplay(&display, send_event);
 
     return 0;
+}
+
+void
+UIKit_DelDisplay(UIScreen *uiscreen)
+{
+    int i;
+
+    for (i = 0; i < SDL_GetNumVideoDisplays(); ++i) {
+        SDL_DisplayData *data = (__bridge SDL_DisplayData *)SDL_GetDisplayDriverData(i);
+
+        if (data && data.uiscreen == uiscreen) {
+            CFRelease(SDL_GetDisplayDriverData(i));
+            SDL_DelVideoDisplay(i);
+            return;
+        }
+    }
 }
 
 SDL_bool
@@ -186,13 +375,15 @@ UIKit_InitModes(_THIS)
 {
     @autoreleasepool {
         for (UIScreen *uiscreen in [UIScreen screens]) {
-            if (UIKit_AddDisplay(uiscreen) < 0) {
+            if (UIKit_AddDisplay(uiscreen, SDL_FALSE) < 0) {
                 return -1;
             }
         }
 #if !TARGET_OS_TV
         SDL_OnApplicationDidChangeStatusBarOrientation();
 #endif
+
+        [SDL_DisplayWatch start];
     }
 
     return 0;
@@ -244,6 +435,27 @@ UIKit_GetDisplayModes(_THIS, SDL_VideoDisplay * display)
 }
 
 int
+UIKit_GetDisplayDPI(_THIS, SDL_VideoDisplay * display, float * ddpi, float * hdpi, float * vdpi)
+{
+    @autoreleasepool {
+        SDL_DisplayData *data = (__bridge SDL_DisplayData *) display->driverdata;
+        float dpi = data.screenDPI;
+
+        if (ddpi) {
+            *ddpi = dpi * (float)SDL_sqrt(2.0);
+        }
+        if (hdpi) {
+            *hdpi = dpi;
+        }
+        if (vdpi) {
+            *vdpi = dpi;
+        }
+    }
+
+    return 0;
+}
+
+int
 UIKit_SetDisplayMode(_THIS, SDL_VideoDisplay * display, SDL_DisplayMode * mode)
 {
     @autoreleasepool {
@@ -287,12 +499,6 @@ UIKit_GetDisplayUsableBounds(_THIS, SDL_VideoDisplay * display, SDL_Rect * rect)
             return -1;
         }
 
-#if !TARGET_OS_TV && __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
-        if (!UIKit_IsSystemVersionAtLeast(7.0)) {
-            frame = [data.uiscreen applicationFrame];
-        }
-#endif
-
         rect->x += frame.origin.x;
         rect->y += frame.origin.y;
         rect->w = frame.size.width;
@@ -305,6 +511,8 @@ UIKit_GetDisplayUsableBounds(_THIS, SDL_VideoDisplay * display, SDL_Rect * rect)
 void
 UIKit_QuitModes(_THIS)
 {
+    [SDL_DisplayWatch stop];
+
     /* Release Objective-C objects, so higher level doesn't free() them. */
     int i, j;
     @autoreleasepool {

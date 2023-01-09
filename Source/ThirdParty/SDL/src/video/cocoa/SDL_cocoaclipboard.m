@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -29,13 +29,17 @@ int
 Cocoa_SetClipboardText(_THIS, const char *text)
 { @autoreleasepool
 {
-    SDL_VideoData *data = (SDL_VideoData *) _this->driverdata;
+    SDL_VideoData *data = (__bridge SDL_VideoData *) _this->driverdata;
     NSPasteboard *pasteboard;
     NSString *format = NSPasteboardTypeString;
+    NSString *nsstr = [NSString stringWithUTF8String:text];
+    if (nsstr == nil) {
+        return SDL_SetError("Couldn't create NSString; is your string data in UTF-8 format?");
+    }
 
     pasteboard = [NSPasteboard generalPasteboard];
-    data->clipboard_count = [pasteboard declareTypes:[NSArray arrayWithObject:format] owner:nil];
-    [pasteboard setString:[NSString stringWithUTF8String:text] forType:format];
+    data.clipboard_count = [pasteboard declareTypes:[NSArray arrayWithObject:format] owner:nil];
+    [pasteboard setString:nsstr forType:format];
 
     return 0;
 }}
@@ -61,7 +65,7 @@ Cocoa_GetClipboardText(_THIS)
         } else {
             utf8 = [string UTF8String];
         }
-        text = SDL_strdup(utf8);
+        text = SDL_strdup(utf8 ? utf8 : "");
     } else {
         text = SDL_strdup("");
     }
@@ -82,7 +86,7 @@ Cocoa_HasClipboardText(_THIS)
 }
 
 void
-Cocoa_CheckClipboardUpdate(struct SDL_VideoData * data)
+Cocoa_CheckClipboardUpdate(SDL_VideoData * data)
 { @autoreleasepool
 {
     NSPasteboard *pasteboard;
@@ -90,11 +94,11 @@ Cocoa_CheckClipboardUpdate(struct SDL_VideoData * data)
 
     pasteboard = [NSPasteboard generalPasteboard];
     count = [pasteboard changeCount];
-    if (count != data->clipboard_count) {
-        if (data->clipboard_count) {
+    if (count != data.clipboard_count) {
+        if (data.clipboard_count) {
             SDL_SendClipboardUpdate();
         }
-        data->clipboard_count = count;
+        data.clipboard_count = count;
     }
 }}
 

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,15 +18,11 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
-
 #include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_UIKIT
 
 #include "../SDL_sysvideo.h"
-#include "SDL_assert.h"
 #include "SDL_hints.h"
 #include "SDL_system.h"
 #include "SDL_main.h"
@@ -37,6 +33,14 @@
 
 #include "../../events/SDL_events_c.h"
 
+#if !TARGET_OS_TV
+#include <AvailabilityVersions.h>
+
+# ifndef __IPHONE_13_0
+# define __IPHONE_13_0 130000
+# endif
+#endif
+
 #ifdef main
 #undef main
 #endif
@@ -46,24 +50,12 @@ static int forward_argc;
 static char **forward_argv;
 static int exit_status;
 
-// Urho3D: added variables
-const char* resource_dir = 0;
-const char* documents_dir = 0;
-
-#if defined(SDL_MAIN_NEEDED) && !defined(IOS_DYLIB)
-/* SDL is being built as a static library, include main() */
-int main(int argc, char *argv[])
-{
-	return SDL_UIKitRunApp(argc, argv, SDL_main);
-}
-#endif /* SDL_MAIN_NEEDED && !IOS_DYLIB */
-
 int SDL_UIKitRunApp(int argc, char *argv[], SDL_main_func mainFunction)
 {
     int i;
 
     /* store arguments */
-	forward_main = mainFunction;
+    forward_main = mainFunction;
     forward_argc = argc;
     forward_argv = (char **)malloc((argc+1) * sizeof(char *));
     for (i = 0; i < argc; i++) {
@@ -85,51 +77,6 @@ int SDL_UIKitRunApp(int argc, char *argv[], SDL_main_func mainFunction)
 
     return exit_status;
 }
-
-// Urho3D: added function
-void SDL_IOS_LogMessage(const char *message)
-{
-    #ifdef _DEBUG
-    NSLog(@"%@", [NSString stringWithUTF8String: message]);
-    #endif
-}
-
-// Urho3D: added function
-const char* SDL_IOS_GetResourceDir()
-{
-    if (!resource_dir)
-    {
-        const char *temp = [[[NSBundle mainBundle] resourcePath] UTF8String];
-        resource_dir = malloc(strlen(temp) + 1);
-        strcpy(resource_dir, temp);
-    }
-
-    return resource_dir;
-}
-
-// Urho3D: added function
-const char* SDL_IOS_GetDocumentsDir()
-{
-    if (!documents_dir)
-    {
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-        NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
-
-        const char *temp = [basePath UTF8String];
-        documents_dir = malloc(strlen(temp) + 1);
-        strcpy(documents_dir, temp);
-    }
-
-    return documents_dir;
-}
-
-// Urho3D: added function
-#if TARGET_OS_TV
-unsigned SDL_TVOS_GetActiveProcessorCount()
-{
-    return [NSProcessInfo class] ? (unsigned)[[NSProcessInfo processInfo] activeProcessorCount] : 1;
-}
-#endif
 
 static void SDLCALL
 SDL_IdleTimerDisabledChanged(void *userdata, const char *name, const char *oldValue, const char *hint)
@@ -177,6 +124,53 @@ SDL_LoadLaunchImageNamed(NSString *name, int screenh)
 
     return image;
 }
+
+@interface SDLLaunchStoryboardViewController : UIViewController
+@property (nonatomic, strong) UIViewController *storyboardViewController;
+- (instancetype)initWithStoryboardViewController:(UIViewController *)storyboardViewController;
+@end
+
+@implementation SDLLaunchStoryboardViewController
+
+- (instancetype)initWithStoryboardViewController:(UIViewController *)storyboardViewController {
+    self = [super init];
+    self.storyboardViewController = storyboardViewController;
+    return self;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    [self addChildViewController:self.storyboardViewController];
+    [self.view addSubview:self.storyboardViewController.view];
+    self.storyboardViewController.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.storyboardViewController.view.frame = self.view.bounds;
+    [self.storyboardViewController didMoveToParentViewController:self];
+
+    UIApplication.sharedApplication.statusBarHidden = self.prefersStatusBarHidden;
+    UIApplication.sharedApplication.statusBarStyle = self.preferredStatusBarStyle;
+}
+
+- (BOOL)prefersStatusBarHidden {
+    return [[NSBundle.mainBundle objectForInfoDictionaryKey:@"UIStatusBarHidden"] boolValue];
+}
+
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    NSString *statusBarStyle = [NSBundle.mainBundle objectForInfoDictionaryKey:@"UIStatusBarStyle"];
+    if ([statusBarStyle isEqualToString:@"UIStatusBarStyleLightContent"]) {
+        return UIStatusBarStyleLightContent;
+    }
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_13_0
+    if (@available(iOS 13.0, *)) {
+        if ([statusBarStyle isEqualToString:@"UIStatusBarStyleDarkContent"]) {
+            return UIStatusBarStyleDarkContent;
+        }
+    }
+#endif
+    return UIStatusBarStyleDefault;
+}
+
+@end
 #endif /* !TARGET_OS_TV */
 
 @interface SDLLaunchScreenController ()
@@ -202,10 +196,9 @@ SDL_LoadLaunchImageNamed(NSString *name, int screenh)
 
     NSString *screenname = nibNameOrNil;
     NSBundle *bundle = nibBundleOrNil;
-    BOOL atleastiOS8 = UIKit_IsSystemVersionAtLeast(8.0);
 
-    /* Launch screens were added in iOS 8. Otherwise we use launch images. */
-    if (screenname && atleastiOS8) {
+    /* A launch screen may not exist. Fall back to launch images in that case. */
+    if (screenname) {
         @try {
             self.view = [bundle loadNibNamed:screenname owner:self options:nil][0];
         }
@@ -302,9 +295,9 @@ SDL_LoadLaunchImageNamed(NSString *name, int screenh)
             UIImageOrientation imageorient = UIImageOrientationUp;
 
 #if !TARGET_OS_TV
-            /* Bugs observed / workaround tested in iOS 8.3, 7.1, and 6.1. */
+            /* Bugs observed / workaround tested in iOS 8.3. */
             if (UIInterfaceOrientationIsLandscape(curorient)) {
-                if (atleastiOS8 && image.size.width < image.size.height) {
+                if (image.size.width < image.size.height) {
                     /* On iOS 8, portrait launch images displayed in forced-
                      * landscape mode (e.g. a standard Default.png on an iPhone
                      * when Info.plist only supports landscape orientations) need
@@ -313,15 +306,6 @@ SDL_LoadLaunchImageNamed(NSString *name, int screenh)
                         imageorient = UIImageOrientationRight;
                     } else if (curorient == UIInterfaceOrientationLandscapeRight) {
                         imageorient = UIImageOrientationLeft;
-                    }
-                } else if (!atleastiOS8 && image.size.width > image.size.height) {
-                    /* On iOS 7 and below, landscape launch images displayed in
-                     * landscape mode (e.g. landscape iPad launch images) need
-                     * to be rotated to display in the expected orientation. */
-                    if (curorient == UIInterfaceOrientationLandscapeLeft) {
-                        imageorient = UIImageOrientationLeft;
-                    } else if (curorient == UIInterfaceOrientationLandscapeRight) {
-                        imageorient = UIImageOrientationRight;
                     }
                 }
             }
@@ -439,13 +423,14 @@ SDL_LoadLaunchImageNamed(NSString *name, int screenh)
 #if !TARGET_OS_TV
     screenname = [bundle objectForInfoDictionaryKey:@"UILaunchStoryboardName"];
 
-    if (screenname && UIKit_IsSystemVersionAtLeast(8.0)) {
+    if (screenname) {
         @try {
             /* The launch storyboard is actually a nib in some older versions of
              * Xcode. We'll try to load it as a storyboard first, as it's more
              * modern. */
             UIStoryboard *storyboard = [UIStoryboard storyboardWithName:screenname bundle:bundle];
-            vc = [storyboard instantiateInitialViewController];
+            __auto_type storyboardVc = [storyboard instantiateInitialViewController];
+            vc = [[SDLLaunchStoryboardViewController alloc] initWithStoryboardViewController:storyboardVc];
         }
         @catch (NSException *exception) {
             /* Do nothing (there's more code to execute below). */
@@ -503,43 +488,6 @@ SDL_LoadLaunchImageNamed(NSString *name, int screenh)
 - (void)setWindow:(UIWindow *)window
 {
     /* Do nothing. */
-}
-
-#if !TARGET_OS_TV
-- (void)application:(UIApplication *)application didChangeStatusBarOrientation:(UIInterfaceOrientation)oldStatusBarOrientation
-{
-    SDL_OnApplicationDidChangeStatusBarOrientation();
-}
-#endif
-
-- (void)applicationWillTerminate:(UIApplication *)application
-{
-    SDL_OnApplicationWillTerminate();
-}
-
-- (void)applicationDidReceiveMemoryWarning:(UIApplication *)application
-{
-    SDL_OnApplicationDidReceiveMemoryWarning();
-}
-
-- (void)applicationWillResignActive:(UIApplication*)application
-{
-    SDL_OnApplicationWillResignActive();
-}
-
-- (void)applicationDidEnterBackground:(UIApplication*)application
-{
-    SDL_OnApplicationDidEnterBackground();
-}
-
-- (void)applicationWillEnterForeground:(UIApplication*)application
-{
-    SDL_OnApplicationWillEnterForeground();
-}
-
-- (void)applicationDidBecomeActive:(UIApplication*)application
-{
-    SDL_OnApplicationDidBecomeActive();
 }
 
 - (void)sendDropFileForURL:(NSURL *)url

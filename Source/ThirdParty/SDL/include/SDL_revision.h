@@ -1,2 +1,6 @@
-#define SDL_REVISION "hg-8628:b558f99d48f0"
-#define SDL_REVISION_NUMBER 8628
+#ifdef SDL_VENDOR_INFO
+#define SDL_REVISION SDL_VENDOR_INFO
+#else
+#define SDL_REVISION ""
+#endif
+#define SDL_REVISION_NUMBER 0

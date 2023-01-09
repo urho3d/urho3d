@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -26,20 +26,17 @@
 #include "../SDL_systhread.h"
 
 #ifdef SDL_PASSED_BEGINTHREAD_ENDTHREAD
-int
-SDL_SYS_CreateThread(SDL_Thread * thread, void *args,
-                     pfnSDL_CurrentBeginThread pfnBeginThread,
-                     pfnSDL_CurrentEndThread pfnEndThread)
+int SDL_SYS_CreateThread(SDL_Thread *thread,
+                         pfnSDL_CurrentBeginThread pfnBeginThread,
+                         pfnSDL_CurrentEndThread pfnEndThread)
 #else
-int
-SDL_SYS_CreateThread(SDL_Thread * thread, void *args)
+int SDL_SYS_CreateThread(SDL_Thread *thread)
 #endif /* SDL_PASSED_BEGINTHREAD_ENDTHREAD */
 {
     return SDL_SetError("Threads are not supported on this platform");
 }
 
-void
-SDL_SYS_SetupThread(const char *name)
+void SDL_SYS_SetupThread(const char *name)
 {
     return;
 }
@@ -47,23 +44,20 @@ SDL_SYS_SetupThread(const char *name)
 SDL_threadID
 SDL_ThreadID(void)
 {
-    return (0);
+    return 0;
 }
 
-int
-SDL_SYS_SetThreadPriority(SDL_ThreadPriority priority)
+int SDL_SYS_SetThreadPriority(SDL_ThreadPriority priority)
 {
-    return (0);
+    return 0;
 }
 
-void
-SDL_SYS_WaitThread(SDL_Thread * thread)
+void SDL_SYS_WaitThread(SDL_Thread *thread)
 {
     return;
 }
 
-void
-SDL_SYS_DetachThread(SDL_Thread * thread)
+void SDL_SYS_DetachThread(SDL_Thread *thread)
 {
     return;
 }

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,9 +19,9 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#define MAX_WMMSG   (sizeof(wmtab)/sizeof(wmtab[0]))
+#define MAX_WMMSG (sizeof(wmtab) / sizeof(wmtab[0]))
 
-char *wmtab[] = {
+const char *wmtab[] = {
     "WM_NULL",
     "WM_CREATE",
     "WM_DESTROY",
@@ -762,7 +762,7 @@ char *wmtab[] = {
     "UNKNOWN (737)",
     "UNKNOWN (738)",
     "UNKNOWN (739)",
-    "UNKNOWN (740)",
+    "WM_GETDPISCALEDSIZE",
     "UNKNOWN (741)",
     "UNKNOWN (742)",
     "UNKNOWN (743)",

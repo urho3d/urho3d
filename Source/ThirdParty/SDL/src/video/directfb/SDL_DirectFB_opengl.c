@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -47,7 +47,7 @@ struct SDL_GLDriverData
 };
 
 #define OPENGL_REQUIRS_DLOPEN
-#if defined(OPENGL_REQUIRS_DLOPEN) && defined(SDL_LOADSO_DLOPEN)
+#if defined(OPENGL_REQUIRS_DLOPEN) && defined(HAVE_DLOPEN)
 #include <dlfcn.h>
 #define GL_LoadObject(X)    dlopen(X, (RTLD_NOW|RTLD_GLOBAL))
 #define GL_LoadFunction     dlsym

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,8 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by Lasse Oorni for Urho3D
 
 /**
  *  \file SDL_gesture.h
@@ -48,39 +46,65 @@ typedef Sint64 SDL_GestureID;
 /* Function prototypes */
 
 /**
- *  \brief Begin Recording a gesture on the specified touch, or all touches (-1)
+ * Begin recording a gesture on a specified touch device or all touch devices.
  *
+ * If the parameter `touchId` is -1 (i.e., all devices), this function will
+ * always return 1, regardless of whether there actually are any devices.
  *
+ * \param touchId the touch device id, or -1 for all touch devices
+ * \returns 1 on success or 0 if the specified device could not be found.
+ *
+ * \since This function is available since SDL 2.0.0.
+ *
+ * \sa SDL_GetTouchDevice
  */
 extern DECLSPEC int SDLCALL SDL_RecordGesture(SDL_TouchID touchId);
 
 
 /**
- *  \brief Save all currently loaded Dollar Gesture templates
+ * Save all currently loaded Dollar Gesture templates.
  *
+ * \param dst a SDL_RWops to save to
+ * \returns the number of saved templates on success or 0 on failure; call
+ *          SDL_GetError() for more information.
  *
+ * \since This function is available since SDL 2.0.0.
+ *
+ * \sa SDL_LoadDollarTemplates
+ * \sa SDL_SaveDollarTemplate
  */
 extern DECLSPEC int SDLCALL SDL_SaveAllDollarTemplates(SDL_RWops *dst);
 
 /**
- *  \brief Save a currently loaded Dollar Gesture template
+ * Save a currently loaded Dollar Gesture template.
  *
+ * \param gestureId a gesture id
+ * \param dst a SDL_RWops to save to
+ * \returns 1 on success or 0 on failure; call SDL_GetError() for more
+ *          information.
  *
+ * \since This function is available since SDL 2.0.0.
+ *
+ * \sa SDL_LoadDollarTemplates
+ * \sa SDL_SaveAllDollarTemplates
  */
 extern DECLSPEC int SDLCALL SDL_SaveDollarTemplate(SDL_GestureID gestureId,SDL_RWops *dst);
 
 
 /**
- *  \brief Load Dollar Gesture templates from a file
+ * Load Dollar Gesture templates from a file.
  *
+ * \param touchId a touch id
+ * \param src a SDL_RWops to load from
+ * \returns the number of loaded templates on success or a negative error code
+ *          (or 0) on failure; call SDL_GetError() for more information.
  *
+ * \since This function is available since SDL 2.0.0.
+ *
+ * \sa SDL_SaveAllDollarTemplates
+ * \sa SDL_SaveDollarTemplate
  */
 extern DECLSPEC int SDLCALL SDL_LoadDollarTemplates(SDL_TouchID touchId, SDL_RWops *src);
-
-
-// Urho3d: added functions
-extern DECLSPEC int SDLCALL SDL_RemoveDollarTemplate(SDL_GestureID gestureId);
-extern DECLSPEC void SDLCALL SDL_RemoveAllDollarTemplates(void);
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus

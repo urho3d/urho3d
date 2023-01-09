@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -32,15 +32,22 @@
 void *
 SDL_LoadObject(const char *sofile)
 {
-    LPTSTR tstr = WIN_UTF8ToString(sofile);
+    void *handle;
+    LPTSTR tstr;
+
+    if (sofile == NULL) {
+        SDL_InvalidParamError("sofile");
+        return NULL;
+    }
+    tstr = WIN_UTF8ToString(sofile);
 #ifdef __WINRT__
-    /* WinRT only publically supports LoadPackagedLibrary() for loading .dll
+    /* WinRT only publicly supports LoadPackagedLibrary() for loading .dll
        files.  LoadLibrary() is a private API, and not available for apps
        (that can be published to MS' Windows Store.)
     */
-    void *handle = (void *) LoadPackagedLibrary(tstr, 0);
+    handle = (void *)LoadPackagedLibrary(tstr, 0);
 #else
-    void *handle = (void *) LoadLibrary(tstr);
+    handle = (void *)LoadLibrary(tstr);
 #endif
     SDL_free(tstr);
 
@@ -57,7 +64,7 @@ SDL_LoadObject(const char *sofile)
 void *
 SDL_LoadFunction(void *handle, const char *name)
 {
-    void *symbol = (void *) GetProcAddress((HMODULE) handle, name);
+    void *symbol = (void *)GetProcAddress((HMODULE)handle, name);
     if (symbol == NULL) {
         char errbuf[512];
         SDL_strlcpy(errbuf, "Failed loading ", SDL_arraysize(errbuf));
@@ -67,11 +74,10 @@ SDL_LoadFunction(void *handle, const char *name)
     return symbol;
 }
 
-void
-SDL_UnloadObject(void *handle)
+void SDL_UnloadObject(void *handle)
 {
     if (handle != NULL) {
-        FreeLibrary((HMODULE) handle);
+        FreeLibrary((HMODULE)handle);
     }
 }
 

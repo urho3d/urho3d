@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,23 +27,17 @@
 #include "SDL_x11xinput2.h"
 #include "../../events/SDL_touch_c.h"
 
-
-void
-X11_InitTouch(_THIS)
+void X11_InitTouch(_THIS)
 {
-    if (X11_Xinput2IsMultitouchSupported()) {
-        X11_InitXinput2Multitouch(_this);
-    }
+    X11_InitXinput2Multitouch(_this);
 }
 
-void
-X11_QuitTouch(_THIS)
+void X11_QuitTouch(_THIS)
 {
     SDL_TouchQuit();
 }
 
-void
-X11_ResetTouch(_THIS)
+void X11_ResetTouch(_THIS)
 {
     X11_QuitTouch(_this);
     X11_InitTouch(_this);

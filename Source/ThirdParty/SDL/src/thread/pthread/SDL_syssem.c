@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -45,8 +45,8 @@ struct SDL_semaphore
 SDL_sem *
 SDL_CreateSemaphore(Uint32 initial_value)
 {
-    SDL_sem *sem = (SDL_sem *) SDL_malloc(sizeof(SDL_sem));
-    if (sem) {
+    SDL_sem *sem = (SDL_sem *)SDL_malloc(sizeof(SDL_sem));
+    if (sem != NULL) {
         if (sem_init(&sem->sem, 0, initial_value) < 0) {
             SDL_SetError("sem_init() failed");
             SDL_free(sem);
@@ -58,22 +58,20 @@ SDL_CreateSemaphore(Uint32 initial_value)
     return sem;
 }
 
-void
-SDL_DestroySemaphore(SDL_sem * sem)
+void SDL_DestroySemaphore(SDL_sem *sem)
 {
-    if (sem) {
+    if (sem != NULL) {
         sem_destroy(&sem->sem);
         SDL_free(sem);
     }
 }
 
-int
-SDL_SemTryWait(SDL_sem * sem)
+int SDL_SemTryWait(SDL_sem *sem)
 {
     int retval;
 
-    if (!sem) {
-        return SDL_SetError("Passed a NULL semaphore");
+    if (sem == NULL) {
+        return SDL_InvalidParamError("sem");
     }
     retval = SDL_MUTEX_TIMEDOUT;
     if (sem_trywait(&sem->sem) == 0) {
@@ -82,13 +80,12 @@ SDL_SemTryWait(SDL_sem * sem)
     return retval;
 }
 
-int
-SDL_SemWait(SDL_sem * sem)
+int SDL_SemWait(SDL_sem *sem)
 {
     int retval;
 
-    if (!sem) {
-        return SDL_SetError("Passed a NULL semaphore");
+    if (sem == NULL) {
+        return SDL_InvalidParamError("sem");
     }
 
     do {
@@ -101,10 +98,9 @@ SDL_SemWait(SDL_sem * sem)
     return retval;
 }
 
-int
-SDL_SemWaitTimeout(SDL_sem * sem, Uint32 timeout)
+int SDL_SemWaitTimeout(SDL_sem *sem, Uint32 timeout)
 {
-    int retval;
+    int retval = 0;
 #ifdef HAVE_SEM_TIMEDWAIT
 #ifndef HAVE_CLOCK_GETTIME
     struct timeval now;
@@ -114,8 +110,8 @@ SDL_SemWaitTimeout(SDL_sem * sem, Uint32 timeout)
     Uint32 end;
 #endif
 
-    if (!sem) {
-        return SDL_SetError("Passed a NULL semaphore");
+    if (sem == NULL) {
+        return SDL_InvalidParamError("sem");
     }
 
     /* Try the easy cases first */
@@ -128,9 +124,9 @@ SDL_SemWaitTimeout(SDL_sem * sem, Uint32 timeout)
 
 #ifdef HAVE_SEM_TIMEDWAIT
     /* Setup the timeout. sem_timedwait doesn't wait for
-    * a lapse of time, but until we reach a certain time.
-    * This time is now plus the timeout.
-    */
+     * a lapse of time, but until we reach a certain time.
+     * This time is now plus the timeout.
+     */
 #ifdef HAVE_CLOCK_GETTIME
     clock_gettime(CLOCK_REALTIME, &ts_timeout);
 
@@ -177,25 +173,28 @@ SDL_SemWaitTimeout(SDL_sem * sem, Uint32 timeout)
 }
 
 Uint32
-SDL_SemValue(SDL_sem * sem)
+SDL_SemValue(SDL_sem *sem)
 {
     int ret = 0;
-    if (sem) {
-        sem_getvalue(&sem->sem, &ret);
-        if (ret < 0) {
-            ret = 0;
-        }
+
+    if (sem == NULL) {
+        SDL_InvalidParamError("sem");
+        return 0;
     }
-    return (Uint32) ret;
+
+    sem_getvalue(&sem->sem, &ret);
+    if (ret < 0) {
+        ret = 0;
+    }
+    return (Uint32)ret;
 }
 
-int
-SDL_SemPost(SDL_sem * sem)
+int SDL_SemPost(SDL_sem *sem)
 {
     int retval;
 
-    if (!sem) {
-        return SDL_SetError("Passed a NULL semaphore");
+    if (sem == NULL) {
+        return SDL_InvalidParamError("sem");
     }
 
     retval = sem_post(&sem->sem);
