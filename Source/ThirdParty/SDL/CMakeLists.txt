@@ -3616,3 +3616,6 @@ install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdPa
 file (GENERATE
       OUTPUT "${THIRD_PARTY_INCLUDE_DIR}/SDL/SDL_config.h"
       INPUT "${SDL2_BINARY_DIR}/SDL_config.h.intermediate")
+
+# Так как мы не используем макрос setup_library, то добавляем библиотеку в список самостоятельно
+set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} SDL2-static PARENT_SCOPE)

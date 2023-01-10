@@ -626,6 +626,3 @@ endif ()
 if (URHO3D_FORCE_AS_MAX_PORTABILITY)
     add_definitions (-DAS_MAX_PORTABILITY)
 endif ()
-
-# В целях минимизации изменений в SDL, подключаем SDL тут
-target_link_libraries (Urho3D SDL2-static)
