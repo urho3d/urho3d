@@ -3619,3 +3619,4 @@ file (GENERATE
 
 # Так как мы не используем макрос setup_library, то добавляем библиотеку в список самостоятельно
 set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} SDL2-static PARENT_SCOPE)
+
