@@ -11,14 +11,7 @@ set (SDL2_DISABLE_SDL2MAIN ON CACHE BOOL "" FORCE)
 
 # Urho3D: Добавлено. Этот хак позволяет компилировать 32-битную версию движка на 64-битной Ubuntu/Linux Mint.
 # CMAKE_LIBRARY_ARCHITECTURE устанавливается неправильно: https://gitlab.kitware.com/cmake/cmake/-/issues/20565
-# Текст ошибки:
-# [ 17%] Building C object Source/ThirdParty/SDL/CMakeFiles/SDL2-static.dir/src/video/x11/SDL_x11events.c.o
-#In file included from /home/runner/work/urho3d/urho3d/engine_repo/Source/ThirdParty/SDL/src/video/x11/SDL_x11events.c:33:
-#/home/runner/work/urho3d/urho3d/engine_repo/Source/ThirdParty/SDL/src/video/x11/SDL_x11xinput2.h:30:36: error: typedef redefinition with different types ('struct XGenericEventCookie' vs 'struct XGenericEventCookie' (aka 'XGenericEventCookie'))
-#typedef struct XGenericEventCookie XGenericEventCookie;
-#                                   ^
-#/usr/include/X11/Xlib.h:967:3: note: previous definition is here
-#} XGenericEventCookie;
+# Текст ошибки при компиляции GCC: Source/ThirdParty/SDL/src/video/x11/SDL_x11xinput2.h:30:36: error: conflicting types for ‘XGenericEventCookie’; have ‘struct XGenericEventCookie’
 if (CMAKE_LIBRARY_ARCHITECTURE STREQUAL "x86_64-linux-gnu" AND NOT URHO3D_64BIT)
     set (CMAKE_LIBRARY_ARCHITECTURE "i386-linux-gnu")
 endif ()
@@ -462,7 +455,14 @@ set_option(SDL_LIBSAMPLERATE       "Use libsamplerate for audio rate conversion"
 dep_option(SDL_LIBSAMPLERATE_SHARED "Dynamically load libsamplerate" ON "SDL_LIBSAMPLERATE" OFF)
 set_option(SDL_RPATH               "Use an rpath when linking SDL" ${UNIX_SYS})
 set_option(SDL_CLOCK_GETTIME       "Use clock_gettime() instead of gettimeofday()" ${SDL_CLOCK_GETTIME_ENABLED_BY_DEFAULT})
-set_option(SDL_X11                 "Use X11 video driver" ${UNIX_SYS})
+
+# Urho3D: Закомментировано
+#set_option(SDL_X11                 "Use X11 video driver" ${UNIX_SYS})
+
+# Urho3D: Добавлено. X11 будет доступен только на Unix (включая macOS)
+# Текст ошибки CMake при сборке для Raspberry Pi: Missing Xext.h, maybe you need to install the libxext-dev
+dep_option(SDL_X11                 "Use X11 video driver" ON "UNIX_OR_MAC_SYS\;NOT RPI AND NOT IOS AND NOT TVOS" OFF)
+
 dep_option(SDL_X11_SHARED          "Dynamically load X11 support" ON "SDL_X11" OFF)
 set(SDL_X11_OPTIONS Xcursor Xdbe XInput Xfixes Xrandr Xscrnsaver XShape)
 foreach(_SUB ${SDL_X11_OPTIONS})
