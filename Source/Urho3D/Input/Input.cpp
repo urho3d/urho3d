@@ -1239,15 +1239,14 @@ bool Input::RemoveGesture(unsigned gestureID)
 #ifdef __EMSCRIPTEN__
     return false;
 #else
-    return false;
-    //return SDL_RemoveDollarTemplate(gestureID) != 0;
+    return SDL_RemoveDollarTemplate(gestureID) != 0;
 #endif
 }
 
 void Input::RemoveAllGestures()
 {
 #ifndef __EMSCRIPTEN__
-    //SDL_RemoveAllDollarTemplates();
+    SDL_RemoveAllDollarTemplates();
 #endif
 }
 

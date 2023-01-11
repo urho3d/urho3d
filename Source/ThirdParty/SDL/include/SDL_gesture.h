@@ -19,6 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+// Модифицировано для Urho3D
+
 /**
  *  \file SDL_gesture.h
  *
@@ -42,6 +44,10 @@ extern "C" {
 #endif
 
 typedef Sint64 SDL_GestureID;
+
+// Urho3D: Добавлено
+extern DECLSPEC int SDLCALL SDL_RemoveDollarTemplate(SDL_GestureID gestureId);
+extern DECLSPEC void SDLCALL SDL_RemoveAllDollarTemplates(void);
 
 /* Function prototypes */
 
