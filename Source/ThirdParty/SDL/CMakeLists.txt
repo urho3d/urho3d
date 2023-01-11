@@ -461,7 +461,7 @@ set_option(SDL_CLOCK_GETTIME       "Use clock_gettime() instead of gettimeofday(
 
 # Urho3D: Добавлено. X11 будет доступен только на Unix (включая macOS)
 # Текст ошибки CMake при сборке для Raspberry Pi: Missing Xext.h, maybe you need to install the libxext-dev
-dep_option(SDL_X11                 "Use X11 video driver" ON "UNIX_OR_MAC_SYS\;NOT RPI AND NOT IOS AND NOT TVOS" OFF)
+dep_option(SDL_X11                 "Use X11 video driver" ON "UNIX_OR_MAC_SYS;NOT RPI AND NOT IOS AND NOT TVOS" OFF)
 
 dep_option(SDL_X11_SHARED          "Dynamically load X11 support" ON "SDL_X11" OFF)
 set(SDL_X11_OPTIONS Xcursor Xdbe XInput Xfixes Xrandr Xscrnsaver XShape)
