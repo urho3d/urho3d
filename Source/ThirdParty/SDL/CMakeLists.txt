@@ -456,7 +456,7 @@ dep_option(SDL_LIBSAMPLERATE_SHARED "Dynamically load libsamplerate" ON "SDL_LIB
 set_option(SDL_RPATH               "Use an rpath when linking SDL" ${UNIX_SYS})
 set_option(SDL_CLOCK_GETTIME       "Use clock_gettime() instead of gettimeofday()" ${SDL_CLOCK_GETTIME_ENABLED_BY_DEFAULT})
 
-# Urho3D: Закомментировано
+# Urho3D: Закомментировано. X11 не нужен на Raspberry Pi (возможно это проблема используемого для компиляции образа), но нужен на macOS
 #set_option(SDL_X11                 "Use X11 video driver" ${UNIX_SYS})
 
 # Urho3D: Добавлено. X11 будет доступен только на Unix (включая macOS)
