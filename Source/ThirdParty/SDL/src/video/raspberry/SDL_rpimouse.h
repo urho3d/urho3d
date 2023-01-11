@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,13 +27,13 @@
 typedef struct _RPI_CursorData RPI_CursorData;
 struct _RPI_CursorData
 {
-    DISPMANX_RESOURCE_HANDLE_T  resource;
-    DISPMANX_ELEMENT_HANDLE_T   element;
-    int                         hot_x, hot_y;
-    int                         w, h;
+    DISPMANX_RESOURCE_HANDLE_T resource;
+    DISPMANX_ELEMENT_HANDLE_T element;
+    int hot_x, hot_y;
+    int w, h;
 };
 
-#define SDL_RPI_CURSORDATA(curs)  RPI_CursorData *curdata = (RPI_CursorData *) ((curs) ? (curs)->driverdata : NULL)
+#define SDL_RPI_CURSORDATA(curs) RPI_CursorData *curdata = (RPI_CursorData *)((curs) ? (curs)->driverdata : NULL)
 
 extern void RPI_InitMouse(_THIS);
 extern void RPI_QuitMouse(_THIS);

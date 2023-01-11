@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -46,15 +46,15 @@ extern SDL_bool Android_JNI_GetAccelerometerValues(float values[3]);
 extern void Android_JNI_ShowTextInput(SDL_Rect *inputRect);
 extern void Android_JNI_HideTextInput(void);
 extern SDL_bool Android_JNI_IsScreenKeyboardShown(void);
-extern ANativeWindow* Android_JNI_GetNativeWindow(void);
-extern void Android_JNI_SetSurfaceViewFormat(int format);
+extern ANativeWindow *Android_JNI_GetNativeWindow(void);
 
 extern SDL_DisplayOrientation Android_JNI_GetDisplayOrientation(void);
 extern int Android_JNI_GetDisplayDPI(float *ddpi, float *xdpi, float *ydpi);
 
 /* Audio support */
-extern int Android_JNI_OpenAudioDevice(int iscapture, SDL_AudioSpec *spec);
-extern void* Android_JNI_GetAudioBuffer(void);
+extern void Android_DetectDevices(void);
+extern int Android_JNI_OpenAudioDevice(int iscapture, int device_id, SDL_AudioSpec *spec);
+extern void *Android_JNI_GetAudioBuffer(void);
 extern void Android_JNI_WriteAudioBuffer(void);
 extern int Android_JNI_CaptureAudioBuffer(void *buffer, int buflen);
 extern void Android_JNI_FlushCapturedAudio(void);
@@ -78,12 +78,12 @@ int Android_JNI_FileClose(SDL_RWops* ctx);
 void Android_JNI_GetManifestEnvironmentVariables(void);
 
 /* Clipboard support */
-int Android_JNI_SetClipboardText(const char* text);
-char* Android_JNI_GetClipboardText(void);
+int Android_JNI_SetClipboardText(const char *text);
+char *Android_JNI_GetClipboardText(void);
 SDL_bool Android_JNI_HasClipboardText(void);
 
 /* Power support */
-int Android_JNI_GetPowerInfo(int* plugged, int* charged, int* battery, int* seconds, int* percent);
+int Android_JNI_GetPowerInfo(int *plugged, int *charged, int *battery, int *seconds, int *percent);
 
 /* Joystick support */
 void Android_JNI_PollInputDevices(void);
@@ -104,11 +104,14 @@ void Android_JNI_InitTouch(void);
 JNIEnv *Android_JNI_GetEnv(void);
 int Android_JNI_SetupThread(void);
 
+/* Locale */
+int Android_JNI_GetLocale(char *buf, size_t buflen);
+
 /* Generic messages */
 int Android_JNI_SendMessage(int command, int param);
 
 /* Init */
-JNIEXPORT void JNICALL SDL_Android_Init(JNIEnv* mEnv, jclass cls);
+JNIEXPORT void JNICALL SDL_Android_Init(JNIEnv *mEnv, jclass cls);
 
 /* MessageBox */
 #include "SDL_messagebox.h"
@@ -116,6 +119,7 @@ int Android_JNI_ShowMessageBox(const SDL_MessageBoxData *messageboxdata, int *bu
 
 /* Cursor support */
 int Android_JNI_CreateCustomCursor(SDL_Surface *surface, int hot_x, int hot_y);
+void Android_JNI_DestroyCustomCursor(int cursorID);
 SDL_bool Android_JNI_SetCustomCursor(int cursorID);
 SDL_bool Android_JNI_SetSystemCursor(int cursorID);
 
@@ -123,6 +127,13 @@ SDL_bool Android_JNI_SetSystemCursor(int cursorID);
 SDL_bool Android_JNI_SupportsRelativeMouse(void);
 SDL_bool Android_JNI_SetRelativeMouseEnabled(SDL_bool enabled);
 
+/* Request permission */
+SDL_bool Android_JNI_RequestPermission(const char *permission);
+
+/* Show toast notification */
+int Android_JNI_ShowToast(const char *message, int duration, int gravity, int xOffset, int yOffset);
+
+int Android_JNI_OpenURL(const char *url);
 
 int SDL_GetAndroidSDKVersion(void);
 

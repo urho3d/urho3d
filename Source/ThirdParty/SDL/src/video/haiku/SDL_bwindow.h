@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,9 +22,7 @@
 #ifndef SDL_BWINDOW_H
 #define SDL_BWINDOW_H
 
-
 #include "../SDL_sysvideo.h"
-
 
 extern int HAIKU_CreateWindow(_THIS, SDL_Window *window);
 extern int HAIKU_CreateWindowFrom(_THIS, SDL_Window * window, const void *data);
@@ -32,6 +30,7 @@ extern void HAIKU_SetWindowTitle(_THIS, SDL_Window * window);
 extern void HAIKU_SetWindowIcon(_THIS, SDL_Window * window, SDL_Surface * icon);
 extern void HAIKU_SetWindowPosition(_THIS, SDL_Window * window);
 extern void HAIKU_SetWindowSize(_THIS, SDL_Window * window);
+extern void HAIKU_SetWindowMinimumSize(_THIS, SDL_Window * window);
 extern void HAIKU_ShowWindow(_THIS, SDL_Window * window);
 extern void HAIKU_HideWindow(_THIS, SDL_Window * window);
 extern void HAIKU_RaiseWindow(_THIS, SDL_Window * window);
@@ -43,12 +42,10 @@ extern void HAIKU_SetWindowResizable(_THIS, SDL_Window * window, SDL_bool resiza
 extern void HAIKU_SetWindowFullscreen(_THIS, SDL_Window * window, SDL_VideoDisplay * display, SDL_bool fullscreen);
 extern int HAIKU_SetWindowGammaRamp(_THIS, SDL_Window * window, const Uint16 * ramp);
 extern int HAIKU_GetWindowGammaRamp(_THIS, SDL_Window * window, Uint16 * ramp);
-extern void HAIKU_SetWindowGrab(_THIS, SDL_Window * window, SDL_bool grabbed);
+extern void HAIKU_SetWindowMouseGrab(_THIS, SDL_Window * window, SDL_bool grabbed);
 extern void HAIKU_DestroyWindow(_THIS, SDL_Window * window);
 extern SDL_bool HAIKU_GetWindowWMInfo(_THIS, SDL_Window * window,
                                     struct SDL_SysWMinfo *info);
-
-
 
 #endif
 

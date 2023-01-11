@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,7 +22,6 @@
 
 #if SDL_VIDEO_DRIVER_DIRECTFB
 
-#include "SDL_assert.h"
 
 #include "SDL_DirectFB_video.h"
 #include "SDL_DirectFB_mouse.h"
@@ -165,7 +164,7 @@ DirectFB_CreateCursor(SDL_Surface * surface, int hot_x, int hot_y)
 
     p = surface->pixels;
     for (i = 0; i < surface->h; i++)
-        memcpy((char *) dest + i * pitch,
+        SDL_memcpy((char *) dest + i * pitch,
                (char *) p + i * surface->pitch, 4 * surface->w);
 
     curdata->surf->Unlock(curdata->surf);

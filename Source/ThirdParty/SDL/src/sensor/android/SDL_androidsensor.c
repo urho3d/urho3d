@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,6 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+#include "../../SDL_internal.h"
 
 #include "SDL_config.h"
 
@@ -31,10 +32,9 @@
 #include "SDL_androidsensor.h"
 #include "../SDL_syssensor.h"
 #include "../SDL_sensor_c.h"
-//#include "../../core/android/SDL_android.h"
 
 #ifndef LOOPER_ID_USER
-#define LOOPER_ID_USER  3
+#define LOOPER_ID_USER 3
 #endif
 
 typedef struct
@@ -43,26 +43,25 @@ typedef struct
     SDL_SensorID instance_id;
 } SDL_AndroidSensor;
 
-static ASensorManager* SDL_sensor_manager;
-static ALooper* SDL_sensor_looper;
+static ASensorManager *SDL_sensor_manager;
+static ALooper *SDL_sensor_looper;
 static SDL_AndroidSensor *SDL_sensors;
 static int SDL_sensors_count;
 
-static int
-SDL_ANDROID_SensorInit(void)
+static int SDL_ANDROID_SensorInit(void)
 {
     int i, sensors_count;
     ASensorList sensors;
 
     SDL_sensor_manager = ASensorManager_getInstance();
-    if (!SDL_sensor_manager) {
+    if (SDL_sensor_manager == NULL) {
         return SDL_SetError("Couldn't create sensor manager");
     }
 
     SDL_sensor_looper = ALooper_forThread();
-    if (!SDL_sensor_looper) {
+    if (SDL_sensor_looper == NULL) {
         SDL_sensor_looper = ALooper_prepare(ALOOPER_PREPARE_ALLOW_NON_CALLBACKS);
-        if (!SDL_sensor_looper) {
+        if (SDL_sensor_looper == NULL) {
             return SDL_SetError("Couldn't create sensor event loop");
         }
     }
@@ -71,7 +70,7 @@ SDL_ANDROID_SensorInit(void)
     sensors_count = ASensorManager_getSensorList(SDL_sensor_manager, &sensors);
     if (sensors_count > 0) {
         SDL_sensors = (SDL_AndroidSensor *)SDL_calloc(sensors_count, sizeof(*SDL_sensors));
-        if (!SDL_sensors) {
+        if (SDL_sensors == NULL) {
             return SDL_OutOfMemory();
         }
 
@@ -84,25 +83,21 @@ SDL_ANDROID_SensorInit(void)
     return 0;
 }
 
-static int
-SDL_ANDROID_SensorGetCount(void)
+static int SDL_ANDROID_SensorGetCount(void)
 {
     return SDL_sensors_count;
 }
 
-static void
-SDL_ANDROID_SensorDetect(void)
+static void SDL_ANDROID_SensorDetect(void)
 {
 }
 
-static const char *
-SDL_ANDROID_SensorGetDeviceName(int device_index)
+static const char *SDL_ANDROID_SensorGetDeviceName(int device_index)
 {
     return ASensor_getName(SDL_sensors[device_index].asensor);
 }
 
-static SDL_SensorType
-SDL_ANDROID_SensorGetDeviceType(int device_index)
+static SDL_SensorType SDL_ANDROID_SensorGetDeviceType(int device_index)
 {
     switch (ASensor_getType(SDL_sensors[device_index].asensor)) {
     case 0x00000001:
@@ -114,22 +109,20 @@ SDL_ANDROID_SensorGetDeviceType(int device_index)
     }
 }
 
-static int
-SDL_ANDROID_SensorGetDeviceNonPortableType(int device_index)
+static int SDL_ANDROID_SensorGetDeviceNonPortableType(int device_index)
 {
     return ASensor_getType(SDL_sensors[device_index].asensor);
 }
 
-static SDL_SensorID
-SDL_ANDROID_SensorGetDeviceInstanceID(int device_index)
+static SDL_SensorID SDL_ANDROID_SensorGetDeviceInstanceID(int device_index)
 {
     return SDL_sensors[device_index].instance_id;
 }
 
-static int
-SDL_ANDROID_SensorOpen(SDL_Sensor *sensor, int device_index)
+static int SDL_ANDROID_SensorOpen(SDL_Sensor *sensor, int device_index)
 {
     struct sensor_hwdata *hwdata;
+    int delay_us, min_delay_us;
 
     hwdata = (struct sensor_hwdata *)SDL_calloc(1, sizeof(*hwdata));
     if (hwdata == NULL) {
@@ -149,29 +142,34 @@ SDL_ANDROID_SensorOpen(SDL_Sensor *sensor, int device_index)
         return SDL_SetError("Couldn't enable sensor");
     }
 
-    /* FIXME: What rate should we set for this sensor? 60 FPS? Let's try the default rate for now... */
+    /* Use 60 Hz update rate if possible */
+    /* FIXME: Maybe add a hint for this? */
+    delay_us = 1000000 / 60;
+    min_delay_us = ASensor_getMinDelay(hwdata->asensor);
+    if (delay_us < min_delay_us) {
+        delay_us = min_delay_us;
+    }
+    ASensorEventQueue_setEventRate(hwdata->eventqueue, hwdata->asensor, delay_us);
 
     sensor->hwdata = hwdata;
     return 0;
 }
-    
-static void
-SDL_ANDROID_SensorUpdate(SDL_Sensor *sensor)
+
+static void SDL_ANDROID_SensorUpdate(SDL_Sensor *sensor)
 {
     int events;
     ASensorEvent event;
-    struct android_poll_source* source;
+    struct android_poll_source *source;
 
-    if (ALooper_pollAll(0, NULL, &events, (void**)&source) == LOOPER_ID_USER) {
+    if (ALooper_pollAll(0, NULL, &events, (void **)&source) == LOOPER_ID_USER) {
         SDL_zero(event);
         while (ASensorEventQueue_getEvents(sensor->hwdata->eventqueue, &event, 1) > 0) {
-            SDL_PrivateSensorUpdate(sensor, event.data, SDL_arraysize(event.data));
+            SDL_PrivateSensorUpdate(sensor, 0, event.data, SDL_arraysize(event.data));
         }
     }
 }
 
-static void
-SDL_ANDROID_SensorClose(SDL_Sensor *sensor)
+static void SDL_ANDROID_SensorClose(SDL_Sensor *sensor)
 {
     if (sensor->hwdata) {
         ASensorEventQueue_disableSensor(sensor->hwdata->eventqueue, sensor->hwdata->asensor);
@@ -181,8 +179,7 @@ SDL_ANDROID_SensorClose(SDL_Sensor *sensor)
     }
 }
 
-static void
-SDL_ANDROID_SensorQuit(void)
+static void SDL_ANDROID_SensorQuit(void)
 {
     if (SDL_sensors) {
         SDL_free(SDL_sensors);
@@ -191,8 +188,7 @@ SDL_ANDROID_SensorQuit(void)
     }
 }
 
-SDL_SensorDriver SDL_ANDROID_SensorDriver =
-{
+SDL_SensorDriver SDL_ANDROID_SensorDriver = {
     SDL_ANDROID_SensorInit,
     SDL_ANDROID_SensorGetCount,
     SDL_ANDROID_SensorDetect,

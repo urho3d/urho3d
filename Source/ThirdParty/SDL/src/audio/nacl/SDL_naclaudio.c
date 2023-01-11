@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -49,8 +49,8 @@ static void nacl_audio_callback(void* stream, uint32_t buffer_size, PP_TimeDelta
     const int len = (int) buffer_size;
     SDL_AudioDevice* _this = (SDL_AudioDevice*) data;
     SDL_AudioCallback callback = _this->callbackspec.callback;
-    
-    SDL_LockMutex(private->mutex);  /* !!! FIXME: is this mutex necessary? */
+
+    SDL_LockMutex(_this->mixer_lock);
 
     /* Only do something if audio is enabled */
     if (!SDL_AtomicGet(&_this->enabled) || SDL_AtomicGet(&_this->paused)) {
@@ -58,34 +58,31 @@ static void nacl_audio_callback(void* stream, uint32_t buffer_size, PP_TimeDelta
             SDL_AudioStreamClear(_this->stream);
         }
         SDL_memset(stream, _this->spec.silence, len);
-        return;
-    }
+    } else {
+        SDL_assert(_this->spec.size == len);
 
-    SDL_assert(_this->spec.size == len);
+        if (_this->stream == NULL) {  /* no conversion necessary. */
+            callback(_this->callbackspec.userdata, stream, len);
+        } else {  /* streaming/converting */
+            const int stream_len = _this->callbackspec.size;
+            while (SDL_AudioStreamAvailable(_this->stream) < len) {
+                callback(_this->callbackspec.userdata, _this->work_buffer, stream_len);
+                if (SDL_AudioStreamPut(_this->stream, _this->work_buffer, stream_len) == -1) {
+                    SDL_AudioStreamClear(_this->stream);
+                    SDL_AtomicSet(&_this->enabled, 0);
+                    break;
+                }
+            }
 
-    if (_this->stream == NULL) {  /* no conversion necessary. */
-        SDL_LockMutex(_this->mixer_lock);
-        callback(_this->callbackspec.userdata, stream, len);
-        SDL_UnlockMutex(_this->mixer_lock);
-    } else {  /* streaming/converting */
-        const int stream_len = _this->callbackspec.size;
-        while (SDL_AudioStreamAvailable(_this->stream) < len) {
-            callback(_this->callbackspec.userdata, _this->work_buffer, stream_len);
-            if (SDL_AudioStreamPut(_this->stream, _this->work_buffer, stream_len) == -1) {
-                SDL_AudioStreamClear(_this->stream);
-                SDL_AtomicSet(&_this->enabled, 0);
-                break;
+            const int got = SDL_AudioStreamGet(_this->stream, stream, len);
+            SDL_assert((got < 0) || (got == len));
+            if (got != len) {
+                SDL_memset(stream, _this->spec.silence, len);
             }
         }
-
-        const int got = SDL_AudioStreamGet(_this->stream, stream, len);
-        SDL_assert((got < 0) || (got == len));
-        if (got != len) {
-            SDL_memset(stream, _this->spec.silence, len);
-        }
     }
 
-    SDL_UnlockMutex(private->mutex);
+    SDL_UnlockMutex(_this->mixer_lock);
 }
 
 static void NACLAUDIO_CloseDevice(SDL_AudioDevice *device) {
@@ -94,12 +91,11 @@ static void NACLAUDIO_CloseDevice(SDL_AudioDevice *device) {
     SDL_PrivateAudioData *hidden = (SDL_PrivateAudioData *) device->hidden;
     
     ppb_audio->StopPlayback(hidden->audio);
-    SDL_DestroyMutex(hidden->mutex);
     core->ReleaseResource(hidden->audio);
 }
 
 static int
-NACLAUDIO_OpenDevice(_THIS, void *handle, const char *devname, int iscapture) {
+NACLAUDIO_OpenDevice(_THIS, const char *devname) {
     PP_Instance instance = PSGetInstanceId();
     const PPB_Audio *ppb_audio = PSInterfaceAudio();
     const PPB_AudioConfig *ppb_audiocfg = PSInterfaceAudioConfig();
@@ -109,7 +105,6 @@ NACLAUDIO_OpenDevice(_THIS, void *handle, const char *devname, int iscapture) {
         return SDL_OutOfMemory();
     }
     
-    private->mutex = SDL_CreateMutex();
     _this->spec.freq = 44100;
     _this->spec.format = AUDIO_S16LSB;
     _this->spec.channels = 2;
@@ -133,18 +128,18 @@ NACLAUDIO_OpenDevice(_THIS, void *handle, const char *devname, int iscapture) {
     return 0;
 }
 
-static int
+static SDL_bool
 NACLAUDIO_Init(SDL_AudioDriverImpl * impl)
 {
     if (PSGetInstanceId() == 0) {
-        return 0;
+        return SDL_FALSE;
     }
     
     /* Set the function pointers */
     impl->OpenDevice = NACLAUDIO_OpenDevice;
     impl->CloseDevice = NACLAUDIO_CloseDevice;
-    impl->OnlyHasDefaultOutputDevice = 1;
-    impl->ProvidesOwnCallbackThread = 1;
+    impl->OnlyHasDefaultOutputDevice = SDL_TRUE;
+    impl->ProvidesOwnCallbackThread = SDL_TRUE;
     /*
      *    impl->WaitDevice = NACLAUDIO_WaitDevice;
      *    impl->GetDeviceBuf = NACLAUDIO_GetDeviceBuf;
@@ -152,12 +147,12 @@ NACLAUDIO_Init(SDL_AudioDriverImpl * impl)
      *    impl->Deinitialize = NACLAUDIO_Deinitialize;
      */
     
-    return 1;
+    return SDL_TRUE;
 }
 
 AudioBootStrap NACLAUDIO_bootstrap = {
     NACLAUDIO_DRIVER_NAME, "SDL NaCl Audio Driver",
-    NACLAUDIO_Init, 0
+    NACLAUDIO_Init, SDL_FALSE
 };
 
 #endif /* SDL_AUDIO_DRIVER_NACL */

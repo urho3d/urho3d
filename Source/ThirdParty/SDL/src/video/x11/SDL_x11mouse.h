@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,6 +22,17 @@
 
 #ifndef SDL_x11mouse_h_
 #define SDL_x11mouse_h_
+
+typedef struct SDL_XInput2DeviceInfo
+{
+    int device_id;
+    SDL_bool relative[2];
+    double minval[2];
+    double maxval[2];
+    double prev_coords[2];
+    Time prev_time;
+    struct SDL_XInput2DeviceInfo *next;
+} SDL_XInput2DeviceInfo;
 
 extern void X11_InitMouse(_THIS);
 extern void X11_QuitMouse(_THIS);

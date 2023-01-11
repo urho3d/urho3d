@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -28,15 +28,17 @@
 
 #ifdef SDL_INPUT_LINUXEV
 #include "../../core/linux/SDL_evdev.h"
+#elif defined SDL_INPUT_WSCONS
+#include "../../core/openbsd/SDL_wscons.h"
 #endif
 
 void KMSDRM_PumpEvents(_THIS)
 {
 #ifdef SDL_INPUT_LINUXEV
     SDL_EVDEV_Poll();
+#elif defined SDL_INPUT_WSCONS
+    SDL_WSCONS_PumpEvents();
 #endif
-
 }
 
 #endif /* SDL_VIDEO_DRIVER_KMSDRM */
-

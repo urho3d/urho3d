@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,7 +27,6 @@
 
 #include "SDL_power.h"
 #include "SDL_timer.h"
-#include "SDL_assert.h"
 #include "SDL_syspower.h"
 
 #if !TARGET_OS_TV
@@ -35,8 +34,7 @@
 static const int BATTERY_MONITORING_TIMEOUT = 3000;
 static Uint32 SDL_UIKitLastPowerInfoQuery = 0;
 
-void
-SDL_UIKit_UpdateBatteryMonitoring(void)
+void SDL_UIKit_UpdateBatteryMonitoring(void)
 {
     if (SDL_UIKitLastPowerInfoQuery) {
         if (SDL_TICKS_PASSED(SDL_GetTicks(), SDL_UIKitLastPowerInfoQuery + BATTERY_MONITORING_TIMEOUT)) {
@@ -48,21 +46,20 @@ SDL_UIKit_UpdateBatteryMonitoring(void)
     }
 }
 #else
-void
-SDL_UIKit_UpdateBatteryMonitoring(void)
+void SDL_UIKit_UpdateBatteryMonitoring(void)
 {
     /* Do nothing. */
 }
 #endif /* !TARGET_OS_TV */
 
 SDL_bool
-SDL_GetPowerInfo_UIKit(SDL_PowerState * state, int *seconds, int *percent)
+SDL_GetPowerInfo_UIKit(SDL_PowerState *state, int *seconds, int *percent)
 {
 #if TARGET_OS_TV
     *state = SDL_POWERSTATE_NO_BATTERY;
     *seconds = -1;
     *percent = -1;
-#else /* TARGET_OS_TV */
+#else  /* TARGET_OS_TV */
     @autoreleasepool {
         UIDevice *uidev = [UIDevice currentDevice];
 
@@ -78,7 +75,7 @@ SDL_GetPowerInfo_UIKit(SDL_PowerState * state, int *seconds, int *percent)
          */
         SDL_UIKitLastPowerInfoQuery = SDL_GetTicks();
 
-        *seconds = -1;   /* no API to estimate this in UIKit. */
+        *seconds = -1; /* no API to estimate this in UIKit. */
 
         switch (uidev.batteryState) {
         case UIDeviceBatteryStateCharging:
@@ -100,7 +97,7 @@ SDL_GetPowerInfo_UIKit(SDL_PowerState * state, int *seconds, int *percent)
         }
 
         const float level = uidev.batteryLevel;
-        *percent = ( (level < 0.0f) ? -1 : ((int) ((level * 100) + 0.5f)) );
+        *percent = ((level < 0.0f) ? -1 : ((int)((level * 100) + 0.5f)));
     }
 #endif /* TARGET_OS_TV */
 

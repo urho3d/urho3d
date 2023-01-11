@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -23,7 +23,6 @@
 extern "C" {
 #include "SDL_thread.h"
 #include "SDL_systhread_c.h"
-#include "SDL_log.h"
 }
 
 #include <system_error>
@@ -31,17 +30,15 @@ extern "C" {
 #include "SDL_sysmutex_c.h"
 #include <Windows.h>
 
-
 /* Create a mutex */
-extern "C"
-SDL_mutex *
+extern "C" SDL_mutex *
 SDL_CreateMutex(void)
 {
     /* Allocate and initialize the mutex */
     try {
-        SDL_mutex * mutex = new SDL_mutex;
+        SDL_mutex *mutex = new SDL_mutex;
         return mutex;
-    } catch (std::system_error & ex) {
+    } catch (std::system_error &ex) {
         SDL_SetError("unable to create a C++ mutex: code=%d; %s", ex.code(), ex.what());
         return NULL;
     } catch (std::bad_alloc &) {
@@ -51,41 +48,37 @@ SDL_CreateMutex(void)
 }
 
 /* Free the mutex */
-extern "C"
-void
-SDL_DestroyMutex(SDL_mutex * mutex)
+extern "C" void
+SDL_DestroyMutex(SDL_mutex *mutex)
 {
-    if (mutex) {
+    if (mutex != NULL) {
         delete mutex;
     }
 }
 
-/* Lock the semaphore */
-extern "C"
-int
-SDL_mutexP(SDL_mutex * mutex)
+/* Lock the mutex */
+extern "C" int
+SDL_LockMutex(SDL_mutex *mutex) SDL_NO_THREAD_SAFETY_ANALYSIS /* clang doesn't know about NULL mutexes */
 {
     if (mutex == NULL) {
-        SDL_SetError("Passed a NULL mutex");
-        return -1;
+        return 0;
     }
 
     try {
         mutex->cpp_mutex.lock();
         return 0;
-    } catch (std::system_error & ex) {
-        SDL_SetError("unable to lock a C++ mutex: code=%d; %s", ex.code(), ex.what());
-        return -1;
+    } catch (std::system_error &ex) {
+        return SDL_SetError("unable to lock a C++ mutex: code=%d; %s", ex.code(), ex.what());
     }
 }
 
 /* TryLock the mutex */
-int
-SDL_TryLockMutex(SDL_mutex * mutex)
+int SDL_TryLockMutex(SDL_mutex *mutex)
 {
     int retval = 0;
+
     if (mutex == NULL) {
-        return SDL_SetError("Passed a NULL mutex");
+        return 0;
     }
 
     if (mutex->cpp_mutex.try_lock() == false) {
@@ -95,13 +88,11 @@ SDL_TryLockMutex(SDL_mutex * mutex)
 }
 
 /* Unlock the mutex */
-extern "C"
-int
-SDL_mutexV(SDL_mutex * mutex)
+extern "C" int
+SDL_UnlockMutex(SDL_mutex *mutex) SDL_NO_THREAD_SAFETY_ANALYSIS /* clang doesn't know about NULL mutexes */
 {
     if (mutex == NULL) {
-        SDL_SetError("Passed a NULL mutex");
-        return -1;
+        return 0;
     }
 
     mutex->cpp_mutex.unlock();

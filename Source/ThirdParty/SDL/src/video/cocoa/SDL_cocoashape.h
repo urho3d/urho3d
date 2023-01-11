@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -29,12 +29,11 @@
 #include "SDL_shape.h"
 #include "../SDL_shape_internals.h"
 
-typedef struct {
-    NSGraphicsContext* context;
-    SDL_bool saved;
-
-    SDL_ShapeTree* shape;
-} SDL_ShapeData;
+@interface SDL_ShapeData : NSObject
+    @property (nonatomic) NSGraphicsContext* context;
+    @property (nonatomic) SDL_bool saved;
+    @property (nonatomic) SDL_ShapeTree* shape;
+@end
 
 extern SDL_WindowShaper* Cocoa_CreateShaper(SDL_Window* window);
 extern int Cocoa_SetWindowShape(SDL_WindowShaper *shaper,SDL_Surface *shape,SDL_WindowShapeMode *shape_mode);

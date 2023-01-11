@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,6 +27,7 @@
 
 #include "SDL_emscriptenvideo.h"
 #include "SDL_emscriptenopengles.h"
+#include "SDL_hints.h"
 
 #define LOAD_FUNC(NAME) _this->egl_data->NAME = NAME;
 
@@ -82,27 +83,18 @@ Emscripten_GLES_LoadLibrary(_THIS, const char *path) {
 }
 
 SDL_EGL_CreateContext_impl(Emscripten)
-SDL_EGL_SwapWindow_impl(Emscripten)
 SDL_EGL_MakeCurrent_impl(Emscripten)
 
-void
-Emscripten_GLES_GetDrawableSize(_THIS, SDL_Window * window, int * w, int * h)
+int Emscripten_GLES_SwapWindow(_THIS, SDL_Window *window)
 {
-    SDL_WindowData *data;
-    if (window->driverdata) {
-        data = (SDL_WindowData *) window->driverdata;
-
-        if (w) {
-            *w = window->w * data->pixel_ratio;
-        }
-
-        if (h) {
-            *h = window->h * data->pixel_ratio;
-        }
+    EGLBoolean ret = SDL_EGL_SwapBuffers(_this, ((SDL_WindowData *) window->driverdata)->egl_surface);
+    if (emscripten_has_asyncify() && SDL_GetHintBoolean(SDL_HINT_EMSCRIPTEN_ASYNCIFY, SDL_TRUE)) {
+        /* give back control to browser for screen refresh */
+        emscripten_sleep(0);
     }
+    return ret;
 }
 
 #endif /* SDL_VIDEO_DRIVER_EMSCRIPTEN && SDL_VIDEO_OPENGL_EGL */
 
 /* vi: set ts=4 sw=4 expandtab: */
-

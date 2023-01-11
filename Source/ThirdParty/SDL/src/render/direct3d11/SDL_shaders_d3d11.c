@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -32,7 +32,6 @@
 
 #define SDL_COMPOSE_ERROR(str) SDL_STRINGIFY_ARG(__FUNCTION__) ", " str
 
-
 /* Direct3D 11.x shaders
 
    SDL's shaders are compiled into SDL itself, to simplify distribution.
@@ -52,7 +51,7 @@
      - vs_4_0_level_9_1: Vertex shader for Windows 8+, including Windows RT
      - ps_4_0_level_9_3: Pixel shader for Windows Phone 8
      - vs_4_0_level_9_3: Vertex shader for Windows Phone 8
-   
+
 
    Shader object code was converted to a list of DWORDs via the following
    *nix style command (available separately from Windows + MSVC):
@@ -1886,9 +1885,10 @@ static struct
 {
     const void *shader_data;
     SIZE_T shader_size;
-} D3D11_shaders[] = {
+} D3D11_shaders[NUM_SHADERS] = {
     { D3D11_PixelShader_Colors, sizeof(D3D11_PixelShader_Colors) },
     { D3D11_PixelShader_Textures, sizeof(D3D11_PixelShader_Textures) },
+#if SDL_HAVE_YUV
     { D3D11_PixelShader_YUV_JPEG, sizeof(D3D11_PixelShader_YUV_JPEG) },
     { D3D11_PixelShader_YUV_BT601, sizeof(D3D11_PixelShader_YUV_BT601) },
     { D3D11_PixelShader_YUV_BT709, sizeof(D3D11_PixelShader_YUV_BT709) },
@@ -1898,38 +1898,36 @@ static struct
     { D3D11_PixelShader_NV21_JPEG, sizeof(D3D11_PixelShader_NV21_JPEG) },
     { D3D11_PixelShader_NV21_BT601, sizeof(D3D11_PixelShader_NV21_BT601) },
     { D3D11_PixelShader_NV21_BT709, sizeof(D3D11_PixelShader_NV21_BT709) },
+#endif
 };
 
 int D3D11_CreateVertexShader(ID3D11Device1 *d3dDevice, ID3D11VertexShader **vertexShader, ID3D11InputLayout **inputLayout)
 {
     /* Declare how the input layout for SDL's vertex shader will be setup: */
-    const D3D11_INPUT_ELEMENT_DESC vertexDesc[] = 
-    {
-        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    const D3D11_INPUT_ELEMENT_DESC vertexDesc[] = {
+        { "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 8, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
     HRESULT result;
 
     /* Load in SDL's one and only vertex shader: */
     result = ID3D11Device_CreateVertexShader(d3dDevice,
-        D3D11_VertexShader,
-        sizeof(D3D11_VertexShader),
-        NULL,
-        vertexShader
-        );
+                                             D3D11_VertexShader,
+                                             sizeof(D3D11_VertexShader),
+                                             NULL,
+                                             vertexShader);
     if (FAILED(result)) {
         return WIN_SetErrorFromHRESULT(SDL_COMPOSE_ERROR("ID3D11Device1::CreateVertexShader"), result);
     }
 
     /* Create an input layout for SDL's vertex shader: */
     result = ID3D11Device_CreateInputLayout(d3dDevice,
-        vertexDesc,
-        ARRAYSIZE(vertexDesc),
-        D3D11_VertexShader,
-        sizeof(D3D11_VertexShader),
-        inputLayout
-        );
+                                            vertexDesc,
+                                            ARRAYSIZE(vertexDesc),
+                                            D3D11_VertexShader,
+                                            sizeof(D3D11_VertexShader),
+                                            inputLayout);
     if (FAILED(result)) {
         return WIN_SetErrorFromHRESULT(SDL_COMPOSE_ERROR("ID3D11Device1::CreateInputLayout"), result);
     }
@@ -1941,11 +1939,10 @@ int D3D11_CreatePixelShader(ID3D11Device1 *d3dDevice, D3D11_Shader shader, ID3D1
     HRESULT result;
 
     result = ID3D11Device_CreatePixelShader(d3dDevice,
-        D3D11_shaders[shader].shader_data,
-        D3D11_shaders[shader].shader_size,
-        NULL,
-        pixelShader
-        );
+                                            D3D11_shaders[shader].shader_data,
+                                            D3D11_shaders[shader].shader_size,
+                                            NULL,
+                                            pixelShader);
     if (FAILED(result)) {
         return WIN_SetErrorFromHRESULT(SDL_COMPOSE_ERROR("ID3D11Device1::CreatePixelShader"), result);
     }

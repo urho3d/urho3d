@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -33,7 +33,6 @@
 #include "../../events/SDL_keyboard_c.h"
 
 
-
 /* PSP declarations */
 #include "SDL_pspvideo.h"
 #include "SDL_pspevents_c.h"
@@ -42,53 +41,38 @@
 /* unused
 static SDL_bool PSP_initialized = SDL_FALSE;
 */
-static int
-PSP_Available(void)
-{
-    return 1;
-}
 
-static void
-PSP_Destroy(SDL_VideoDevice * device)
+static void PSP_Destroy(SDL_VideoDevice *device)
 {
-/*    SDL_VideoData *phdata = (SDL_VideoData *) device->driverdata; */
+    /*    SDL_VideoData *phdata = (SDL_VideoData *) device->driverdata; */
 
     if (device->driverdata != NULL) {
         device->driverdata = NULL;
     }
 }
 
-static SDL_VideoDevice *
-PSP_Create()
+static SDL_VideoDevice *PSP_Create()
 {
     SDL_VideoDevice *device;
     SDL_VideoData *phdata;
     SDL_GLDriverData *gldata;
-    int status;
-
-    /* Check if PSP could be initialized */
-    status = PSP_Available();
-    if (status == 0) {
-        /* PSP could not be used */
-        return NULL;
-    }
 
     /* Initialize SDL_VideoDevice structure */
-    device = (SDL_VideoDevice *) SDL_calloc(1, sizeof(SDL_VideoDevice));
+    device = (SDL_VideoDevice *)SDL_calloc(1, sizeof(SDL_VideoDevice));
     if (device == NULL) {
         SDL_OutOfMemory();
         return NULL;
     }
 
     /* Initialize internal PSP specific data */
-    phdata = (SDL_VideoData *) SDL_calloc(1, sizeof(SDL_VideoData));
+    phdata = (SDL_VideoData *)SDL_calloc(1, sizeof(SDL_VideoData));
     if (phdata == NULL) {
         SDL_OutOfMemory();
         SDL_free(device);
         return NULL;
     }
 
-        gldata = (SDL_GLDriverData *) SDL_calloc(1, sizeof(SDL_GLDriverData));
+    gldata = (SDL_GLDriverData *)SDL_calloc(1, sizeof(SDL_GLDriverData));
     if (gldata == NULL) {
         SDL_OutOfMemory();
         SDL_free(device);
@@ -100,7 +84,6 @@ PSP_Create()
     device->driverdata = phdata;
 
     phdata->egl_initialized = SDL_TRUE;
-
 
     /* Setup amount of available displays */
     device->num_displays = 0;
@@ -125,7 +108,6 @@ PSP_Create()
     device->MaximizeWindow = PSP_MaximizeWindow;
     device->MinimizeWindow = PSP_MinimizeWindow;
     device->RestoreWindow = PSP_RestoreWindow;
-    device->SetWindowGrab = PSP_SetWindowGrab;
     device->DestroyWindow = PSP_DestroyWindow;
 #if 0
     device->GetWindowWMInfo = PSP_GetWindowWMInfo;
@@ -152,15 +134,13 @@ PSP_Create()
 VideoBootStrap PSP_bootstrap = {
     "PSP",
     "PSP Video Driver",
-    PSP_Available,
     PSP_Create
 };
 
 /*****************************************************************************/
 /* SDL Video and Display initialization/handling functions                   */
 /*****************************************************************************/
-int
-PSP_VideoInit(_THIS)
+int PSP_VideoInit(_THIS)
 {
     SDL_VideoDisplay display;
     SDL_DisplayMode current_mode;
@@ -173,7 +153,6 @@ PSP_VideoInit(_THIS)
     current_mode.refresh_rate = 60;
     /* 32 bpp for default */
     current_mode.format = SDL_PIXELFORMAT_ABGR8888;
-
     current_mode.driverdata = NULL;
 
     SDL_zero(display);
@@ -181,47 +160,48 @@ PSP_VideoInit(_THIS)
     display.current_mode = current_mode;
     display.driverdata = NULL;
 
-    SDL_AddVideoDisplay(&display);
+    SDL_AddDisplayMode(&display, &current_mode);
 
+    /* 16 bpp secondary mode */
+    current_mode.format = SDL_PIXELFORMAT_BGR565;
+    display.desktop_mode = current_mode;
+    display.current_mode = current_mode;
+    SDL_AddDisplayMode(&display, &current_mode);
+
+    SDL_AddVideoDisplay(&display, SDL_FALSE);
     return 1;
 }
 
-void
-PSP_VideoQuit(_THIS)
+void PSP_VideoQuit(_THIS)
 {
-
 }
 
-void
-PSP_GetDisplayModes(_THIS, SDL_VideoDisplay * display)
+void PSP_GetDisplayModes(_THIS, SDL_VideoDisplay *display)
 {
-
 }
 
-int
-PSP_SetDisplayMode(_THIS, SDL_VideoDisplay * display, SDL_DisplayMode * mode)
+int PSP_SetDisplayMode(_THIS, SDL_VideoDisplay *display, SDL_DisplayMode *mode)
 {
     return 0;
 }
-#define EGLCHK(stmt)                            \
-    do {                                        \
-        EGLint err;                             \
-                                                \
-        stmt;                                   \
-        err = eglGetError();                    \
-        if (err != EGL_SUCCESS) {               \
-            SDL_SetError("EGL error %d", err);  \
-            return 0;                           \
-        }                                       \
+#define EGLCHK(stmt)                           \
+    do {                                       \
+        EGLint err;                            \
+                                               \
+        stmt;                                  \
+        err = eglGetError();                   \
+        if (err != EGL_SUCCESS) {              \
+            SDL_SetError("EGL error %d", err); \
+            return 0;                          \
+        }                                      \
     } while (0)
 
-int
-PSP_CreateWindow(_THIS, SDL_Window * window)
+int PSP_CreateWindow(_THIS, SDL_Window *window)
 {
     SDL_WindowData *wdata;
 
     /* Allocate window internal data */
-    wdata = (SDL_WindowData *) SDL_calloc(1, sizeof(SDL_WindowData));
+    wdata = (SDL_WindowData *)SDL_calloc(1, sizeof(SDL_WindowData));
     if (wdata == NULL) {
         return SDL_OutOfMemory();
     }
@@ -229,64 +209,48 @@ PSP_CreateWindow(_THIS, SDL_Window * window)
     /* Setup driver data for this window */
     window->driverdata = wdata;
 
+    SDL_SetKeyboardFocus(window);
 
     /* Window has been successfully created */
     return 0;
 }
 
-int
-PSP_CreateWindowFrom(_THIS, SDL_Window * window, const void *data)
+int PSP_CreateWindowFrom(_THIS, SDL_Window *window, const void *data)
 {
     return SDL_Unsupported();
 }
 
-void
-PSP_SetWindowTitle(_THIS, SDL_Window * window)
+void PSP_SetWindowTitle(_THIS, SDL_Window *window)
 {
 }
-void
-PSP_SetWindowIcon(_THIS, SDL_Window * window, SDL_Surface * icon)
+void PSP_SetWindowIcon(_THIS, SDL_Window *window, SDL_Surface *icon)
 {
 }
-void
-PSP_SetWindowPosition(_THIS, SDL_Window * window)
+void PSP_SetWindowPosition(_THIS, SDL_Window *window)
 {
 }
-void
-PSP_SetWindowSize(_THIS, SDL_Window * window)
+void PSP_SetWindowSize(_THIS, SDL_Window *window)
 {
 }
-void
-PSP_ShowWindow(_THIS, SDL_Window * window)
+void PSP_ShowWindow(_THIS, SDL_Window *window)
 {
 }
-void
-PSP_HideWindow(_THIS, SDL_Window * window)
+void PSP_HideWindow(_THIS, SDL_Window *window)
 {
 }
-void
-PSP_RaiseWindow(_THIS, SDL_Window * window)
+void PSP_RaiseWindow(_THIS, SDL_Window *window)
 {
 }
-void
-PSP_MaximizeWindow(_THIS, SDL_Window * window)
+void PSP_MaximizeWindow(_THIS, SDL_Window *window)
 {
 }
-void
-PSP_MinimizeWindow(_THIS, SDL_Window * window)
+void PSP_MinimizeWindow(_THIS, SDL_Window *window)
 {
 }
-void
-PSP_RestoreWindow(_THIS, SDL_Window * window)
+void PSP_RestoreWindow(_THIS, SDL_Window *window)
 {
 }
-void
-PSP_SetWindowGrab(_THIS, SDL_Window * window, SDL_bool grabbed)
-{
-
-}
-void
-PSP_DestroyWindow(_THIS, SDL_Window * window)
+void PSP_DestroyWindow(_THIS, SDL_Window *window)
 {
 }
 
@@ -300,8 +264,8 @@ PSP_GetWindowWMInfo(_THIS, SDL_Window * window, struct SDL_SysWMinfo *info)
     if (info->version.major <= SDL_MAJOR_VERSION) {
         return SDL_TRUE;
     } else {
-        SDL_SetError("Application not compiled with SDL %d.%d",
-                     SDL_MAJOR_VERSION, SDL_MINOR_VERSION);
+        SDL_SetError("Application not compiled with SDL %d",
+                     SDL_MAJOR_VERSION);
         return SDL_FALSE;
     }
 
@@ -326,7 +290,6 @@ SDL_bool PSP_IsScreenKeyboardShown(_THIS, SDL_Window *window)
 {
     return SDL_FALSE;
 }
-
 
 #endif /* SDL_VIDEO_DRIVER_PSP */
 

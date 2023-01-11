@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -256,7 +256,6 @@ static const DWORD D3D9_PixelShader_YUV_BT709[] = {
     0x02000001, 0x80080001, 0xa0ff0000, 0x03000005, 0x800f0000, 0x80e40001,
     0x90e40000, 0x02000001, 0x800f0800, 0x80e40000, 0x0000ffff
 };
-
 
 static const DWORD *D3D9_shaders[] = {
     D3D9_PixelShader_YUV_JPEG,

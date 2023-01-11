@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -41,20 +41,17 @@ typedef struct
     const char *libname;
 } x11dynlib;
 
-#ifndef SDL_VIDEO_DRIVER_X11_DYNAMIC
-#define SDL_VIDEO_DRIVER_X11_DYNAMIC NULL
-#endif
 #ifndef SDL_VIDEO_DRIVER_X11_DYNAMIC_XEXT
 #define SDL_VIDEO_DRIVER_X11_DYNAMIC_XEXT NULL
 #endif
 #ifndef SDL_VIDEO_DRIVER_X11_DYNAMIC_XCURSOR
 #define SDL_VIDEO_DRIVER_X11_DYNAMIC_XCURSOR NULL
 #endif
-#ifndef SDL_VIDEO_DRIVER_X11_DYNAMIC_XINERAMA
-#define SDL_VIDEO_DRIVER_X11_DYNAMIC_XINERAMA NULL
-#endif
 #ifndef SDL_VIDEO_DRIVER_X11_DYNAMIC_XINPUT2
 #define SDL_VIDEO_DRIVER_X11_DYNAMIC_XINPUT2 NULL
+#endif
+#ifndef SDL_VIDEO_DRIVER_X11_DYNAMIC_XFIXES
+#define SDL_VIDEO_DRIVER_X11_DYNAMIC_XFIXES NULL
 #endif
 #ifndef SDL_VIDEO_DRIVER_X11_DYNAMIC_XRANDR
 #define SDL_VIDEO_DRIVER_X11_DYNAMIC_XRANDR NULL
@@ -62,31 +59,27 @@ typedef struct
 #ifndef SDL_VIDEO_DRIVER_X11_DYNAMIC_XSS
 #define SDL_VIDEO_DRIVER_X11_DYNAMIC_XSS NULL
 #endif
-#ifndef SDL_VIDEO_DRIVER_X11_DYNAMIC_XVIDMODE
-#define SDL_VIDEO_DRIVER_X11_DYNAMIC_XVIDMODE NULL
-#endif
 
 static x11dynlib x11libs[] = {
-    {NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC},
-    {NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC_XEXT},
-    {NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC_XCURSOR},
-    {NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC_XINERAMA},
-    {NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC_XINPUT2},
-    {NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC_XRANDR},
-    {NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC_XSS},
-    {NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC_XVIDMODE}
+    { NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC },
+    { NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC_XEXT },
+    { NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC_XCURSOR },
+    { NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC_XINPUT2 },
+    { NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC_XFIXES },
+    { NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC_XRANDR },
+    { NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC_XSS }
 };
 
-static void *
-X11_GetSym(const char *fnname, int *pHasModule)
+static void *X11_GetSym(const char *fnname, int *pHasModule)
 {
     int i;
     void *fn = NULL;
     for (i = 0; i < SDL_TABLESIZE(x11libs); i++) {
         if (x11libs[i].lib != NULL) {
             fn = SDL_LoadFunction(x11libs[i].lib, fnname);
-            if (fn != NULL)
+            if (fn != NULL) {
                 break;
+            }
         }
     }
 
@@ -97,8 +90,9 @@ X11_GetSym(const char *fnname, int *pHasModule)
         printf("X11: Symbol '%s' NOT FOUND!\n", fnname);
 #endif
 
-    if (fn == NULL)
-        *pHasModule = 0;  /* kill this module. */
+    if (fn == NULL) {
+        *pHasModule = 0; /* kill this module. */
+    }
 
     return fn;
 }
@@ -106,7 +100,7 @@ X11_GetSym(const char *fnname, int *pHasModule)
 #endif /* SDL_VIDEO_DRIVER_X11_DYNAMIC */
 
 /* Define all the function pointers and wrappers... */
-#define SDL_X11_SYM(rc,fn,params,args,ret) SDL_DYNX11FN_##fn X11_##fn = NULL;
+#define SDL_X11_SYM(rc, fn, params, args, ret) SDL_DYNX11FN_##fn X11_##fn = NULL;
 #include "SDL_x11sym.h"
 
 /* Annoying varargs entry point... */
@@ -121,17 +115,18 @@ SDL_DYNX11FN_XGetICValues X11_XGetICValues = NULL;
 
 static int x11_load_refcount = 0;
 
-void
-SDL_X11_UnloadSymbols(void)
+void SDL_X11_UnloadSymbols(void)
 {
     /* Don't actually unload if more than one module is using the libs... */
     if (x11_load_refcount > 0) {
         if (--x11_load_refcount == 0) {
+#ifdef SDL_VIDEO_DRIVER_X11_DYNAMIC
             int i;
+#endif
 
             /* set all the function pointers to NULL. */
-#define SDL_X11_MODULE(modname) SDL_X11_HAVE_##modname = 0;
-#define SDL_X11_SYM(rc,fn,params,args,ret) X11_##fn = NULL;
+#define SDL_X11_MODULE(modname)                SDL_X11_HAVE_##modname = 0;
+#define SDL_X11_SYM(rc, fn, params, args, ret) X11_##fn = NULL;
 #include "SDL_x11sym.h"
 
 #ifdef X_HAVE_UTF8_STRING
@@ -152,10 +147,9 @@ SDL_X11_UnloadSymbols(void)
 }
 
 /* returns non-zero if all needed symbols were loaded. */
-int
-SDL_X11_LoadSymbols(void)
+int SDL_X11_LoadSymbols(void)
 {
-    int rc = 1;                 /* always succeed if not using Dynamic X11 stuff. */
+    int rc = 1; /* always succeed if not using Dynamic X11 stuff. */
 
     /* deal with multiple modules (dga, x11, etc) needing these symbols... */
     if (x11_load_refcount++ == 0) {
@@ -171,15 +165,15 @@ SDL_X11_LoadSymbols(void)
 #define SDL_X11_MODULE(modname) SDL_X11_HAVE_##modname = 1; /* default yes */
 #include "SDL_x11sym.h"
 
-#define SDL_X11_MODULE(modname) thismod = &SDL_X11_HAVE_##modname;
-#define SDL_X11_SYM(a,fn,x,y,z) X11_##fn = (SDL_DYNX11FN_##fn) X11_GetSym(#fn,thismod);
+#define SDL_X11_MODULE(modname)     thismod = &SDL_X11_HAVE_##modname;
+#define SDL_X11_SYM(a, fn, x, y, z) X11_##fn = (SDL_DYNX11FN_##fn)X11_GetSym(#fn, thismod);
 #include "SDL_x11sym.h"
 
 #ifdef X_HAVE_UTF8_STRING
         X11_XCreateIC = (SDL_DYNX11FN_XCreateIC)
-                        X11_GetSym("XCreateIC", &SDL_X11_HAVE_UTF8);
+            X11_GetSym("XCreateIC", &SDL_X11_HAVE_UTF8);
         X11_XGetICValues = (SDL_DYNX11FN_XGetICValues)
-                        X11_GetSym("XGetICValues", &SDL_X11_HAVE_UTF8);
+            X11_GetSym("XGetICValues", &SDL_X11_HAVE_UTF8);
 #endif
 
         if (SDL_X11_HAVE_BASEXLIB) {
@@ -191,10 +185,10 @@ SDL_X11_LoadSymbols(void)
             rc = 0;
         }
 
-#else  /* no dynamic X11 */
+#else /* no dynamic X11 */
 
-#define SDL_X11_MODULE(modname) SDL_X11_HAVE_##modname = 1; /* default yes */
-#define SDL_X11_SYM(a,fn,x,y,z) X11_##fn = (SDL_DYNX11FN_##fn) fn;
+#define SDL_X11_MODULE(modname)     SDL_X11_HAVE_##modname = 1; /* default yes */
+#define SDL_X11_SYM(a, fn, x, y, z) X11_##fn = (SDL_DYNX11FN_##fn)fn;
 #include "SDL_x11sym.h"
 
 #ifdef X_HAVE_UTF8_STRING

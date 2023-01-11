@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,7 +22,7 @@
 #ifndef SDL_blit_copy_h_
 #define SDL_blit_copy_h_
 
-void SDL_BlitCopy(SDL_BlitInfo * info);
+void SDL_BlitCopy(SDL_BlitInfo *info);
 
 #endif /* SDL_blit_copy_h_ */
 

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,7 +21,7 @@
 #include "../../SDL_internal.h"
 
 /* TODO, WinRT: remove the need to compile this with C++/CX (/ZW) extensions, and if possible, without C++ at all
-*/
+ */
 
 #ifdef __WINRT__
 
@@ -44,46 +44,55 @@ extern "C" const wchar_t *
 SDL_WinRTGetFSPathUNICODE(SDL_WinRT_Path pathType)
 {
     switch (pathType) {
-        case SDL_WINRT_PATH_INSTALLED_LOCATION:
-        {
-            static wstring path;
-            if (path.empty()) {
+    case SDL_WINRT_PATH_INSTALLED_LOCATION:
+    {
+        static wstring path;
+        if (path.empty()) {
+#if defined(NTDDI_WIN10_19H1) && (NTDDI_VERSION >= NTDDI_WIN10_19H1) && (WINAPI_FAMILY == WINAPI_FAMILY_PC_APP) /* Only PC supports mods */
+            /* Windows 1903 supports mods, via the EffectiveLocation API */
+            if (Windows::Foundation::Metadata::ApiInformation::IsApiContractPresent("Windows.Foundation.UniversalApiContract", 8, 0)) {
+                path = Windows::ApplicationModel::Package::Current->EffectiveLocation->Path->Data();
+            } else {
                 path = Windows::ApplicationModel::Package::Current->InstalledLocation->Path->Data();
             }
-            return path.c_str();
+#else
+            path = Windows::ApplicationModel::Package::Current->InstalledLocation->Path->Data();
+#endif
         }
+        return path.c_str();
+    }
 
-        case SDL_WINRT_PATH_LOCAL_FOLDER:
-        {
-            static wstring path;
-            if (path.empty()) {
-                path = ApplicationData::Current->LocalFolder->Path->Data();
-            }
-            return path.c_str();
+    case SDL_WINRT_PATH_LOCAL_FOLDER:
+    {
+        static wstring path;
+        if (path.empty()) {
+            path = ApplicationData::Current->LocalFolder->Path->Data();
         }
+        return path.c_str();
+    }
 
 #if (WINAPI_FAMILY != WINAPI_FAMILY_PHONE_APP) || (NTDDI_VERSION > NTDDI_WIN8)
-        case SDL_WINRT_PATH_ROAMING_FOLDER:
-        {
-            static wstring path;
-            if (path.empty()) {
-                path = ApplicationData::Current->RoamingFolder->Path->Data();
-            }
-            return path.c_str();
+    case SDL_WINRT_PATH_ROAMING_FOLDER:
+    {
+        static wstring path;
+        if (path.empty()) {
+            path = ApplicationData::Current->RoamingFolder->Path->Data();
         }
+        return path.c_str();
+    }
 
-        case SDL_WINRT_PATH_TEMP_FOLDER:
-        {
-            static wstring path;
-            if (path.empty()) {
-                path = ApplicationData::Current->TemporaryFolder->Path->Data();
-            }
-            return path.c_str();
+    case SDL_WINRT_PATH_TEMP_FOLDER:
+    {
+        static wstring path;
+        if (path.empty()) {
+            path = ApplicationData::Current->TemporaryFolder->Path->Data();
         }
+        return path.c_str();
+    }
 #endif
 
-        default:
-            break;
+    default:
+        break;
     }
 
     SDL_Unsupported();
@@ -101,12 +110,12 @@ SDL_WinRTGetFSPathUTF8(SDL_WinRT_Path pathType)
         return searchResult->second.c_str();
     }
 
-    const wchar_t * ucs2Path = SDL_WinRTGetFSPathUNICODE(pathType);
-    if (!ucs2Path) {
+    const wchar_t *ucs2Path = SDL_WinRTGetFSPathUNICODE(pathType);
+    if (ucs2Path == NULL) {
         return NULL;
     }
 
-    char * utf8Path = WIN_StringToUTF8(ucs2Path);
+    char *utf8Path = WIN_StringToUTF8(ucs2Path);
     utf8Paths[pathType] = utf8Path;
     SDL_free(utf8Path);
     return utf8Paths[pathType].c_str();
@@ -115,18 +124,18 @@ SDL_WinRTGetFSPathUTF8(SDL_WinRT_Path pathType)
 extern "C" char *
 SDL_GetBasePath(void)
 {
-    const char * srcPath = SDL_WinRTGetFSPathUTF8(SDL_WINRT_PATH_INSTALLED_LOCATION);
+    const char *srcPath = SDL_WinRTGetFSPathUTF8(SDL_WINRT_PATH_INSTALLED_LOCATION);
     size_t destPathLen;
-    char * destPath = NULL;
+    char *destPath = NULL;
 
-    if (!srcPath) {
+    if (srcPath == NULL) {
         SDL_SetError("Couldn't locate our basepath: %s", SDL_GetError());
         return NULL;
     }
 
     destPathLen = SDL_strlen(srcPath) + 2;
-    destPath = (char *) SDL_malloc(destPathLen);
-    if (!destPath) {
+    destPath = (char *)SDL_malloc(destPathLen);
+    if (destPath == NULL) {
         SDL_OutOfMemory();
         return NULL;
     }
@@ -144,24 +153,24 @@ SDL_GetPrefPath(const char *org, const char *app)
      * without violating Microsoft's app-store requirements.
      */
 
-    const WCHAR * srcPath = NULL;
+    const WCHAR *srcPath = NULL;
     WCHAR path[MAX_PATH];
     char *retval = NULL;
-    WCHAR* worg = NULL;
-    WCHAR* wapp = NULL;
+    WCHAR *worg = NULL;
+    WCHAR *wapp = NULL;
     size_t new_wpath_len = 0;
     BOOL api_result = FALSE;
 
-    if (!app) {
+    if (app == NULL) {
         SDL_InvalidParamError("app");
         return NULL;
     }
-    if (!org) {
+    if (org == NULL) {
         org = "";
     }
 
     srcPath = SDL_WinRTGetFSPathUNICODE(SDL_WINRT_PATH_LOCAL_FOLDER);
-    if ( ! srcPath) {
+    if (srcPath == NULL) {
         SDL_SetError("Unable to find a source path");
         return NULL;
     }

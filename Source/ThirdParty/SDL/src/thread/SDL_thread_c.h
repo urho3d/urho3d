@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -32,10 +32,20 @@
 #include "pthread/SDL_systhread_c.h"
 #elif SDL_THREAD_WINDOWS
 #include "windows/SDL_systhread_c.h"
+#elif SDL_THREAD_PS2
+#include "ps2/SDL_systhread_c.h"
 #elif SDL_THREAD_PSP
 #include "psp/SDL_systhread_c.h"
+#elif SDL_THREAD_VITA
+#include "vita/SDL_systhread_c.h"
+#elif SDL_THREAD_N3DS
+#include "n3ds/SDL_systhread_c.h"
 #elif SDL_THREAD_STDCPP
 #include "stdcpp/SDL_systhread_c.h"
+#elif SDL_THREAD_OS2
+#include "os2/SDL_systhread_c.h"
+#elif SDL_THREAD_NGAGE
+#include "ngage/SDL_systhread_c.h"
 #else
 #error Need thread implementation for this platform
 #include "generic/SDL_systhread_c.h"
@@ -56,22 +66,27 @@ struct SDL_Thread
     SDL_threadID threadid;
     SYS_ThreadHandle handle;
     int status;
-    SDL_atomic_t state;  /* SDL_THREAD_STATE_* */
+    SDL_atomic_t state; /* SDL_THREAD_STATE_* */
     SDL_error errbuf;
     char *name;
-    size_t stacksize;  /* 0 for default, >0 for user-specified stack size. */
+    size_t stacksize; /* 0 for default, >0 for user-specified stack size. */
+    int(SDLCALL *userfunc)(void *);
+    void *userdata;
     void *data;
+    void *endfunc; /* only used on some platforms. */
 };
 
 /* This is the function called to run a thread */
-extern void SDL_RunThread(void *data);
+extern void SDL_RunThread(SDL_Thread *thread);
 
 /* This is the system-independent thread local storage structure */
-typedef struct {
+typedef struct
+{
     unsigned int limit;
-    struct {
+    struct
+    {
         void *data;
-        void (SDLCALL *destructor)(void*);
+        void(SDLCALL *destructor)(void *);
     } array[1];
 } SDL_TLSData;
 

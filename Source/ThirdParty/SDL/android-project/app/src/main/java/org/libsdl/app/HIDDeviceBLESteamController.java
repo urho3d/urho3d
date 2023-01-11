@@ -1,8 +1,5 @@
-// Modified by Yao Wei Tjong for Urho3D
-
 package org.libsdl.app;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -12,6 +9,7 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.bluetooth.BluetoothGattService;
+import android.hardware.usb.UsbDevice;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -24,8 +22,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.UUID;
 
-// Urho3D - suppress lint error
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 class HIDDeviceBLESteamController extends BluetoothGattCallback implements HIDDevice {
 
     private static final String TAG = "hidapi";
@@ -170,13 +166,13 @@ class HIDDeviceBLESteamController extends BluetoothGattCallback implements HIDDe
         mHandler = new Handler(Looper.getMainLooper());
 
         mGatt = connectGatt();
-        final HIDDeviceBLESteamController finalThis = this;
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                finalThis.checkConnectionForChromebookIssue();
-            }
-        }, CHROMEBOOK_CONNECTION_CHECK_INTERVAL);
+        // final HIDDeviceBLESteamController finalThis = this;
+        // mHandler.postDelayed(new Runnable() {
+        //     @Override
+        //     public void run() {
+        //         finalThis.checkConnectionForChromebookIssue();
+        //     }
+        // }, CHROMEBOOK_CONNECTION_CHECK_INTERVAL);
     }
 
     public String getIdentifier() {
@@ -474,7 +470,7 @@ class HIDDeviceBLESteamController extends BluetoothGattCallback implements HIDDe
             // Only register controller with the native side once it has been fully configured
             if (!isRegistered()) {
                 Log.v(TAG, "Registering Steam Controller with ID: " + getId());
-                mManager.HIDDeviceConnected(getId(), getIdentifier(), getVendorId(), getProductId(), getSerialNumber(), getVersion(), getManufacturerName(), getProductName(), 0);
+                mManager.HIDDeviceConnected(getId(), getIdentifier(), getVendorId(), getProductId(), getSerialNumber(), getVersion(), getManufacturerName(), getProductName(), 0, 0, 0, 0);
                 setRegistered();
             }
         }
@@ -566,6 +562,11 @@ class HIDDeviceBLESteamController extends BluetoothGattCallback implements HIDDe
     @Override
     public String getProductName() {
         return "Steam Controller";
+    }
+
+    @Override
+    public UsbDevice getDevice() {
+        return null;
     }
 
     @Override

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -35,16 +35,12 @@
 extern "C" {
 #endif
 
-#ifndef DRAWTHREAD
-static int32 HAIKU_UpdateOnce(SDL_Window *window);
-#endif
-
 static SDL_INLINE SDL_BWin *_ToBeWin(SDL_Window *window) {
-    return ((SDL_BWin*)(window->driverdata));
+    return (SDL_BWin *)(window->driverdata);
 }
 
 static SDL_INLINE SDL_BApp *_GetBeApp() {
-    return ((SDL_BApp*)be_app);
+    return (SDL_BApp *)be_app;
 }
 
 int HAIKU_CreateWindowFramebuffer(_THIS, SDL_Window * window,
@@ -52,47 +48,44 @@ int HAIKU_CreateWindowFramebuffer(_THIS, SDL_Window * window,
                                        void ** pixels, int *pitch) {
     SDL_BWin *bwin = _ToBeWin(window);
     BScreen bscreen;
-    if(!bscreen.IsValid()) {
+    if (!bscreen.IsValid()) {
         return -1;
     }
 
-    while(!bwin->Connected()) { snooze(100); }
-    
     /* Make sure we have exclusive access to frame buffer data */
     bwin->LockBuffer();
+
+    bwin->CreateView();
 
     /* format */
     display_mode bmode;
     bscreen.GetMode(&bmode);
-    int32 bpp = HAIKU_ColorSpaceToBitsPerPixel(bmode.space);
-    *format = HAIKU_BPPToSDLPxFormat(bpp);
+    *format = HAIKU_ColorSpaceToSDLPxFormat(bmode.space);
 
     /* Create the new bitmap object */
     BBitmap *bitmap = bwin->GetBitmap();
 
-    if(bitmap) {
+    if (bitmap) {
         delete bitmap;
     }
     bitmap = new BBitmap(bwin->Bounds(), (color_space)bmode.space,
             false,    /* Views not accepted */
             true);    /* Contiguous memory required */
-            
-    if(bitmap->InitCheck() != B_OK) {
+
+    if (bitmap->InitCheck() != B_OK) {
         delete bitmap;
         return SDL_SetError("Could not initialize back buffer!");
     }
 
 
     bwin->SetBitmap(bitmap);
-    
+
     /* Set the pixel pointer */
     *pixels = bitmap->Bits();
 
     /* pitch = width of window, in bytes */
     *pitch = bitmap->BytesPerRow();
 
-    bwin->SetBufferExists(true);
-    bwin->SetTrashBuffer(false);
     bwin->UnlockBuffer();
     return 0;
 }
@@ -101,154 +94,31 @@ int HAIKU_CreateWindowFramebuffer(_THIS, SDL_Window * window,
 
 int HAIKU_UpdateWindowFramebuffer(_THIS, SDL_Window * window,
                                       const SDL_Rect * rects, int numrects) {
-    if(!window)
+    if (window == NULL) {
         return 0;
+    }
 
     SDL_BWin *bwin = _ToBeWin(window);
 
-#ifdef DRAWTHREAD    
-    bwin->LockBuffer();
-    bwin->SetBufferDirty(true);
-    bwin->UnlockBuffer();
-#else
-    bwin->SetBufferDirty(true);
-    HAIKU_UpdateOnce(window);
-#endif
+    bwin->PostMessage(BWIN_UPDATE_FRAMEBUFFER);
 
     return 0;
-}
-
-int32 HAIKU_DrawThread(void *data) {
-    SDL_BWin *bwin = (SDL_BWin*)data;
-    
-    BScreen bscreen;
-    if(!bscreen.IsValid()) {
-        return -1;
-    }
-
-    while(bwin->ConnectionEnabled()) {
-        if( bwin->Connected() && bwin->BufferExists() && bwin->BufferIsDirty() ) {
-            bwin->LockBuffer();
-            BBitmap *bitmap = NULL;
-            bitmap = bwin->GetBitmap();
-            int32 windowPitch = bitmap->BytesPerRow();
-            int32 bufferPitch = bwin->GetRowBytes();
-            uint8 *windowpx;
-            uint8 *bufferpx;
-
-            int32 BPP = bwin->GetBytesPerPx();
-            int32 windowSub = bwin->GetFbX() * BPP +
-                          bwin->GetFbY() * windowPitch;
-            clipping_rect *clips = bwin->GetClips();
-            int32 numClips = bwin->GetNumClips();
-            int i, y;
-
-            /* Blit each clipping rectangle */
-            bscreen.WaitForRetrace();
-            for(i = 0; i < numClips; ++i) {
-                /* Get addresses of the start of each clipping rectangle */
-                int32 width = clips[i].right - clips[i].left + 1;
-                int32 height = clips[i].bottom - clips[i].top + 1;
-                bufferpx = bwin->GetBufferPx() + 
-                    clips[i].top * bufferPitch + clips[i].left * BPP;
-                windowpx = (uint8*)bitmap->Bits() + 
-                    clips[i].top * windowPitch + clips[i].left * BPP -
-                    windowSub;
-
-                /* Copy each row of pixels from the window buffer into the frame
-                   buffer */
-                for(y = 0; y < height; ++y)
-                {
-
-                    if(bwin->CanTrashWindowBuffer()) {
-                        goto escape;    /* Break out before the buffer is killed */
-                    }
-
-                    memcpy(bufferpx, windowpx, width * BPP);
-                    bufferpx += bufferPitch;
-                    windowpx += windowPitch;
-                }
-            }
-
-            bwin->SetBufferDirty(false);
-escape:
-            bwin->UnlockBuffer();
-        } else {
-            snooze(16000);
-        }
-    }
-    
-    return B_OK;
 }
 
 void HAIKU_DestroyWindowFramebuffer(_THIS, SDL_Window * window) {
     SDL_BWin *bwin = _ToBeWin(window);
-    
+
     bwin->LockBuffer();
-    
+
     /* Free and clear the window buffer */
     BBitmap *bitmap = bwin->GetBitmap();
     delete bitmap;
     bwin->SetBitmap(NULL);
-    bwin->SetBufferExists(false);
+
+    bwin->RemoveView();
+
     bwin->UnlockBuffer();
 }
-
-
-/*
- * TODO:
- * This was written to test if certain errors were caused by threading issues.
- * The specific issues have since become rare enough that they may have been
- * solved, but I doubt it- they were pretty sporadic before now.
- */
-#ifndef DRAWTHREAD
-static int32 HAIKU_UpdateOnce(SDL_Window *window) {
-    SDL_BWin *bwin = _ToBeWin(window);
-    BScreen bscreen;
-    if(!bscreen.IsValid()) {
-        return -1;
-    }
-
-    if(bwin->ConnectionEnabled() && bwin->Connected()) {
-        bwin->LockBuffer();
-        int32 windowPitch = window->surface->pitch;
-        int32 bufferPitch = bwin->GetRowBytes();
-        uint8 *windowpx;
-        uint8 *bufferpx;
-
-        int32 BPP = bwin->GetBytesPerPx();
-        uint8 *windowBaseAddress = (uint8*)window->surface->pixels;
-        int32 windowSub = bwin->GetFbX() * BPP +
-                          bwin->GetFbY() * windowPitch;
-        clipping_rect *clips = bwin->GetClips();
-        int32 numClips = bwin->GetNumClips();
-        int i, y;
-
-        /* Blit each clipping rectangle */
-        bscreen.WaitForRetrace();
-        for(i = 0; i < numClips; ++i) {
-            /* Get addresses of the start of each clipping rectangle */
-            int32 width = clips[i].right - clips[i].left + 1;
-            int32 height = clips[i].bottom - clips[i].top + 1;
-            bufferpx = bwin->GetBufferPx() + 
-                clips[i].top * bufferPitch + clips[i].left * BPP;
-            windowpx = windowBaseAddress + 
-                clips[i].top * windowPitch + clips[i].left * BPP - windowSub;
-
-            /* Copy each row of pixels from the window buffer into the frame
-               buffer */
-            for(y = 0; y < height; ++y)
-            {
-                memcpy(bufferpx, windowpx, width * BPP);
-                bufferpx += bufferPitch;
-                windowpx += windowPitch;
-            }
-        }
-        bwin->UnlockBuffer();
-    }
-    return 0;
-}
-#endif
 
 #ifdef __cplusplus
 }

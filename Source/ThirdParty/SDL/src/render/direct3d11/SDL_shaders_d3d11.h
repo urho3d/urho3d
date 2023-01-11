@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,9 +22,11 @@
 
 /* D3D11 shader implementation */
 
-typedef enum {
+typedef enum
+{
     SHADER_SOLID,
     SHADER_RGB,
+#if SDL_HAVE_YUV
     SHADER_YUV_JPEG,
     SHADER_YUV_BT601,
     SHADER_YUV_BT709,
@@ -34,6 +36,7 @@ typedef enum {
     SHADER_NV21_JPEG,
     SHADER_NV21_BT601,
     SHADER_NV21_BT709,
+#endif
     NUM_SHADERS
 } D3D11_Shader;
 

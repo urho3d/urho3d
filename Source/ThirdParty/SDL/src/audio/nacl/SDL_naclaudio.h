@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -34,8 +34,7 @@
 #define private _this->hidden
 
 typedef struct SDL_PrivateAudioData {
-  SDL_mutex* mutex;
-  PP_Resource audio;
+    PP_Resource audio;
 } SDL_PrivateAudioData;
 
 #endif /* SDL_naclaudio_h_ */

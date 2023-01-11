@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -32,7 +32,7 @@ SDL_LoadObject(const char *sofile)
 {
     const char *loaderror = "SDL_LoadObject() not implemented";
     SDL_SetError("Failed loading %s: %s", sofile, loaderror);
-    return (NULL);
+    return NULL;
 }
 
 void *
@@ -40,11 +40,10 @@ SDL_LoadFunction(void *handle, const char *name)
 {
     const char *loaderror = "SDL_LoadFunction() not implemented";
     SDL_SetError("Failed loading %s: %s", name, loaderror);
-    return (NULL);
+    return NULL;
 }
 
-void
-SDL_UnloadObject(void *handle)
+void SDL_UnloadObject(void *handle)
 {
     /* no-op. */
 }

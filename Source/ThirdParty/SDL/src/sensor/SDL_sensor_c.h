@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -37,7 +37,7 @@ extern int SDL_SensorInit(void);
 extern void SDL_SensorQuit(void);
 
 /* Internal event queueing functions */
-extern int SDL_PrivateSensorUpdate(SDL_Sensor *sensor, float *data, int num_values);
+extern int SDL_PrivateSensorUpdate(SDL_Sensor *sensor, Uint64 timestamp_us, float *data, int num_values);
 
 #endif /* SDL_sensor_c_h_ */
 

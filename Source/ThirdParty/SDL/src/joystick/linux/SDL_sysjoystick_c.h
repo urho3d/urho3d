@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -32,11 +32,12 @@ struct joystick_hwdata
     int fd;
     struct SDL_joylist_item *item;
     SDL_JoystickGUID guid;
-    char *fname;                /* Used in haptic subsystem */
+    char *fname; /* Used in haptic subsystem */
 
     SDL_bool ff_rumble;
     SDL_bool ff_sine;
     struct ff_effect effect;
+    Uint32 effect_expiration;
 
     /* The current Linux joystick driver maps hats to two axes */
     struct hwdata_hat
@@ -52,18 +53,42 @@ struct joystick_hwdata
     /* Support for the Linux 2.4 unified input interface */
     Uint8 key_map[KEY_MAX];
     Uint8 abs_map[ABS_MAX];
+    SDL_bool has_key[KEY_MAX];
+    SDL_bool has_abs[ABS_MAX];
+
+    /* Support for the classic joystick interface */
+    SDL_bool classic;
+    Uint16 *key_pam;
+    Uint8 *abs_pam;
+
     struct axis_correct
     {
-        int used;
+        SDL_bool use_deadzones;
+
+        /* Deadzone coefficients */
         int coef[3];
+
+        /* Raw coordinate scale */
+        int minimum;
+        int maximum;
+        float scale;
     } abs_correct[ABS_MAX];
 
-    int fresh;
+    SDL_bool fresh;
+    SDL_bool recovering_from_dropped;
 
     /* Steam Controller support */
     SDL_bool m_bSteamController;
+
     /* 4 = (ABS_HAT3X-ABS_HAT0X)/2 (see input-event-codes.h in kernel) */
     int hats_indices[4];
+    SDL_bool has_hat[4];
+    struct hat_axis_correct
+    {
+        SDL_bool use_deadzones;
+        int minimum[2];
+        int maximum[2];
+    } hat_correct[4];
 
     /* Set when gamepad is pending removal due to ENODEV read error */
     SDL_bool gone;

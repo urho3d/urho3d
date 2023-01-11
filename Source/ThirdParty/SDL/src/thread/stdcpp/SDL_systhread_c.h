@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,6 +21,6 @@
 #include "SDL_config.h"
 
 /* For a thread handle, use a void pointer to a std::thread */
-typedef void * SYS_ThreadHandle;
+typedef void *SYS_ThreadHandle;
 
 /* vi: set ts=4 sw=4 expandtab: */

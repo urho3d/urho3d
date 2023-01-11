@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,16 +18,12 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by Yao Wei Tjong for Urho3D
-
 #include "../../SDL_internal.h"
 
 #ifndef SDL_artsaudio_h_
 #define SDL_artsaudio_h_
 
-// Urho3D - bug fix - use the correct include path to avoid adding artsc-specific include directory into header search path
-#include <artsc/artsc.h>
+#include <artsc.h>
 
 #include "../SDL_sysaudio.h"
 

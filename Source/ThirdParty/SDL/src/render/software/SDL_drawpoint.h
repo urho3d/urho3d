@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -24,9 +24,8 @@
 
 #include "../../SDL_internal.h"
 
-
-extern int SDL_DrawPoint(SDL_Surface * dst, int x, int y, Uint32 color);
-extern int SDL_DrawPoints(SDL_Surface * dst, const SDL_Point * points, int count, Uint32 color);
+extern int SDL_DrawPoint(SDL_Surface *dst, int x, int y, Uint32 color);
+extern int SDL_DrawPoints(SDL_Surface *dst, const SDL_Point *points, int count, Uint32 color);
 
 #endif /* SDL_drawpoint_h_ */
 

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +19,6 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Yao Wei Tjong for Urho3D
-
 /**
  *  \file begin_code.h
  *
@@ -36,7 +34,7 @@
 #define _begin_code_h
 
 #ifndef SDL_DEPRECATED
-#  if (__GNUC__ >= 4)  /* technically, this arrived in gcc 3.1, but oh well. */
+#  if defined(__GNUC__) && (__GNUC__ >= 4)  /* technically, this arrived in gcc 3.1, but oh well. */
 #    define SDL_DEPRECATED __attribute__((deprecated))
 #  else
 #    define SDL_DEPRECATED
@@ -52,18 +50,12 @@
 #endif
 
 /* Some compilers use a special export keyword */
-// Urho3D: Only export when it is being requested
-#ifdef SDL_EXPORTS
 #ifndef DECLSPEC
-# if defined(__WIN32__) || defined(__WINRT__)
-#  ifdef __BORLANDC__
-#   ifdef BUILD_SDL
-#    define DECLSPEC
-#   else
-#    define DECLSPEC    __declspec(dllimport)
-#   endif
-#  else
+# if defined(__WIN32__) || defined(__WINRT__) || defined(__CYGWIN__) || defined(__GDK__)
+#  ifdef DLL_EXPORT
 #   define DECLSPEC __declspec(dllexport)
+#  else
+#   define DECLSPEC
 #  endif
 # elif defined(__OS2__)
 #   ifdef BUILD_SDL
@@ -79,13 +71,10 @@
 #  endif
 # endif
 #endif
-#else
-# define DECLSPEC
-#endif
 
 /* By default SDL uses the C calling convention */
 #ifndef SDLCALL
-#if (defined(__WIN32__) || defined(__WINRT__)) && !defined(__GNUC__)
+#if (defined(__WIN32__) || defined(__WINRT__) || defined(__GDK__)) && !defined(__GNUC__)
 #define SDLCALL __cdecl
 #elif defined(__OS2__) || defined(__EMX__)
 #define SDLCALL _System
@@ -118,7 +107,7 @@
 #ifdef __BORLANDC__
 #pragma nopackwarning
 #endif
-#ifdef _M_X64
+#ifdef _WIN64
 /* Use 8-byte alignment on 64-bit architectures, so pointers are aligned */
 #pragma pack(push,8)
 #else
@@ -175,3 +164,24 @@
 #endif
 #endif /* NULL */
 #endif /* ! Mac OS X - breaks precompiled headers */
+
+#ifndef SDL_FALLTHROUGH
+#if (defined(__cplusplus) && __cplusplus >= 201703L) || \
+    (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202000L)
+#define SDL_FALLTHROUGH [[fallthrough]]
+#else
+#if defined(__has_attribute)
+#define _HAS_FALLTHROUGH __has_attribute(__fallthrough__)
+#else
+#define _HAS_FALLTHROUGH 0
+#endif /* __has_attribute */
+#if _HAS_FALLTHROUGH && \
+   ((defined(__GNUC__) && __GNUC__ >= 7) || \
+    (defined(__clang_major__) && __clang_major__ >= 10))
+#define SDL_FALLTHROUGH __attribute__((__fallthrough__))
+#else
+#define SDL_FALLTHROUGH do {} while (0) /* fallthrough */
+#endif /* _HAS_FALLTHROUGH */
+#undef _HAS_FALLTHROUGH
+#endif /* C++17 or C2x */
+#endif /* SDL_FALLTHROUGH not defined */

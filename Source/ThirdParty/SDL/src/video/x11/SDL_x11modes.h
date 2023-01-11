@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -35,50 +35,39 @@ typedef struct
     float hdpi;
     float vdpi;
 
-    int use_xinerama;
-    int use_xrandr;
-    int use_vidmode;
-
-#if SDL_VIDEO_DRIVER_X11_XINERAMA
-    XineramaScreenInfo xinerama_info;
-    int xinerama_screen;
-#endif
+    SDL_bool use_xrandr;
 
 #if SDL_VIDEO_DRIVER_X11_XRANDR
     RROutput xrandr_output;
 #endif
-
-#if SDL_VIDEO_DRIVER_X11_XVIDMODE
-    int vidmode_screen;
-#endif
-
 } SDL_DisplayData;
 
 typedef struct
 {
 #if SDL_VIDEO_DRIVER_X11_XRANDR
     RRMode xrandr_mode;
+#else
+    int unused; /* just so struct isn't empty. */
 #endif
-
-#if SDL_VIDEO_DRIVER_X11_XVIDMODE
-    XF86VidModeModeInfo vm_mode;
-#endif
-
 } SDL_DisplayModeData;
 
 extern int X11_InitModes(_THIS);
-extern void X11_GetDisplayModes(_THIS, SDL_VideoDisplay * display);
-extern int X11_SetDisplayMode(_THIS, SDL_VideoDisplay * display, SDL_DisplayMode * mode);
+extern void X11_GetDisplayModes(_THIS, SDL_VideoDisplay *display);
+extern int X11_SetDisplayMode(_THIS, SDL_VideoDisplay *display, SDL_DisplayMode *mode);
 extern void X11_QuitModes(_THIS);
 
 /* Some utility functions for working with visuals */
-extern int X11_GetVisualInfoFromVisual(Display * display, Visual * visual,
-                                       XVisualInfo * vinfo);
-extern Uint32 X11_GetPixelFormatFromVisualInfo(Display * display,
-                                               XVisualInfo * vinfo);
-extern int X11_GetDisplayBounds(_THIS, SDL_VideoDisplay * sdl_display, SDL_Rect * rect);
-extern int X11_GetDisplayUsableBounds(_THIS, SDL_VideoDisplay * sdl_display, SDL_Rect * rect);
-extern int X11_GetDisplayDPI(_THIS, SDL_VideoDisplay * sdl_display, float * ddpi, float * hdpi, float * vdpi);
+extern int X11_GetVisualInfoFromVisual(Display *display, Visual *visual,
+                                       XVisualInfo *vinfo);
+extern Uint32 X11_GetPixelFormatFromVisualInfo(Display *display,
+                                               XVisualInfo *vinfo);
+extern int X11_GetDisplayBounds(_THIS, SDL_VideoDisplay *sdl_display, SDL_Rect *rect);
+extern int X11_GetDisplayUsableBounds(_THIS, SDL_VideoDisplay *sdl_display, SDL_Rect *rect);
+extern int X11_GetDisplayDPI(_THIS, SDL_VideoDisplay *sdl_display, float *ddpi, float *hdpi, float *vdpi);
+
+#if SDL_VIDEO_DRIVER_X11_XRANDR
+extern void X11_HandleXRandREvent(_THIS, const XEvent *xevent);
+#endif
 
 #endif /* SDL_x11modes_h_ */
 
