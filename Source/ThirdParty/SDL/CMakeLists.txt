@@ -9,6 +9,20 @@ set (SDL_SHARED_ENABLED_BY_DEFAULT FALSE) # Нужна только статич
 set (SDL2_DISABLE_UNINSTALL ON CACHE BOOL "" FORCE)
 set (SDL2_DISABLE_SDL2MAIN ON CACHE BOOL "" FORCE)
 
+# Urho3D: Добавлено. Этот хак позволяет компилировать 32-битную версию движка на 64-битной Ubuntu/Linux Mint.
+# CMAKE_LIBRARY_ARCHITECTURE устанавливается неправильно: https://gitlab.kitware.com/cmake/cmake/-/issues/20565
+# Текст ошибки:
+# [ 17%] Building C object Source/ThirdParty/SDL/CMakeFiles/SDL2-static.dir/src/video/x11/SDL_x11events.c.o
+#In file included from /home/runner/work/urho3d/urho3d/engine_repo/Source/ThirdParty/SDL/src/video/x11/SDL_x11events.c:33:
+#/home/runner/work/urho3d/urho3d/engine_repo/Source/ThirdParty/SDL/src/video/x11/SDL_x11xinput2.h:30:36: error: typedef redefinition with different types ('struct XGenericEventCookie' vs 'struct XGenericEventCookie' (aka 'XGenericEventCookie'))
+#typedef struct XGenericEventCookie XGenericEventCookie;
+#                                   ^
+#/usr/include/X11/Xlib.h:967:3: note: previous definition is here
+#} XGenericEventCookie;
+if (CMAKE_LIBRARY_ARCHITECTURE STREQUAL "x86_64-linux-gnu" AND NOT URHO3D_64BIT)
+    set (CMAKE_LIBRARY_ARCHITECTURE "i386-linux-gnu")
+endif ()
+
 if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
   message(FATAL_ERROR "Prevented in-tree build. Please create a build directory outside of the SDL source code and run \"cmake -S ${CMAKE_SOURCE_DIR} -B .\" from there")
 endif()
