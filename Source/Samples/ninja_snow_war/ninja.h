@@ -40,7 +40,7 @@ public:
     Quaternion GetAim();
     void FixedUpdate(float timeStep) override;
     void DeathUpdate(float timeStep);
-    bool Heal(i32 amount);
+    bool Heal(i32 amount) override;
 };
 
 } // namespace Urho3D
