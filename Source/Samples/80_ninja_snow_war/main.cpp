@@ -8,7 +8,7 @@
     С параметром "-server" игра запустится в режиме сервера.
     Сервер удобно запускать в виде консольного приложения, используя параметры "-server -headless".
     С параметром "-address 127.0.0.1" игра запустится в режиме клиента и
-    подключится к серверу запущенному на этом же компьютере.
+    подключится к серверу, запущенному на этом же компьютере.
     Также игра поддерживает геймпады и сенсорные экраны.
     Параметр "-touch" позволяет сэмулировать тачскрин на ПК.
 */
@@ -52,16 +52,14 @@ class App : public Application
 private:
     SharedPtr<Scene> gameScene;
     SharedPtr<Node> gameCameraNode;
-    SharedPtr<Node> musicNode;
     Camera* gameCamera = nullptr;
+    SharedPtr<Node> musicNode;
+    SoundSource* musicSource = nullptr;
     SharedPtr<Text> scoreText;
     SharedPtr<Text> hiscoreText;
     SharedPtr<Text> messageText;
     SharedPtr<BorderImage> healthBar;
     SharedPtr<BorderImage> sight;
-    SharedPtr<BorderImage> moveButton;
-    BorderImage* fireButton = nullptr;
-    SoundSource* musicSource = nullptr;
 
     Controls playerControls;
     Controls prevPlayerControls;
@@ -667,7 +665,7 @@ public:
         Connection* connection = (Connection*)GetEventSender();
         // If user has empty name, invent one
         if (connection->identity_["UserName"].GetString().Trimmed().Empty())
-            connection->identity_["UserName"] = "user" + Random(1000);
+            connection->identity_["UserName"] = "user" + String(Random(1000));
         // Assign scene to begin replicating it to the client
         connection->SetScene(gameScene);
     }
