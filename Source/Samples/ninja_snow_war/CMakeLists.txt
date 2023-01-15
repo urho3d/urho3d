@@ -2,6 +2,10 @@
 # Copyright (c) 2008-2023 the Urho3D project
 # License: MIT
 
+if (NOT URHO3D_NETWORK OR NOT URHO3D_PHYSICS)
+    return ()
+endif ()
+
 # Define target name
 set (TARGET_NAME ninja_snow_war)
 
