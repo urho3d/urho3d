@@ -71,7 +71,7 @@ private:
     i32 incrementCounter = 0;
     float enemySpawnTimer = 0.f;
     float powerupSpawnTimer = 0.f;
-    id32 clientNodeID = 0;
+    NodeId clientNodeID = 0;
     i32 clientScore = 0;
 
     i32 screenJoystickID = -1;
