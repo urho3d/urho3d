@@ -329,6 +329,7 @@ bool Ninja::Heal(i32 amount)
     // If player, play the "powerup" sound
     if (side == SIDE_PLAYER)
         PlaySound("Sounds/Powerup.wav");
+
     return true;
 }
 

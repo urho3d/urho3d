@@ -42,7 +42,7 @@ public:
 
     void FixedUpdate(float timeStep) override;
     bool Damage(GameObject& origin, i32 amount);
-    bool Heal(i32 amount);
+    virtual bool Heal(i32 amount);
     void PlaySound(const String& soundName);
     void HandleSoundFinished(StringHash eventType, VariantMap& eventData);
     void HandleNodeCollision(StringHash eventType, VariantMap& eventData);

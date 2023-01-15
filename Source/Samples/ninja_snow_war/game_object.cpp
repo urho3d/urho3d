@@ -16,7 +16,7 @@ GameObject::GameObject(Context* context)
     : LogicComponent(context)
     , onGround(false)
     , isSliding(false)
-    , duration(false)
+    , duration(-1) // Бесконечно
     , health(0)
     , maxHealth(0)
     , side(SIDE_NEUTRAL)
