@@ -7,7 +7,7 @@ if (NOT URHO3D_NETWORK OR NOT URHO3D_PHYSICS)
 endif ()
 
 # Define target name
-set (TARGET_NAME ninja_snow_war)
+set (TARGET_NAME 80_ninja_snow_war)
 
 # Define source files
 define_source_files (GROUP RECURSE)
