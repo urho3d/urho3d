@@ -111,7 +111,7 @@ public:
 
         SubscribeToEvent(gameScene, E_SCENEUPDATE, URHO3D_HANDLER(App, HandleUpdate));
 
-        PhysicsWorld* physicsWorld = gameScene->GetComponent< PhysicsWorld>();
+        PhysicsWorld* physicsWorld = gameScene->GetComponent<PhysicsWorld>();
         if (physicsWorld)
             SubscribeToEvent(physicsWorld, E_PHYSICSPRESTEP, URHO3D_HANDLER(App, HandleFixedUpdate));
 
@@ -396,7 +396,7 @@ public:
         else
             spawnPosition = Vector3(Random(SPAWN_AREA_SIZE) - SPAWN_AREA_SIZE * 0.5f, 0.97f, Random(SPAWN_AREA_SIZE) - SPAWN_AREA_SIZE);
 
-        Node* playerNode = SpawnObject(gameScene, spawnPosition, Quaternion(), "Ninja");
+        Node* playerNode = SpawnObject(gameScene, spawnPosition, Quaternion(), "ninja");
         // Set owner connection. Owned nodes are always updated to the owner at full frequency
         playerNode->SetOwner(connection);
         playerNode->SetName("Player");
@@ -864,7 +864,7 @@ public:
                 float xOffset = Random(maxOffset * 2.0f) - maxOffset;
                 float zOffset = Random(maxOffset * 2.0f) - maxOffset;
 
-                SpawnObject(gameScene, Vector3(xOffset, 50.f, zOffset), Quaternion(), "SnowCrate");
+                SpawnObject(gameScene, Vector3(xOffset, 50.f, zOffset), Quaternion(), "snow_crate");
             }
         }
 
@@ -891,7 +891,7 @@ public:
                 dir *= 90;
                 Quaternion rotation(0.f, (float)dir, 0.f);
 
-                Node* enemyNode = SpawnObject(gameScene, rotation * Vector3(offset, 10.f, -120.f), rotation, "Ninja");
+                Node* enemyNode = SpawnObject(gameScene, rotation * Vector3(offset, 10.f, -120.f), rotation, "ninja");
 
                 // Initialize variables
                 Ninja* enemyNinja = enemyNode->GetComponent<Ninja>();

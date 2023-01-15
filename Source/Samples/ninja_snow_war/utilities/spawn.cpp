@@ -6,7 +6,10 @@
 
 #include "../foot_steps.h"
 #include "../game_object.h"
+#include "../light_flash.h"
 #include "../ninja.h"
+#include "../potion.h"
+#include "../snow_crate.h"
 #include "../snowball.h"
 
 namespace Urho3D
@@ -15,20 +18,31 @@ namespace Urho3D
 Node* SpawnObject(Scene* scene, const Vector3& position, const Quaternion& rotation, const String& className)
 {
     ResourceCache* cache = scene->GetSubsystem<ResourceCache>();
-    XMLFile* xml = cache->GetResource<XMLFile>("Objects/" + className + ".xml");
+    XMLFile* xml = cache->GetResource<XMLFile>("native_objects/" + className + ".xml");
     Node* ret =  scene->InstantiateXML(xml->GetRoot(), position, rotation);
 
-    // В AS-версии игры XML-файлы содержат компонеты ScriprInstance, добавляем C++-версии
-    if (className == "Ninja")
+    // В AS-версии игры XML-файлы содержат компонеты ScriprInstance. В папке native_objects они вырезаны,
+    // но нужно еще добавить C++-версии компонентов
+    if (className == "ninja")
     {
-        ret->RemoveComponents<ScriptInstance>();
         ret->CreateComponent<Ninja>();
         ret->CreateComponent<FootSteps>();
     }
-    else if (className == "SnowBall")
+    else if (className == "snowball")
     {
-        ret->RemoveComponent<ScriptInstance>();
         ret->CreateComponent<Snowball>();
+    }
+    else if (className == "light_flash")
+    {
+        ret->CreateComponent<LightFlash>();
+    }
+    else if (className == "potion")
+    {
+        ret->CreateComponent<Potion>();
+    }
+    else if (className == "snow_crate")
+    {
+        ret->CreateComponent<SnowCrate>();
     }
 
     return ret;

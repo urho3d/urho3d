@@ -89,7 +89,7 @@ void GameObject::HandleNodeCollision(StringHash eventType, VariantMap& eventData
         WorldCollision(eventData);
 
     // If the other node is scripted, perform object-to-object collision
-    GameObject* otherObject = otherNode->GetComponent<GameObject>();
+    GameObject* otherObject = otherNode->GetDerivedComponent<GameObject>();
     if (otherObject)
         ObjectCollision(*otherObject, eventData);
 }

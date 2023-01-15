@@ -229,7 +229,7 @@ void Ninja::FixedUpdate(float timeStep)
         animCtrl->Play("Models/NinjaSnowWar/Ninja_Attack1.ani", LAYER_ATTACK, false, 0.0f);
         animCtrl->SetTime("Models/NinjaSnowWar/Ninja_Attack1.ani", 0.0f); // Always play from beginning
 
-        Node* snowball = SpawnObject(node_->GetScene(), node_->GetPosition() + vel * timeStep + q * NINJA_THROW_POSITION, GetAim(), "SnowBall");
+        Node* snowball = SpawnObject(node_->GetScene(), node_->GetPosition() + vel * timeStep + q * NINJA_THROW_POSITION, GetAim(), "snowball");
         RigidBody* snowballBody = snowball->GetComponent<RigidBody>();
         snowballBody->SetLinearVelocity(projectileVel);
         Snowball* snowballObject = snowball->GetComponent<Snowball>();
@@ -312,7 +312,7 @@ void Ninja::DeathUpdate(float timeStep)
 
     if (deathTime > NINJA_CORPSE_DURATION)
     {
-        SpawnObject(node_->GetScene(), node_->GetPosition() + Vector3(0.f, -0.5f, 0.f), Quaternion(), "LightFlash");
+        SpawnObject(node_->GetScene(), node_->GetPosition() + Vector3(0.f, -0.5f, 0.f), Quaternion(), "light_flash");
         SpawnSound(node_->GetScene(), node_->GetPosition() + Vector3(0.f, -0.5f, 0.f), "Sounds/BigExplosion.wav", 2.f);
         node_->Remove();
     }
