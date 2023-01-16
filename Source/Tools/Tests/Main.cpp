@@ -3,6 +3,7 @@
 // License: MIT
 
 #include <iostream>
+#include <clocale>
 
 void Test_Container_Str();
 void Test_Math_BigInt();

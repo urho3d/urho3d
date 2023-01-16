@@ -207,6 +207,7 @@ CONFIGURE_FILE(
 
 # Urho3D: added
 # Urho3D: pulled up from zlib's CMakeLists.txt
+check_include_file(unistd.h Z_HAVE_UNISTD_H)
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/contrib/zlib/zconf.h.cmakein
   ${CMAKE_CURRENT_BINARY_DIR}/contrib/zlib/zconf.h @ONLY

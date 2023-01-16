@@ -993,9 +993,6 @@ set (TARGET_NAME Assimp)
 # Define source files
 set (SOURCE_FILES ${assimp_src})
 
-# Since we only build AssetImporter as a single-arch native tool, there is no point to build Assimp as universal binary library
-list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH YES)
-
 # Setup target
 setup_library ()
 

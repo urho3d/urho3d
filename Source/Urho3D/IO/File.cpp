@@ -50,6 +50,8 @@ static i32 FSeek64(FILE* stream, i64 offset, i32 origin)
 {
 #ifdef _MSC_VER
     return _fseeki64(stream, offset, origin);
+#elif defined(__APPLE__)
+    return fseeko(stream, offset, origin);
 #else
     return fseeko64(stream, offset, origin);
 #endif
@@ -59,6 +61,8 @@ static i64 FTell64(FILE* stream)
 {
 #ifdef _MSC_VER
     return _ftelli64(stream);
+#elif defined(__APPLE__)
+    return ftello(stream);
 #else
     return ftello64(stream);
 #endif
@@ -479,6 +483,8 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
 
 #ifdef _WIN32
     handle_ = _wfopen(GetWideNativePath(fileName).CString(), openMode[mode]);
+#elif defined(__APPLE__)
+    handle_ = fopen(GetNativePath(fileName).CString(), openMode[mode]);
 #else
     handle_ = fopen64(GetNativePath(fileName).CString(), openMode[mode]);
 #endif
@@ -488,6 +494,8 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
     {
 #ifdef _WIN32
         handle_ = _wfopen(GetWideNativePath(fileName).CString(), openMode[mode + 1]);
+#elif defined(__APPLE__)
+        handle_ = fopen(GetNativePath(fileName).CString(), openMode[mode + 1]);
 #else
         handle_ = fopen64(GetNativePath(fileName).CString(), openMode[mode + 1]);
 #endif
