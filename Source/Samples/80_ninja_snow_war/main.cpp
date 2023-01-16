@@ -99,8 +99,8 @@ public:
     {
         // Modify engine startup parameters
         engineParameters_[EP_WINDOW_TITLE] = "Ninja Snow Wars Native";
-        engineParameters_[EP_LOG_NAME] = GetSubsystem<FileSystem>()->GetAppPreferencesDir("urho3d", "logs") + "ninja_snow_wars_native.log";
-        engineParameters_[EP_FULL_SCREEN] = false;
+        engineParameters_[EP_LOG_NAME] = GetSubsystem<FileSystem>()->GetAppPreferencesDir("urho3d", "logs") + "80_ninja_snow_wars_native.log";
+        //engineParameters_[EP_FULL_SCREEN] = false;
     }
 
     void Start() override
