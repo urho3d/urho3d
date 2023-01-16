@@ -5,6 +5,8 @@
 	<attribute name="Rotation" value="1 0 0 0" />
 	<attribute name="Scale" value="1 1 1" />
 	<attribute name="Variables" />
+	<component type="SnowCrate" id="16777219">
+	</component>
 	<component type="NetworkPriority" id="16777220">
 		<attribute name="Base Priority" value="100" />
 		<attribute name="Distance Factor" value="4" />

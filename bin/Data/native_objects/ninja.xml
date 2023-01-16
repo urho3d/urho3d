@@ -5,6 +5,8 @@
 	<attribute name="Rotation" value="1 0 0 0" />
 	<attribute name="Scale" value="1 1 1" />
 	<attribute name="Variables" />
+	<component type="Ninja" id="16777216">
+	</component>
 	<component type="NetworkPriority" id="16777217">
 		<attribute name="Base Priority" value="110" />
 		<attribute name="Distance Factor" value="2" />
@@ -97,6 +99,8 @@
 		</component>
 		<component type="AnimationController" id="7">
 			<attribute name="Animations" />
+		</component>
+		<component type="FootSteps" id="8">
 		</component>
 	</node>
 </node>

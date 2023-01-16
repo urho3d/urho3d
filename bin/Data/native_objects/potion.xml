@@ -5,6 +5,8 @@
 	<attribute name="Rotation" value="1 0 0 0" />
 	<attribute name="Scale" value="1 1 1" />
 	<attribute name="Variables" />
+	<component type="Potion" id="16777217">
+	</component>
 	<component type="NetworkPriority" id="16777218">
 		<attribute name="Base Priority" value="100" />
 		<attribute name="Distance Factor" value="4" />

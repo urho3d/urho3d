@@ -4,13 +4,7 @@
 
 #include "spawn.h"
 
-#include "../foot_steps.h"
 #include "../game_object.h"
-#include "../light_flash.h"
-#include "../ninja.h"
-#include "../potion.h"
-#include "../snow_crate.h"
-#include "../snowball.h"
 
 namespace Urho3D
 {
@@ -19,34 +13,7 @@ Node* SpawnObject(Scene* scene, const Vector3& position, const Quaternion& rotat
 {
     ResourceCache* cache = scene->GetSubsystem<ResourceCache>();
     XMLFile* xml = cache->GetResource<XMLFile>("native_objects/" + className + ".xml");
-    Node* ret =  scene->InstantiateXML(xml->GetRoot(), position, rotation);
-
-    // В AS-версии игры XML-файлы содержат компонеты ScriprInstance. В папке native_objects они вырезаны,
-    // взамен нужно добавить C++-версии компонентов. Эти компоненты создаются только на сервере и не реплицируются на клиенте
-    if (className == "ninja")
-    {
-        ret->CreateComponent<Ninja>(LOCAL);
-        Node* node = ret->GetChild(0); // Дочерняя нода с анимированной моделью
-        node->CreateComponent<FootSteps>(LOCAL);
-    }
-    else if (className == "snowball")
-    {
-        ret->CreateComponent<Snowball>(LOCAL);
-    }
-    else if (className == "light_flash")
-    {
-        ret->CreateComponent<LightFlash>(LOCAL);
-    }
-    else if (className == "potion")
-    {
-        ret->CreateComponent<Potion>(LOCAL);
-    }
-    else if (className == "snow_crate")
-    {
-        ret->CreateComponent<SnowCrate>(LOCAL);
-    }
-
-    return ret;
+    return scene->InstantiateXML(xml->GetRoot(), position, rotation);
 }
 
 Node* SpawnParticleEffect(Scene* scene, const Vector3& position, const String& effectName, float duration, CreateMode mode)
