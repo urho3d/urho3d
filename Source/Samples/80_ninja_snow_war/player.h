@@ -14,7 +14,7 @@ struct Player
     i32 score;
     String name;
     NodeId nodeID;
-    SharedPtr<Connection> connection;
+    WeakPtr<Connection> connection;
     Controls lastControls;
 
     Player();

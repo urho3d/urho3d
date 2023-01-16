@@ -22,28 +22,28 @@ Node* SpawnObject(Scene* scene, const Vector3& position, const Quaternion& rotat
     Node* ret =  scene->InstantiateXML(xml->GetRoot(), position, rotation);
 
     // В AS-версии игры XML-файлы содержат компонеты ScriprInstance. В папке native_objects они вырезаны,
-    // взамен нужно добавить C++-версии компонентов
+    // взамен нужно добавить C++-версии компонентов. Эти компоненты создаются только на сервере и не реплицируются на клиенте
     if (className == "ninja")
     {
-        ret->CreateComponent<Ninja>();
+        ret->CreateComponent<Ninja>(LOCAL);
         Node* node = ret->GetChild(0); // Дочерняя нода с анимированной моделью
-        node->CreateComponent<FootSteps>();
+        node->CreateComponent<FootSteps>(LOCAL);
     }
     else if (className == "snowball")
     {
-        ret->CreateComponent<Snowball>();
+        ret->CreateComponent<Snowball>(LOCAL);
     }
     else if (className == "light_flash")
     {
-        ret->CreateComponent<LightFlash>();
+        ret->CreateComponent<LightFlash>(LOCAL);
     }
     else if (className == "potion")
     {
-        ret->CreateComponent<Potion>();
+        ret->CreateComponent<Potion>(LOCAL);
     }
     else if (className == "snow_crate")
     {
-        ret->CreateComponent<SnowCrate>();
+        ret->CreateComponent<SnowCrate>(LOCAL);
     }
 
     return ret;
