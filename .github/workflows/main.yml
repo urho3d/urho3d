@@ -237,31 +237,17 @@ jobs:
         with: { fetch-depth: 0 }
       - name: Install dependencies
         id: install_dependencies
-        shell: bash {0} # Allow catching errors
+        shell: bash
         run: |
-          # Server may reject connection, so try several times
-          for (( i = 0; i < 4; ++i ))
-          do
-            choco install --no-progress doxygen.install
-            if (( $? == 0 )) # Exit code of the previous command
-            then
-              break
-            else
-              echo "========== One more try =========="
-              sleep 20
-            fi
-          done
-          for (( i = 0; i < 4; ++i ))
-          do
-            choco install --no-progress graphviz.portable
-            if (( $? == 0 )) # Exit code of the previous command
-            then
-              break
-            else
-              echo "========== One more try =========="
-              sleep 20
-            fi
-          done
+          choco install --no-progress graphviz.portable
+
+          # choco качает Doxygen через раз. Качаем собственную сборку
+          mkdir $GITHUB_WORKSPACE/../programs
+          cd $GITHUB_WORKSPACE/../programs
+          curl -Lso tmp.zip https://github.com/dviglo-tools/doxygen-builder/raw/main/doxygen_win64.zip && unzip tmp.zip && rm tmp.zip
+          echo "$GITHUB_WORKSPACE/../programs" >> $GITHUB_PATH
+          echo "Собственная сборка Doxygen скачана в $GITHUB_WORKSPACE/../programs"
+
           # Use MSYS2 instead obsolete MinGW
           # https://github.com/urho3d/Urho3D/issues/2887
           echo "c:\msys64\mingw32\bin" >> $GITHUB_PATH
@@ -275,6 +261,7 @@ jobs:
           # If there are changes in repository, then generated bindings are different from existing ones
           cd D:/a/Urho3D/Urho3D
           if [[ `git status --porcelain` ]]; then
+            git status --porcelain
             echo "!!!!! ERROR: Generated bindings are different from existing ones"
             exit -1 # Exit from the script with error code
           fi
@@ -469,6 +456,7 @@ jobs:
         # If there are changes in repository, then generated bindings are different from existing ones
         cd engine_repo
         if [[ `git status --porcelain` ]]; then
+          git status --porcelain
           echo "!!!!! ERROR: Generated bindings are different from existing ones"
           exit -1 # Exit from the script with error code
         fi
