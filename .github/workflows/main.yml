@@ -426,7 +426,7 @@ jobs:
         # Ubuntu repository contains obsolete Doxygen 1.9.1. Download own build
         mkdir $HOME/programs
         cd $HOME/programs
-        wget -q -O tmp.zip https://github.com/rurho3d/doxygen-builder/raw/main/doxygen_linux64.zip && unzip tmp.zip && rm tmp.zip
+        wget -q -O tmp.zip https://github.com/dviglo-tools/doxygen-builder/raw/main/doxygen_linux64.zip && unzip tmp.zip && rm tmp.zip
         echo "$HOME/programs" >> $GITHUB_PATH
 
     - name: Скачиваем кэш
