@@ -52,7 +52,7 @@ Urho3D распространяется под лицензией MIT.
 * [Обучающие материалы](https://github.com/urho3d-learn)
 * [Инструменты и утилиты](https://github.com/urho3d-tools)
 * [Примеры, скомпилированные для веб](https://urho3d-web-samples.github.io)
-* [Архив форума](https://urho3d-forum-archive.github.io)
+* [Архив старого форума](https://urho3d-forum-archive.github.io)
 
 ## Авторы проекта
 
