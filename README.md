@@ -9,7 +9,16 @@
 
 Licensed under the MIT license, see [LICENSE](licenses/urho3d/LICENSE) for details.<br>
 Licenses for third-party libraries: [licenses](licenses).<br>
-Credits: [licenses/urho3d/credits.md](licenses/urho3d/credits.md)
+Credits: [licenses/urho3d/credits.md](licenses/urho3d/credits.md).
+
+## Important Links
+
+* [The last english version (1.9.0)](https://github.com/urho3d/urho3d/releases/tag/1.9.0)
+* [Documentation for 1.9.0 version](https://urho3d-doxygen.github.io/1_9_0_tutors/index.html)
+* [Documentation for latest version](https://urho3d-doxygen.github.io/latest/index.html)
+* [Wiki archive](https://github.com/urho3d-community/wiki-archive/wiki)
+* [Forum archive](https://urho3d-forum-archive.github.io)
+* [Web samples](https://urho3d-web-samples.github.io)
 
 ## Project Authors
 
@@ -42,6 +51,7 @@ Urho3D распространяется под лицензией MIT.
 * [Обучающие материалы](https://github.com/urho3d-learn)
 * [Инструменты и утилиты](https://github.com/urho3d-tools)
 * [Примеры, скомпилированные для веб](https://urho3d-web-samples.github.io)
+* [Архив форума](https://urho3d-forum-archive.github.io)
 
 ## Авторы проекта
 
