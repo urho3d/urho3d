@@ -22,6 +22,7 @@ Credits: [licenses/urho3d/credits.md](licenses/urho3d/credits.md).
 * [Forum 🇬🇧](https://github.com/urho3d-community/discussions/discussions/categories/for-english-speakers)
 * [Old forum archive](https://urho3d-forum-archive.github.io)
 * [Web samples](https://urho3d-web-samples.github.io)
+* [Tools](https://github.com/urho3d-tools)
 
 ## Project Authors
 
