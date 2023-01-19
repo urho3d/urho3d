@@ -1,5 +1,7 @@
 # Urho3D
 
+![](https://raw.githubusercontent.com/urho3d-learn/flappy-urho/main/screen.png)
+
 [![CI/CD](https://github.com/urho3d/Urho3D/workflows/CI/CD/badge.svg)](https://github.com/urho3d/Urho3D/actions?query=workflow%3ACI%2FCD)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/4954/badge.svg)](https://scan.coverity.com/projects/urho3d-urho3d)
 
