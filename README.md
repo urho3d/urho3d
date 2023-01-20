@@ -1,3 +1,7 @@
+***Активная работа над движком без сохранения обратной совместимости ведётся в форке [Dviglo](https://github.com/dviglo/dviglo).***
+
+---
+
 # Urho3D
 
 ![](https://raw.githubusercontent.com/urho3d-learn/flappy-urho/main/screen.png)
