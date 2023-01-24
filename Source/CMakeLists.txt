@@ -52,10 +52,6 @@ endif ()
 add_subdirectory (ThirdParty)
 add_subdirectory (Urho3D)
 
-if (URHO3D_CLANG_TOOLS)
-    add_subdirectory (Clang-Tools)
-endif ()
-
 # In order to get clean module segregation, always exclude player/samples from AAR
 if (NOT ANDROID)
     add_subdirectory (Tools)
