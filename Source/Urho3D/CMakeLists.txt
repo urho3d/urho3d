@@ -35,19 +35,6 @@ elseif (MINGW)
     endif ()
 endif ()
 
-# Generate JSON compilation database format specification
-if (URHO3D_CLANG_TOOLS OR URHO3D_BINDINGS)
-    set (CMAKE_EXPORT_COMPILE_COMMANDS 1)
-    # Clang assumes all their tools to be installed in a relative path to their libs but this is not the case for our own Clang-tools
-    # Clang has a hard-coded way to search for their headers (see http://clang.llvm.org/docs/LibTooling.html#builtin-includes)
-    # In order for our Clang-tools to work correctly we need to make this Clang's assumption to be true
-    execute_process (COMMAND ${LLVM_CONFIG} --version OUTPUT_VARIABLE LLVM_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
-    string (REGEX REPLACE "([.0123456789]+).*" \\1 LLVM_VERSION "${LLVM_VERSION}")      # Stringify against empty output variable
-    execute_process (COMMAND ${LLVM_CONFIG} --libdir OUTPUT_VARIABLE LLVM_LIBDIR OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
-    execute_process (COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bin/tool/lib/clang/${LLVM_VERSION})
-    create_symlink (${LLVM_LIBDIR}/clang/${LLVM_VERSION}/include ${CMAKE_BINARY_DIR}/bin/tool/lib/clang/${LLVM_VERSION}/include FALLBACK_TO_COPY)
-endif ()
-
 # Save keep the preprocessor macros (for using the Urho3D library) for later use in generating Urho3D.pc file
 get_directory_property (URHO3D_COMPILE_DEFINITIONS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMPILE_DEFINITIONS)
 
@@ -237,37 +224,6 @@ add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/librevision.h
     COMMENT "")     # Suppress the comment as the header file may or may not be re-generated
 source_group ("Source Files\\Generated" FILES ${CMAKE_CURRENT_BINARY_DIR}/librevision.h)
 
-# Use the AutoBinder tool to generate source files for binding script subsystems
-if (URHO3D_BINDINGS)
-    # Build the Clang-tools as external project (even when we are not cross-compiling because it needs C++11 standard on) for auto-binding generation
-    include (ExternalProject)
-    if (IOS OR TVOS)
-        # When cross-compiling for iOS/tvOS the host environment has been altered by xcodebuild for the said platform, the following fix is required to reset the host environment before spawning another process to configure/generate project file for external project
-        set (ALTERNATE_COMMAND CMAKE_COMMAND /usr/bin/env -i PATH=$ENV{PATH} CC=${SAVED_CC} CXX=${SAVED_CXX} CI=$ENV{CI} ${CMAKE_COMMAND})
-    else ()
-        set (ALTERNATE_COMMAND CMAKE_COMMAND ${CMAKE_COMMAND} -E env CC=${SAVED_CC} CXX=${SAVED_CXX} CI=$ENV{CI} ${CMAKE_COMMAND})
-    endif ()
-    ExternalProject_Add (AutoBinder
-        SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/Clang-Tools
-        CMAKE_ARGS -D URHO3D_CLANG_TOOLS=AutoBinder -D URHO3D_DEPLOYMENT_TARGET=generic -D DEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool/clang -D DEST_INCLUDE_DIR=${DEST_INCLUDE_DIR} -D BAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -D CMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
-        ${ALTERNATE_COMMAND})
-    add_make_clean_files (${CMAKE_BINARY_DIR}/bin/tool/clang/AutoBinder)
-    file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/generated)
-    foreach (SCRIPT AngelScript LuaScript JavaScript)
-        string (TOUPPER URHO3D_${SCRIPT} OPT)
-        if (${OPT})
-            list (APPEND SCRIPT_SUBSYSTEMS -s ${SCRIPT})
-            list (APPEND GEN_CPP_FILES ${CMAKE_CURRENT_BINARY_DIR}/generated/${SCRIPT}API.cpp)
-        endif ()
-    endforeach ()
-    string (REGEX REPLACE "[^;]+API\\.cpp" "" ANNOTATED_SOURCES "${CPP_FILES}")    # Stringify to preserve the semicolons
-    add_custom_command (OUTPUT ${GEN_CPP_FILES}
-        COMMAND ${CMAKE_BINARY_DIR}/bin/tool/clang/AutoBinder -p ${CMAKE_BINARY_DIR} -t ${CMAKE_BINARY_DIR}/bin/tool/clang/Templates -o ${CMAKE_CURRENT_BINARY_DIR}/generated ${SCRIPT_SUBSYSTEMS} ${ANNOTATED_SOURCES}
-        COMMAND ${CMAKE_COMMAND} -E touch ${GEN_CPP_FILES}   # TODO: fake the output - WIP
-        DEPENDS AutoBinder ${H_FILES}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMENT "Generating source files for binding script subsystems")
-endif ()
 if (URHO3D_LUA)
     # The host tool must be built natively
     if (CMAKE_CROSSCOMPILING OR URHO3D_LUAJIT)
@@ -365,10 +321,6 @@ endif()
 if (MSVC)
     set (APPENDIX "\n#pragma warning(disable: 4251)\n#pragma warning(disable: 4275)\n\n#if _MSC_VER < 1900\n#define strtoll _strtoi64\n#define strtoull _strtoui64\n#endif\n")
 endif ()
-if (URHO3D_CLANG_TOOLS)
-    set (ANNOTATE_NONSCRIPTABLE "__attribute__((annotate(\"nonscriptable\")))")
-endif ()
-set (APPENDIX "${APPENDIX}\n#define NONSCRIPTABLE ${ANNOTATE_NONSCRIPTABLE}\n\n")
 foreach (DEFINE URHO3D_STATIC_DEFINE URHO3D_OPENGL URHO3D_D3D11 URHO3D_SSE URHO3D_DATABASE_ODBC URHO3D_DATABASE_SQLITE URHO3D_LUAJIT URHO3D_TESTING CLANG_PRE_STANDARD)
     if (${DEFINE})
         set (APPENDIX "${APPENDIX}#define ${DEFINE}\n")
