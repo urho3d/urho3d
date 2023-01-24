@@ -1,13 +1,15 @@
 # Copyright (c) 2008-2023 the Urho3D project
 # License: MIT
 
-# Find Broadcom VideoCore firmware installation
+# Raspberry Pi использует графический процессор Broadcom VideoCore.
 #
-#  VIDEOCORE_FOUND
-#  VIDEOCORE_INCLUDE_DIRS
-#  VIDEOCORE_LIBRARY_DIRS
-#  VIDEOCORE_LIBRARIES
+# Этот модуль ищет библиотеку bcm_host и задаёт значения следующих переменных:
+#  VIDEOCORE_FOUND        - найдена ли библиотека
+#  VIDEOCORE_INCLUDE_DIRS - папки с h-файлами
+#  VIDEOCORE_LIBRARY_DIRS - папки с библиотеками
+#  VIDEOCORE_LIBRARIES    - библиотеки
 #
+# Использование модуля: find_package (VideoCore ...
 
 # Only need to cater for raspbian as they are not in CMAKE_SYSTEM_PATH
 set (VIDEOCORE_INC_SEARCH_PATH /opt/vc/include)

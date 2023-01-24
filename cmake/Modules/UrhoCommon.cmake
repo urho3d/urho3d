@@ -1,6 +1,9 @@
 # Copyright (c) 2008-2023 the Urho3D project
 # License: MIT
 
+# Этот модуль содержит вещи, которые используются и самим движком,
+# и играми на движке
+
 # Save the initial values of CC and CXX environment variables
 if (NOT CMAKE_CROSSCOMPILING)
     set (SAVED_CC $ENV{CC} CACHE INTERNAL "Initial value for CC")
