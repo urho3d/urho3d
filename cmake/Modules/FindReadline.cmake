@@ -1,12 +1,16 @@
 # Copyright (c) 2008-2023 the Urho3D project
 # License: MIT
 
-# Find Readline development library
+# https://ru.wikipedia.org/wiki/GNU_Readline
+# Библиотека для удобного ввода команд в консольных приложениях.
+# Используется в командной оболочке SQLite.
 #
-#  READLINE_FOUND
-#  READLINE_INCLUDE_DIRS
-#  READLINE_LIBRARIES
+# Этот модуль ищет библиотеку Readline и устанавливает следующие переменные:
+#  READLINE_FOUND        - найдена ли библиотека
+#  READLINE_INCLUDE_DIRS - папки с h-файлами
+#  READLINE_LIBRARIES    - библиотеки
 #
+# Использование модуля: find_package (Readline)
 
 if (APPLE AND NOT READLINE_INCLUDE_DIRS AND NOT READLINE_LIBRARIES)
     # Assuming GNU Readline development library is installed using Homebrew (keg-only - prebuilt universal binary)
