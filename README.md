@@ -2,6 +2,10 @@
 
 ---
 
+***The founder of Urho3D (Lasse Öörni) is currently working on [Turso3D](https://github.com/cadaver/turso3d).***
+
+---
+
 # Urho3D
 
 ![](https://raw.githubusercontent.com/urho3d-learn/flappy-urho/main/screen.png)
