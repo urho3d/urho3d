@@ -1,4 +1,0 @@
-<material>
-    <technique name="Techniques/BasicVColUnlitAlpha.xml" />
-    <texture unit="diffuse" name="Textures/Editor/IconPointLight.png" />
-</material>
